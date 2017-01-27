@@ -31,7 +31,7 @@ class Application(tornado.web.Application):
             (r"/Alerts", AlertsHandler, {'mainT':mainT}),
             (r"/alertinfo", CreateEditAlertsHandler, {'mainT':mainT}),
             (r"/alertinfo/([0-9])", CreateEditAlertsHandler, {'mainT':mainT}),
-            (r"/Feed/([a-z])", FeedHandler, {'mainT':mainT}),
+            (r"/Feed/([0-9])", FeedHandler, {'mainT':mainT}),
             (r"/Feed", FeedHandler, {'mainT':mainT}),
             (r'/(.*)', tornado.web.StaticFileHandler, {'path': settings['static_path']}),
         ]
@@ -43,8 +43,6 @@ class BaseHandler(tornado.web.RequestHandler):
 
 class MainHandler(BaseHandler, TemplateRendering):
     def get(self):
-        print "test"
-        print self.mainT
         template = 'index.html'
         variables = {
             'title' : "Watchtower"
@@ -62,9 +60,10 @@ class LoginHandler(BaseHandler, TemplateRendering):
         self.write(content)
 
     def post(self):
-        userinfo = {}
-        userinfo ['username'] = self.get_argument("username")
-        userinfo ['password'] = self.get_argument("password")
+        userinfo = {
+            'username': self.get_argument("username")
+            'password': self.get_argument("password")
+        }
         if logic.login(userinfo):
             self.redirect("/Alerts")
         else:
