@@ -65,6 +65,7 @@ def addAlert(alert, mainT):
 def updateAlert(alert, mainT):
     cur.execute("update alerts set keywords = %s ,lang = %s where id = %s;", [alert['keywords'], alert['lang'], alert['id']])
     conn.commit
+    db[str(alert['id'])].drop()
     alert = getAlertAllOfThemList(alert['id'])
     mainT.killThread(alert)
     mainT.addThread(alert)
