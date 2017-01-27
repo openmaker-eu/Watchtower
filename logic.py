@@ -82,8 +82,9 @@ def getTweets(alertid):
     alert_keywords = getAlertAllOfThemList(alertid)['keywords']
     for tweet in tweets:
         for keyword in alert_keywords:
+            marked = "<mark>" + keyword + "</mark>"
             keyword = re.compile(re.escape(keyword), re.IGNORECASE)
-            tweet['text'] = keyword.sub("<mark>" + keyword + "</mark>", tweet['text'])
+            tweet['text'] = keyword.sub(marked, tweet['text'])
     return tweets
 
 # Runs we scroll the page
@@ -93,6 +94,7 @@ def getSkipTweets(alertid, lastTweetId):
     alert_keywords = getAlertAllOfThemList(alertid)['keywords']
     for tweet in tweets:
         for keyword in alert_keywords:
+            marked = "<mark>" + keyword + "</mark>"
             keyword = re.compile(re.escape(keyword), re.IGNORECASE)
-            tweet['text'] = keyword.sub("<mark>" + keyword + "</mark>", tweet['text'])
+            tweet['text'] = keyword.sub(marked, tweet['text'])
     return tweets
