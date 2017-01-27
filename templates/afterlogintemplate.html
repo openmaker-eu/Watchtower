@@ -135,8 +135,8 @@
                 });
             });
           }
-        });
-      });*/
+        });*/
+      });
     </script>
     <script>
         $(document).ready(function() {
@@ -149,6 +149,7 @@
                 'alertid': aid
               }
             }).success(function(html) {
+              $('#feedcontainer').empty();
               $('#feedcontainer').append(html);
             });
           });
