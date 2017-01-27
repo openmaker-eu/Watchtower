@@ -1,0 +1,35 @@
+<div class="container" style="float: center">
+    <form id="bootstrapTagsInputForm" method = "post" onkeypress="return event.keyCode != 13;">
+        <legend><h1>Alert Information</h1></legend>
+        <!-- Text input-->
+        <div class="form-group">
+            <label for="Alert Name"><big>Alert Name</label>
+            <input name="alertname" class="form-control" id="Alert Name" type="text" {% if alert['name'] != "" %}value="{{alert['name']}}" disabled{% endif %}>
+        </div>
+        <!-- son eklenen -->
+        <div class="form-group">
+            <label >Keywords</label>
+            <input type="text" name="keywords" class="form-control" value="{{alert['keywords']}}" data-role="tagsinput" style="font-size: 100px"/>
+
+        </div>
+        <!-- Select Multiple -->
+        <div class="form-group">
+            <label for="Languages">Languages</label>
+              <select name="languages" size="7" class="form-control" id="Languages" multiple="multiple">
+                        <option id="opt" value="en" {% if "en" in alert['lang'] %}selected="active"{% endif %}>English</option>
+                        <option id="opt" value="fr" {% if "fr" in alert['lang'] %}selected="active"{% endif %}>French</option>
+                        <option id="opt" value="de" {% if "de" in alert['lang'] %}selected="active"{% endif %}>German</option>
+                        <option id="opt" value="es" {% if "es" in alert['lang'] %}selected="active"{% endif %}>Spanish</option>
+                        <option id="opt" value="it" {% if "it" in alert['lang'] %}selected="active"{% endif %}>Italian</option>
+                        <option id="opt" value="tr" {% if "tr" in alert['lang'] %}selected="active"{% endif %}>Turkish</option>
+                        <option id="opt" value="ru" {% if "ru" in alert['lang'] %}selected="active"{% endif %}>Russian</option>
+                    </select>
+
+        </div>
+        <!-- Button -->
+        <div class="form-group">
+            <label for="Submit"></label>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+    </form>
+</div>

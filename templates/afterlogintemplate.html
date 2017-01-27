@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en" wp-site wp-site-is-master-page>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>{{title}}</title>
+    <!-- Bootstrap core CSS -->
+    <link href="/css/bootstrap.css" rel="stylesheet">
+    <!-- Custom styles for this template -->
+    <link href="/css/starter-template.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <!-- for alert template -->
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,300,600,700">
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic,700italic">
+    <!-- for alertForm -->
+    <link rel="stylesheet" href="/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="/css/bootstrap-tagsinput.css">
+    <style type="text/css">
+        #opt {
+            font-size: 18px;
+        }
+
+        select {
+            overflow: auto;
+        }
+    </style>
+
+</head>
+
+<body>
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                <a class="navbar-brand" href="#">Watchtower<br></a>
+            </div>
+            <div id="navbar" class="collapse navbar-collapse">
+                <ul class="nav navbar-nav">
+                    <li {% if type=="alertlist" or type=="editAlert" or type=="createAlert" %} class="active" {% endif %}>
+                        <a href="/Alerts">Alerts</a>
+                    </li>
+                    <li {% if type=="feed" %} class="active" {% endif %}>
+                        <a href="/Feed">Feed</a>
+                    </li>
+                    <li {% if type=="influencer" %} class="active" {% endif %}>
+                        <a href="#">Influencers</a>
+                    </li>
+                    <li>
+                        <a href="/">Sign Out</a>
+                    </li>
+                </ul>
+            </div>
+            <!--/.nav-collapse -->
+        </div>
+    </nav>
+    {% if type == "alertlist" %}
+      {% include 'alerts.html' %}
+    {% endif %}
+
+    {% if type == "editAlert" %}
+      {% include 'alertForm.html' %}
+    {% endif %}
+
+    {% if type == "createAlert" %}
+      {% include 'alertForm.html' %}
+    {% endif %}
+
+    {% if type == "feed" %}
+      {% include 'feed.html'%}
+    {% endif %}
+
+    <!-- /.container -->
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="/js/ie10-viewport-bug-workaround.js"></script>
+    <!-- for edit form -->
+    <script>
+        jQuery(".tm-input").tagsManager();
+    </script>
+    <script src="/js/typeahead.bundle.min.js"></script>
+    <script src="/js/angular.min.js"></script>
+    <script src="/js/rainbow.min.js"></script>
+    <script src="/js/bootstrap-tagsinput.min.js"></script>
+    <script src="/js/bootstrap-tagsinput-angular.min.js"></script>
+    <script src="/js/generic.js"></script>
+    <!-- for feed -->
+    <script>
+        $(".dropdown-menu").on('click', 'li a', function() {
+            var selText = $(this).children("h4").html();
+            $(this).parent('li').siblings().removeClass('active');
+            $(this).parents('.btn-group').find('.selection').html(selText);
+            $(this).parents('li').addClass("active");
+        });
+    </script>
+    <script>
+        $(document).ready(function() {
+          var win = $(window);
+          win.scroll(function() {
+            if ($(document).height() - win.height() == win.scrollTop()) {
+              var tid = $("ol > li").last().attr("id");
+              var aid = $("ol").attr("alertid");
+              $.ajax({
+                url: '/Feed/scroll',
+                method: "POST",
+                data: {
+                  'lastTweetId': tid
+                  'alertid': aid
+                }).success(function(html) {
+                  $('#tweets').append(html);
+                });
+            });
+          }
+        });
+      });
+    </script>
+    <script>
+        $(document).ready(function() {
+          $('a.alertids').click(function() {
+            var aid = $(this).attr("data-id");
+            $.ajax({
+              url: '/Feed',
+              method: 'POST',
+              data: {
+                'alertid': aid
+              }
+            }).success(function(html) {
+              $('#feedcontainer').append(html);
+            });
+          });
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,29 @@
+<div class="container" style="padding:10px">
+  <a href="/alertinfo">Create a new alert</a>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Alert Name</th>
+          <th>Edit</th>
+          <th>Remove</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for alert in alerts %}
+        <tr>
+          <td>{{ alert['name'] }}</td>
+          <td>
+            <a href="/alertinfo/{{alert['id']}}">
+              <button type="button" name="edit" class="btn btn-default">Edit</button>
+            </a>
+          </td>
+          <td>
+            <form class="form-vertical" method="post" onkeypress="return event.keyCode != 13;">
+              <button type="submit" name="remove" value="{{alert['id']}}" class="btn btn-default" style="float: left">Remove</button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+</div>

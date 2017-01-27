@@ -1,0 +1,6 @@
+{% for tweet in tweets %}
+  <li class="list-group-item" id="{{tweet['tid']}}">
+      <h4><small>@{{tweet['user']['screen_name']}}</small></br>{{tweet['user']['name']}}</h4>
+      <p>{{tweet['text']}}</br>{{tweet['created_at']}}</p>
+  </li>
+{% endfor %}
