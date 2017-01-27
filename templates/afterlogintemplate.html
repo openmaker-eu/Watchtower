@@ -115,10 +115,20 @@
           $(window).scroll(function() {
               if($(window).scrollTop() + $(window).height() == $(document).height()) {
                 alert("bottom!");
-                // getData();
+                var tid = $("ol > li").last().attr("id");
+                var aid = $("ol").attr("alertid");
+                $.ajax({
+                  url: '/Feed/scroll',
+                  method: 'POST',
+                  data: {
+                    'lastTweetId': tid
+                    'alertid': aid
+                  }}).success(function(html) {
+                    $('#tweets').append(html);
+                  });
               }
           });
-
+        });
           /*var win = $(window);
           win.scroll(function() {
             if ($(document).height() - win.height() === win.scrollTop()) {
@@ -136,7 +146,7 @@
             });
           }
         });*/
-      });
+
     </script>
     <script>
         $(document).ready(function() {
