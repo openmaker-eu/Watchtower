@@ -8,7 +8,7 @@ import dbM
 import json
 
 def get_next_tweets_sequence(zimdB):
-    cursor = zimdB.counters.find_and_modify(
+    cursor = self.db_listener["counters"].find_and_modify(
             query= { '_id': "tweetDBId" },
             update= { '$inc': { 'seq': 1 } },
             new= True,
@@ -38,7 +38,7 @@ class StdOutListener(StreamListener):
         if self.terminate == False:
             #print data
             tweet = json.loads(data)
-            tweet['tweetDBId'] = get_next_tweets_sequence(self.dbName)
+            tweet['tweetDBId'] = get_next_tweets_sequence(self.db_listener)
             self.db_listener[str(self.campaignId)].insert_one(tweet) #this creates tweets collection, if there is one then write on it
             return True
         else:
