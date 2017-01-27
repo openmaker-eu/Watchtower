@@ -115,7 +115,7 @@
           $(window).scroll(function() {
               if($(window).scrollTop() + $(window).height() == $(document).height()) {
                 alert("bottom!");
-                var tid = $("ol > li").last().attr("id");
+                var tid = $("ol > li").last().attr("tweetid");
                 var aid = $("ol").attr("alertid");
                 $.ajax({
                   url: '/Feed/scroll',
