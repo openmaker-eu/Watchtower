@@ -114,7 +114,6 @@
 
           $(window).scroll(function() {
               if($(window).scrollTop() + $(window).height() == $(document).height()) {
-                alert("bottom!");
                 var tid = $("ol > li").last().attr("tweetid");
                 var aid = $("ol").attr("alertid");
                 $.ajax({
@@ -125,7 +124,6 @@
                     'alertid': aid
                   }
                 }).success(function(html) {
-                    alert("bottom!");
                     $('#tweets').append(html);
                   });
               }
