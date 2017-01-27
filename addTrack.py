@@ -23,6 +23,7 @@ class AddTrack():
     def addThread(self, alert):
         self.threadDic[str(alert['id'])] = StreamCreator(alert)
         self.threadDic[str(alert['id'])].start()
+        print threadDic
 
     def killThread(self, alert):
         self.threadDic[str(alert['id'])].terminate()
