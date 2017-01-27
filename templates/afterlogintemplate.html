@@ -111,6 +111,14 @@
     </script>
     <script>
         $(document).ready(function() {
+
+          $(window).scroll(function() {
+              if($(window).scrollTop() + $(window).height() == $(document).height()) {
+                alert("bottom!");
+                // getData();
+              }
+          });
+
           var win = $(window);
           win.scroll(function() {
             if ($(document).height() - win.height() == win.scrollTop()) {
