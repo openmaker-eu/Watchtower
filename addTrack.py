@@ -23,11 +23,9 @@ class AddTrack():
     def addThread(self, alert):
         self.threadDic[str(alert['id'])] = StreamCreator(alert)
         self.threadDic[str(alert['id'])].start()
-        print self.threadDic
 
     def killThread(self, alert):
         self.threadDic[str(alert['id'])].terminate()
-        print "yesss"
 
     def __getitem__(self):
         return (self.threadDic)
