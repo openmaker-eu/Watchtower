@@ -81,7 +81,7 @@ def deleteAlert(alertid, mainT):
     conn.commit()
 
 def getTweets(alertid):
-    tweets = db[str(alertid)].find({}, {"text":1, "user":1, 'created_at': 1, "_id":0}).sort([('tweetDBId', pymongo.DESCENDING)]).limit(25)
+    tweets = db[str(alertid)].find({}, {'tweetDBId': 1, "text":1, "user":1, 'created_at': 1, "_id":0}).sort([('tweetDBId', pymongo.DESCENDING)]).limit(25)
     tweets = list(tweets)
     alert_keywords = getAlertAllOfThemList(alertid)['keywords']
     for tweet in tweets:
@@ -93,7 +93,7 @@ def getTweets(alertid):
 
 # Runs we scroll the page
 def getSkipTweets(alertid, lastTweetId):
-    tweets = db[str(alertid)].find({'tweetDBId': {'$gt': lastTweetId}}, {"text":1, "user":1, 'created_at': 1, "_id":0}).sort([('tweetDBId', pymongo.DESCENDING)]).limit(25)
+    tweets = db[str(alertid)].find({'tweetDBId': {'$gt': lastTweetId}}, {'tweetDBId': 1, "text":1, "user":1, 'created_at': 1, "_id":0}).sort([('tweetDBId', pymongo.DESCENDING)]).limit(25)
     tweets = list(tweets)
     alert_keywords = getAlertAllOfThemList(alertid)['keywords']
     for tweet in tweets:
