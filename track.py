@@ -8,7 +8,7 @@ import dbM
 import json
 
 def get_next_tweets_sequence(zimdB):
-    cursor = self.db_listener["counters"].find_and_modify(
+    cursor = zimdB["counters"].find_and_modify(
             query= { '_id': "tweetDBId" },
             update= { '$inc': { 'seq': 1 } },
             new= True,
