@@ -6,9 +6,9 @@ class AddTrack():
 
     def setup(self,alertList):
         for alert in alertList :
-            if alert['id'] not in self.threadDic:
-                self.threadDic[alert['id']] = StreamCreator(alert)
-                self.threadDic[alert['id']].start()
+            if str(alert['id']) not in self.threadDic:
+                self.threadDic[str(alert['id'])] = StreamCreator(alert)
+                self.threadDic[str(alert['id'])].start()
 
     def killAllThreads(self):
         for alert in self.threadDic:
@@ -21,11 +21,11 @@ class AddTrack():
         self.threadDic = newDic
 
     def addThread(self, alert):
-        self.threadDic[alert['id']] = StreamCreator(alert)
-        self.threadDic[alert['id']].start()
+        self.threadDic[str(alert['id'])] = StreamCreator(alert)
+        self.threadDic[str(alert['id'])].start()
 
     def killThread(self, alert):
-        self.threadDic[alert['id']].terminate()
+        self.threadDic[str(alert['id'])].terminate()
 
     def __getitem__(self):
         return (self.threadDic)
