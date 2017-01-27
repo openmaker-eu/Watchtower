@@ -118,10 +118,9 @@
                 var tid = $("ol > li").last().attr("tweetid");
                 var aid = $("ol").attr("alertid");
                 $.ajax({
-                  url: '/Feed',
+                  url: '/Feed/scroll',
                   method: 'POST',
                   data: {
-                    'posttype': "scroll"
                     'lastTweetId': tid
                     'alertid': aid
                   }}).success(function(html) {
@@ -157,7 +156,6 @@
               url: '/Feed',
               method: 'POST',
               data: {
-                'posttype': "click"
                 'alertid': aid
               }
             }).success(function(html) {

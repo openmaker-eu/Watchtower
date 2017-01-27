@@ -31,6 +31,7 @@ class Application(tornado.web.Application):
             (r"/Alerts", AlertsHandler, {'mainT':mainT}),
             (r"/alertinfo", CreateEditAlertsHandler, {'mainT':mainT}),
             (r"/alertinfo/([0-9])", CreateEditAlertsHandler, {'mainT':mainT}),
+            (r"/Feed/scroll", FeedHandler, {'mainT':mainT}),
             (r"/Feed", FeedHandler, {'mainT':mainT}),
             (r'/(.*)', tornado.web.StaticFileHandler, {'path': settings['static_path']}),
         ]
@@ -125,9 +126,8 @@ class FeedHandler(BaseHandler, TemplateRendering):
         content = self.render_template(template, variables)
         self.write(content)
 
-    def post(self):
-        posttype = self.get_argument('posttype')
-        if(posttype == "scroll"):
+    def post(self, scroll=None):
+        if(scroll != None):
             template = 'tweetsTemplate.html'
             alertid = self.get_argument('alertid')
             alertid = self.get_argument('lastTweetId')
