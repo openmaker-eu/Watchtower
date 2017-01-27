@@ -48,10 +48,10 @@ def getNextAlertId():
     cur.execute("select id from alerts order by id desc limit 1;")
     rows = cur.fetchall()
     if(len(rows) == 0):
-        return alert['id'] = 0
+        return 0
     else:
         for temp in rows:
-            return alert['id'] = temp[0]+1
+            return temp[0]+1
 
 # Take alert information, give an id and add it DB
 def addAlert(alert, mainT):
