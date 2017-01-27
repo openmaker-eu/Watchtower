@@ -61,7 +61,7 @@ class LoginHandler(BaseHandler, TemplateRendering):
 
     def post(self):
         userinfo = {
-            'username': self.get_argument("username")
+            'username': self.get_argument("username"),
             'password': self.get_argument("password")
         }
         if logic.login(userinfo):
