@@ -115,18 +115,19 @@
           $(window).scroll(function() {
               if($(window).scrollTop() + $(window).height() == $(document).height()) {
                 alert("bottom!");
-                /*var tid = $("ol > li").last().attr("tweetid");
+                var tid = $("ol > li").last().attr("tweetid");
                 var aid = $("ol").attr("alertid");
                 $.ajax({
                   url: '/Feed/scroll',
                   method: 'POST',
                   data: {
-                    'lastTweetId': tid
+                    'lastTweetId': tid,
                     'alertid': aid
-                  }}).success(function(html) {
+                  }
+                }).success(function(html) {
                     alert("bottom!");
                     $('#tweets').append(html);
-                  });*/
+                  });
               }
           });
         });
