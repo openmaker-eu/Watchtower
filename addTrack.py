@@ -14,10 +14,10 @@ class AddTrack():
         for alert in self.threadDic:
             self.threadDic[alert].terminate()
 
-    def getThreadDic():
+    def getThreadDic(self):
         return self.threadDic
 
-    def setThreadDic(newDic):
+    def setThreadDic(self, newDic):
         self.threadDic = newDic
 
     def addThread(self, alert):
