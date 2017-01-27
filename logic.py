@@ -72,6 +72,7 @@ def updateAlert(alert, mainT):
 # Deletes alert and terminate its thread
 def deleteAlert(alertid, mainT):
     alert = getAlertAllOfThemList(alertid)
+    db[str(alertid)].drop()
     mainT.killThread(alert)
     cur.execute("delete from alerts where id = %s;", [alertid])
     conn.commit()
