@@ -5,6 +5,7 @@
         <tr>
           <th>Alert Name</th>
           <th>Edit</th>
+          <th>Status</th>
           <th>Remove</th>
         </tr>
       </thead>
@@ -18,8 +19,23 @@
             </a>
           </td>
           <td>
-            <form class="form-vertical" method="post" onkeypress="return event.keyCode != 13;">
-              <button type="submit" name="remove" value="{{alert['id']}}" class="btn btn-default" style="float: left">Remove</button>
+              {% if not alert['status'] %}
+              <form action="Alerts/{{alert['id']}}/start" method="post" style="float: left">
+                <button type="submit" class="btn btn-success">
+                  <span class="glyphicon glyphicon-play" style="color: white"></span>
+                </button>
+              </form>
+              {% else %}
+              <form method="post" action="Alerts/{{alert['id']}}/stop" style="float: left">
+                <button type="submit" class="btn btn-danger">
+                  <span class="glyphicon glyphicon-stop" style="color: white"></span>
+                </button>
+              </form>
+              {% endif %}
+          </td>
+          <td>
+            <form action="Alerts/{{alert['id']}}/remove" method="post">
+                <button type="submit" class="btn btn-default" style="float: left">Remove</button>
             </form>
           </td>
         </tr>

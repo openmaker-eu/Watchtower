@@ -90,6 +90,25 @@
     <script src="/js/bootstrap.min.js"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="/js/ie10-viewport-bug-workaround.js"></script>
+    <!-- for alerts -->
+    <script>
+        $(document).ready(function() {
+          $('a.status').click(function() {
+            var aid = $(this).attr("alertid");
+            var ptype = $(this).attr("posttype");
+            $.ajax({
+              url: '/Alerts',
+              method: 'POST',
+              data: {
+                'alertid': aid,
+                'posttype': ptype
+              }
+            }).success(function(html) {
+              console.log(ptype)
+            });
+          });
+        });
+    </script>
     <!-- for edit form -->
     <script>
         jQuery(".tm-input").tagsManager();
@@ -125,33 +144,14 @@
                   }
                 }).success(function(html) {
                     $('#tweets').append(html);
-                    console.log(html)
-                  });
+                });
               }
           });
         });
-          /*var win = $(window);
-          win.scroll(function() {
-            if ($(document).height() - win.height() === win.scrollTop()) {
-              var tid = $("ol > li").last().attr("id");
-              var aid = $("ol").attr("alertid");
-              $.ajax({
-                url: '/Feed/scroll',
-                method: 'POST',
-                data: {
-                  'lastTweetId': tid
-                  'alertid': aid
-                }).success(function(html) {
-                  $('#tweets').append(html);
-                });
-            });
-          }
-        });*/
-
     </script>
     <script>
         $(document).ready(function() {
-          $('a.alertids').click(function() {
+          $('a.feedalerts').click(function() {
             var aid = $(this).attr("data-id");
             $.ajax({
               url: '/Feed',

@@ -17,7 +17,7 @@ cur = conn.cursor()
 def getAlertList():
     cur.execute("Select * from alerts;")
     var = cur.fetchall()
-    alerts = [ {'id':str(i[0]), 'name':i[1], 'keywords':i[2].split(","), 'lang': i[3].split(",")} for i in var   ]
+    alerts = [ {'id':str(i[0]), 'name':i[1], 'keywords':i[2].split(","), 'lang': i[3].split(","), 'status': i[4]} for i in var   ]
     return alerts
 
 # Login check
@@ -31,16 +31,16 @@ def getAlert(alertid):
     if alertid != None:
         cur.execute("Select * from alerts where id = %s;", [alertid])
         var = cur.fetchone()
-        alert = {'id': str(var[0]), 'name':var[1], 'keywords':var[2], 'lang': var[3].split(",")}
+        alert = {'id': str(var[0]), 'name':var[1], 'keywords':var[2], 'lang': var[3].split(","), 'status': var[4]}
     else:
-        alert = {'id': "", 'name': "", 'keywords': "", 'lang': ""}
+        alert = {'id': "", 'name': "", 'keywords': "", 'lang': "", 'status': False}
     return alert
 
 # Take alertid and return that alert as not lists
 def getAlertAllOfThemList(alertid):
     cur.execute("Select * from alerts where id = %s;", [alertid])
     var = cur.fetchone()
-    alert = {'id':var[0], 'name':var[1], 'keywords':var[2].split(","), 'lang': var[3].split(",")}
+    alert = {'id':var[0], 'name':var[1], 'keywords':var[2].split(","), 'lang': var[3].split(","), 'status': var[4]}
     return alert
 
 # Give nextalertid
@@ -56,7 +56,7 @@ def getNextAlertId():
 # Take alert information, give an id and add it DB
 def addAlert(alert, mainT):
     alert['id'] = getNextAlertId()
-    cur.execute("INSERT INTO alerts (id, alertname, keywords,lang) values (%s, %s, %s, %s);", [alert['id'] , alert['name'], alert['keywords'], alert['lang']])
+    cur.execute("INSERT INTO alerts (id, alertname, keywords,lang, isAlive) values (%s, %s, %s, %s, %s);", [alert['id'] , alert['name'], alert['keywords'], alert['lang'], True])
     conn.commit()
     alert = getAlertAllOfThemList(alert['id'])
     mainT.addThread(alert)
@@ -70,6 +70,21 @@ def updateAlert(alert, mainT):
         mainT.killThread(alert)
     db[str(alert['id'])].drop()
     mainT.addThread(alert)
+
+# Starts alert streaming.
+def startAlert(alertid, mainT):
+    cur.execute("update alerts set isAlive = %s where id = %s;", [True, alertid])
+    conn.commit()
+    alert = getAlertAllOfThemList(alertid)
+    mainT.addThread(alert)
+
+# Stops alert streaming.
+def stopAlert(alertid, mainT):
+    cur.execute("update alerts set isAlive = %s where id = %s;", [False, alertid])
+    conn.commit()
+    alert = getAlertAllOfThemList(alertid)
+    if str(alert['id']) in mainT.getThreadDic():
+        mainT.killThread(alert)
 
 # Deletes alert and terminate its thread
 def deleteAlert(alertid, mainT):
@@ -95,7 +110,6 @@ def getTweets(alertid):
 def getSkipTweets(alertid, lastTweetId):
     tweets = db[str(alertid)].find({'tweetDBId': {'$lt': int(lastTweetId)}}, {'tweetDBId': 1, "text":1, "user":1, 'created_at': 1, "_id":0}).sort([('tweetDBId', pymongo.DESCENDING)]).limit(25)
     tweets = list(tweets)
-    print alertid
     alert_keywords = getAlertAllOfThemList(alertid)['keywords']
     for tweet in tweets:
         for keyword in alert_keywords:

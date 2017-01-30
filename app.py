@@ -29,6 +29,7 @@ class Application(tornado.web.Application):
             (r"/", MainHandler, {'mainT':mainT}),
             (r"/login", LoginHandler, {'mainT':mainT}),
             (r"/Alerts", AlertsHandler, {'mainT':mainT}),
+            (r"/Alerts/([0-9])/(.*)", AlertsHandler, {'mainT':mainT}),
             (r"/alertinfo", CreateEditAlertsHandler, {'mainT':mainT}),
             (r"/alertinfo/([0-9])", CreateEditAlertsHandler, {'mainT':mainT}),
             (r"/Feed/(.*)", FeedHandler, {'mainT':mainT}),
@@ -70,7 +71,7 @@ class LoginHandler(BaseHandler, TemplateRendering):
             self.write("Information is not correct")
 
 class AlertsHandler(BaseHandler, TemplateRendering):
-    def get(self):
+    def get(self, alertid = None, posttype = None):
         template = 'afterlogintemplate.html'
         variables = {
             'title' : "Alerts",
@@ -80,9 +81,13 @@ class AlertsHandler(BaseHandler, TemplateRendering):
         content = self.render_template(template, variables)
         self.write(content)
 
-    def post(self):
-        alertid = self.get_argument('remove')
-        logic.deleteAlert(alertid, self.mainT)
+    def post(self, alertid = None, posttype= None):
+        if posttype == 'remove':
+            logic.deleteAlert(alertid, self.mainT)
+        elif posttype == "stop":
+            logic.stopAlert(alertid, self.mainT)
+        else:
+            logic.startAlert(alertid, self.mainT)
         self.redirect("/Alerts")
 
 class CreateEditAlertsHandler(BaseHandler, TemplateRendering):
@@ -128,14 +133,12 @@ class FeedHandler(BaseHandler, TemplateRendering):
 
     def post(self, scroll=None):
         if scroll is not None:
-            print "scroll"
             template = 'tweetsTemplate.html'
             alertid = self.get_argument('alertid')
             lastTweetId = self.get_argument('lastTweetId')
             variables = {
                 'tweets': logic.getSkipTweets(alertid, lastTweetId)
             }
-            print logic.getSkipTweets(alertid, lastTweetId)
         else:
             template = 'alertFeed.html'
             alertid = self.get_argument('alertid')
@@ -143,8 +146,6 @@ class FeedHandler(BaseHandler, TemplateRendering):
                 'tweets': logic.getTweets(alertid),
                 'alertid': alertid
             }
-            print "alert"
-        print template
         content = self.render_template(template, variables)
         self.write(content)
 
