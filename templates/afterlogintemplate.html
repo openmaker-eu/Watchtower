@@ -181,7 +181,7 @@
         $(document).ready(function() {
           setInterval(function() {
             var tid = -1;
-            if ($("ol > li").hasAttr("tweetid")) {
+            if ($("ol > li").hasAttribute("tweetid")) {
               tid = $("ol > li").first().attr("tweetid");
             }
             var aid = $("ol").attr("alertid");
@@ -207,7 +207,7 @@
     <script>
         function refreshTweets() {
           var tid = -1;
-          if ($("ol > li").hasAttr("tweetid")) {
+          if ($("ol > li").hasAttribute("tweetid")) {
             tid = $("ol > li").first().attr("tweetid");
           }
           var aid = $("ol").attr("alertid");
