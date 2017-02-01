@@ -1,6 +1,7 @@
 import pymongo
 import psycopg2
 import re
+import search
 
 # MongoDB
 client = pymongo.MongoClient('138.68.92.181', 27017)
@@ -19,6 +20,12 @@ def getAlertList():
     var = cur.fetchall()
     alerts = [ {'id':str(i[0]), 'name':i[1], 'keywords':i[2].split(","), 'lang': i[3].split(","), 'status': i[4]} for i in var   ]
     return alerts
+
+"""
+# Converts strings to lists
+def fname(arg):
+    pass
+"""
 
 # Login check
 def login(userDic):
@@ -116,4 +123,29 @@ def getSkipTweets(alertid, lastTweetId):
             marked = "<mark>" + keyword + "</mark>"
             keyword = re.compile(re.escape(keyword), re.IGNORECASE)
             tweet['text'] = keyword.sub(marked, tweet['text'])
+    return tweets
+
+# Checks periodically new tweets
+def checkTweets(alertid, newestId):
+    tweets = db[str(alertid)].find({'tweetDBId': {'$gt': int(newestId)}}, {'tweetDBId': 1, "text":1, "user":1, 'created_at': 1, "_id":0}).sort([('tweetDBId', pymongo.DESCENDING)])
+    tweets = list(tweets)
+    return len(tweets)
+
+# Gets newest tweets and returns them
+def getNewTweets(alertid, newestId):
+    tweets = db[str(alertid)].find({'tweetDBId': {'$gt': int(newestId)}}, {'tweetDBId': 1, "text":1, "user":1, 'created_at': 1, "_id":0}).sort([('tweetDBId', pymongo.DESCENDING)])
+    tweets = list(tweets)
+    alert_keywords = getAlertAllOfThemList(alertid)['keywords']
+    for tweet in tweets:
+        for keyword in alert_keywords:
+            marked = "<mark>" + keyword + "</mark>"
+            keyword = re.compile(re.escape(keyword), re.IGNORECASE)
+            tweet['text'] = keyword.sub(marked, tweet['text'])
+    return tweets
+
+# Return preview alert search tweets
+def searchTweets(keywords, languages):
+    keywords = " OR ".join(keywords.split(","))
+    languages = " OR ".join(languages.split(","))
+    tweets = search.getTweets(keywords, languages)
     return tweets

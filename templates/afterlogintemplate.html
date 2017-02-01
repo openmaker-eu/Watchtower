@@ -25,7 +25,15 @@
     <link rel="stylesheet" href="/css/bootstrap-tagsinput.css">
     <style type="text/css">
         #opt {
-            font-size: 18px;
+            font-size: 16px;
+        }
+
+        .bootstrap-tagsinput {
+            width: 100%;
+        }
+
+        .bootstrap-tagsinput input {
+            width: 100%;
         }
 
         select {
@@ -91,35 +99,39 @@
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="/js/ie10-viewport-bug-workaround.js"></script>
     <!-- for alerts -->
-    <script>
-        $(document).ready(function() {
-          $('a.status').click(function() {
-            var aid = $(this).attr("alertid");
-            var ptype = $(this).attr("posttype");
-            $.ajax({
-              url: '/Alerts',
-              method: 'POST',
-              data: {
-                'alertid': aid,
-                'posttype': ptype
-              }
-            }).success(function(html) {
-              console.log(ptype)
-            });
-          });
-        });
-    </script>
+
     <!-- for edit form -->
-    <script>
-        jQuery(".tm-input").tagsManager();
-    </script>
+    {% if type == "editAlert" or type == "createAlert" %}
     <script src="/js/typeahead.bundle.min.js"></script>
     <script src="/js/angular.min.js"></script>
     <script src="/js/rainbow.min.js"></script>
     <script src="/js/bootstrap-tagsinput.min.js"></script>
     <script src="/js/bootstrap-tagsinput-angular.min.js"></script>
     <script src="/js/generic.js"></script>
+
+    <script>
+        $(document).ready(function() {
+          $('#previewbutton').click(function() {
+            var keys = $("#keywords").val();
+            var langs = $("#languages").val().join();
+            console.log(typeof(langs));
+            $.ajax({
+              url: '/preview',
+              method: 'POST',
+              data: {
+                'keywords': keys,
+                'languages': langs
+              }
+            }).success(function(html) {
+              $('#preview').empty();
+              $('#preview').append(html);
+            });
+          });
+        });
+    </script>
+    {% endif %}
     <!-- for feed -->
+    {% if type == "feed" %}
     <script>
         $(".dropdown-menu").on('click', 'li a', function() {
             var selText = $(this).children("h4").html();
@@ -130,7 +142,6 @@
     </script>
     <script>
         $(document).ready(function() {
-
           $(window).scroll(function() {
               if($(window).scrollTop() + $(window).height() == $(document).height()) {
                 var tid = $("ol > li").last().attr("tweetid");
@@ -166,6 +177,48 @@
           });
         });
     </script>
+    <script>
+        $(document).ready(function() {
+          setInterval(function() {
+            var tid = $("ol > li").first().attr("tweetid");
+            var aid = $("ol").attr("alertid");
+            $.ajax({
+              url: '/newTweets',
+              method: 'POST',
+              data: {
+                'alertid': aid,
+                'tweetid': tid
+              }
+            }).success(function(response) {
+              response = parseInt(response);
+              console.log(response);
+              if(response > 0){
+                $('#newTweetsButton').remove();
+                var html = "<button type='button' onclick='refreshTweets();' id='newTweetsButton' style='width: 100%' class='btn btn-default'>" + response + "</button>";
+                $('#feedDiv').prepend(html);
+              }
+            });
+          }, 5000);
+        });
+    </script>
+    <script>
+        function refreshTweets() {
+            var tid = $("ol > li").first().attr("tweetid");
+            var aid = $("ol").attr("alertid");
+            $.ajax({
+              url: '/newTweets/get',
+              method: 'POST',
+              data: {
+                'alertid': aid,
+                'tweetid': tid
+              }
+            }).success(function(html) {
+              $('#newTweetsButton').remove();
+              $('#tweets').prepend(html);
+            });
+        }
+    </script>
+    {% endif %}
 </body>
 
 </html>

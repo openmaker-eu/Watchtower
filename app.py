@@ -34,6 +34,9 @@ class Application(tornado.web.Application):
             (r"/alertinfo/([0-9])", CreateEditAlertsHandler, {'mainT':mainT}),
             (r"/Feed/(.*)", FeedHandler, {'mainT':mainT}),
             (r"/Feed", FeedHandler, {'mainT':mainT}),
+            (r"/preview", PreviewHandler, {'mainT':mainT}),
+            (r"/newTweets", NewTweetsHandler, {'mainT':mainT}),
+            (r"/newTweets/(.*)", NewTweetsHandler, {'mainT':mainT}),
             (r'/(.*)', tornado.web.StaticFileHandler, {'path': settings['static_path']}),
         ]
         super(Application, self).__init__(handlers, **settings)
@@ -120,6 +123,19 @@ class CreateEditAlertsHandler(BaseHandler, TemplateRendering):
             logic.addAlert(alert, self.mainT)
         self.redirect("/Alerts")
 
+class PreviewHandler(BaseHandler, TemplateRendering):
+    def post(self):
+        template = 'tweetsTemplate.html'
+        keywords = self.get_argument("keywords")
+        print keywords
+        languages = self.get_argument("languages")
+        print languages
+        variables = {
+            'tweets': logic.searchTweets(keywords, languages)
+        }
+        content = self.render_template(template, variables)
+        self.write(content)
+
 class FeedHandler(BaseHandler, TemplateRendering):
     def get(self, scroll = None):
         template = 'afterlogintemplate.html'
@@ -147,6 +163,22 @@ class FeedHandler(BaseHandler, TemplateRendering):
                 'alertid': alertid
             }
         content = self.render_template(template, variables)
+        self.write(content)
+
+class NewTweetsHandler(BaseHandler, TemplateRendering):
+    def post(self, get = None):
+        if get is not None:
+            template = 'tweetsTemplate.html'
+            alertid = self.get_argument('alertid')
+            newestId = self.get_argument('tweetid')
+            variables = {
+                'tweets': logic.getNewTweets(alertid, newestId)
+            }
+            content = self.render_template(template, variables)
+        else:
+            alertid = self.get_argument('alertid')
+            newestId = self.get_argument('tweetid')
+            content = str(logic.checkTweets(alertid, newestId))
         self.write(content)
 
 def main(mainT):
