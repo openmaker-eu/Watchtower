@@ -180,10 +180,7 @@
     <script>
         $(document).ready(function() {
           setInterval(function() {
-            var tid = -1;
-            if ($("ol > li").hasAttribute("tweetid")) {
-              tid = $("ol > li").first().attr("tweetid");
-            }
+            var tid = $("ol > li").first().attr("tweetid") || -1;
             var aid = $("ol").attr("alertid");
             $.ajax({
               url: '/newTweets',
@@ -206,10 +203,7 @@
     </script>
     <script>
         function refreshTweets() {
-          var tid = -1;
-          if ($("ol > li").hasAttribute("tweetid")) {
-            tid = $("ol > li").first().attr("tweetid");
-          }
+          var tid = $("ol > li").first().attr("tweetid") || -1;
           var aid = $("ol").attr("alertid");
           $.ajax({
             url: '/newTweets/get',
