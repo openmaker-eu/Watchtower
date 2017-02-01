@@ -18,7 +18,7 @@ cur = conn.cursor()
 def setupServer():
     alerts = getAlertList()
     for alert in alerts:
-        cur.execute("update alerts setisAlive=%s where id = %s;", True, alert['id']])
+        cur.execute("update alerts setisAlive=%s where id = %s;", [True, alert['id']])
         conn.commit()
 
 # Gives alerts as lists
