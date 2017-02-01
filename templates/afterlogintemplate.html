@@ -180,7 +180,10 @@
     <script>
         $(document).ready(function() {
           setInterval(function() {
-            var tid = $("ol > li").first().attr("tweetid");
+            var tid = -1;
+            if ($("ol > li").hasAttr("tweetid")) {
+              tid = $("ol > li").first().attr("tweetid");
+            }
             var aid = $("ol").attr("alertid");
             $.ajax({
               url: '/newTweets',
@@ -203,19 +206,22 @@
     </script>
     <script>
         function refreshTweets() {
-            var tid = $("ol > li").first().attr("tweetid");
-            var aid = $("ol").attr("alertid");
-            $.ajax({
-              url: '/newTweets/get',
-              method: 'POST',
-              data: {
-                'alertid': aid,
-                'tweetid': tid
-              }
-            }).success(function(html) {
-              $('#newTweetsButton').remove();
-              $('#tweets').prepend(html);
-            });
+          var tid = -1;
+          if ($("ol > li").hasAttr("tweetid")) {
+            tid = $("ol > li").first().attr("tweetid");
+          }
+          var aid = $("ol").attr("alertid");
+          $.ajax({
+            url: '/newTweets/get',
+            msethod: 'POST',
+            data: {
+              'alertid': aid,
+              'tweetid': tid
+            }
+          }).success(function(html) {
+            $('#newTweetsButton').remove();
+            $('#tweets').prepend(html);
+          });
         }
     </script>
     {% endif %}

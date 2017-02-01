@@ -128,14 +128,19 @@ def getSkipTweets(alertid, lastTweetId):
 
 # Checks periodically new tweets
 def checkTweets(alertid, newestId):
-    print newestId
-    tweets = db[str(alertid)].find({'tweetDBId': {'$gt': int(newestId)}}, {'tweetDBId': 1, "text":1, "user":1, 'created_at': 1, "_id":0}).sort([('tweetDBId', pymongo.DESCENDING)])
+    if newestId = -1:
+        tweets = db[str(alertid)].find({}, {'tweetDBId': 1, "text":1, "user":1, 'created_at': 1, "_id":0}).sort([('tweetDBId', pymongo.DESCENDING)])
+    else:
+        tweets = db[str(alertid)].find({'tweetDBId': {'$gt': int(newestId)}}, {'tweetDBId': 1, "text":1, "user":1, 'created_at': 1, "_id":0}).sort([('tweetDBId', pymongo.DESCENDING)])
     tweets = list(tweets)
     return len(tweets)
 
 # Gets newest tweets and returns them
 def getNewTweets(alertid, newestId):
-    tweets = db[str(alertid)].find({'tweetDBId': {'$gt': int(newestId)}}, {'tweetDBId': 1, "text":1, "user":1, 'created_at': 1, "_id":0}).sort([('tweetDBId', pymongo.DESCENDING)])
+    if newestId = -1:
+        tweets = db[str(alertid)].find({}, {'tweetDBId': 1, "text":1, "user":1, 'created_at': 1, "_id":0}).sort([('tweetDBId', pymongo.DESCENDING)])
+    else:
+        tweets = db[str(alertid)].find({'tweetDBId': {'$gt': int(newestId)}}, {'tweetDBId': 1, "text":1, "user":1, 'created_at': 1, "_id":0}).sort([('tweetDBId', pymongo.DESCENDING)])
     tweets = list(tweets)
     alert_keywords = getAlertAllOfThemList(alertid)['keywords']
     for tweet in tweets:
