@@ -64,7 +64,7 @@ def addAlert(alert, mainT):
 
 # Updates given alert information and kill its thread, then again start its thread.
 def updateAlert(alert, mainT):
-    cur.execute("update alerts set keywords = %s ,lang = %s where id = %s;", [alert['keywords'], alert['lang'], alert['id']])
+    cur.execute("update alerts set keywords = %s ,lang = %s, isAlive=%s where id = %s;", [alert['keywords'], alert['lang'],True, alert['id']])
     conn.commit()
     alert = getAlertAllOfThemList(alert['id'])
     if str(alert['id']) in mainT.getThreadDic():
