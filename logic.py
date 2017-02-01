@@ -110,7 +110,7 @@ def getTweets(alertid):
     for tweet in tweets:
         for keyword in alert_keywords:
             marked = "<mark>" + keyword + "</mark>"
-            keyword = re.compile(re.escape(keyword), re.IGNORECASE)
+            keyword = re.compile(re.escape(keyword), re.IGNORECASE, re.UNICODE)
             tweet['text'] = keyword.sub(marked, tweet['text'])
     return tweets
 
@@ -122,7 +122,7 @@ def getSkipTweets(alertid, lastTweetId):
     for tweet in tweets:
         for keyword in alert_keywords:
             marked = "<mark>" + keyword + "</mark>"
-            keyword = re.compile(re.escape(keyword), re.IGNORECASE)
+            keyword = re.compile(re.escape(keyword), re.IGNORECASE, re.UNICODE)
             tweet['text'] = keyword.sub(marked, tweet['text'])
     return tweets
 
@@ -146,7 +146,7 @@ def getNewTweets(alertid, newestId):
     for tweet in tweets:
         for keyword in alert_keywords:
             marked = "<mark>" + keyword + "</mark>"
-            keyword = re.compile(re.escape(keyword), re.IGNORECASE)
+            keyword = re.compile(re.escape(keyword), re.IGNORECASE, re.UNICODE)
             tweet['text'] = keyword.sub(marked, tweet['text'])
     return tweets
 
@@ -159,6 +159,6 @@ def searchTweets(keywords, languages):
     for tweet in tweets:
         for keyword in keys:
             marked = "<mark>" + keyword + "</mark>"
-            keyword = re.compile(re.escape(keyword), re.IGNORECASE)
+            keyword = re.compile(re.escape(keyword), re.IGNORECASE, re.UNICODE)
             tweet['text'] = keyword.sub(marked, tweet['text'])
     return tweets
