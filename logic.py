@@ -21,12 +21,6 @@ def getAlertList():
     alerts = [ {'id':str(i[0]), 'name':i[1], 'keywords':i[2].split(","), 'lang': i[3].split(","), 'status': i[4]} for i in var   ]
     return alerts
 
-"""
-# Converts strings to lists
-def fname(arg):
-    pass
-"""
-
 # Login check
 def login(userDic):
     cur.execute("Select * from users;")

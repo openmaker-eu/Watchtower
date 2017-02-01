@@ -26,6 +26,7 @@ class AddTrack():
 
     def killThread(self, alert):
         self.threadDic[str(alert['id'])].terminate()
+        del self.threadDic[str(alert['id'])] #sonradan ekledik
 
     def __getitem__(self):
         return (self.threadDic)
