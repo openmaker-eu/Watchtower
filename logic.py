@@ -14,6 +14,13 @@ except Exception as e:
     print "I am unable to connect to the database"
 cur = conn.cursor()
 
+# Setups server
+def setupServer():
+    alerts = getAlertList()
+    for alert in alerts:
+        cur.execute("update alerts setisAlive=%s where id = %s;", True, alert['id']])
+        conn.commit()
+
 # Gives alerts as lists
 def getAlertList():
     cur.execute("Select * from alerts;")
@@ -139,7 +146,13 @@ def getNewTweets(alertid, newestId):
 
 # Return preview alert search tweets
 def searchTweets(keywords, languages):
+    keys = keywords.split(",")
     keywords = " OR ".join(keywords.split(","))
     languages = " OR ".join(languages.split(","))
     tweets = search.getTweets(keywords, languages)
+    for tweet in tweets:
+        for keyword in keys:
+            marked = "<mark>" + keyword + "</mark>"
+            keyword = re.compile(re.escape(keyword), re.IGNORECASE)
+            tweet['text'] = keyword.sub(marked, tweet['text'])
     return tweets
