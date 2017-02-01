@@ -203,7 +203,7 @@
     </script>
     <script>
         function refreshTweets() {
-          var tid = $("ol > li").first().attr("tweetid") || -1;
+          var tid = $("ol > li").first().attr("tweetid");
           var aid = $("ol").attr("alertid");
           $.ajax({
             url: '/newTweets/get',
