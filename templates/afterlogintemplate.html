@@ -194,7 +194,7 @@
               console.log(response);
               if(response > 0){
                 $('#newTweetsButton').remove();
-                var html = "<button type='button' onclick='refreshTweets();' id='newTweetsButton' style='width: 100%' class='btn btn-default'>" + response + "</button>";
+                var html = "<button type='button' onclick='refreshTweets();' id='newTweetsButton' style='width: 100%' class='btn btn-primary'>" + response + " new tweets</button>";
                 $('#feedDiv').prepend(html);
               }
             });
