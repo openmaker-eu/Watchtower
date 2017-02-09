@@ -4,6 +4,7 @@
       <thead>
         <tr>
           <th>Alert Name</th>
+          <th>Keywords</th>
           <th>Edit</th>
           <th>Status</th>
           <th>Remove</th>
@@ -13,6 +14,7 @@
       {% for alert in alerts %}
         <tr>
           <td>{{ alert['name'] }}</td>
+          <td>{{ ", ".join(alert['keywords']) }}</td>
           <td>
             <a href="/alertinfo/{{alert['id']}}">
               <button type="button" name="edit" class="btn btn-default">Edit</button>

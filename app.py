@@ -5,6 +5,9 @@ import logic
 from jinja2 import Environment, FileSystemLoader, TemplateNotFound
 from threading import Thread
 import os
+import sys
+reload(sys)
+sys.setdefaultencoding('utf8')
 
 settings = dict(
     template_path=os.path.join(os.path.dirname(__file__), "templates"),
@@ -75,6 +78,7 @@ class LoginHandler(BaseHandler, TemplateRendering):
 
 class AlertsHandler(BaseHandler, TemplateRendering):
     def get(self, alertid = None, posttype = None):
+        logic.refrestAlertStatus(mainT)
         template = 'afterlogintemplate.html'
         variables = {
             'title' : "Alerts",

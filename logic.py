@@ -2,13 +2,25 @@ import re
 import search
 import pymongo
 from application.Connections import Connection
-
+from time import gmtime, strftime
+import sys
+reload(sys)
+sys.setdefaultencoding('utf8')
 
 # Setups server
 def setupServer():
     alerts = getAlertList()
     for alert in alerts:
         Connection.Instance().cur.execute("update alerts set isAlive=%s where id = %s;", [True, alert['id']])
+        Connection.Instance().PostGreSQLConnect.commit()
+
+# Refreshes Alerts status
+def refrestAlertStatus(mainT):
+    alerts = getAlertList()
+    threadDict = mainT.getThreadDic()
+    for alert in alerts:
+        aliveStatus = threadDict[str(alert['id'])].checkAlive()
+        Connection.Instance().cur.execute("update alerts set isAlive=%s where id = %s;", [aliveStatus, alert['id']])
         Connection.Instance().PostGreSQLConnect.commit()
 
 # Gives alerts as lists
@@ -54,7 +66,8 @@ def getNextAlertId():
 # Take alert information, give an id and add it DB
 def addAlert(alert, mainT):
     alert['id'] = getNextAlertId()
-    Connection.Instance().cur.execute("INSERT INTO alerts (id, alertname, keywords,lang, isAlive) values (%s, %s, %s, %s, %s);", [alert['id'] , alert['name'], alert['keywords'], alert['lang'], True])
+    now = strftime("%Y-%m-%d %H:%M:%S", gmtime())
+    Connection.Instance().cur.execute("INSERT INTO alerts (id, alertname, keywords,lang, isAlive, creationTime) values (%s, %s, %s, %s, %s, %s);", [alert['id'] , alert['name'], alert['keywords'], alert['lang'], True, now])
     Connection.Instance().PostGreSQLConnect.commit()
     alert = getAlertAllOfThemList(alert['id'])
     mainT.addThread(alert)
@@ -94,7 +107,7 @@ def deleteAlert(alertid, mainT):
     Connection.Instance().PostGreSQLConnect.commit()
 
 def getTweets(alertid):
-    tweets = Connection.Instance().db[str(alertid)].find({}, {'tweetDBId': 1, "text":1, "user":1, 'created_at': 1, "_id":0}).sort([('tweetDBId', pymongo.DESCENDING)]).limit(25)
+    tweets = Connection.Instance().db[str(alertid)].find({}, {'tweetDBId': 1, "text":1, "user":1, 'created_at': 1, "_id":0}).sort([('tweetDBId' , pymongo.DESCENDING)]).limit(25)
     tweets = list(tweets)
     alert_keywords = getAlertAllOfThemList(alertid)['keywords']
     for tweet in tweets:

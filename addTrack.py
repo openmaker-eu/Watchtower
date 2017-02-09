@@ -1,4 +1,7 @@
 from track import StreamCreator
+import sys
+reload(sys)
+sys.setdefaultencoding('utf8')
 
 class AddTrack():
     def __init__(self):

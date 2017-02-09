@@ -6,6 +6,10 @@ import time
 import threading
 from application.Connections import Connection
 import json
+import sys
+reload(sys)
+sys.setdefaultencoding('utf8')
+
 
 def get_next_tweets_sequence():
     cursor = Connection.Instance().db["counters"].find_and_modify(
@@ -67,3 +71,5 @@ class StreamCreator():
         self.t.start()
     def terminate(self):
         self.l.terminate = True
+    def checkAlive():
+        return self.t.isAlive()

@@ -1,6 +1,9 @@
 import tweepy
 import json
 from tweepy import OAuthHandler
+import sys
+reload(sys)
+sys.setdefaultencoding('utf8')
 
 
 # Accessing Twitter API

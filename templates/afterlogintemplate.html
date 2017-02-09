@@ -74,20 +74,8 @@
             <!--/.nav-collapse -->
         </div>
     </nav>
-    {% if type == "alertlist" %}
-      {% include 'alerts.html' %}
-    {% endif %}
 
-    {% if type == "editAlert" %}
-      {% include 'alertForm.html' %}
-    {% endif %}
-
-    {% if type == "createAlert" %}
-      {% include 'alertForm.html' %}
-    {% endif %}
-
-    {% if type == "feed" %}
-      {% include 'feed.html'%}
+    {% if type == "alertlist" %} {% include 'alerts.html' %} {% endif %} {% if type == "editAlert" %} {% include 'alertForm.html' %} {% endif %} {% if type == "createAlert" %} {% include 'alertForm.html' %} {% endif %} {% if type == "feed" %} {% include 'feed.html'%}
     {% endif %}
 
     <!-- /.container -->
@@ -108,25 +96,29 @@
     <script src="/js/bootstrap-tagsinput.min.js"></script>
     <script src="/js/bootstrap-tagsinput-angular.min.js"></script>
     <script src="/js/generic.js"></script>
+    <script src="/js/jquery.babypaunch.spinner.min.js"></script>
 
     <script>
         $(document).ready(function() {
-          $('#previewbutton').click(function() {
-            var keys = $("#keywords").val();
-            var langs = $("#languages").val().join();
-            console.log(typeof(langs));
-            $.ajax({
-              url: '/preview',
-              method: 'POST',
-              data: {
-                'keywords': keys,
-                'languages': langs
-              }
-            }).success(function(html) {
-              $('#preview').empty();
-              $('#preview').append(html);
+            $("#spin").spinner();
+            $('#previewbutton').click(function() {
+                $('#preview').empty();
+                $("#spin").show();
+                var keys = $("#keywords").val();
+                var langs = $("#languages").val().join();
+                console.log(typeof(langs));
+                $.ajax({
+                    url: '/preview',
+                    method: 'POST',
+                    data: {
+                        'keywords': keys,
+                        'languages': langs
+                    }
+                }).success(function(html) {
+                    $('#preview').append(html);
+                    $("#spin").hide();
+                });
             });
-          });
         });
     </script>
     {% endif %}
@@ -142,80 +134,80 @@
     </script>
     <script>
         $(document).ready(function() {
-          $(window).scroll(function() {
-              if($(window).scrollTop() + $(window).height() == $(document).height()) {
-                var tid = $("ol > li").last().attr("tweetid");
+            $(window).scroll(function() {
+                if ($(window).scrollTop() + $(window).height() == $(document).height()) {
+                    var tid = $("ol > li").last().attr("tweetid");
+                    var aid = $("ol").attr("alertid");
+                    $.ajax({
+                        url: '/Feed/scroll',
+                        method: 'POST',
+                        data: {
+                            'lastTweetId': tid,
+                            'alertid': aid
+                        }
+                    }).success(function(html) {
+                        $('#tweets').append(html);
+                    });
+                }
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function() {
+            $('a.feedalerts').click(function() {
+                var aid = $(this).attr("data-id");
+                $.ajax({
+                    url: '/Feed',
+                    method: 'POST',
+                    data: {
+                        'alertid': aid
+                    }
+                }).success(function(html) {
+                    $('#feedcontainer').empty();
+                    $('#feedcontainer').append(html);
+                });
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function() {
+            setInterval(function() {
+                var tid = $("ol > li").first().attr("tweetid") || -1;
                 var aid = $("ol").attr("alertid");
                 $.ajax({
-                  url: '/Feed/scroll',
-                  method: 'POST',
-                  data: {
-                    'lastTweetId': tid,
-                    'alertid': aid
-                  }
-                }).success(function(html) {
-                    $('#tweets').append(html);
+                    url: '/newTweets',
+                    method: 'POST',
+                    data: {
+                        'alertid': aid,
+                        'tweetid': tid
+                    }
+                }).success(function(response) {
+                    response = parseInt(response);
+                    console.log(response);
+                    if (response > 0) {
+                        $('#newTweetsButton').remove();
+                        var html = "<button type='button' onclick='refreshTweets();' id='newTweetsButton' style='width: 100%' class='btn btn-primary'>" + response + " new tweets</button>";
+                        $('#feedDiv').prepend(html);
+                    }
                 });
-              }
-          });
-        });
-    </script>
-    <script>
-        $(document).ready(function() {
-          $('a.feedalerts').click(function() {
-            var aid = $(this).attr("data-id");
-            $.ajax({
-              url: '/Feed',
-              method: 'POST',
-              data: {
-                'alertid': aid
-              }
-            }).success(function(html) {
-              $('#feedcontainer').empty();
-              $('#feedcontainer').append(html);
-            });
-          });
-        });
-    </script>
-    <script>
-        $(document).ready(function() {
-          setInterval(function() {
-            var tid = $("ol > li").first().attr("tweetid") || -1;
-            var aid = $("ol").attr("alertid");
-            $.ajax({
-              url: '/newTweets',
-              method: 'POST',
-              data: {
-                'alertid': aid,
-                'tweetid': tid
-              }
-            }).success(function(response) {
-              response = parseInt(response);
-              console.log(response);
-              if(response > 0){
-                $('#newTweetsButton').remove();
-                var html = "<button type='button' onclick='refreshTweets();' id='newTweetsButton' style='width: 100%' class='btn btn-primary'>" + response + " new tweets</button>";
-                $('#feedDiv').prepend(html);
-              }
-            });
-          }, 5000);
+            }, 5000);
         });
     </script>
     <script>
         function refreshTweets() {
-          var tid = $("ol > li").first().attr("tweetid") || -1;
-          var aid = $("ol").attr("alertid");
-          $.ajax({
-            url: '/newTweets/get',
-            method: 'POST',
-            data: {
-              'alertid': aid,
-              'tweetid': tid
-            }
-          }).success(function(html) {
-            $('#newTweetsButton').remove();
-            $('#tweets').prepend(html);
-          });
+            var tid = $("ol > li").first().attr("tweetid") || -1;
+            var aid = $("ol").attr("alertid");
+            $.ajax({
+                url: '/newTweets/get',
+                method: 'POST',
+                data: {
+                    'alertid': aid,
+                    'tweetid': tid
+                }
+            }).success(function(html) {
+                $('#newTweetsButton').remove();
+                $('#tweets').prepend(html);
+            });
         }
     </script>
     {% endif %}
