@@ -78,7 +78,7 @@ class LoginHandler(BaseHandler, TemplateRendering):
 
 class AlertsHandler(BaseHandler, TemplateRendering):
     def get(self, alertid = None, posttype = None):
-        logic.refrestAlertStatus(mainT)
+        logic.refrestAlertStatus(self.mainT)
         template = 'afterlogintemplate.html'
         variables = {
             'title' : "Alerts",
