@@ -27,7 +27,7 @@ def refrestAlertStatus(mainT):
 def getAlertList():
     Connection.Instance().cur.execute("Select * from alerts;")
     var = Connection.Instance().cur.fetchall()
-    alerts = [ {'id':str(i[0]), 'name':i[1], 'keywords':i[2].split(","), 'lang': i[3].split(","), 'status': i[4]} for i in var   ]
+    alerts = [ {'id':str(i[0]), 'name':i[1], 'keywords':i[2].split(","), 'lang': i[3].split(","), 'status': i[4], 'creationTime': i[5]} for i in var   ]
     return alerts
 
 # Login check

@@ -71,5 +71,5 @@ class StreamCreator():
         self.t.start()
     def terminate(self):
         self.l.terminate = True
-    def checkAlive():
+    def checkAlive(self):
         return self.t.isAlive()
