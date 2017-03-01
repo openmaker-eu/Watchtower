@@ -11,7 +11,7 @@ class Connection:
 
     def __init__(self):
         try:
-            self.MongoDBClient = pymongo.MongoClient('localhost', 27017)
+            self.MongoDBClient = pymongo.MongoClient('mongodb://admin:smio1EUp@localhost:27017/')
             self.db = self.MongoDBClient.openMakerdB
             self.PostGreSQLConnect = psycopg2.connect("dbname='postgres' user='postgres' host='localhost' password='99'")
             self.cur = self.PostGreSQLConnect.cursor()
