@@ -5,14 +5,23 @@ import logic
 from jinja2 import Environment, FileSystemLoader, TemplateNotFound
 from threading import Thread
 import os
+import string
+import random
+import json
 import sys
 reload(sys)
 sys.setdefaultencoding('utf8')
+
+chars = ''.join([string.ascii_letters, string.digits, string.punctuation]).replace('\'', '').replace('"', '').replace('\\', '')
+secret_key = ''.join([random.SystemRandom().choice(chars) for i in range(100)])
+print secret_key
 
 settings = dict(
     template_path=os.path.join(os.path.dirname(__file__), "templates"),
     static_path=os.path.join(os.path.dirname(__file__), "static"),
     xsrf_cookies=False,
+    cookie_secret= secret_key,
+    login_url= "/login",
 )
 
 class TemplateRendering:
@@ -30,9 +39,10 @@ class Application(tornado.web.Application):
     def __init__(self, mainT):
         handlers = [
             (r"/", MainHandler, {'mainT':mainT}),
+            (r"/logout", LogoutHandler, {'mainT': mainT}),
             (r"/login", LoginHandler, {'mainT':mainT}),
             (r"/Alerts", AlertsHandler, {'mainT':mainT}),
-            (r"/Alerts/([0-9])/(.*)", AlertsHandler, {'mainT':mainT}),
+            (r"/Alerts/([0-9])", AlertsHandler, {'mainT':mainT}),
             (r"/alertinfo", CreateEditAlertsHandler, {'mainT':mainT}),
             (r"/alertinfo/([0-9])", CreateEditAlertsHandler, {'mainT':mainT}),
             (r"/Feed/(.*)", FeedHandler, {'mainT':mainT}),
@@ -40,13 +50,16 @@ class Application(tornado.web.Application):
             (r"/preview", PreviewHandler, {'mainT':mainT}),
             (r"/newTweets", NewTweetsHandler, {'mainT':mainT}),
             (r"/newTweets/(.*)", NewTweetsHandler, {'mainT':mainT}),
-            (r'/(.*)', tornado.web.StaticFileHandler, {'path': settings['static_path']}),
+            (r"/(.*)", tornado.web.StaticFileHandler, {'path': settings['static_path']}),
         ]
         super(Application, self).__init__(handlers, **settings)
 
 class BaseHandler(tornado.web.RequestHandler):
     def initialize(self, mainT):
         self.mainT = mainT
+
+    def get_current_user(self):
+        return self.get_secure_cookie("userid")
 
 class MainHandler(BaseHandler, TemplateRendering):
     def get(self):
@@ -67,37 +80,64 @@ class LoginHandler(BaseHandler, TemplateRendering):
         self.write(content)
 
     def post(self):
-        userinfo = {
-            'username': self.get_argument("username"),
-            'password': self.get_argument("password")
-        }
-        if logic.login(userinfo):
-            self.redirect("/Alerts")
+        userinfo = logic.getUserInfo(self.get_argument("username"))
+        print type(userinfo['userid'])
+        userInputPassword = str(self.get_argument("password"))
+        if userInputPassword == userinfo['password']:
+            self.set_secure_cookie("userid", str(userinfo['userid']))
+            self.redirect(self.get_argument('next', '/Alerts'))
         else:
             self.write("Information is not correct")
 
+class LogoutHandler(BaseHandler, TemplateRendering):
+    def get(self):
+        self.clear_all_cookies()
+        self.redirect("/")
+
 class AlertsHandler(BaseHandler, TemplateRendering):
-    def get(self, alertid = None, posttype = None):
+    @tornado.web.authenticated
+    def get(self, alertid = None):
         logic.refrestAlertStatus(self.mainT)
+        userid = tornado.escape.xhtml_escape(self.current_user)
         template = 'afterlogintemplate.html'
         variables = {
             'title' : "Alerts",
-            'alerts' : logic.getAlertList(),
+            'alerts' : logic.getAlertList(userid),
             'type' : "alertlist"
         }
+        if alertid != None:
+            info = logic.response(alertid)
+            variables['message'] = info['message']
+            variables['messagetype'] = info['type']
         content = self.render_template(template, variables)
         self.write(content)
 
-    def post(self, alertid = None, posttype= None):
-        if posttype == 'remove':
-            logic.deleteAlert(alertid, self.mainT)
-        elif posttype == "stop":
-            logic.stopAlert(alertid, self.mainT)
+    def post(self, alertid = None):
+        alertid = self.get_argument("alertid")
+        posttype = self.get_argument("posttype")
+        userid = tornado.escape.xhtml_escape(self.current_user)
+        if posttype == u'remove':
+            print posttype, type(posttype)
+            info = logic.deleteAlert(alertid, self.mainT,userid)
+        elif posttype == u'stop':
+            print "stop"
+            info = logic.stopAlert(alertid, self.mainT)
         else:
-            logic.startAlert(alertid, self.mainT)
-        self.redirect("/Alerts")
+            print "start"
+            info = logic.startAlert(alertid, self.mainT)
+        template = "alerts.html"
+        variables = {
+            'title' : "Alerts",
+            'alerts' : logic.getAlertList(userid),
+            'type' : "alertlist"
+        }
+        variables['message'] = info['message']
+        variables['messagetype'] = info['type']
+        content = self.render_template(template, variables)
+        self.write(content)
 
 class CreateEditAlertsHandler(BaseHandler, TemplateRendering):
+    @tornado.web.authenticated
     def get(self, alertid = None):
         template = 'afterlogintemplate.html'
         variables = {}
@@ -113,27 +153,29 @@ class CreateEditAlertsHandler(BaseHandler, TemplateRendering):
         self.write(content)
 
     def post(self, alertid = None):
+        userid = tornado.escape.xhtml_escape(self.current_user)
         alert = {}
         alert['keywords'] = ",".join(self.get_argument("keywords").split(","))
+        alert['excludedkeywords'] = ",".join(self.get_argument("excludedkeywords").split(","))
         if len(self.request.arguments.get("languages")) != 0:
             alert['lang'] = ",".join(self.request.arguments.get("languages"))
         else:
             alert['lang'] = ""
         if alertid != None:
-            alert['id'] = alertid
-            logic.updateAlert(alert, self.mainT)
+            alert['alertid'] = alertid
+            logic.updateAlert(alert, self.mainT, userid)
         else:
             alert['name'] = self.get_argument('alertname')
-            logic.addAlert(alert, self.mainT)
-        self.redirect("/Alerts")
+            alertid = logic.getNextAlertId()
+            logic.addAlert(alert, self.mainT, userid)
+        self.redirect("/Alerts/" + str(alertid))
 
 class PreviewHandler(BaseHandler, TemplateRendering):
     def post(self):
         template = 'tweetsTemplate.html'
         keywords = self.get_argument("keywords")
-        print keywords
+        exculdedkeywords = self.get_argument("excludedkeywords")
         languages = self.get_argument("languages")
-        print languages
         variables = {
             'tweets': logic.searchTweets(keywords, languages)
         }
@@ -141,11 +183,13 @@ class PreviewHandler(BaseHandler, TemplateRendering):
         self.write(content)
 
 class FeedHandler(BaseHandler, TemplateRendering):
+    @tornado.web.authenticated
     def get(self, scroll = None):
+        userid = tornado.escape.xhtml_escape(self.current_user)
         template = 'afterlogintemplate.html'
         variables = {
             'title': "Feed",
-            'alerts': logic.getAlertList(),
+            'alerts': logic.getAlertList(userid),
             'type': "feed"
         }
         content = self.render_template(template, variables)

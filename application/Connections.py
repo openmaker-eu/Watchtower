@@ -13,7 +13,7 @@ class Connection:
         try:
             self.MongoDBClient = pymongo.MongoClient('localhost', 27017)
             self.db = self.MongoDBClient.openMakerdB
-            self.PostGreSQLConnect = psycopg2.connect("dbname='postgres' user='postgres' host='localhost' password='smio#1EUp'")
+            self.PostGreSQLConnect = psycopg2.connect("dbname='postgres' user='postgres' host='localhost' password='99'")
             self.cur = self.PostGreSQLConnect.cursor()
             print "new connection"
         except Exception as e:

@@ -2,7 +2,7 @@
   <legend align="center"><h1>Alert Information</h1></legend>
     <div class="row" style="height: 450px">
         <div class="col-xs-6">
-            <form id="bootstrapTagsInputForm" method="post" onkeypress="return event.keyCode != 13;">
+            <form id="bootstrapTagsInputForm" method="post" action={% if alert[ 'name'] !="" %}"/alertinfo/{{alert['alertid']}}"{% else %}"/alertinfo"{% endif %} onkeypress="return event.keyCode != 13;">
                 <!-- Text input-->
                 <div class="form-group">
                     <label style="font-size: 18px"for="Alert Name">Alert Name</label>
@@ -13,6 +13,11 @@
                     <label>Keywords</label>
                     <br>
                     <input type="text" id="keywords" name= "keywords" class="form-control" value="{{alert['keywords']}}" data-role="tagsinput"/>
+                </div>
+                <div class="form-group" style="font-size: 18px">
+                    <label>Excluded Keywords</label>
+                    <br>
+                    <input type="text" id="excludedkeywords" name= "excludedkeywords" class="form-control" value="{{alert['excludedkeywords']}}" data-role="tagsinput"/>
                 </div>
                 <!-- Select Multiple -->
                 <div class="form-group">

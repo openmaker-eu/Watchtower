@@ -36,13 +36,15 @@ class StdOutListener(StreamListener):
 
     def __init__(self,alert):
         self.terminate = False
-        self.campaignId = alert['id']
+        self.campaignId = alert['alertid']
         self.campaignName = alert['name']
         super(StdOutListener, self).__init__()
 
     def on_data(self, data):
         if self.terminate == False:
             #print data
+            Connection.Instance().cur.execute("update alerts set threadstatus=%s where alertid = %s;", ["OK", self.campaignId])
+            Connection.Instance().PostGreSQLConnect.commit()
             tweet = json.loads(data)
             tweet['tweetDBId'] = get_next_tweets_sequence()
             Connection.Instance().db[str(self.campaignId)].insert_one(tweet) #this creates tweets collection, if there is one then write on it
@@ -51,6 +53,8 @@ class StdOutListener(StreamListener):
             return False
 
     def on_error(self, status):
+        Connection.Instance().cur.execute("update alerts set threadstatus=%s where alertid = %s;", [str(status), self.campaignId])
+        Connection.Instance().PostGreSQLConnect.commit()
         print status
         if self.terminate == True:
             return False
