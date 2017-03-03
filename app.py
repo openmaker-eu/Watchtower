@@ -103,7 +103,8 @@ class AlertsHandler(BaseHandler, TemplateRendering):
         variables = {
             'title' : "Alerts",
             'alerts' : logic.getAlertList(userid),
-            'type' : "alertlist"
+            'type' : "alertlist",
+            'alertlimit' : logic.getAlertLimit(userid)
         }
         if alertid != None:
             info = logic.response(alertid)
@@ -112,6 +113,7 @@ class AlertsHandler(BaseHandler, TemplateRendering):
         content = self.render_template(template, variables)
         self.write(content)
 
+    @tornado.web.authenticated
     def post(self, alertid = None):
         alertid = self.get_argument("alertid")
         posttype = self.get_argument("posttype")
@@ -120,7 +122,7 @@ class AlertsHandler(BaseHandler, TemplateRendering):
             print posttype, type(posttype)
             info = logic.deleteAlert(alertid, self.mainT,userid)
         elif posttype == u'stop':
-            print "stop"
+            print "stop", alertid, posttype
             info = logic.stopAlert(alertid, self.mainT)
         else:
             print "start"
@@ -129,7 +131,8 @@ class AlertsHandler(BaseHandler, TemplateRendering):
         variables = {
             'title' : "Alerts",
             'alerts' : logic.getAlertList(userid),
-            'type' : "alertlist"
+            'type' : "alertlist",
+            'alertlimit' : logic.getAlertLimit(userid)
         }
         variables['message'] = info['message']
         variables['messagetype'] = info['type']
@@ -139,6 +142,7 @@ class AlertsHandler(BaseHandler, TemplateRendering):
 class CreateEditAlertsHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
     def get(self, alertid = None):
+        userid = tornado.escape.xhtml_escape(self.current_user)
         template = 'afterlogintemplate.html'
         variables = {}
         if alertid != None:
@@ -146,16 +150,22 @@ class CreateEditAlertsHandler(BaseHandler, TemplateRendering):
             variables['alert'] = logic.getAlert(alertid)
             variables['type'] = "editAlert"
         else:
+            print logic.getAlertLimit(userid)
+            if logic.getAlertLimit(userid) == 0:
+                self.redirect("/Alerts")
             variables['title'] = "Create Alert"
             variables['alert'] = logic.getAlert(alertid)
             variables['type'] = "createAlert"
         content = self.render_template(template, variables)
         self.write(content)
 
+    @tornado.web.authenticated
     def post(self, alertid = None):
         userid = tornado.escape.xhtml_escape(self.current_user)
         alert = {}
         alert['keywords'] = ",".join(self.get_argument("keywords").split(","))
+        keywordlimit = 10 - len(self.get_argument("keywords").split(","))
+        alert['keywordlimit'] = keywordlimit
         alert['excludedkeywords'] = ",".join(self.get_argument("excludedkeywords").split(","))
         if len(self.request.arguments.get("languages")) != 0:
             alert['lang'] = ",".join(self.request.arguments.get("languages"))
@@ -171,6 +181,7 @@ class CreateEditAlertsHandler(BaseHandler, TemplateRendering):
         self.redirect("/Alerts/" + str(alertid))
 
 class PreviewHandler(BaseHandler, TemplateRendering):
+    @tornado.web.authenticated
     def post(self):
         template = 'tweetsTemplate.html'
         keywords = self.get_argument("keywords")
@@ -195,6 +206,7 @@ class FeedHandler(BaseHandler, TemplateRendering):
         content = self.render_template(template, variables)
         self.write(content)
 
+    @tornado.web.authenticated
     def post(self, scroll=None):
         if scroll is not None:
             template = 'tweetsTemplate.html'
@@ -214,6 +226,7 @@ class FeedHandler(BaseHandler, TemplateRendering):
         self.write(content)
 
 class NewTweetsHandler(BaseHandler, TemplateRendering):
+    @tornado.web.authenticated
     def post(self, get = None):
         if get is not None:
             template = 'tweetsTemplate.html'

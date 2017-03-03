@@ -149,7 +149,24 @@
     <script src="/js/bootstrap-tagsinput-angular.min.js"></script>
     <script src="/js/generic.js"></script>
     <script src="/js/jquery.babypaunch.spinner.min.js"></script>
-
+    <script>
+    var main = function(){
+      $(".keyword > .bootstrap-tagsinput").on('DOMSubtreeModified', function() {
+          var keywordCount = $(".keyword > .bootstrap-tagsinput > .tag").length;
+          var limitLeft = 10 - keywordCount;
+          if(limitLeft <= 0){
+            $('.counter').css('color', 'red');
+            $(".keyword > .bootstrap-tagsinput > input").prop('disabled', true);
+            $('.counter').text("Your keyword limit is full. In order to add a new keyword, please remove old ones.");
+          }else{
+            $('.counter').css('color', 'black');
+            $('.counter').text("Keyword Limit: " + limitLeft);
+            $(".keyword > .bootstrap-tagsinput > input").prop('disabled', false);
+          }
+      });
+    };
+    $(document).ready(main);
+    </script>
     <script>
         $(document).ready(function() {
             $("#spin").spinner();

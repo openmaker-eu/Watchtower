@@ -1,5 +1,9 @@
     <div id="alerts">
+      {% if alertlimit != 0 %}
         <a href="/alertinfo">Create a new alert</a>
+      {% else %}
+        <p style="color: red; font-size: 15px"><b>You cannot create a new alert because your limit is full. If you want create a new alert, please remove old ones.</b></p>
+      {% endif %}
         <table class="table">
             <thead>
                 <tr>

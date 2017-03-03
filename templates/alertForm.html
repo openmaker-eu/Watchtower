@@ -1,6 +1,6 @@
 <div class="container">
   <legend align="center"><h1>Alert Information</h1></legend>
-    <div class="row" style="height: 450px">
+    <div class="row" style="height: 550px">
         <div class="col-xs-6">
             <form id="bootstrapTagsInputForm" method="post" action={% if alert[ 'name'] !="" %}"/alertinfo/{{alert['alertid']}}"{% else %}"/alertinfo"{% endif %} onkeypress="return event.keyCode != 13;">
                 <!-- Text input-->
@@ -9,10 +9,11 @@
                     <input name="alertname" class="form-control" id="alertname" type="text" {% if alert[ 'name'] !="" %}value="{{alert['name']}}" disabled{% endif %}>
                 </div>
                 <!-- son eklenen -->
-                <div class="form-group" style="font-size: 18px">
+                <div class="form-group keyword" style="font-size: 18px">
                     <label>Keywords</label>
                     <br>
                     <input type="text" id="keywords" name= "keywords" class="form-control" value="{{alert['keywords']}}" data-role="tagsinput"/>
+                    <p class="counter" style="font-size:15px">Keyword Limit: {{alert['keywordlimit']}}</p>
                 </div>
                 <div class="form-group" style="font-size: 18px">
                     <label>Excluded Keywords</label>

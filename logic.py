@@ -7,6 +7,11 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf8')
 
+def getAlertLimit(userid):
+    Connection.Instance().cur.execute("select alertlimit from users where userid = %s", [userid])
+    fetched = Connection.Instance().cur.fetchall()
+    return fetched[0][0]
+
 def getUserInfo(username):
     Connection.Instance().cur.execute("select * from users where username = %s", [username])
     fetched = Connection.Instance().cur.fetchall()
@@ -62,6 +67,7 @@ def refrestAlertStatus(mainT):
 
 # Gives alerts as lists
 def getAlertList(userid):
+    print userid
     Connection.Instance().cur.execute("Select * from alerts where userid = %s;", [userid])
     var = Connection.Instance().cur.fetchall()
     alerts = [{'alertid':i[0], 'name':i[2], 'keywords':i[3].split(","), 'excludedkeywords': i[4].split(","),\
@@ -74,9 +80,9 @@ def getAlert(alertid):
     if alertid != None:
         Connection.Instance().cur.execute("Select * from alerts where alertid = %s;", [alertid])
         var = Connection.Instance().cur.fetchone()
-        alert = {'alertid': var[0], 'name':var[2], 'keywords':var[3], 'excludedkeywords': var[4], 'lang': var[5].split(","), 'status': var[6]}
+        alert = {'alertid': var[0], 'name':var[2], 'keywords':var[3], 'excludedkeywords': var[4], 'lang': var[5].split(","), 'status': var[6], 'keywordlimit': var[9]}
     else:
-        alert = {'alertid': "", 'name': "", 'keywords': "", 'excludedkeywords': "", 'lang': "", 'status': False}
+        alert = {'alertid': "", 'name': "", 'keywords': "", 'excludedkeywords': "", 'lang': "", 'status': False, 'keywordlimit': 10}
     return alert
 
 # Take alertid and return that alert as not lists
@@ -96,44 +102,48 @@ def getNextAlertId():
         for temp in rows:
             return temp[0]+1
 
+def setUserAlertLimit(userid, setType):
+    Connection.Instance().cur.execute("select alertlimit from users where userid = %s", [userid])
+    fetched = Connection.Instance().cur.fetchall()
+    if setType == 'decrement':
+        newLimit = fetched[0][0] - 1
+    elif setType == 'increment':
+        newLimit = fetched[0][0] + 1
+    Connection.Instance().cur.execute("update users set alertlimit = %s where userid = %s", [newLimit, userid])
+    Connection.Instance().PostGreSQLConnect.commit()
+
 # Take alert information, give an id and add it DB
 def addAlert(alert, mainT, userid):
     alert['alertid'] = getNextAlertId()
     now = strftime("%Y-%m-%d %H:%M:%S", gmtime())
-    Connection.Instance().cur.execute("INSERT INTO alerts (alertid, userid, alertname, keywords,excludedkeywords, languages, creationtime) values (%s, %s, %s, %s, %s, %s, %s);", [alert['alertid'], userid, alert['name'], alert['keywords'], alert['excludedkeywords'], alert['lang'], now])
+    Connection.Instance().cur.execute("INSERT INTO alerts (alertid, userid, alertname, keywords,excludedkeywords, languages, creationtime, keywordlimit) values (%s, %s, %s, %s, %s, %s, %s, %s);", [alert['alertid'], userid, alert['name'], alert['keywords'], alert['excludedkeywords'], alert['lang'], now, alert['keywordlimit']])
     Connection.Instance().PostGreSQLConnect.commit()
     alert = getAlertAllOfThemList(alert['alertid'])
-
-    length = len(alert['keywords'])
-    Connection.Instance().cur.execute("select keywordlimit from users where userid = %s", [userid])
-    fetched = Connection.Instance().cur.fetchall()
-    newLimit = fetched[0][0] - length
-    Connection.Instance().cur.execute("update users set keywordlimit = %s where userid = %s", [newLimit, userid])
-    Connection.Instance().PostGreSQLConnect.commit()
-
+    setUserAlertLimit(userid, 'decrement')
     mainT.addThread(alert)
     return response(alert['alertid'])
 
+# Deletes alert and terminate its thread
+def deleteAlert(alertid, mainT, userid):
+    alert = getAlertAllOfThemList(alertid)
+    setUserAlertLimit(userid, 'increment')
+    if str(alert['alertid']) in mainT.getThreadDic():
+        print "delete"
+        mainT.killThread(alert)
+        print mainT.getThreadDic()
+    Connection.Instance().db[str(alertid)].drop()
+    Connection.Instance().cur.execute("delete from alerts where alertid = %s;", [alertid])
+    Connection.Instance().PostGreSQLConnect.commit()
+    return response(alertid)
 
 # Updates given alert information and kill its thread, then again start its thread.
 def updateAlert(alert, mainT, userid):
     if str(alert['alertid']) in mainT.getThreadDic():
         mainT.killThread(alert)
-
-    oldNumOfKeywords = len(getAlertAllOfThemList(alert['alertid'])['keywords'])
-
     Connection.Instance().db[str(alert['alertid'])].drop()
     Connection.Instance().cur.execute("update alerts set userid = %s, keywords = %s ,excludedkeywords = %s, languages = %s where alertid = %s;", [userid, alert['keywords'],alert['excludedkeywords'], alert['lang'], alert['alertid']])
     Connection.Instance().PostGreSQLConnect.commit()
     alert = getAlertAllOfThemList(alert['alertid'])
-
-    length = len(alert['keywords'])
-    Connection.Instance().cur.execute("select keywordlimit from users where userid = %s", [userid])
-    fetched = Connection.Instance().cur.fetchall()
-    newLimit = fetched[0][0] - (length - oldNumOfKeywords)
-    Connection.Instance().cur.execute("update users set keywordlimit = %s where userid = %s", [newLimit, userid])
-    Connection.Instance().PostGreSQLConnect.commit()
-
     mainT.addThread(alert)
     return response(alert['alertid'])
 
@@ -145,34 +155,13 @@ def startAlert(alertid, mainT):
 
 # Stops alert streaming.
 def stopAlert(alertid, mainT):
-    Connection.Instance().cur.execute("update alerts set isalive = %s where alertid = %s;", [False, alertid])
+    Connection.Instance().cur.execute("update alerts set isalive = %s, threadstatus = %s where alertid = %s;", [False, '-', alertid])
     Connection.Instance().PostGreSQLConnect.commit()
     alert = getAlertAllOfThemList(alertid)
     print mainT.getThreadDic(), alert['alertid']
     if str(alert['alertid']) in mainT.getThreadDic():
         mainT.killThread(alert)
     return response(alert['alertid'])
-
-# Deletes alert and terminate its thread
-def deleteAlert(alertid, mainT, userid):
-    alert = getAlertAllOfThemList(alertid)
-
-    oldNumOfKeywords = len(getAlertAllOfThemList(alert['alertid'])['keywords'])
-    length = len(alert['keywords'])
-    Connection.Instance().cur.execute("select keywordlimit from users where userid = %s", [userid])
-    fetched = Connection.Instance().cur.fetchall()
-    newLimit = fetched[0][0] + oldNumOfKeywords
-    Connection.Instance().cur.execute("update users set keywordlimit = %s where userid = %s", [newLimit, userid])
-    Connection.Instance().PostGreSQLConnect.commit()
-
-    if str(alert['alertid']) in mainT.getThreadDic():
-        print "delete"
-        mainT.killThread(alert)
-        print mainT.getThreadDic()
-    Connection.Instance().db[str(alertid)].drop()
-    Connection.Instance().cur.execute("delete from alerts where alertid = %s;", [alertid])
-    Connection.Instance().PostGreSQLConnect.commit()
-    return response(alertid)
 
 def getTweets(alertid):
     tweets = Connection.Instance().db[str(alertid)].find({}, {'tweetDBId': 1, "text":1, "user":1, 'created_at': 1, "_id":0}).sort([('tweetDBId' , pymongo.DESCENDING)]).limit(25)

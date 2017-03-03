@@ -62,7 +62,6 @@ class StdOutListener(StreamListener):
     def stop(self):
         self.terminate = True
 
-
 class StreamCreator():
     def __init__(self,alert):
         #This handles Twitter authetification and the connection to Twitter Streaming API

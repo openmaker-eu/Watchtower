@@ -6,7 +6,3 @@ mainT = AddTrack()
 mainT.setup(getAllAlertList())
 setupServer()
 webserverInit(mainT)
-
-print "Yes"
-while True:
-    print "girdi"
