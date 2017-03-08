@@ -71,6 +71,7 @@ class StreamCreator():
         self.stream = Stream(self.auth, self.l)
         self.t = threading.Thread(target = self.stream.filter, kwargs = {'track':alert['keywords'],'languages':alert['lang']} )
     def start(self):
+        self.t.deamon = True
         self.t.start()
     def terminate(self):
         self.l.terminate = True
