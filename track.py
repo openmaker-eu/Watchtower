@@ -55,7 +55,6 @@ class StdOutListener(StreamListener):
     def on_error(self, status):
         Connection.Instance().cur.execute("update alerts set threadstatus=%s where alertid = %s;", [str(status), self.campaignId])
         Connection.Instance().PostGreSQLConnect.commit()
-        print status
         if self.terminate == True:
             return False
 
