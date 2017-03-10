@@ -35,6 +35,13 @@ class TemplateRendering:
         content = template.render(variables)
         return content
 
+class BaseHandler(tornado.web.RequestHandler):
+    def initialize(self, mainT):
+        self.mainT = mainT
+
+    def get_current_user(self):
+        return self.get_secure_cookie("userid")
+
 class Application(tornado.web.Application):
     def __init__(self, mainT):
         handlers = [
@@ -50,16 +57,27 @@ class Application(tornado.web.Application):
             (r"/preview", PreviewHandler, {'mainT':mainT}),
             (r"/newTweets", NewTweetsHandler, {'mainT':mainT}),
             (r"/newTweets/(.*)", NewTweetsHandler, {'mainT':mainT}),
+            (r"/get_themes", ThemesHandler),
+            (r"/get_influencers/([A-Z])", InfluencersHandler),
+            (r"/get_feeds/([A-Z])", FeedsHandler),
             (r"/(.*)", tornado.web.StaticFileHandler, {'path': settings['static_path']}),
         ]
         super(Application, self).__init__(handlers, **settings)
 
-class BaseHandler(tornado.web.RequestHandler):
-    def initialize(self, mainT):
-        self.mainT = mainT
+class ThemesHandler(BaseHandler, TemplateRendering):
+    def get(self):
+        themes = logic.getThemes()
+        self.write(themes)
 
-    def get_current_user(self):
-        return self.get_secure_cookie("userid")
+class InfluencersHandler(BaseHandler, TemplateRendering):
+    def get(self, themename):
+        influencers = logic.getInfluencers(themename)
+        self.write(influencers)
+
+class FeedsHandler(BaseHandler, TemplateRendering):
+    def get(self, themename):
+        feeds = logic.getFeeds(themename)
+        self.write(feeds)
 
 class MainHandler(BaseHandler, TemplateRendering):
     def get(self):
