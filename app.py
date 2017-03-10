@@ -55,8 +55,8 @@ class Application(tornado.web.Application):
             (r"/newTweets", NewTweetsHandler, {'mainT':mainT}),
             (r"/newTweets/(.*)", NewTweetsHandler, {'mainT':mainT}),
             (r"/get_themes", ThemesHandler, {'mainT':mainT}),
-            (r"/get_influencers/([A-Z])", InfluencersHandler, {'mainT':mainT}),
-            (r"/get_feeds/([A-Z])", FeedsHandler, {'mainT':mainT}),
+            (r"/get_influencers/([A-Z][a-z][0-9])", InfluencersHandler, {'mainT':mainT}),
+            (r"/get_feeds/([A-Z][a-z][0-9])", FeedsHandler, {'mainT':mainT}),
             (r"/(.*)", tornado.web.StaticFileHandler, {'path': settings['static_path']}),
         ]
         super(Application, self).__init__(handlers, **settings)
