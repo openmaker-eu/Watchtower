@@ -8,9 +8,6 @@ import os
 import string
 import random
 import json
-import sys
-reload(sys)
-sys.setdefaultencoding('utf8')
 
 chars = ''.join([string.ascii_letters, string.digits, string.punctuation]).replace('\'', '').replace('"', '').replace('\\', '')
 secret_key = ''.join([random.SystemRandom().choice(chars) for i in range(100)])
@@ -57,9 +54,9 @@ class Application(tornado.web.Application):
             (r"/preview", PreviewHandler, {'mainT':mainT}),
             (r"/newTweets", NewTweetsHandler, {'mainT':mainT}),
             (r"/newTweets/(.*)", NewTweetsHandler, {'mainT':mainT}),
-            (r"/get_themes", ThemesHandler),
-            (r"/get_influencers/([A-Z])", InfluencersHandler),
-            (r"/get_feeds/([A-Z])", FeedsHandler),
+            (r"/get_themes", ThemesHandler, {'mainT':mainT}),
+            (r"/get_influencers/([A-Z])", InfluencersHandler, {'mainT':mainT}),
+            (r"/get_feeds/([A-Z])", FeedsHandler, {'mainT':mainT}),
             (r"/(.*)", tornado.web.StaticFileHandler, {'path': settings['static_path']}),
         ]
         super(Application, self).__init__(handlers, **settings)
