@@ -17,7 +17,7 @@ def getInfluencers(themename):
     return json.dumps(influencers, indent=4)
 
 def getFeeds(themename):
-    feeds = Connection.Instance().infDB[str(themename)].find({}, {"_id":0})
+    feeds = Connection.Instance().feedDB[str(themename)].find({}, {"_id":0})
     feeds = list(feeds)
     return json.dumps(feeds, indent=4)
 
