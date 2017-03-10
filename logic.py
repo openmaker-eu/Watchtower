@@ -3,24 +3,22 @@ import search
 import pymongo
 from application.Connections import Connection
 from time import gmtime, strftime
-import sys
-reload(sys)
-sys.setdefaultencoding('utf8')
+import json
 
 def getThemes():
     names = Connection.Instance().feedDB.collection_names()
     themes = [{'name': name} for name in names]
-    return themes
+    return json.dumps(themes)
 
 def getInfluencers(themename):
     influencers = Connection.Instance().infDB[str(themename)].find({"type": "filteredCentralityRank"}, {"rankList":1, "_id":0})
     influencers = list(influencers)[0]["rankList"]
     influencers = [{'influencer_id': influencer_id} for influencer_id in influencers]
-    return influencers
+    return json.dumps(influencers)
 
 def getFeeds(themename):
     feeds = Connection.Instance().infDB[str(themename)].find({}, {"_id":0})
-    return feeds
+    return json.dumps(feeds)
 
 def getAlertLimit(userid):
     Connection.Instance().cur.execute("select alertlimit from users where userid = %s", [userid])
