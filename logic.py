@@ -7,6 +7,21 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf8')
 
+def getThemes():
+    names = Connection.Instance().feedDB.collection_names()
+    themes = [{'name': name} for name in names]
+    return themes
+
+def getInfluencers(themename):
+    influencers = Connection.Instance().infDB[str(themename)].find({"type": "filteredCentralityRank"}, {"rankList":1, "_id":0})
+    influencers = list(influencers)[0]["rankList"]
+    influencers = [{'influencer_id': influencer_id} for influencer_id in influencers]
+    return influencers
+
+def getFeeds(themename):
+    feeds = Connection.Instance().infDB[str(themename)].find({}, {"_id":0})
+    return feeds
+
 def getAlertLimit(userid):
     Connection.Instance().cur.execute("select alertlimit from users where userid = %s", [userid])
     fetched = Connection.Instance().cur.fetchall()
