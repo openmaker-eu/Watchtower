@@ -18,6 +18,7 @@ def getInfluencers(themename):
 
 def getFeeds(themename):
     feeds = Connection.Instance().infDB[str(themename)].find({}, {"_id":0})
+    feeds = list(feeds)
     return json.dumps(feeds, indent=4)
 
 def getAlertLimit(userid):
