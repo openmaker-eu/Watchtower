@@ -56,8 +56,6 @@ class StdOutListener(StreamListener):
         Connection.Instance().cur.execute("update alerts set threadstatus=%s where alertid = %s;", [str(status), self.campaignId])
         Connection.Instance().PostGreSQLConnect.commit()
         if self.terminate == True:
-            self.running = False
-            self.stop()
             return False
 
     def stop(self):

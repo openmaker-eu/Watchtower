@@ -163,6 +163,9 @@ def updateAlert(alert, mainT, userid):
 # Starts alert streaming.
 def startAlert(alertid, mainT):
     alert = getAlertAllOfThemList(alertid)
+    print mainT.getThreadDic(), alert['alertid']
+    if str(alert['alertid']) in mainT.getThreadDic():
+        mainT.killThread(alert)
     mainT.addThread(alert)
     return response(alert['alertid'])
 
