@@ -65,7 +65,7 @@ class Application(tornado.web.Application):
 class ThemesHandler(BaseHandler, TemplateRendering):
     def get(self):
         themes = logic.getThemes()
-        self.write(themes)
+        self.write(json.dumps(themes))
         self.finish()
 
 class InfluencersHandler(BaseHandler, TemplateRendering):
