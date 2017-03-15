@@ -8,17 +8,17 @@ import json
 def getThemes():
     names = Connection.Instance().feedDB.collection_names()
     themes = [{'name': name} for name in names]
-    return json.dumps(themes, indent=4)
+    return json.dumps(themes)
 
 def getInfluencers(themename):
     influencers = Connection.Instance().infDB[str(themename)].find({"type": "filteredUser"}, {"_id":0, "type": 0})
     influencers = list(influencers)
-    return json.dumps(influencers, indent=4)
+    return json.dumps(influencers)
 
 def getFeeds(themename):
     feeds = Connection.Instance().feedDB[str(themename)].find({}, {"_id":0})
     feeds = list(feeds)
-    return json.dumps(feeds, indent=4)
+    return json.dumps(feeds)
 
 def getAlertLimit(userid):
     Connection.Instance().cur.execute("select alertlimit from users where userid = %s", [userid])

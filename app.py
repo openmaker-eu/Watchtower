@@ -65,17 +65,20 @@ class Application(tornado.web.Application):
 class ThemesHandler(BaseHandler, TemplateRendering):
     def get(self):
         themes = logic.getThemes()
-        self.write(json_encode(themes))
+        self.write(themes)
+        self.finish()
 
 class InfluencersHandler(BaseHandler, TemplateRendering):
     def get(self, themename):
         influencers = logic.getInfluencers(themename)
         self.write(influencers)
+        self.finish()
 
 class FeedsHandler(BaseHandler, TemplateRendering):
     def get(self, themename):
         feeds = logic.getFeeds(themename)
         self.write(feeds)
+        self.finish()
 
 class MainHandler(BaseHandler, TemplateRendering):
     def get(self):
