@@ -61,7 +61,7 @@ class StreamCreator():
         #This handles Twitter authetification and the connection to Twitter Streaming API
         self.l = StdOutListener(alert)
         self.auth = OAuthHandler(consumer_key, consumer_secret)
-        self.auth.set_access_token(access_token, access_token_secret)
+        self.auth.set_access_token(access_token, access_secret)
         self.stream = Stream(self.auth, self.l)
         self.t = threading.Thread(target = self.stream.filter, kwargs = {'track':alert['keywords'],'languages':alert['lang']} )
     def start(self):
