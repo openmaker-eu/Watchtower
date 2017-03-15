@@ -1,6 +1,7 @@
 import tornado.web
 import tornado.options
 import tornado.ioloop
+from tornado.escape import json_encode
 import logic
 from jinja2 import Environment, FileSystemLoader, TemplateNotFound
 from threading import Thread
@@ -64,7 +65,7 @@ class Application(tornado.web.Application):
 class ThemesHandler(BaseHandler, TemplateRendering):
     def get(self):
         themes = logic.getThemes()
-        self.write(themes)
+        self.write(json_encode(themes))
 
 class InfluencersHandler(BaseHandler, TemplateRendering):
     def get(self, themename):
