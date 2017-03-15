@@ -11,9 +11,8 @@ def getThemes():
     return json.dumps(themes, indent=4)
 
 def getInfluencers(themename):
-    influencers = Connection.Instance().infDB[str(themename)].find({"type": "filteredCentralityRank"}, {"rankList":1, "_id":0})
-    influencers = list(influencers)[0]["rankList"]
-    influencers = [{'influencer_id': influencer_id} for influencer_id in influencers]
+    influencers = Connection.Instance().infDB[str(themename)].find({"type": "filteredUser"}, {"_id":0, "type": 0})
+    influencers = list(influencers)
     return json.dumps(influencers, indent=4)
 
 def getFeeds(themename):

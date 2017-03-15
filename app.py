@@ -54,9 +54,9 @@ class Application(tornado.web.Application):
             (r"/preview", PreviewHandler, {'mainT':mainT}),
             (r"/newTweets", NewTweetsHandler, {'mainT':mainT}),
             (r"/newTweets/(.*)", NewTweetsHandler, {'mainT':mainT}),
-            (r"/get_themes", ThemesHandler, {'mainT':mainT}),
-            (r"/get_influencers/(.*)", InfluencersHandler, {'mainT':mainT}),
-            (r"/get_feeds/(.*)", FeedsHandler, {'mainT':mainT}),
+            (r"/api/get_themes", ThemesHandler, {'mainT':mainT}),
+            (r"/api/get_influencers/(.*)", InfluencersHandler, {'mainT':mainT}),
+            (r"/api/get_feeds/(.*)", FeedsHandler, {'mainT':mainT}),
             (r"/(.*)", tornado.web.StaticFileHandler, {'path': settings['static_path']}),
         ]
         super(Application, self).__init__(handlers, **settings)
@@ -99,7 +99,7 @@ class LoginHandler(BaseHandler, TemplateRendering):
         print type(userinfo['userid'])
         userInputPassword = str(self.get_argument("password"))
         if userInputPassword == userinfo['password']:
-            self.set_secure_cookie("userid", str(userinfo['userid']))
+            self.set_secure_cookie("userid", str(userinfo['userid']), expires_days=0.00011574)
             self.redirect(self.get_argument('next', '/Alerts'))
         else:
             self.write("Information is not correct")
