@@ -99,7 +99,7 @@ class LoginHandler(BaseHandler, TemplateRendering):
         print type(userinfo['userid'])
         userInputPassword = str(self.get_argument("password"))
         if userInputPassword == userinfo['password']:
-            self.set_secure_cookie("userid", str(userinfo['userid']), expires_days=0.00011574)
+            self.set_secure_cookie("userid", str(userinfo['userid']))
             self.redirect(self.get_argument('next', '/Alerts'))
         else:
             self.write("Information is not correct")
