@@ -241,6 +241,8 @@ class FeedHandler(BaseHandler, TemplateRendering):
                 'tweets': logic.getTweets(alertid),
                 'alertid': alertid
             }
+            if len(variables['tweets']) == 0:
+                self.write("<p style='color: red; font-size: 15px'><b>Ops! There is no tweet now.</b></p>")
         content = self.render_template(template, variables)
         self.write(content)
 

@@ -97,6 +97,8 @@
     <script src="/js/bootstrap.min.js"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="/js/ie10-viewport-bug-workaround.js"></script>
+
+    <script src="/js/jquery.babypaunch.spinner.min.js"></script>
     <!-- for alerts -->
     {% if type == "alertlist" %}
       <script src="/js/bootstrap-notify.min.js"></script>
@@ -183,6 +185,11 @@
                         'keywords': keys,
                         'languages': langs,
                         'excludedkeywords': exkeys
+                    },
+                    timeout: 10000,
+                    error: function () {
+                         $('#preview').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");
+                         $("#spin").hide();
                     }
                 }).success(function(html) {
                     $('#preview').append(html);
@@ -224,17 +231,26 @@
     </script>
     <script>
         $(document).ready(function() {
+            $("#spin").spinner();
             $('a.feedalerts').click(function() {
+                $('#feedcontainer').empty();
+                $("#spin").show();
                 var aid = $(this).attr("data-id");
                 $.ajax({
                     url: '/Feed',
                     method: 'POST',
                     data: {
                         'alertid': aid
+                    },
+                    timeout: 10000,
+                    error: function () {
+                         $('#preview').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");
+                         $("#spin").hide();
                     }
                 }).success(function(html) {
                     $('#feedcontainer').empty();
                     $('#feedcontainer').append(html);
+                    $("#spin").hide();
                 });
             });
         });
