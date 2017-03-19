@@ -86,6 +86,8 @@ def getAlertList(userid):
     alerts = [{'alertid':i[0], 'name':i[2], 'keywords':i[3].split(","), 'excludedkeywords': i[4].split(","),\
                'lang': i[5].split(","), 'status': i[6], 'threadstatus': i[7], 'creationTime': i[8]} for i in var]
     alerts = sorted(alerts, key=lambda k: k['alertid'])
+    for alert in alerts:
+        alert['tweetCount'] = Connection.Instance().db[str(alert['alertid'])].find().count()
     return alerts
 
 # Take alertid and return that alert as not lists
@@ -188,6 +190,12 @@ def getTweets(alertid):
             marked = "<mark>" + keyword + "</mark>"
             keyword = re.compile(re.escape(keyword), re.IGNORECASE)
             tweet['text'] = keyword.sub(marked, tweet['text'])
+        urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', tweet['text'])
+        if len(urls) != 0:
+            for url in urls:
+                ahref = '<a href="' + url + '">' + url + '</a>'
+                url = re.compile(re.escape(url), re.IGNORECASE)
+                tweet['text'] = url.sub(ahref, tweet['text'])
     return tweets
 
 # Runs we scroll the page
@@ -200,6 +208,12 @@ def getSkipTweets(alertid, lastTweetId):
             marked = "<mark>" + keyword + "</mark>"
             keyword = re.compile(re.escape(keyword), re.IGNORECASE)
             tweet['text'] = keyword.sub(marked, tweet['text'])
+        urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', tweet['text'])
+        if len(urls) != 0:
+            for url in urls:
+                ahref = '<a href="' + url + '">' + url + '</a>'
+                url = re.compile(re.escape(url), re.IGNORECASE)
+                tweet['text'] = url.sub(ahref, tweet['text'])
     return tweets
 
 # Checks periodically new tweets
@@ -224,6 +238,12 @@ def getNewTweets(alertid, newestId):
             marked = "<mark>" + keyword + "</mark>"
             keyword = re.compile(re.escape(keyword), re.IGNORECASE)
             tweet['text'] = keyword.sub(marked, tweet['text'])
+        urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', tweet['text'])
+        if len(urls) != 0:
+            for url in urls:
+                ahref = '<a href="' + url + '">' + url + '</a>'
+                url = re.compile(re.escape(url), re.IGNORECASE)
+                tweet['text'] = url.sub(ahref, tweet['text'])
     return tweets
 
 # Return preview alert search tweets
@@ -237,4 +257,10 @@ def searchTweets(keywords, languages):
             marked = "<mark>" + keyword + "</mark>"
             keyword = re.compile(re.escape(keyword), re.IGNORECASE)
             tweet['text'] = keyword.sub(marked, tweet['text'])
+        urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', tweet['text'])
+        if len(urls) != 0:
+            for url in urls:
+                ahref = '<a href="' + url + '">' + url + '</a>'
+                url = re.compile(re.escape(url), re.IGNORECASE)
+                tweet['text'] = url.sub(ahref, tweet['text'])
     return tweets

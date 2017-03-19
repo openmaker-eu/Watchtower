@@ -11,6 +11,7 @@
                     <th>Keywords</th>
                     <th>Exclude Keywords</th>
                     <th>Creation Time</th>
+                    <th>#Tweets</th>
                     <th>Edit</th>
                     <th>Remove</th>
                     <th>Status</th>
@@ -24,6 +25,7 @@
                     <td>{{ ", ".join(alert['keywords']) }}</td>
                     <td>{{ ", ".join(alert['excludedkeywords']) }}</td>
                     <td>{{alert['creationTime']}}</td>
+                    <td>{{alert['tweetCount']}}</td>
                     <td>
                         <a href="/alertinfo/{{alert['alertid']}}">
                             <button type="button" name="edit" class="btn btn-default">Edit</button>
