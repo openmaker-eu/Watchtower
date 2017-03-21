@@ -47,6 +47,7 @@ class Application(tornado.web.Application):
             (r"/logout", LogoutHandler, {'mainT': mainT}),
             (r"/login", LoginHandler, {'mainT':mainT}),
             (r"/Alerts", AlertsHandler, {'mainT':mainT}),
+            (r"/message", MessageHandler, {'mainT':mainT}),
             (r"/Alerts/([0-9])", AlertsHandler, {'mainT':mainT}),
             (r"/alertinfo", CreateEditAlertsHandler, {'mainT':mainT}),
             (r"/alertinfo/([0-9])", CreateEditAlertsHandler, {'mainT':mainT}),
@@ -125,10 +126,6 @@ class AlertsHandler(BaseHandler, TemplateRendering):
             'type' : "alertlist",
             'alertlimit' : logic.getAlertLimit(userid)
         }
-        if alertid != None:
-            info = logic.response(alertid)
-            variables['message'] = info['message']
-            variables['messagetype'] = info['type']
         content = self.render_template(template, variables)
         self.write(content)
 
@@ -153,10 +150,15 @@ class AlertsHandler(BaseHandler, TemplateRendering):
             'type' : "alertlist",
             'alertlimit' : logic.getAlertLimit(userid)
         }
-        variables['message'] = info['message']
-        variables['messagetype'] = info['type']
         content = self.render_template(template, variables)
         self.write(content)
+
+class MessageHandler(BaseHandler, TemplateRendering):
+    def post(self):
+        alertid = self.get_argument("alertid")
+        info = logic.response(alertid)
+        result = info['message'] + ";" + info['type']
+        self.write(result)
 
 class CreateEditAlertsHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
@@ -214,20 +216,42 @@ class PreviewHandler(BaseHandler, TemplateRendering):
 
 class FeedHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
-    def get(self, scroll = None):
+    def get(self, argument = None):
         userid = tornado.escape.xhtml_escape(self.current_user)
         template = 'afterlogintemplate.html'
-        variables = {
-            'title': "Feed",
-            'alerts': logic.getAlertList(userid),
-            'type': "feed"
-        }
+        if argument is not None:
+            try:
+                alertid = int(argument)
+                print "long"
+                variables = {
+                    'title': "Feed",
+                    'tweets': logic.getTweets(alertid),
+                    'alertid': alertid,
+                    'comesAlert': True,
+                    'type': "feed"
+                }
+            except ValueError:
+                print "str"
+                variables = {
+                    'title': "Feed",
+                    'alerts': logic.getAlertList(userid),
+                    'comesAlert': False,
+                    'type': "feed"
+                }
+                pass
+        else:
+            variables = {
+                'title': "Feed",
+                'alerts': logic.getAlertList(userid),
+                'comesAlert': False,
+                'type': "feed"
+            }
         content = self.render_template(template, variables)
         self.write(content)
 
     @tornado.web.authenticated
-    def post(self, scroll=None):
-        if scroll is not None:
+    def post(self, argument=None):
+        if argument is not None:
             template = 'tweetsTemplate.html'
             alertid = self.get_argument('alertid')
             lastTweetId = self.get_argument('lastTweetId')

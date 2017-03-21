@@ -21,7 +21,7 @@
             <tbody>
                 {% for alert in alerts %}
                 <tr>
-                    <td>{{ alert['name'] }}</td>
+                    <td><a href="/Feed/{{alert['alertid']}}" style="text-decoration : none; color : #000000;">{{ alert['name'] }}</a></td>
                     <td>{{ ", ".join(alert['keywords']) }}</td>
                     <td>{{ ", ".join(alert['excludedkeywords']) }}</td>
                     <td>{{alert['creationTime']}}</td>
@@ -34,19 +34,24 @@
                     <td>
                     <button onclick= "alertbuttonclick({{alert['alertid']}}, 'remove');" posttype = "remove" alertid = "{{alert['alertid']}}" class="btn btn-default">Remove</button>
                     </td>
-                    <td>{{alert['threadstatus']}}</td>
+                    <td>
+                      {% if alert['threadstatus'] == "OK" %}
+                        <span style="background-color:#5CB85C;color:white;font-size:16px;padding:8px;position: relative;top: 7px;"> <b>{{alert['threadstatus']}}</b></span>
+                      {% else %}
+                        <span style="background-color:#d9534f;color:white;font-size:16px;padding:8px;position: relative;top: 7px;"> <b>{{alert['threadstatus']}}</b></span>
+                      {% endif %}
+                    </td>
                     <td>
                         {% if not alert['status'] %}
-                        <button onclick= "alertbuttonclick({{alert['alertid']}}, 'start');" posttype = "start" alertid = "{{alert['alertid']}}" class="btn btn-success">
+                        <button onclick= "alertbuttonclick({{alert['alertid']}}, 'start');" posttype = "start" alertid = "{{alert['alertid']}}" class="btn btn-default">
                   <span class="glyphicon glyphicon-play" style="color: white"></span>
                 </button> {% else %}
-                        <button onclick= "alertbuttonclick({{alert['alertid']}}, 'stop');" posttype = "stop" alertid = "{{alert['alertid']}}" class="btn btn-danger">
-                  <span class="glyphicon glyphicon-stop" style="color: white"></span>
+                        <button onclick= "alertbuttonclick({{alert['alertid']}}, 'stop');" posttype = "stop" alertid = "{{alert['alertid']}}" class="btn btn-default">
+                  <span class="glyphicon glyphicon-stop"></span>
                 </button> {% endif %}
                     </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
-        <div class='bottom-right' message="{{message}}" messagetype="{{messagetype}}"></div>
     </div>

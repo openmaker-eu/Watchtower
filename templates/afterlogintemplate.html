@@ -105,22 +105,40 @@
       <script src="/js/bootstrap-notify.js"></script>
       <script>
       $(document).ready(function() {
-        notification();
+        var path = window.location.pathname;
+        var pathList = path.split("/");
+        if(pathList.length === 3){
+          notification(pathList[2]);
+        }
+
       });
       </script>
       <script>
-      function notification(aid, ptype) {
-        var message = $('.bottom-right').attr("message");
-        var messagetype = $('.bottom-right').attr("messagetype");
-        if(message != ""){
-          $.notify({
-            message: message
-          },
-          {
-            type: messagetype
-          })
-        }
+      function notification(alertid) {
+        setTimeout('', 10000);
+        console.log(alertid);
+        $.ajax({
+            url: "/message",
+            method: 'POST',
+            data: {
+              'alertid' : alertid,
+            }
+        }).success(function(response) {
+            var results = response.split(";");
+            var message = results[0];
+            var messagetype = results[1];
+            if(message != ""){
+              $.notify({
+                message: message
+              },
+              {
+                type: messagetype
+              })
+            }
+            console.log("message:" + message);
+        });
       }
+
       </script>
       <script>
         function alertbuttonclick(aid, ptype) {
@@ -137,7 +155,8 @@
               }).success(function(html) {
                   $('#alerts').remove();
                   $("#alertspage").append(html);
-                  notification();
+                  console.log("notification :" + aid);
+                  notification(aid);
               });
         }
       </script>
@@ -276,7 +295,7 @@
                         $('#feedDiv').prepend(html);
                     }
                 });
-            }, 5000);
+            }, 10000);
         });
     </script>
     <script>

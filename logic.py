@@ -131,7 +131,7 @@ def setUserAlertLimit(userid, setType):
 def addAlert(alert, mainT, userid):
     alert['alertid'] = getNextAlertId()
     now = strftime("%Y-%m-%d %H:%M:%S", gmtime())
-    Connection.Instance().cur.execute("INSERT INTO alerts (alertid, userid, alertname, keywords,excludedkeywords, languages, creationtime, keywordlimit, threadstatus) values (%s, %s, %s, %s, %s, %s, %s, %s);", [alert['alertid'], userid, alert['name'], alert['keywords'], alert['excludedkeywords'], alert['lang'], now, alert['keywordlimit'], "OK"])
+    Connection.Instance().cur.execute("INSERT INTO alerts (alertid, userid, alertname, keywords,excludedkeywords, languages, creationtime, keywordlimit, threadstatus) values (%s, %s, %s, %s, %s, %s, %s, %s, %s);", [alert['alertid'], userid, alert['name'], alert['keywords'], alert['excludedkeywords'], alert['lang'], now, alert['keywordlimit'], "OK"])
     Connection.Instance().PostGreSQLConnect.commit()
     alert = getAlertAllOfThemList(alert['alertid'])
     setUserAlertLimit(userid, 'decrement')

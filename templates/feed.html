@@ -1,21 +1,27 @@
 <div id="spin"></div>
-<div class="container" style="margin-bottom:10px">
-    <h2><strong>Feed</strong></h2>
-    <div class="row">
-        <div class="btn-group" class="col-xs-6">
-            <a class="btn btn-default dropdown-toggle btn-blog " data-toggle="dropdown" href="#" id="dropdownMenu1" style="width:200px;"><span class="selection pull-left">Select an option </span>
-    <span class="pull-right glyphiconglyphicon-chevron-down caret" style="float:right;margin-top:10px;"></span></a>
-            <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
-                {% for alert in alerts %}
-                <li>
-                    <a data-id="{{alert['alertid']}}" class="feedalerts">
-                        <h4> <span> {{alert['name']}}</span> </h4>
-                        <p>KW: {{ ", ".join(alert['keywords']) }} <br> EKW: {{ ", ".join(alert['excludedkeywords']) }} </p></a>
-                </li>
-                {% endfor %}
-            </ul>
-        </div>
-    </div>
-</div>
-<div class="container" id="feedcontainer">
-</div>
+{% if comesAlert %}
+  <div class="container" id="feedcontainer">
+    {% include 'alertFeed.html' %}
+  </div>
+{% else %}
+  <div class="container" style="margin-bottom:10px">
+      <h2><strong>Feed</strong></h2>
+      <div class="row">
+          <div class="btn-group" class="col-xs-6">
+              <a class="btn btn-default dropdown-toggle btn-blog " data-toggle="dropdown" href="#" id="dropdownMenu1" style="width:200px;"><span class="selection pull-left">Select an option </span>
+      <span class="pull-right glyphiconglyphicon-chevron-down caret" style="float:right;margin-top:10px;"></span></a>
+              <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+                  {% for alert in alerts %}
+                  <li>
+                      <a data-id="{{alert['alertid']}}" class="feedalerts">
+                          <h4> <span> {{alert['name']}}</span> </h4>
+                          <p>KW: {{ ", ".join(alert['keywords']) }} <br> EKW: {{ ", ".join(alert['excludedkeywords']) }} </p></a>
+                  </li>
+                  {% endfor %}
+              </ul>
+          </div>
+      </div>
+  </div>
+  <div class="container" id="feedcontainer">
+  </div>
+{% endif %}
