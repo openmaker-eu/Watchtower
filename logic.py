@@ -69,7 +69,6 @@ def setupServer():
 # Refreshes Alerts status
 def refrestAlertStatus(mainT):
     alerts = getAllAlertList()
-    threadDict = mainT.getThreadDic()
     for alert in alerts:
         if alert['threadstatus'] == 'OK':
             aliveStatus = True
@@ -150,8 +149,6 @@ def deleteAlert(alertid, mainT, userid):
 
 # Updates given alert information and kill its thread, then again start its thread.
 def updateAlert(alert, mainT, userid):
-    if str(alert['alertid']) in mainT.getThreadDic():
-        mainT.killThread(alert)
     Connection.Instance().db[str(alert['alertid'])].drop()
     Connection.Instance().cur.execute("update alerts set userid = %s, keywords = %s ,excludedkeywords = %s, languages = %s, threadstatus = %s where alertid = %s;", [userid, alert['keywords'],alert['excludedkeywords'], alert['lang'], "OK", alert['alertid']])
     Connection.Instance().PostGreSQLConnect.commit()
