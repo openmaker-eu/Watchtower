@@ -9,23 +9,28 @@ class AddAlert():
         self.onlyThread = None
 
     def setup(self,alertList):
-        for alert in alertList :
-            if str(alert['alertid']) not in self.alertDic:
-                self.alertDic[str(alert['alertid'])] = alert
-        self.onlyThread = StreamCreator(self.alertDic)
-        self.onlyThread.start()
+        if len(alertList) != 0:
+            for alert in alertList :
+                if str(alert['alertid']) not in self.alertDic:
+                    self.alertDic[str(alert['alertid'])] = alert
+            print self.alertDic
+            self.onlyThread = StreamCreator(self.alertDic)
+            self.onlyThread.start()
 
     def addAlert(self, alert):
         self.alertDic[str(alert['alertid'])] = alert
-        self.killThread()
+        if self.onlyThread is not None:
+            self.killThread()
         self.onlyThread = StreamCreator(self.alertDic)
         self.onlyThread.start()
 
     def delAlert(self, alert):
         del self.alertDic[str(alert['alertid'])]
-        self.killThread()
-        self.onlyThread = StreamCreator(self.alertDic)
-        self.onlyThread.start()
+        if self.onlyThread is not None:
+            self.killThread()
+        if len(self.alertDic) != 0:
+            self.onlyThread = StreamCreator(self.alertDic)
+            self.onlyThread.start()
 
     def updateAlert(self, alert):
         del self.alertDic[str(alert['alertid'])]

@@ -9,7 +9,7 @@
                 <tr>
                     <th>Alert Name</th>
                     <th>Keywords</th>
-                    <th>Exclude Keywords</th>
+                    <!--<th>Exclude Keywords</th>-->
                     <th>Creation Time</th>
                     <th>#Tweets</th>
                     <th>Edit</th>
@@ -23,9 +23,9 @@
                 <tr>
                     <td><a href="/Feed/{{alert['alertid']}}" style="text-decoration : none; color : #000000;">{{ alert['name'] }}</a></td>
                     <td>{{ ", ".join(alert['keywords']) }}</td>
-                    <td>{{ ", ".join(alert['excludedkeywords']) }}</td>
-                    <td>{{alert['creationTime']}}</td>
-                    <td>{{alert['tweetCount']}}</td>
+                    <!--<td>{{ ", ".join(alert['excludedkeywords']) }}</td>-->
+                    <td style="text-align:center">{{alert['creationTime']}}</td>
+                    <td style="text-align:center">{{alert['tweetCount']}}</td>
                     <td>
                         <a href="/alertinfo/{{alert['alertid']}}">
                             <button type="button" name="edit" class="btn btn-default">Edit</button>

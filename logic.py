@@ -50,7 +50,7 @@ def response(alertid):
 def getAllAlertList():
     Connection.Instance().cur.execute("Select * from alerts;")
     var = Connection.Instance().cur.fetchall()
-    alerts = [{'alertid':i[0], 'name':i[2], 'keywords':i[3].split(","), 'excludedkeywords': i[4].split(","),\
+    alerts = [{'alertid':i[0], 'name':i[2], 'keywords':i[3].split(","), \
                'lang': i[5].split(","), 'status': i[6], 'threadstatus': i[7], 'creationTime': i[8]} for i in var]
     alerts = sorted(alerts, key=lambda k: k['alertid'])
     return alerts
@@ -82,8 +82,8 @@ def getAlertList(userid):
     print userid
     Connection.Instance().cur.execute("Select * from alerts where userid = %s;", [userid])
     var = Connection.Instance().cur.fetchall()
-    alerts = [{'alertid':i[0], 'name':i[2], 'keywords':i[3].split(","), 'excludedkeywords': i[4].split(","),\
-               'lang': i[5].split(","), 'status': i[6], 'threadstatus': i[7], 'creationTime': i[8]} for i in var]
+    alerts = [{'alertid':i[0], 'name':i[2], 'keywords':i[3].split(","), 'lang': i[5].split(","),\
+               'status': i[6], 'threadstatus': i[7], 'creationTime': i[8]} for i in var]
     alerts = sorted(alerts, key=lambda k: k['alertid'])
     for alert in alerts:
         alert['tweetCount'] = Connection.Instance().db[str(alert['alertid'])].find().count()
@@ -94,16 +94,16 @@ def getAlert(alertid):
     if alertid != None:
         Connection.Instance().cur.execute("Select * from alerts where alertid = %s;", [alertid])
         var = Connection.Instance().cur.fetchone()
-        alert = {'alertid': var[0], 'name':var[2], 'keywords':var[3], 'excludedkeywords': var[4], 'lang': var[5].split(","), 'status': var[6], 'keywordlimit': var[9]}
+        alert = {'alertid': var[0], 'name':var[2], 'keywords':var[3], 'lang': var[5].split(","), 'status': var[6], 'keywordlimit': var[9]}
     else:
-        alert = {'alertid': "", 'name': "", 'keywords': "", 'excludedkeywords': "", 'lang': "", 'status': False, 'keywordlimit': 10}
+        alert = {'alertid': "", 'name': "", 'keywords': "", 'lang': "", 'status': False, 'keywordlimit': 10}
     return alert
 
 # Take alertid and return that alert as not lists
 def getAlertAllOfThemList(alertid):
     Connection.Instance().cur.execute("Select * from alerts where alertid = %s;", [alertid])
     var = Connection.Instance().cur.fetchone()
-    alert = {'alertid':var[0], 'name':var[2], 'keywords':var[3].split(","), 'excludedkeywords':var[4].split(","), 'lang': var[5].split(","), 'status': var[6]}
+    alert = {'alertid':var[0], 'name':var[2], 'keywords':var[3].split(","), 'lang': var[5].split(","), 'status': var[6]}
     return alert
 
 # Give nextalertid
@@ -129,8 +129,8 @@ def setUserAlertLimit(userid, setType):
 # Take alert information, give an id and add it DB
 def addAlert(alert, mainT, userid):
     alert['alertid'] = getNextAlertId()
-    now = strftime("%Y-%m-%d %H:%M:%S", gmtime())
-    Connection.Instance().cur.execute("INSERT INTO alerts (alertid, userid, alertname, keywords,excludedkeywords, languages, creationtime, keywordlimit, threadstatus) values (%s, %s, %s, %s, %s, %s, %s, %s, %s);", [alert['alertid'], userid, alert['name'], alert['keywords'], alert['excludedkeywords'], alert['lang'], now, alert['keywordlimit'], "OK"])
+    now = strftime("%Y-%m-%d", gmtime())
+    Connection.Instance().cur.execute("INSERT INTO alerts (alertid, userid, alertname, keywords, languages, creationtime, keywordlimit, threadstatus) values (%s, %s, %s, %s, %s, %s, %s, %s);", [alert['alertid'], userid, alert['name'], alert['keywords'], alert['lang'], now, alert['keywordlimit'], "OK"])
     Connection.Instance().PostGreSQLConnect.commit()
     alert = getAlertAllOfThemList(alert['alertid'])
     setUserAlertLimit(userid, 'decrement')
@@ -150,7 +150,7 @@ def deleteAlert(alertid, mainT, userid):
 # Updates given alert information and kill its thread, then again start its thread.
 def updateAlert(alert, mainT, userid):
     Connection.Instance().db[str(alert['alertid'])].drop()
-    Connection.Instance().cur.execute("update alerts set userid = %s, keywords = %s ,excludedkeywords = %s, languages = %s, threadstatus = %s where alertid = %s;", [userid, alert['keywords'],alert['excludedkeywords'], alert['lang'], "OK", alert['alertid']])
+    Connection.Instance().cur.execute("update alerts set userid = %s, keywords = %s , languages = %s, threadstatus = %s where alertid = %s;", [userid, alert['keywords'], alert['lang'], "OK", alert['alertid']])
     Connection.Instance().PostGreSQLConnect.commit()
     alert = getAlertAllOfThemList(alert['alertid'])
     mainT.updateAlert(alert)

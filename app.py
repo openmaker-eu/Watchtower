@@ -187,7 +187,7 @@ class CreateEditAlertsHandler(BaseHandler, TemplateRendering):
         alert['keywords'] = ",".join(self.get_argument("keywords").split(","))
         keywordlimit = 10 - len(self.get_argument("keywords").split(","))
         alert['keywordlimit'] = keywordlimit
-        alert['excludedkeywords'] = ",".join(self.get_argument("excludedkeywords").split(","))
+        #alert['excludedkeywords'] = ",".join(self.get_argument("excludedkeywords").split(","))
         if len(self.request.arguments.get("languages")) != 0:
             alert['lang'] = ",".join(self.request.arguments.get("languages"))
         else:
@@ -206,7 +206,7 @@ class PreviewHandler(BaseHandler, TemplateRendering):
     def post(self):
         template = 'tweetsTemplate.html'
         keywords = self.get_argument("keywords")
-        exculdedkeywords = self.get_argument("excludedkeywords")
+        #exculdedkeywords = self.get_argument("excludedkeywords")
         languages = self.get_argument("languages")
         variables = {
             'tweets': logic.searchTweets(keywords, languages)

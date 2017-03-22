@@ -6,22 +6,24 @@ import time
 import threading
 from application.Connections import Connection
 import json
-import sys
-reload(sys)
-sys.setdefaultencoding('utf8')
+import re
 
 def get_keywords(alertDic):
-    keywords = set()
+    keywords = []
     for key in alertDic:
         alert = alertDic[key]
-        keywords.union(alert['keywords'])
+        keywords = keywords + alert['keywords']
+    keywords = list(set(keywords))
+    print "get keys "
     return keywords
 
 def get_lang(alertDic):
-    lang = set()
+    lang = []
     for key in alertDic:
         alert = alertDic[key]
-        lang.union(alert['lang'])
+        lang = lang + alert['lang']
+    lang = list(set(lang))
+    print "get lang "
     return lang
 
 def get_next_tweets_sequence():
@@ -34,10 +36,11 @@ def get_next_tweets_sequence():
     return cursor['seq']
 
 def separates_tweet(alertDic, tweet):
-    for alert in alertDic:
-        for keyword in alert['keyword']:
+    for key in alertDic:
+        alert = alertDic[key]
+        for keyword in alert['keywords']:
             keyword = re.compile(re.escape(keyword), re.IGNORECASE)
-            if re.search(keyword, tweet):
+            if len(re.findall(keyword, tweet['text'])) != 0:
                 Connection.Instance().db[str(alert['alertid'])].insert_one(tweet)
 
 # Accessing Twitter API
@@ -58,13 +61,14 @@ class StdOutListener(StreamListener):
         if self.terminate == False:
             tweet = json.loads(data)
             tweet['tweetDBId'] = get_next_tweets_sequence()
-            separates_tweet(alertDic, tweet)
+            separates_tweet(self.alertDic, tweet)
             Connection.Instance().db["all"].insert_one(tweet)
             return True
         else:
             return False
 
     def on_error(self, status):
+        print status
         if self.terminate == True:
             return False
 
@@ -76,7 +80,9 @@ class StreamCreator():
         #This handles Twitter authetification and the connection to Twitter Streaming API
         self.l = StdOutListener(alertDic)
         self.keywords = get_keywords(alertDic= alertDic)
+        print self.keywords
         self.lang = get_lang(alertDic= alertDic)
+        print self.lang
         self.auth = OAuthHandler(consumer_key, consumer_secret)
         self.auth.set_access_token(access_token, access_secret)
         self.stream = Stream(self.auth, self.l)
