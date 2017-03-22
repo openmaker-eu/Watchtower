@@ -1,4 +1,4 @@
-from addTrack import AddTrack
+from addTrack import AddAlert
 from app import webserverInit
 from logic import getAllAlertList, setupServer
 
