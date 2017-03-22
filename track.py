@@ -80,7 +80,7 @@ class StreamCreator():
         self.auth = OAuthHandler(consumer_key, consumer_secret)
         self.auth.set_access_token(access_token, access_secret)
         self.stream = Stream(self.auth, self.l)
-        self.t = threading.Thread(target = self.stream.filter, kwargs = {'track':keywords, 'languages':lang} )
+        self.t = threading.Thread(target = self.stream.filter, kwargs = {'track':self.keywords, 'languages':self.lang} )
     def start(self):
         self.t.deamon = True
         self.t.start()
