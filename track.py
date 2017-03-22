@@ -12,13 +12,13 @@ sys.setdefaultencoding('utf8')
 
 def get_keywords(alertDic):
     keywords = set()
-    for alert in alertList :
+    for key,alert in alertDic:
         keywords.union(alert['keywords'])
     return keywords
 
 def get_lang(alertDic):
     lang = set()
-    for alert in alertList :
+    for key,alert in alertDic:
         lang.union(alert['lang'])
     return lang
 
