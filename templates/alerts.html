@@ -34,12 +34,12 @@
                     <td>
                     <button onclick= "alertbuttonclick({{alert['alertid']}}, 'remove');" posttype = "remove" alertid = "{{alert['alertid']}}" class="btn btn-default">Remove</button>
                     </td>
-                    <td>
+                    <td><!--
                       {% if alert['threadstatus'] == "OK" %}
                         <span style="background-color:#5CB85C;color:white;font-size:16px;padding:8px;position: relative;top: 7px;"> <b>{{alert['threadstatus']}}</b></span>
                       {% else %}
                         <span style="background-color:#d9534f;color:white;font-size:16px;padding:8px;position: relative;top: 7px;"> <b>{{alert['threadstatus']}}</b></span>
-                      {% endif %}
+                      {% endif %}--> Dummy
                     </td>
                     <td>
                         {% if not alert['status'] %}
