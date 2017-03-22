@@ -1,4 +1,4 @@
-from AddAlert import AddAlert
+from addAlert import AddAlert
 from app import webserverInit
 from logic import getAllAlertList, setupServer
 
