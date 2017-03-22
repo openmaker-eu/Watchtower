@@ -135,17 +135,14 @@ def addAlert(alert, mainT, userid):
     Connection.Instance().PostGreSQLConnect.commit()
     alert = getAlertAllOfThemList(alert['alertid'])
     setUserAlertLimit(userid, 'decrement')
-    mainT.addThread(alert)
+    mainT.addAlert(alert)
     return response(alert['alertid'])
 
 # Deletes alert and terminate its thread
 def deleteAlert(alertid, mainT, userid):
     alert = getAlertAllOfThemList(alertid)
     setUserAlertLimit(userid, 'increment')
-    if str(alert['alertid']) in mainT.getThreadDic():
-        print "delete"
-        mainT.killThread(alert)
-        print mainT.getThreadDic()
+    mainT.delAlert(alert)
     Connection.Instance().db[str(alertid)].drop()
     Connection.Instance().cur.execute("delete from alerts where alertid = %s;", [alertid])
     Connection.Instance().PostGreSQLConnect.commit()
@@ -159,16 +156,13 @@ def updateAlert(alert, mainT, userid):
     Connection.Instance().cur.execute("update alerts set userid = %s, keywords = %s ,excludedkeywords = %s, languages = %s, threadstatus = %s where alertid = %s;", [userid, alert['keywords'],alert['excludedkeywords'], alert['lang'], "OK", alert['alertid']])
     Connection.Instance().PostGreSQLConnect.commit()
     alert = getAlertAllOfThemList(alert['alertid'])
-    mainT.addThread(alert)
+    mainT.updateAlert(alert)
     return response(alert['alertid'])
 
 # Starts alert streaming.
 def startAlert(alertid, mainT):
     alert = getAlertAllOfThemList(alertid)
-    print mainT.getThreadDic(), alert['alertid']
-    if str(alert['alertid']) in mainT.getThreadDic():
-        mainT.killThread(alert)
-    mainT.addThread(alert)
+    mainT.addAlert(alert)
     return response(alert['alertid'])
 
 # Stops alert streaming.
@@ -176,9 +170,7 @@ def stopAlert(alertid, mainT):
     Connection.Instance().cur.execute("update alerts set isalive = %s, threadstatus = %s where alertid = %s;", [False, '-', alertid])
     Connection.Instance().PostGreSQLConnect.commit()
     alert = getAlertAllOfThemList(alertid)
-    print mainT.getThreadDic(), alert['alertid']
-    if str(alert['alertid']) in mainT.getThreadDic():
-        mainT.killThread(alert)
+    mainT.delAlert(alert)
     return response(alert['alertid'])
 
 def getTweets(alertid):

@@ -44,7 +44,7 @@
                     <td>
                         {% if not alert['status'] %}
                         <button onclick= "alertbuttonclick({{alert['alertid']}}, 'start');" posttype = "start" alertid = "{{alert['alertid']}}" class="btn btn-default">
-                  <span class="glyphicon glyphicon-play" style="color: white"></span>
+                  <span class="glyphicon glyphicon-play"></span>
                 </button> {% else %}
                         <button onclick= "alertbuttonclick({{alert['alertid']}}, 'stop');" posttype = "stop" alertid = "{{alert['alertid']}}" class="btn btn-default">
                   <span class="glyphicon glyphicon-stop"></span>
