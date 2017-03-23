@@ -40,5 +40,8 @@ class AddAlert():
         self.onlyThread.terminate()
         self.onlyThread = None
 
+    def checkThread(self):
+        print "thread status: " + str(self.onlyThread.checkAlive())
+
     def __getitem__(self):
         return (self.threadDic)

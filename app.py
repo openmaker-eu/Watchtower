@@ -117,6 +117,7 @@ class LogoutHandler(BaseHandler, TemplateRendering):
 class AlertsHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
     def get(self, alertid = None):
+        self.mainT.checkThread()
         logic.refrestAlertStatus(self.mainT)
         userid = tornado.escape.xhtml_escape(self.current_user)
         template = 'afterlogintemplate.html'
@@ -135,13 +136,10 @@ class AlertsHandler(BaseHandler, TemplateRendering):
         posttype = self.get_argument("posttype")
         userid = tornado.escape.xhtml_escape(self.current_user)
         if posttype == u'remove':
-            print posttype, type(posttype)
             info = logic.deleteAlert(alertid, self.mainT,userid)
         elif posttype == u'stop':
-            print "stop", alertid, posttype
             info = logic.stopAlert(alertid, self.mainT)
         else:
-            print "start"
             info = logic.startAlert(alertid, self.mainT)
         template = "alerts.html"
         variables = {
@@ -171,7 +169,6 @@ class CreateEditAlertsHandler(BaseHandler, TemplateRendering):
             variables['alert'] = logic.getAlert(alertid)
             variables['type'] = "editAlert"
         else:
-            print logic.getAlertLimit(userid)
             if logic.getAlertLimit(userid) == 0:
                 self.redirect("/Alerts")
             variables['title'] = "Create Alert"
@@ -222,7 +219,6 @@ class FeedHandler(BaseHandler, TemplateRendering):
         if argument is not None:
             try:
                 alertid = int(argument)
-                print "long"
                 variables = {
                     'title': "Feed",
                     'tweets': logic.getTweets(alertid),
@@ -231,7 +227,6 @@ class FeedHandler(BaseHandler, TemplateRendering):
                     'type': "feed"
                 }
             except ValueError:
-                print "str"
                 variables = {
                     'title': "Feed",
                     'alerts': logic.getAlertList(userid),

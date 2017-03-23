@@ -79,7 +79,6 @@ def refrestAlertStatus(mainT):
 
 # Gives alerts as lists
 def getAlertList(userid):
-    print userid
     Connection.Instance().cur.execute("Select * from alerts where userid = %s;", [userid])
     var = Connection.Instance().cur.fetchall()
     alerts = [{'alertid':i[0], 'name':i[2], 'keywords':i[3].split(","), 'lang': i[5].split(","),\
