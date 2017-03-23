@@ -7,6 +7,7 @@ import threading
 from application.Connections import Connection
 import json
 import re
+from bson.objectid import ObjectId
 
 def get_keywords(alertDic):
     keywords = []
@@ -41,6 +42,7 @@ def separates_tweet(alertDic, tweet):
         for keyword in alert['keywords']:
             keyword = re.compile(re.escape(keyword), re.IGNORECASE)
             if len(re.findall(keyword, tweet['text'])) != 0:
+                tweet['_id'] = ObjectId()
                 Connection.Instance().db[str(alert['alertid'])].insert_one(tweet)
 
 # Accessing Twitter API
@@ -62,6 +64,7 @@ class StdOutListener(StreamListener):
             tweet = json.loads(data)
             tweet['tweetDBId'] = get_next_tweets_sequence()
             separates_tweet(self.alertDic, tweet)
+            tweet['_id'] = ObjectId() 
             Connection.Instance().db["all"].insert_one(tweet)
             return True
         else:
