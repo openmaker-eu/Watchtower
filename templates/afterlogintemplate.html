@@ -103,6 +103,7 @@
     {% if type == "alertlist" %}
       <script src="/js/bootstrap-notify.min.js"></script>
       <script src="/js/bootstrap-notify.js"></script>
+      <!--
       <script>
       $(document).ready(function() {
         var path = window.location.pathname;
@@ -138,8 +139,8 @@
             console.log("message:" + message);
         });
       }
-
       </script>
+    -->
       <script>
         function alertbuttonclick(aid, ptype) {
               //var aid = $(this).attr("alertid");
@@ -155,8 +156,8 @@
               }).success(function(html) {
                   $('#alerts').remove();
                   $("#alertspage").append(html);
-                  console.log("notification :" + aid);
-                  notification(aid);
+                  //console.log("notification :" + aid);
+                  //notification(aid);
               });
         }
       </script>
