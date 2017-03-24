@@ -1,5 +1,5 @@
     <div id="alerts">
-      <div class="col-sm-10">
+      <div class="col-sm-9">
         {% if alertlimit != 0 %}
           <a href="/alertinfo">Create a new alert</a>
         {% else %}
@@ -7,23 +7,11 @@
         {% endif %}
       </div>
 
-      {% if threadstatus %}
-      <div class="col-sm-2">
-        <div class="panel panel-success">
-          <div class="panel-heading" style="color:white"><s>
-            <p style="text-align:center"> Thread Status:
-              <span class="glyphicon glyphicon-ok"></span></p></s>
-          </div>
-        </div>
-          {% else %}
-          <div class="col-sm-2">
-            <div class="panel panel-success">
-              <div class="panel-heading" style="color:white"><s>
-                <p style="text-align:center"> Thread Status:
-                  <span class="glyphicon glyphicon-remove"></span></p></s>
-              </div>
-            </div>
-          {% endif %}
+      <div class="col-sm-3">
+        <p style="text-allign:right"><b>Thread Status:
+          {% if threadstatus %}<span class="glyphicon glyphicon-ok"></span>
+          {% else %} <span class="glyphicon glyphicon-remove">
+          {% endif %}</b> </p>
       </div>
 
         <table class="table">
@@ -31,7 +19,6 @@
                 <tr>
                     <th>Alert Name</th>
                     <th>Keywords</th>
-                    <th>Languages</th>
                     <!--<th>Exclude Keywords</th>-->
                     <th>Creation Time</th>
                     <th>#Tweets</th>
@@ -45,7 +32,6 @@
                 <tr>
                     <td><a href="/Feed/{{alert['alertid']}}" style="text-decoration : none; color : #000000;">{{ alert['name'] }}</a></td>
                     <td>{{ ", ".join(alert['keywords']) }}</td>
-                    <td>{{ ", ".join(alert['lang']) }}</td>
                     <!--<td>{{ ", ".join(alert['excludedkeywords']) }}</td>-->
                     <td style="text-align:center">{{alert['creationTime']}}</td>
                     <td style="text-align:center">{{alert['tweetCount']}}</td>
