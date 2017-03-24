@@ -225,6 +225,8 @@ class FeedHandler(BaseHandler, TemplateRendering):
                     'comesAlert': True,
                     'type': "feed"
                 }
+                if len(variables['tweets']) == 0:
+                    self.write("<p style='color: red; font-size: 15px'><b>Ops! There is no tweet now.</b></p>")
             except ValueError:
                 variables = {
                     'title': "Feed",
