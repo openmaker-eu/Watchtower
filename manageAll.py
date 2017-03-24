@@ -1,8 +1,7 @@
 from addAlert import AddAlert
 from app import webserverInit
-from logic import getAllAlertList, setupServer
+from logic import getAllRunningAlertList
 
 mainT = AddAlert()
-mainT.setup(getAllAlertList())
-setupServer()
+mainT.setup(getAllRunningAlertList())
 webserverInit(mainT)

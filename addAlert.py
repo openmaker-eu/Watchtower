@@ -25,7 +25,8 @@ class AddAlert():
         self.onlyThread.start()
 
     def delAlert(self, alert):
-        del self.alertDic[str(alert['alertid'])]
+        if str(alert['alertid']) in self.alertDic:
+            del self.alertDic[str(alert['alertid'])]
         if self.onlyThread is not None:
             self.killThread()
         if len(self.alertDic) != 0:
@@ -33,7 +34,8 @@ class AddAlert():
             self.onlyThread.start()
 
     def updateAlert(self, alert):
-        del self.alertDic[str(alert['alertid'])]
+        if str(alert['alertid']) in self.alertDic:
+            del self.alertDic[str(alert['alertid'])]
         self.addAlert(alert)
 
     def killThread(self):
@@ -41,7 +43,9 @@ class AddAlert():
         self.onlyThread = None
 
     def checkThread(self):
-        print "thread status: " + str(self.onlyThread.checkAlive())
+        if self.onlyThread is not None:
+            return str(self.onlyThread.checkAlive())
+        return ""
 
     def __getitem__(self):
         return (self.threadDic)

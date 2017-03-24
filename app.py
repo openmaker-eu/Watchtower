@@ -47,8 +47,7 @@ class Application(tornado.web.Application):
             (r"/logout", LogoutHandler, {'mainT': mainT}),
             (r"/login", LoginHandler, {'mainT':mainT}),
             (r"/Alerts", AlertsHandler, {'mainT':mainT}),
-            (r"/message", MessageHandler, {'mainT':mainT}),
-            (r"/Alerts/([0-9])", AlertsHandler, {'mainT':mainT}),
+            #(r"/message", MessageHandler, {'mainT':mainT}),
             (r"/alertinfo", CreateEditAlertsHandler, {'mainT':mainT}),
             (r"/alertinfo/([0-9])", CreateEditAlertsHandler, {'mainT':mainT}),
             (r"/Feed/(.*)", FeedHandler, {'mainT':mainT}),
@@ -116,16 +115,16 @@ class LogoutHandler(BaseHandler, TemplateRendering):
 
 class AlertsHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
-    def get(self, alertid = None):
+    def get(self):
         self.mainT.checkThread()
-        logic.refrestAlertStatus(self.mainT)
         userid = tornado.escape.xhtml_escape(self.current_user)
         template = 'afterlogintemplate.html'
         variables = {
             'title' : "Alerts",
             'alerts' : logic.getAlertList(userid),
             'type' : "alertlist",
-            'alertlimit' : logic.getAlertLimit(userid)
+            'alertlimit' : logic.getAlertLimit(userid),
+            'threadstatus': logic.getThreadStatus(self.mainT)
         }
         content = self.render_template(template, variables)
         self.write(content)
@@ -196,7 +195,7 @@ class CreateEditAlertsHandler(BaseHandler, TemplateRendering):
             alert['name'] = self.get_argument('alertname')
             alertid = logic.getNextAlertId()
             logic.addAlert(alert, self.mainT, userid)
-        self.redirect("/Alerts/" + str(alertid))
+        self.redirect("/Alerts")
 
 class PreviewHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated

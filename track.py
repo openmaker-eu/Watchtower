@@ -39,11 +39,12 @@ def get_next_tweets_sequence():
 def separates_tweet(alertDic, tweet):
     for key in alertDic:
         alert = alertDic[key]
-        for keyword in alert['keywords']:
-            keyword = re.compile(re.escape(keyword), re.IGNORECASE)
-            if len(re.findall(keyword, tweet['text'])) != 0:
-                tweet['_id'] = ObjectId()
-                Connection.Instance().db[str(alert['alertid'])].insert_one(tweet)
+        if tweet['lang'] in alert['lang']:
+            for keyword in alert['keywords']:
+                keyword = re.compile(re.escape(keyword), re.IGNORECASE)
+                if len(re.findall(keyword, tweet['text'])) != 0:
+                    tweet['_id'] = ObjectId()
+                    Connection.Instance().db[str(alert['alertid'])].insert_one(tweet)
 
 # Accessing Twitter API
 consumer_key = "utTM4qfuhmzeLUxRkBb1xb12P" # API key
@@ -64,7 +65,7 @@ class StdOutListener(StreamListener):
             tweet = json.loads(data)
             tweet['tweetDBId'] = get_next_tweets_sequence()
             separates_tweet(self.alertDic, tweet)
-            tweet['_id'] = ObjectId() 
+            tweet['_id'] = ObjectId()
             Connection.Instance().db["all"].insert_one(tweet)
             return True
         else:
