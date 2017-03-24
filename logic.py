@@ -104,7 +104,6 @@ def addAlert(alert, mainT, userid):
     alert = getAlertAllOfThemList(alert['alertid'])
     setUserAlertLimit(userid, 'decrement')
     mainT.addAlert(alert)
-    return response(alert['alertid'])
 
 # Deletes alert and terminate its thread
 def deleteAlert(alertid, mainT, userid):
@@ -114,7 +113,6 @@ def deleteAlert(alertid, mainT, userid):
     Connection.Instance().db[str(alertid)].drop()
     Connection.Instance().cur.execute("delete from alerts where alertid = %s;", [alertid])
     Connection.Instance().PostGreSQLConnect.commit()
-    return response(alertid)
 
 # Updates given alert information and kill its thread, then again start its thread.
 def updateAlert(alert, mainT, userid):
