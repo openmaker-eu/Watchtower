@@ -19,6 +19,7 @@
                 <tr>
                     <th>Alert Name</th>
                     <th>Keywords</th>
+                    <th>Languages</th>
                     <!--<th>Exclude Keywords</th>-->
                     <th>Creation Time</th>
                     <th>#Tweets</th>
@@ -32,6 +33,7 @@
                 <tr>
                     <td><a href="/Feed/{{alert['alertid']}}" style="text-decoration : none; color : #000000;">{{ alert['name'] }}</a></td>
                     <td>{{ ", ".join(alert['keywords']) }}</td>
+                    <td>{{ ", ".join(alert['lang']) }}</td>
                     <!--<td>{{ ", ".join(alert['excludedkeywords']) }}</td>-->
                     <td style="text-align:center">{{alert['creationTime']}}</td>
                     <td style="text-align:center">{{alert['tweetCount']}}</td>
