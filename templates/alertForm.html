@@ -1,8 +1,8 @@
-<div class="container">
+<div class="container form-alert">
   <legend align="center"><h1>Alert Information</h1></legend>
     <div class="row" style="height: 550px">
         <div class="col-xs-6">
-            <form id="bootstrapTagsInputForm" method="post" action={% if alert[ 'name'] !="" %}"/alertinfo/{{alert['alertid']}}"{% else %}"/alertinfo"{% endif %} onkeypress="return event.keyCode != 13;">
+            <form id="bootstrapTagsInputForm" class="alert-form" method="post" action={% if alert[ 'name'] !="" %}"/alertinfo/{{alert['alertid']}}"{% else %}"/alertinfo"{% endif %} onkeypress="return event.keyCode != 13;">
                 <!-- Text input-->
                 <div class="form-group">
                     <label style="font-size: 18px"for="Alert Name">Alert Name</label>

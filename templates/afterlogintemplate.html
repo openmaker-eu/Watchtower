@@ -24,6 +24,10 @@
     <link rel="stylesheet" href="/css/bootstrap-theme.min.css">
     <link rel="stylesheet" href="/css/bootstrap-tagsinput.css">
     <style type="text/css">
+        .form-alert form .input-error {
+        	border-color: #de615e;
+        }
+
         #opt {
             font-size: 16px;
         }
@@ -217,6 +221,37 @@
                 });
             });
         });
+    </script>
+
+    <script>
+
+    jQuery(document).ready(function() {
+        $('.alert-form  input[name="alertname"], .alert-form input[name="keywords"], .alert-form  input[name="languages"]').on('focus', function() {
+          $(this).removeClass('input-error');
+        });
+
+        $('.alert-form').on('submit', function(e) {
+
+          $(this).find('input[name="alertname"], input[name="keywords"], select[name="languages"]').each(function(){
+            if( $(this).val() == "" || $(this).val() == null) {
+              e.preventDefault();
+              if($(this).attr("name") == "keywords"){
+                $(".bootstrap-tagsinput").addClass("input-error")
+              }
+              else{
+                $(this).addClass('input-error');
+              }
+            }
+            else {
+              $(this).removeClass('input-error');
+            }
+          });
+
+        });
+
+
+    });
+
     </script>
     {% endif %}
     <!-- for feed -->
