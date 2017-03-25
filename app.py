@@ -55,6 +55,7 @@ class Application(tornado.web.Application):
             (r"/preview", PreviewHandler, {'mainT':mainT}),
             (r"/newTweets", NewTweetsHandler, {'mainT':mainT}),
             (r"/newTweets/(.*)", NewTweetsHandler, {'mainT':mainT}),
+            (r"/api", DocumentationHandler, {'mainT':mainT}),
             (r"/api/get_themes", ThemesHandler, {'mainT':mainT}),
             (r"/api/get_influencers/(.*)", InfluencersHandler, {'mainT':mainT}),
             (r"/api/get_feeds/(.*)", FeedsHandler, {'mainT':mainT}),
@@ -62,23 +63,32 @@ class Application(tornado.web.Application):
         ]
         super(Application, self).__init__(handlers, **settings)
 
+class DocumentationHandler(BaseHandler, TemplateRendering):
+    def get(self):
+        template = 'api.html'
+        variables = {
+            'title' : "Watchtower Api"
+        }
+        content = self.render_template(template, variables)
+        self.write(content)
+
 class ThemesHandler(BaseHandler, TemplateRendering):
     def get(self):
         themes = logic.getThemes()
-        self.write(themes)
-        self.finish()
+        self.set_header('Content-Type', 'application/json')
+        self.write(json_encode(themes))
 
 class InfluencersHandler(BaseHandler, TemplateRendering):
     def get(self, themename):
         influencers = logic.getInfluencers(themename)
-        self.write(influencers)
-        self.finish()
+        self.set_header('Content-Type', 'application/json')
+        self.write(json_encode(influencers))
 
 class FeedsHandler(BaseHandler, TemplateRendering):
     def get(self, themename):
         feeds = logic.getFeeds(themename)
-        self.write(feeds)
-        self.finish()
+        self.set_header('Content-Type', 'application/json')
+        self.write(json_encode(feeds))
 
 class MainHandler(BaseHandler, TemplateRendering):
     def get(self):
