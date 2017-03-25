@@ -2,7 +2,7 @@
   <li class="list-group-item" tweetid="{{tweet['tweetDBId']}}">
       <img style="float: left; margin: 0px 10px 0px 0px;" src="{{tweet['user']['profile_image_url']}}"/>
       <h5><small>@{{tweet['user']['screen_name']}}</small></br>
-      <a href="http://twitter.com/{{tweet['user']['screen_name']}}" style="text-decoration : none; color : #000000;"><b>{{tweet['user']['name']}}</b></a></h5>
+      <a target="_blank" href="http://twitter.com/{{tweet['user']['screen_name']}}" style="text-decoration : none; color : #000000;"><b>{{tweet['user']['name']}}</b></a></h5>
       <p>{{tweet['text']}}</br></p>
         <small>{{tweet['created_at']}}</small>
   </li>

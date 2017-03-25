@@ -147,7 +147,7 @@ def getTweets(alertid):
         urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', tweet['text'])
         if len(urls) != 0:
             for url in urls:
-                ahref = '<a href="' + url + '">' + url + '</a>'
+                ahref = '<a target="_blank" href="' + url + '">' + url + '</a>'
                 url = re.compile(re.escape(url), re.IGNORECASE)
                 tweet['text'] = url.sub(ahref, tweet['text'])
     return tweets
@@ -165,7 +165,7 @@ def getSkipTweets(alertid, lastTweetId):
         urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', tweet['text'])
         if len(urls) != 0:
             for url in urls:
-                ahref = '<a href="' + url + '">' + url + '</a>'
+                ahref = '<a target="_blank" href="' + url + '">' + url + '</a>'
                 url = re.compile(re.escape(url), re.IGNORECASE)
                 tweet['text'] = url.sub(ahref, tweet['text'])
     return tweets
@@ -195,7 +195,7 @@ def getNewTweets(alertid, newestId):
         urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', tweet['text'])
         if len(urls) != 0:
             for url in urls:
-                ahref = '<a href="' + url + '">' + url + '</a>'
+                ahref = '<a target="_blank" href="' + url + '">' + url + '</a>'
                 url = re.compile(re.escape(url), re.IGNORECASE)
                 tweet['text'] = url.sub(ahref, tweet['text'])
     return tweets
@@ -214,7 +214,7 @@ def searchTweets(keywords, languages):
         urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', tweet['text'])
         if len(urls) != 0:
             for url in urls:
-                ahref = '<a href="' + url + '">' + url + '</a>'
+                ahref = '<a target="_blank" href="' + url + '">' + url + '</a>'
                 url = re.compile(re.escape(url), re.IGNORECASE)
                 tweet['text'] = url.sub(ahref, tweet['text'])
     return tweets
