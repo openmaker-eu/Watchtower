@@ -62,7 +62,7 @@ def checkUserIdAlertId(userid, alertid):
     Connection.Instance().cur.execute("Select userid from alerts where alertid = %s;", [alertid])
     var = Connection.Instance().cur.fetchone()
     print var
-    if len(var) != 0:
+    if var != None and len(var) != 0:
         return int(var[0]) == int(userid)
     else:
         return false
