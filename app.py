@@ -174,7 +174,7 @@ class CreateEditAlertsHandler(BaseHandler, TemplateRendering):
         template = 'afterlogintemplate.html'
         variables = {}
         if alertid != None:
-            if checkUserIdAlertId(userid, alertid):
+            if logic.checkUserIdAlertId(userid, alertid):
                 variables['title'] = "Edit Alert"
                 variables['alert'] = logic.getAlert(alertid)
                 variables['type'] = "editAlert"
