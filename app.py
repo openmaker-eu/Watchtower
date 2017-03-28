@@ -49,7 +49,7 @@ class Application(tornado.web.Application):
             (r"/Alerts", AlertsHandler, {'mainT':mainT}),
             #(r"/message", MessageHandler, {'mainT':mainT}),
             (r"/alertinfo", CreateEditAlertsHandler, {'mainT':mainT}),
-            (r"/alertinfo/([0-9])", CreateEditAlertsHandler, {'mainT':mainT}),
+            (r"/alertinfo/([0-9]*)", CreateEditAlertsHandler, {'mainT':mainT}),
             (r"/Feed/(.*)", FeedHandler, {'mainT':mainT}),
             (r"/Feed", FeedHandler, {'mainT':mainT}),
             (r"/preview", PreviewHandler, {'mainT':mainT}),
