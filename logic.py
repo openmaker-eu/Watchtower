@@ -58,6 +58,14 @@ def getAlertList(userid):
         alert['tweetCount'] = Connection.Instance().db[str(alert['alertid'])].find().count()
     return alerts
 
+def alertExist(alertid):
+    Connection.Instance().cur.execute("Select userid from alerts where alertid = %s;", [alertid])
+    var = Connection.Instance().cur.fetchone()
+    if var != None:
+        return True
+    else:
+        return False
+
 def checkUserIdAlertId(userid, alertid):
     Connection.Instance().cur.execute("Select userid from alerts where alertid = %s;", [alertid])
     var = Connection.Instance().cur.fetchone()
@@ -65,7 +73,7 @@ def checkUserIdAlertId(userid, alertid):
     if var != None and len(var) != 0:
         return int(var[0]) == int(userid)
     else:
-        return false
+        return False
 
 # Take alertid and return that alert as not lists
 def getAlert(alertid):
