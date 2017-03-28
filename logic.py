@@ -61,8 +61,9 @@ def getAlertList(userid):
 def checkUserIdAlertId(userid, alertid):
     Connection.Instance().cur.execute("Select userid from alerts where alertid = %s;", [alertid])
     var = Connection.Instance().cur.fetchone()
+    print var
     if len(var) != 0:
-        return var[0] == userid
+        return int(var[0]) == int(userid)
     else:
         return false
 
