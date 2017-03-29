@@ -45,6 +45,7 @@ def separates_tweet(alertDic, tweet):
                 if len(re.findall(keyword, tweet['text'])) != 0:
                     tweet['_id'] = ObjectId()
                     Connection.Instance().db[str(alert['alertid'])].insert_one(tweet)
+                    break
 
 # Accessing Twitter API
 consumer_key = "utTM4qfuhmzeLUxRkBb1xb12P" # API key
