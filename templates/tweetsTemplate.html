@@ -1,0 +1,12 @@
+{% for tweet in tweets %}
+<div style="text-align:center" tweetid="{{tweet['tweetDBId']}}">
+    <blockquote class="twitter-tweet tw-align-center" lang="en">
+      <p>
+        {{tweet['text']}}
+      </p>
+      &mdash; {{tweet['user']['name']}} (@{{tweet['user']['screen_name']}})
+      <a href="http://twitter.com/{{tweet['user']['screen_name']}}/statuses/{{tweet['id']}}">{{tweet['created_at']}}</a>
+    </blockquote>
+</div>
+<script type="text/javascript" async defer src="/js/widgets.js"></script>
+{% endfor %}

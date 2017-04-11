@@ -1,0 +1,53 @@
+<div class="container form-alert">
+  <legend align="center"><h1>Alert Information</h1></legend>
+    <div class="row" style="height: 550px">
+        <div class="col-xs-6">
+            <form id="bootstrapTagsInputForm" class="alert-form" method="post" action={% if alert[ 'name'] !="" %}"/alertinfo/{{alert['alertid']}}"{% else %}"/alertinfo"{% endif %} onkeypress="return event.keyCode != 13;">
+                <!-- Text input-->
+                <div class="form-group">
+                    <label style="font-size: 18px"for="Alert Name">Alert Name</label>
+                    <input name="alertname" class="form-control" id="alertname" type="text" {% if alert[ 'name'] !="" %}value="{{alert['name']}}" disabled{% endif %}>
+                </div>
+                <!-- son eklenen -->
+                <div class="form-group keyword" style="font-size: 18px">
+                    <label>Keywords</label>
+                    <br>
+                    <input type="text" id="keywords" name= "keywords" class="form-control" value="{{alert['keywords']}}" data-role="tagsinput"/>
+                    <p class="counter" style="font-size:15px">Keyword Limit: {{alert['keywordlimit']}}</p>
+                </div>
+                <!--
+                <div class="form-group" style="font-size: 18px">
+                    <label>Excluded Keywords</label>
+                    <br>
+                    <input type="text" id="excludedkeywords" name= "excludedkeywords" class="form-control" value="{{alert['excludedkeywords']}}" data-role="tagsinput"/>
+                </div>
+              -->
+                <!-- Select Multiple -->
+                <div class="form-group">
+                    <label for="Languages" style="font-size: 18px">Languages</label>
+                    <select size="7" class="form-control" name= "languages" id="languages" multiple="multiple">
+                        <option id="opt" value="en" {% if "en" in alert['lang'] %}selected="active"{% endif %}>English</option>
+                        <option id="opt" value="fr" {% if "fr" in alert['lang'] %}selected="active"{% endif %}>French</option>
+                        <option id="opt" value="de" {% if "de" in alert['lang'] %}selected="active"{% endif %}>German</option>
+                        <option id="opt" value="es" {% if "es" in alert['lang'] %}selected="active"{% endif %}>Spanish</option>
+                        <option id="opt" value="it" {% if "it" in alert['lang'] %}selected="active"{% endif %}>Italian</option>
+                        <option id="opt" value="tr" {% if "tr" in alert['lang'] %}selected="active"{% endif %}>Turkish</option>
+                        <option id="opt" value="ru" {% if "ru" in alert['lang'] %}selected="active"{% endif %}>Russian</option>
+                    </select>
+
+                </div>
+                <!-- Button -->
+                <div class="form-group">
+                    <label for="Submit"></label>
+                    <button type="button" class="btn btn-info" id="previewbutton">Preview</button>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </form>
+        </div>
+        <div class="col-xs-6" style="height : 100%; overflow: auto;">
+          <div id="spin"></div>
+          <ol class="list-group" id="preview" style=" margin-top:10px">
+          </ol>
+        </div>
+    </div>
+</div>

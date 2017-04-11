@@ -1,0 +1,342 @@
+FORMAT: 1A
+HOST: http://138.68.92.181:8484/api
+
+# Watchtower API
+
+Watchtower is a simple API allowing consumers to view the given theme's influencers and feeds.
+
+## Themes Collection [/get_themes]
+
+### List All Themes [GET]
+
++ Response 200 (application/json)
+
+        [
+            {
+                "name": "Printer"
+            }, {
+                "name": "RaspberryPi"
+            }, {
+                "name": "Arduino"
+            }
+        ]
+
+## Influencers Collection [/get_influencers/{theme_name}]
+
+### List All Influencers of given theme [GET]
+
++ Response 200 (application/json)
+
+        [
+            {
+                "username": "3dprintindustry", 
+                "description_user": "Leading source for #3DPrinting news & information \u2013 industry reports, business directory, jobs board, and more.", 
+                "name": "3D Printing Industry", 
+                "location_user": "", 
+                "lang_user": "en", 
+                "img_url": "http://pbs.twimg.com/profile_images/721257833371734016/Kf1P-oEZ_normal.jpg", 
+                "time_user": "London"
+            }, {
+                "username": "3DPrintGirl", 
+                "description_user": "Your source for The Latest 3D printing News", 
+                "name": "3D Printing News", 
+                "location_user": "New York", 
+                "lang_user": "en", 
+                "img_url": "http://pbs.twimg.com/profile_images/378800000641439947/778de2f93eaf9450956aa3c9547099b6_normal.jpeg", 
+                "time_user": "Atlantic Time (Canada)"
+            }, {
+                "username": "3dersorg", 
+                "description_user": "https://t.co/WEflmhOa76 is your independent source for the latest 3D printing, 3D printer news, trends, insight and analysis.", 
+                "name": "3D Printing & 3Ders", 
+                "location_user": "World", 
+                "lang_user": "en", 
+                "img_url": "http://pbs.twimg.com/profile_images/697123922257518592/twesICYY_normal.jpg", 
+                "time_user": "Amsterdam"
+            }, {
+                "username": "3dsystems", 
+                "description_user": "Enabling end-to-end digital design and manufacturing solutions to enhance and accelerate your workflow. #MfgInnovation", 
+                "name": "3D Systems", 
+                "location_user": "Rock Hill, SC", 
+                "lang_user": "en", 
+                "img_url": "http://pbs.twimg.com/profile_images/775394580929720320/4t72wWwG_normal.jpg", 
+                "time_user": "Eastern Time (US & Canada)"
+            }, {
+                "username": "shapeways", 
+                "description_user": "A 3D printing marketplace where you can design, make, buy and sell amazing products. Show us your creations #Shap3dbyme", 
+                "name": "Shapeways", 
+                "location_user": "New York, NY", 
+                "lang_user": "en", 
+                "img_url": "http://pbs.twimg.com/profile_images/742424166159286278/KIpBYGPS_normal.jpg", 
+                "time_user": "Eastern Time (US & Canada)"
+            }, {
+                "username": "makerbot", 
+                "description_user": "MakerBot's connected 3D printing solutions address the wider needs of professionals and educators, evolving their ideas from inspiration to innovation.", 
+                "name": "MakerBot", 
+                "location_user": "Brooklyn", 
+                "lang_user": "en", 
+                "img_url": "http://pbs.twimg.com/profile_images/458718156517679104/9XyyKdC6_normal.jpeg", 
+                "time_user": "Eastern Time (US & Canada)"
+            }, {
+                "username": "fabbaloo", 
+                "description_user": "Fabbaloo provides deeper analysis of developments in current and future 3D Printing and Additive Manufacturing industries https://t.co/T820xhfZQP #3DPrinting", 
+                "name": "Fabbaloo", 
+                "location_user": "Worldwide and Beyond", 
+                "lang_user": "en", 
+                "img_url": "http://pbs.twimg.com/profile_images/432205864133353472/GSlzmJhf_normal.jpeg", 
+                "time_user": "Mountain Time (US & Canada)"
+            }, {
+                "username": "3DHubs", 
+                "description_user": "The world\u2019s largest network of 3D printing services: https://t.co/RAdlsFhJz8. \n\nFounded by @briangarret @bram_zwart.", 
+                "name": "3D Hubs", 
+                "location_user": "Everywhere", 
+                "lang_user": "en", 
+                "img_url": "http://pbs.twimg.com/profile_images/459655442361114624/g2R4h-8j_normal.png", 
+                "time_user": "Amsterdam"
+            }, {
+                "username": "3DPrintBoard", 
+                "description_user": "http://t.co/6HneczXiUp covers the latest breaking 3D printing and 3D printer news, before you see it elsewhere!", 
+                "name": "3D Print .com", 
+                "location_user": "Florida", 
+                "lang_user": "en", 
+                "img_url": "http://pbs.twimg.com/profile_images/676422405431029760/cDZEuj4a_normal.png", 
+                "time_user": null
+            }, {
+                "username": "ColorFabb", 
+                "description_user": "ColorFabb. Producer of innovative and functional filaments for 3D Printing.", 
+                "name": "ColorFabb", 
+                "location_user": "Venlo, The Netherlands", 
+                "lang_user": "en", 
+                "img_url": "http://pbs.twimg.com/profile_images/459313313256439810/pFsvxt7A_normal.png", 
+                "time_user": "Amsterdam"
+            }, {
+                "username": "My3DPrinting", 
+                "description_user": "All the latest 3D Printing News from around the World.", 
+                "name": "3D Printing News", 
+                "location_user": "", 
+                "lang_user": "en", 
+                "img_url": "http://pbs.twimg.com/profile_images/492375713849159681/wBgPUcgZ_normal.jpeg", 
+                "time_user": "Eastern Time (US & Canada)"
+            }, {
+                "username": "3dprinting", 
+                "description_user": "Dutch part-time daydreamer skating tru the Carpathian Garden.Tweets from @Roemenie .Amazed about the worldchanging 3D Printing.Big fan of @Shapeways | \uf8ff |", 
+                "name": "3D printing", 
+                "location_user": "Bucharest / Rotterdam", 
+                "lang_user": "en", 
+                "img_url": "http://pbs.twimg.com/profile_images/596050983559569409/1Ro5lXax_normal.jpg", 
+                "time_user": null
+            }, {
+                "username": "3d_printers", 
+                "description_user": "Interested in 3D printing? Follow us for the latest 3D printing news and join the conversation.", 
+                "name": "Stratasys", 
+                "location_user": "", 
+                "lang_user": "en", 
+                "img_url": "http://pbs.twimg.com/profile_images/649446346118709248/RWD5T3KS_normal.jpg", 
+                "time_user": "UTC"
+            }, {
+                "username": "3dprinting3d", 
+                "description_user": "http://t.co/WIZOBci92B industry experts bring you the latest in 3D Printing news, commentary, jobs, videos and entertainment.", 
+                "name": "3D Printing", 
+                "location_user": "", 
+                "lang_user": "en", 
+                "img_url": "http://pbs.twimg.com/profile_images/2218578027/twitter-logo_normal.png", 
+                "time_user": null
+            }, {
+                "username": "3dprintingcom", 
+                "description_user": "Everything about 3D Printing!", 
+                "name": "3DPrinting.com", 
+                "location_user": "", 
+                "lang_user": "en", 
+                "img_url": "http://pbs.twimg.com/profile_images/700663704887517184/oiO8VCdt_normal.png", 
+                "time_user": "Amsterdam"
+            }, {
+                "username": "Ultimaker", 
+                "description_user": "Driven by technology and passionate about innovation, Ultimaker offers a range of high-quality 3D printers, software, materials, and support.", 
+                "name": "Ultimaker", 
+                "location_user": "", 
+                "lang_user": "en", 
+                "img_url": "http://pbs.twimg.com/profile_images/785883430332534784/09W2LPjg_normal.jpg", 
+                "time_user": "Amsterdam"
+            }, {
+                "username": "make", 
+                "description_user": "DIY projects, How-tos, tech news, electronics, crafts and ideas.", 
+                "name": "Make:", 
+                "location_user": "San Francisco, CA - USA", 
+                "lang_user": "en", 
+                "img_url": "http://pbs.twimg.com/profile_images/783080298665775108/LESsgngz_normal.jpg", 
+                "time_user": "Pacific Time (US & Canada)"
+            }, {
+                "username": "imaterialise", 
+                "description_user": "online 3D printing service and community for designers & inventors | World's largest 3D printing facility | Happy to meet you", 
+                "name": "i.materialise", 
+                "location_user": "Leuven, Belgium", 
+                "lang_user": "en", 
+                "img_url": "http://pbs.twimg.com/profile_images/710503015535538176/dxg6Ob_U_normal.jpg", 
+                "time_user": "Brussels"
+            }, {
+                "username": "3DPrintingFans", 
+                "description_user": "We cover all the latest, breaking news surrounding 3D printing and 3D scanning", 
+                "name": "3D Printing Fans", 
+                "location_user": "", 
+                "lang_user": "en", 
+                "img_url": "http://pbs.twimg.com/profile_images/454979770195783681/e8MXCx3I_normal.jpeg", 
+                "time_user": null
+            }, {
+                "username": "3DPrintingIt", 
+                "description_user": "3D Printing News, 3D Scanning News, Building of Electronics, Makers", 
+                "name": "3D Printing", 
+                "location_user": "", 
+                "lang_user": "en", 
+                "img_url": "http://pbs.twimg.com/profile_images/454975817374638080/EYF4cGTL_normal.jpeg", 
+                "time_user": null
+            }
+        ]
+        
+## Feeds Collection [/get_feeds/{theme_name}]
+
+### List All feeds of given theme [GET]
+
++ Response 200 (application/json)
+
+        [
+            {
+                "username": "Build3dprinter", 
+                "description": "\u201cWhat does this error message mean?!\u201d \u201cWait, why is there only half a print?\u201d \u201cBut\u2026 I JUST leveled it\u2026\u201d While owning (and maintaining) a desktop 3D printer", 
+                "title": "DESKTOP VS. SERVICE-BASED 3D PRINTING: A TALE OF SPAGHETTI", 
+                "url": "https://t.co/RoQkn8AdIx", 
+                "userid": 393697898, 
+                "im": "https://www.shapeways.com/blog/wp-content/uploads/2017/03/5795690693_3b69ab8658_b-712x532.jpg"
+            }, {
+                "username": "Just_Print_It", 
+                "description": "After acquiring a 75% stake in German metal 3D printing company Concept Laser, GE has announced its plans for a massive expansion. The expansion will include a bigger HQ, increasing Concept Laser's employee base, and investing more.", 
+                "title": "GE ANNOUNCES MAJOR EXPANSION OF METAL 3D PRINTING COMPANY CONCEPT LASER", 
+                "url": "https://t.co/gvhVIABSD8", 
+                "userid": 3688931057, 
+                "im": "http://www.3ders.org/images2017/ge-announces-major-expansion-metal-3d-printing-comapny-concept-laser-150.jpg"
+            }, {
+                "username": "ArtTeacherWendy", 
+                "description": "One of the most inspirational aspects of covering the 3D printing space is the fact that we constantly have the opportunity to promote the use of the technology in schools around the world.", 
+                "title": "5TH GRADERS UTILIZE 3D PRINTING TO CREATE THEIR OWN CUSTOM CITIES", 
+                "url": "https://t.co/hVVkbPgfVO", 
+                "userid": 274118810, 
+                "im": "http://3dprint.com/wp-content/uploads/2015/05/cityfeatured.jpg"
+            }, {
+                "username": "yeahnoworries", 
+                "description": "Just US$51.62 + free shipping, buy V3 3D Printer Pen online shopping at GearBest.com.", 
+                "title": "V3 3D PRINTER PEN-51.62 ONLINE SHOPPING| .COM", 
+                "url": "https://t.co/zosuivKlMx", 
+                "userid": 3708991092, 
+                "im": "http://gloimg.gearbest.com/gb/2015/201508/goods-img/1438737896412-P-2917803.jpg"
+            }, {
+                "username": "trend_slam", 
+                "description": "Just US$31.37 + free shipping, buy Anet DIY 340m 1.75mm PLA 3D Printing Filament online shopping at GearBest.com.", 
+                "title": "ANET DIY 340M 1.75MM PLA 3D PRINTING FILAMENT-31.37 ONLINE SHOPPING| .COM", 
+                "url": "https://t.co/eq4aD18Gkb", 
+                "userid": 3241283676, 
+                "im": "http://des.gearbest.com/uploads/pdm-desc-pic/Electronic/image/2016/07/27/20160727174903_67070.jpg"
+            }, {
+                "username": "1hourpro", 
+                "description": "Just US$94.64 + free shipping, buy Powerful Blue Laser Dot Module online shopping at GearBest.com.", 
+                "title": "POWERFUL BLUE LASER DOT MODULE-94.64 ONLINE SHOPPING| .COM", 
+                "url": "https://t.co/5mLVIx2fSO", 
+                "userid": 726139681352593409, 
+                "im": "http://gloimg.gearbest.com/gb/pdm-product-pic/Electronic/2016/10/18/goods-img/1477422905678919428.JPG"
+            }, {
+                "username": "1hourpro", 
+                "description": "", 
+                "title": "1 HOUR PRO ON", 
+                "url": "https://t.co/jBzM652lXd", 
+                "userid": 726139681352593409, 
+                "im": "https://pbs.twimg.com/media/C6eURT7UoAAiIaB.jpg:large"
+            }, {
+                "username": "trend_slam", 
+                "description": "Just US$32.02 + free shipping, buy Arduino MEGA2560 RepRap Circuit Sets for 3D Printer Ramps online shopping at GearBest.com.", 
+                "title": "ARDUINO MEGA2560 REPRAP CIRCUIT SETS FOR 3D PRINTER RAMPS-32.02 ONLINE SHOPPING| .COM", 
+                "url": "https://t.co/F29j7Y8e2Y", 
+                "userid": 3241283676, 
+                "im": "http://gloimg.gearbest.com/gb/2014/201406/goods-img/1404084422849-P-1809871.jpg"
+            }, {
+                "username": "yeahnoworries", 
+                "description": "Just US$1.91 + free shipping, buy Flexible Helical Coupling 3D Printer Part online shopping at GearBest.com.", 
+                "title": "FLEXIBLE HELICAL COUPLING 3D PRINTER PART-1.91 ONLINE SHOPPING| .COM", 
+                "url": "https://t.co/Ko04sR67G0", 
+                "userid": 3708991092, 
+                "im": "http://gloimg.gearbest.com/gb/2015/201511/goods-img/1447824457687-P-3377874.jpg"
+            }, {
+                "username": "1hourpro", 
+                "description": "Just US$17.80 + free shipping, buy Anet 240W 3D Printer Power Supply  Switching online shopping at GearBest.com.", 
+                "title": "ANET 240W 3D PRINTER POWER SUPPLY SWITCHING-17.80 ONLINE SHOPPING| .COM", 
+                "url": "https://t.co/Zvqlxy2qVD", 
+                "userid": 726139681352593409, 
+                "im": "http://gloimg.gearbest.com/gb/pdm-product-pic/Distribution/2017/02/17/goods-img/1487273582648415665.JPG"
+            }, {
+                "username": "yeahnoworries", 
+                "description": "Just US$309.60 + , buy Anet A3 Full Acrylic Frame Assembled 3D Printer online shopping at GearBest.com.", 
+                "title": "ANET A3 FULL ACRYLIC FRAME ASSEMBLED 3D PRINTER-309.60 ONLINE SHOPPING| .COM", 
+                "url": "https://t.co/Uup81Yg7iE", 
+                "userid": 3708991092, 
+                "im": "http://gloimg.gearbest.com/gb/pdm-product-pic/Electronic/2016/09/19/goods-img/1474312289481026549.jpg"
+            }, {
+                "username": "PixelMyBlood", 
+                "description": "Dr. Sloane Guy thought 3D printing models was just a gimmick, until he held one in his hands.", 
+                "title": "HERE'S WHANVINCED A HEART SURGEON TO USE 3D PRINTING", 
+                "url": "https://t.co/uwmKh4EzvR", 
+                "userid": 709281494, 
+                "im": "https://video-images.vice.com/_uncategorized/1488912324867-6.jpeg"
+            }, {
+                "username": "anadalle", 
+                "description": "", 
+                "title": "ANA DALLE ON", 
+                "url": "https://t.co/eC0MDX88OP", 
+                "userid": 31276212, 
+                "im": "https://pbs.twimg.com/media/C6eUUuWWUAAOAmC.jpg:large"
+            }, {
+                "username": "betdor", 
+                "description": "Russia's first 3D-printed house was completed in 24 hours using a portable 3D printer", 
+                "title": "WHEN LIFE GIVES YOU A 3D PRINTER, MAKE A HOUSE", 
+                "url": "https://t.co/Q7ttlmSkX4", 
+                "userid": 21208707, 
+                "im": "http://core1.staticworld.net/images/article/2017/03/makerbot_lifestyle1-100712064-small.3x2.jpg"
+            }, {
+                "username": "Druck3D", 
+                "description": "", 
+                "title": "3DRUCK | NEWS AROUND 3D-PRINT / NEUIGKEITEN RUND UM 3D-DRUCK", 
+                "url": "https://t.co/a9dZswB1kk", 
+                "userid": 2192387737, 
+                "im": ""
+            }, {
+                "username": "vanghelita", 
+                "description": "", 
+                "title": "3D PRINTING ON", 
+                "url": "https://t.co/1guZKgWmgs", 
+                "userid": 723063369662521344, 
+                "im": "https://pbs.twimg.com/media/C6eLOb_U4AAjhAG.jpg:large"
+            }, {
+                "username": "paul1978a", 
+                "description": "This is a short video review of the DeltaWASP 20x40 ceramic 3D printer. For more information on the Italian group WASP go to http://www.wasproject.it/w/en/. source", 
+                "title": "TESTING THE DELTAWASP 20\u00d740 CERAMIC 3D PRINTER | CATSPAW PRINTER SUPPLIES", 
+                "url": "https://t.co/DdXaed3aFF", 
+                "userid": 248248876, 
+                "im": ""
+            }, {
+                "username": "IamMental_Leaps", 
+                "description": "", 
+                "title": "ANJA M\u00dcLLER ON", 
+                "url": "https://t.co/Mhz0AwKSfU", 
+                "userid": 294033279, 
+                "im": "https://pbs.twimg.com/media/C6eUm1tWMAI46S3.jpg:large"
+            }, {
+                "username": "flopback", 
+                "description": "Sunwing 3d-printing-pen & 3D-printer-pen,Best Birthday DIY Toy for Kids with LED Display (Blue) by QuadPro in Toys & games | bittopper", 
+                "title": "SUNWING 3D-PRINTING-PEN & 3D-PRINTER-PEN,BEST BIRTHDAY DIY TOY FOR KIDS WITH LED DISPLAY (BLUE) BY QUADPRO", 
+                "url": "https://t.co/YJpwpuoZUp", 
+                "userid": 828384258452516866, 
+                "im": "https://www.bittopper.com/c/37/78/65/bittopper_377865d196e4db525f33035b9c57b59b-sunwing-3d-stereoscopic-drawing-doodling-printing-pen-arts.jpg"
+            }, {
+                "username": "3DPrintMaven", 
+                "description": "Linear components made of Tribo-SLS material allow special shapes to be produced in just 48 hours.", 
+                "title": "IGUS DERIVES LUBRICATION-FREE LINEAR AXES FROM 3D PRINTER", 
+                "url": "https://t.co/gXQQzkbgnL", 
+                "userid": 3298379074, 
+                "im": "http://www.autocarpro.in/IMG/002/53002/web-pm6016-1.jpg"
+            }
+        ]
