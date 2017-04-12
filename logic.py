@@ -247,10 +247,14 @@ def getNewTweets(alertid, newestId):
 
 # Return preview alert search tweets
 def searchTweets(keywords, languages):
+    """
+    This is for the phares.
+    """
     keys = keywords.split(",")
     result_keys = []
     for key in keys:
         result_keys.append("\""+key+"\"")
+    # ends
     keywords = " OR ".join(result_keys)
     languages = " OR ".join(languages.split(","))
     tweets = search.getTweets(keywords, languages)
