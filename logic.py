@@ -248,7 +248,10 @@ def getNewTweets(alertid, newestId):
 # Return preview alert search tweets
 def searchTweets(keywords, languages):
     keys = keywords.split(",")
-    keywords = " OR ".join(keywords.split(","))
+    result_keys = []
+    for key in keys:
+        result_keys.append("\""+key+"\"")
+    keywords = " OR ".join(result_keys)
     languages = " OR ".join(languages.split(","))
     tweets = search.getTweets(keywords, languages)
     for tweet in tweets:
