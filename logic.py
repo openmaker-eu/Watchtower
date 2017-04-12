@@ -19,10 +19,12 @@ def getInfluencers(themename, cursor):
         influencers = Connection.Instance().infDB[str(themename)].find({"type": "filteredUser"}, {"_id":0, "type": 0}).skip(int(cursor)).limit(20)
     influencers = list(influencers)
     if len(influencers) == 0:
-        influencers.append({'cursor': "Cursor is Empty."})
+        influencers.append({'content': "Cursor is Empty."})
     else:
         cursor = int(cursor) + 20
-        influencers.append({'current cursor': cursor})
+        if cursor >= length:
+            cursor = length
+        influencers.append({'next cursor': cursor})
     influencers.append({'cursor length': length})
     return json.dumps(influencers)
 
@@ -35,10 +37,12 @@ def getFeeds(themename, cursor):
         feeds = Connection.Instance().feedDB[str(themename)].find({}, {"_id":0}).skip(int(cursor)).limit(20)
     feeds = list(feeds)
     if len(feeds) == 0:
-        feeds.append({'cursor': "Cursor is Empty."})
+        feeds.append({'content': "Cursor is Empty."})
     else:
         cursor = int(cursor) + 20
-        feeds.append({'current cursor': cursor})
+        if cursor >= length:
+            cursor = length
+        feeds.append({'next cursor': cursor})
     feeds.append({'cursor length': length})
     return json.dumps(feeds)
 
