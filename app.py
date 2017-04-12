@@ -57,6 +57,8 @@ class Application(tornado.web.Application):
             (r"/newTweets/(.*)", NewTweetsHandler, {'mainT':mainT}),
             (r"/api", DocumentationHandler, {'mainT':mainT}),
             (r"/api/get_themes", ThemesHandler, {'mainT':mainT}),
+            (r"/api/get_influencers/(.*)/(.*)", InfluencersHandler, {'mainT':mainT}),
+            (r"/api/get_feeds/(.*)/(.*)", FeedsHandler, {'mainT':mainT}),
             (r"/api/get_influencers/(.*)", InfluencersHandler, {'mainT':mainT}),
             (r"/api/get_feeds/(.*)", FeedsHandler, {'mainT':mainT}),
             (r"/(.*)", tornado.web.StaticFileHandler, {'path': settings['static_path']}),
@@ -79,14 +81,14 @@ class ThemesHandler(BaseHandler, TemplateRendering):
         self.write(themes)
 
 class InfluencersHandler(BaseHandler, TemplateRendering):
-    def get(self, themename):
-        influencers = logic.getInfluencers(themename)
+    def get(self, themename, cursor=None):
+        influencers = logic.getInfluencers(themename, cursor)
         self.set_header('Content-Type', 'application/json')
         self.write(influencers)
 
 class FeedsHandler(BaseHandler, TemplateRendering):
-    def get(self, themename):
-        feeds = logic.getFeeds(themename)
+    def get(self, themename, cursor=None):
+        feeds = logic.getFeeds(themename, cursor)
         self.set_header('Content-Type', 'application/json')
         self.write(feeds)
 
