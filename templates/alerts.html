@@ -1,5 +1,5 @@
     <div id="alerts">
-      <div class="col-sm-6">
+      <div class="col-sm-8">
         {% if alertlimit != 0 %}
           <a href="/alertinfo">Create a new alert</a>
         {% else %}
@@ -7,14 +7,14 @@
         {% endif %}
       </div>
 
-      <div class="col-sm-3">
-        <p style="text-align:right"><b>Thread Connection Status:
+      <div class="col-sm-2">
+        <p style="text-align:right"><b>Connection Status:
           {% if threadconnection %}<span class="glyphicon glyphicon-ok"></span>
           {% else %} <span class="glyphicon glyphicon-remove">
           {% endif %}</b> </p>
       </div>
 
-      <div class="col-sm-3">
+      <div class="col-sm-2">
         <p style="text-align:right"><b>Thread Status:
           {% if threadstatus %}<span class="glyphicon glyphicon-ok"></span>
           {% else %} <span class="glyphicon glyphicon-remove">
