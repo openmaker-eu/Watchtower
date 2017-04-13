@@ -58,7 +58,7 @@ class StdOutListener(StreamListener):
     def __init__(self,alertDic):
         self.alertDic = alertDic
         self.terminate = False
-        self.connection = None
+        self.connection = True
         super(StdOutListener, self).__init__()
 
     def on_data(self, data):
@@ -78,9 +78,6 @@ class StdOutListener(StreamListener):
         self.connection = False
         return
 
-    def connection(self):
-        return self.connection
-        
     def on_error(self, status):
         print status
         if self.terminate == True:
@@ -109,7 +106,7 @@ class StreamCreator():
     def checkAlive(self):
         return self.t.isAlive()
     def checkConnection(self):
-        if self.t is not None:
-            return self.t.connection()
+        if self.l is not None:
+            return self.l.connection
         else:
             return False
