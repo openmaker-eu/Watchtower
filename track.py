@@ -78,6 +78,9 @@ class StdOutListener(StreamListener):
         self.connection = False
         return
 
+    def connection(self):
+        return self.connection
+        
     def on_error(self, status):
         print status
         if self.terminate == True:
@@ -107,6 +110,6 @@ class StreamCreator():
         return self.t.isAlive()
     def checkConnection(self):
         if self.t is not None:
-            return self.t.connection
+            return self.t.connection()
         else:
             return False
