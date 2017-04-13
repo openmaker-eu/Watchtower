@@ -1,10 +1,17 @@
     <div id="alerts">
-      <div class="col-sm-9">
+      <div class="col-sm-6">
         {% if alertlimit != 0 %}
           <a href="/alertinfo">Create a new alert</a>
         {% else %}
           <p style="color: red; font-size: 15px"><b>You cannot create a new alert because your limit is full. If you want create a new alert, please remove old ones.</b></p>
         {% endif %}
+      </div>
+
+      <div class="col-sm-3">
+        <p style="text-align:right"><b>Thread Connection Status:
+          {% if threadconnection %}<span class="glyphicon glyphicon-ok"></span>
+          {% else %} <span class="glyphicon glyphicon-remove">
+          {% endif %}</b> </p>
       </div>
 
       <div class="col-sm-3">
@@ -53,7 +60,7 @@
                         {% else %}
                         <button onclick= "alertbuttonclick({{alert['alertid']}}, 'stop');" posttype = "stop" alertid = "{{alert['alertid']}}" class="btn btn-default">
                           <span class="glyphicon glyphicon-stop"></span>
-                        </button> 
+                        </button>
                         {% endif %}
                     </td>
                 </tr>

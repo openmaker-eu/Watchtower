@@ -135,7 +135,8 @@ class AlertsHandler(BaseHandler, TemplateRendering):
             'alerts' : logic.getAlertList(userid),
             'type' : "alertlist",
             'alertlimit' : logic.getAlertLimit(userid),
-            'threadstatus': logic.getThreadStatus(self.mainT)
+            'threadstatus': logic.getThreadStatus(self.mainT),
+            'threadconnection': logic.getThreadConnection(self.mainT)
         }
         content = self.render_template(template, variables)
         self.write(content)

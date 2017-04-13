@@ -73,6 +73,9 @@ def getAllAlertList():
 def getThreadStatus(mainT):
     return mainT.checkThread()
 
+def getThreadConnection(mainT):
+    return mainT.checkConnection()
+
 # Gives alerts as lists
 def getAlertList(userid):
     Connection.Instance().cur.execute("Select * from alerts where userid = %s;", [userid])
@@ -253,7 +256,10 @@ def searchTweets(keywords, languages):
     keys = keywords.split(",")
     result_keys = []
     for key in keys:
-        result_keys.append("\""+key+"\"")
+        if " " in key:
+            result_keys.append("\""+key+"\"")
+        else:
+            result_keys.append(key)
     # ends
     keywords = " OR ".join(result_keys)
     languages = " OR ".join(languages.split(","))

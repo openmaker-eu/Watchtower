@@ -58,6 +58,7 @@ class StdOutListener(StreamListener):
     def __init__(self,alertDic):
         self.alertDic = alertDic
         self.terminate = False
+        self.connection = None
         super(StdOutListener, self).__init__()
 
     def on_data(self, data):
@@ -67,9 +68,15 @@ class StdOutListener(StreamListener):
             separates_tweet(self.alertDic, tweet)
             tweet['_id'] = ObjectId()
             Connection.Instance().db["all"].insert_one(tweet)
+            self.connection = True
             return True
         else:
             return False
+
+    def on_disconnect(self, notice):
+        print ("Disconnect: {}".format(notice))
+        self.connection = False
+        return
 
     def on_error(self, status):
         print status
@@ -98,3 +105,5 @@ class StreamCreator():
         self.l.terminate = True
     def checkAlive(self):
         return self.t.isAlive()
+    def checkConnection(self):
+        return self.t.connection

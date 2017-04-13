@@ -44,5 +44,10 @@ class AddAlert():
             return str(self.onlyThread.checkAlive())
         return ""
 
+    def checkConnection(self):
+        if self.onlyThread is not None:
+            return str(self.onlyThread.checkConnection())
+        return ""
+
     def __getitem__(self):
         return (self.threadDic)
