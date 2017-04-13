@@ -106,7 +106,7 @@ class StreamCreator():
     def checkAlive(self):
         return self.t.isAlive()
     def checkConnection(self):
-        if self.t in not None:
+        if self.t is not None:
             return self.t.connection
         else:
             return False
