@@ -80,11 +80,15 @@ class StdOutListener(StreamListener):
 
     def on_error(self, status):
         print status
-        if self.terminate == True:
+        if status == 420:
             return False
 
     def stop(self):
         self.terminate = True
+
+    def on_timeout(self):
+        print('Timeout...')
+        return True # To continue listening
 
 class StreamCreator():
     def __init__(self,alertDic):
