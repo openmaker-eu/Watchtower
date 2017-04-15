@@ -101,8 +101,14 @@ class StreamCreator():
         self.stream = Stream(self.auth, self.l)
         self.t = threading.Thread(target = self.stream.filter, kwargs = {'track':self.keywords, 'languages':self.lang} )
     def start(self):
-        self.t.deamon = True
-        self.t.start()
+        try:
+            self.t.deamon = True
+            self.t.start()
+        except:
+            self.t = threading.Thread(target = self.stream.filter, kwargs = {'track':self.keywords, 'languages':self.lang} )
+            self.t.deamon = True
+            self.t.start()
+            
     def terminate(self):
         self.l.running = False
         self.l.stop()
