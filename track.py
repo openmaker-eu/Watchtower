@@ -38,13 +38,16 @@ def get_next_tweets_sequence():
 def separates_tweet(alertDic, tweet):
     for key in alertDic:
         alert = alertDic[key]
-        if tweet['lang'] in alert['lang']:
-            for keyword in alert['keywords']:
-                keyword = re.compile(re.escape(keyword), re.IGNORECASE)
-                if len(re.findall(keyword, str(tweet['text'].decode('utf-8')))) != 0:
-                    tweet['_id'] = ObjectId()
-                    Connection.Instance().db[str(alert['alertid'])].insert_one(tweet)
-                    break
+        try:
+            if tweet['lang'] in alert['lang']:
+                for keyword in alert['keywords']:
+                    keyword = re.compile(re.escape(keyword), re.IGNORECASE)
+                    if len(re.findall(keyword, str(tweet['text'].decode('utf-8')))) != 0:
+                        tweet['_id'] = ObjectId()
+                        Connection.Instance().db[str(alert['alertid'])].insert_one(tweet)
+                        break
+        except KeyError:
+            pass
 
 # Accessing Twitter API
 consumer_key = "utTM4qfuhmzeLUxRkBb1xb12P" # API key
@@ -101,14 +104,8 @@ class StreamCreator():
         self.stream = Stream(self.auth, self.l)
         self.t = threading.Thread(target = self.stream.filter, kwargs = {'track':self.keywords, 'languages':self.lang} )
     def start(self):
-        try:
-            self.t.deamon = True
-            self.t.start()
-        except:
-            self.t = threading.Thread(target = self.stream.filter, kwargs = {'track':self.keywords, 'languages':self.lang} )
-            self.t.deamon = True
-            self.t.start()
-            
+        self.t.deamon = True
+        self.t.start()
     def terminate(self):
         self.l.running = False
         self.l.stop()
