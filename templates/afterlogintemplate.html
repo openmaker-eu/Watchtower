@@ -195,8 +195,23 @@
     </script>
     <script>
         $(document).ready(function() {
-            $("#spin").spinner();
-            $('#previewbutton').click(function() {
+            $('#previewbutton').click(function(e) {
+                $('.alert-form').find('input[name="alertname"], input[name="keywords"], select[name="languages"]').each(function(){
+                  if( $(this).val() == "" || $(this).val() == null) {
+                    e.preventDefault();
+                    if($(this).attr("name") == "keywords"){
+                      $(".bootstrap-tagsinput").addClass("input-error");
+                    }
+                    else{
+                      $(this).addClass('input-error');
+                    }
+                  }
+                  else {
+                    $(this).removeClass('input-error');
+                  }
+                });
+              if($('.input-error').length == 0){
+                $("#spin").spinner();
                 $('#preview').empty();
                 $("#spin").show();
                 var keys = $("#keywords").val();
@@ -219,14 +234,18 @@
                     $('#preview').append(html);
                     $("#spin").hide();
                 });
+              }
+              });
             });
-        });
     </script>
 
     <script>
 
     jQuery(document).ready(function() {
-        $('.alert-form  input[name="alertname"], .alert-form input[name="keywords"], .alert-form  input[name="languages"]').on('focus', function() {
+        $('.alert-form  input[name="alertname"], .alert-form  select[name="languages"]').on('focus', function() {
+          $(this).removeClass('input-error');
+        });
+        $(".keyword > .bootstrap-tagsinput").on('DOMSubtreeModified', function() {
           $(this).removeClass('input-error');
         });
 
@@ -248,7 +267,6 @@
           });
 
         });
-
 
     });
 
@@ -297,7 +315,7 @@
                     data: {
                         'alertid': aid
                     },
-                    timeout: 10000,
+                    timeout: 7000,
                     error: function () {
                          $('#preview').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");
                          $("#spin").hide();
