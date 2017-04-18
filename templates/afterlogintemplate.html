@@ -367,6 +367,7 @@
                 }
             }).success(function(html) {
                 $('#newTweetsButton').remove();
+                $('p').remove();
                 $('#tweets').prepend(html);
             });
         }
