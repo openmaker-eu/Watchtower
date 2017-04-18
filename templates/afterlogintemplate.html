@@ -330,6 +330,7 @@
     </script>
     <script>
         $(document).ready(function() {
+          if($('#feedDiv').length != 0){
             setInterval(function() {
                 var tid = $("ol > div").first().attr("tweetid") || -1;
                 var aid = $("ol").attr("alertid");
@@ -346,10 +347,11 @@
                     if (response > 0) {
                         $('#newTweetsButton').remove();
                         var html = "<button type='button' onclick='refreshTweets();' id='newTweetsButton' style='width: 100%' class='btn btn-primary'>" + response + " new tweets</button>";
-                        $('#feedDiv').prepend(html);
+                        $('#tweets').prepend(html);
                     }
                 });
             }, 10000);
+          }
         });
     </script>
     <script>
