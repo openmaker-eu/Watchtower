@@ -232,7 +232,14 @@
                     }
                 }).success(function(html) {
                     $('#preview').append(html);
-                    $("#spin").hide();
+                    var interval = setInterval(function() { // this code is executed every 500 milliseconds:
+                        console.log("I'm waiting");
+                        if($('blockquote').length === 0) {
+                            clearInterval(interval);
+                            $('#spin').hide();
+                        }
+
+                    }, 500);
                 });
               }
               });
@@ -275,6 +282,21 @@
     <!-- for feed -->
     {% if type == "feed" %}
     <script>
+    $(document).ready(function() {
+      if($('#feedDiv').length != 0){
+      $("#spin").spinner();
+      $('#spin').show();
+      var interval = setInterval(function() { // this code is executed every 500 milliseconds:
+          if($('blockquote').length === $('.twitter-tweet-error').length ) {
+              clearInterval(interval);
+              $('#spin').hide();
+          }
+
+      }, 500);
+    }
+    });
+    </script>
+    <script>
         $(".dropdown-menu").on('click', 'li a', function() {
             var selText = $(this).children("h4").html();
             $(this).parent('li').siblings().removeClass('active');
@@ -285,7 +307,9 @@
     <script>
         $(document).ready(function() {
             $(window).scroll(function() {
-                if ($(window).scrollTop() + $(window).height() == $(document).height()) {
+                if ($(window).scrollTop() + $(window).height() == $(document).height()){
+                  if($('#feedDiv').length != 0){
+                    $("#spin").show();
                     var tid = $("ol > div").last().attr("tweetid");
                     var aid = $("ol").attr("alertid");
                     $.ajax({
@@ -297,7 +321,15 @@
                         }
                     }).success(function(html) {
                         $('#tweets').append(html);
+                        var interval = setInterval(function() { // this code is executed every 500 milliseconds:
+                            if($('blockquote').length === $('.twitter-tweet-error').length ) {
+                                clearInterval(interval);
+                                $('#spin').hide();
+                            }
+
+                        }, 500);
                     });
+                  }
                 }
             });
         });
@@ -317,13 +349,20 @@
                     },
                     timeout: 10000,
                     error: function () {
-                         $('#preview').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");
+                         $('#feedcontainer').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");
                          $("#spin").hide();
                     }
                 }).success(function(html) {
                     $('#feedcontainer').empty();
                     $('#feedcontainer').append(html);
-                    $("#spin").hide();
+                    var interval = setInterval(function() { // this code is executed every 500 milliseconds:
+                        console.log("I'm waiting");
+                        if($('blockquote').length === $('.twitter-tweet-error').length ) {
+                            clearInterval(interval);
+                            $('#spin').hide();
+                        }
+
+                    }, 500);
                 });
             });
         });
@@ -356,6 +395,7 @@
     </script>
     <script>
         function refreshTweets() {
+            $('#spin').show();
             var tid = $("ol > div").first().attr("tweetid") || -1;
             var aid = $("ol").attr("alertid");
             $.ajax({
@@ -369,6 +409,14 @@
                 $('#newTweetsButton').remove();
                 $('p').remove();
                 $('#tweets').prepend(html);
+                var interval = setInterval(function() { // this code is executed every 500 milliseconds:
+                    console.log("I'm waiting");
+                    if($('blockquote').length === $('.twitter-tweet-error').length ) {
+                        clearInterval(interval);
+                        $('#spin').hide();
+                    }
+
+                }, 500);
             });
         }
     </script>

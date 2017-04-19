@@ -241,7 +241,7 @@ def getNewTweets(alertid, newestId):
     if int(newestId) == -1:
         tweets = Connection.Instance().db[str(alertid)].find({}, {'tweetDBId': 1, "text":1, "id":1, "user":1, 'created_at': 1, "_id":0}).sort([('tweetDBId', pymongo.DESCENDING)])
     else:
-        tweets = Connection.Instance().db[str(alertid)].find({'tweetDBId': {'$gt': int(newestId)}}, {'tweetDBId': 1, "text":1, "user":1, 'created_at': 1, "_id":0}).sort([('tweetDBId', pymongo.DESCENDING)])
+        tweets = Connection.Instance().db[str(alertid)].find({'tweetDBId': {'$gt': int(newestId)}}, {'tweetDBId': 1, 'id': 1, "text":1, "user":1, 'created_at': 1, "_id":0}).sort([('tweetDBId', pymongo.DESCENDING)])
     tweets = list(tweets)
     alert_keywords = getAlertAllOfThemList(alertid)['keywords']
     for tweet in tweets:
