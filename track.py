@@ -43,7 +43,7 @@ def separates_tweet(alertDic, tweet):
             if tweet['lang'] in alert['lang']:
                 for keyword in alert['keywords']:
                     keyword = re.compile(keyword.replace(" ", "(.?)"), re.IGNORECASE)
-                    if 'extended_tweet' in i and 'full_text' in tweet['extended_tweet']:
+                    if 'extended_tweet' in tweet and 'full_text' in tweet['extended_tweet']:
                         if re.search(keyword, str(tweet['extended_tweet']['full_text'].decode('utf-8'))):
                             tweet['_id'] = ObjectId()
                             Connection.Instance().db[str(alert['alertid'])].insert_one(tweet)
