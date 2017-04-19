@@ -102,8 +102,8 @@ def getFeedsGoose(themename, date, cursor):
         if link['_id'] != None:
             try:
                 g = Goose()
-                article = g.extract(url=link['_id'][0])
-                last_feeds.append({'url': link['_id'][0], 'im':article.top_image.src, 'title': article.title.upper(), 'description': article.meta_description})
+                article = g.extract(url=link['_id'])
+                last_feeds.append({'url': link['_id'], 'im':article.top_image.src, 'title': article.title.upper(), 'description': article.meta_description})
             except Exception as e:
                 print e
                 pass
@@ -141,9 +141,9 @@ def getFeedsSummary(themename, date, cursor):
     for link in feeds:
         if link['_id'] != None:
             try:
-                s = summary.Summary(link['_id'][0])
+                s = summary.Summary(link['_id'])
                 s.extract()
-                last_feeds.append({'url': link['_id'][0], 'im':str(s.image), 'title': str(s.title), 'description': str(s.description)})
+                last_feeds.append({'url': link['_id'], 'im':str(s.image), 'title': str(s.title), 'description': str(s.description)})
             except Exception as e:
                 print e
                 pass
