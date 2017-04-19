@@ -86,6 +86,10 @@ def getAlertName(alertid):
     Connection.Instance().cur.execute("Select alertname from alerts where alertid = %s;", [alertid])
     return Connection.Instance().cur.fetchall()[0][0]
 
+def getAlertId(alertname):
+    Connection.Instance().cur.execute("Select alertid from alerts where alertname = %s;", [alertname])
+    return Connection.Instance().cur.fetchall()[0][0]
+
 # Gives alerts as lists
 def getAlertList(userid):
     Connection.Instance().cur.execute("Select * from alerts where userid = %s;", [userid])

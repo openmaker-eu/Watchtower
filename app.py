@@ -2,7 +2,7 @@ import tornado.web
 import tornado.options
 import tornado.ioloop
 from tornado.escape import json_encode
-import logic
+import logic, api
 from jinja2 import Environment, FileSystemLoader, TemplateNotFound
 from threading import Thread
 import os
@@ -61,9 +61,35 @@ class Application(tornado.web.Application):
             (r"/api/get_feeds/(.*)/(.*)", FeedsHandler, {'mainT':mainT}),
             (r"/api/get_influencers/(.*)", InfluencersHandler, {'mainT':mainT}),
             (r"/api/get_feeds/(.*)", FeedsHandler, {'mainT':mainT}),
+            (r"/api/v11/get_themes", ThemesV11Handler, {'mainT':mainT}),
+            (r"/api/v11/get_feeds", FeedsV11Handler, {'mainT':mainT}),
             (r"/(.*)", tornado.web.StaticFileHandler, {'path': settings['static_path']}),
         ]
         super(Application, self).__init__(handlers, **settings)
+
+class ThemesV11Handler(BaseHandler, TemplateRendering):
+    def get(self):
+        print self.request.arguments
+        themes = api.getThemes(0)
+        self.set_header('Content-Type', 'application/json')
+        self.write(themes)
+
+class FeedsV11Handler(BaseHandler, TemplateRendering):
+    def get(self):
+        themename = str(self.get_argument("themename"))
+        try:
+            cursor = int(self.get_argument("cursor"))
+        except:
+            cursor = 0
+            pass
+        try:
+            date = str(self.get_argument("date"))
+        except:
+            date = 'all'
+            pass
+        feeds = api.getFeeds(themename, date, cursor)
+        self.set_header('Content-Type', 'application/json')
+        self.write(feeds)
 
 class DocumentationHandler(BaseHandler, TemplateRendering):
     def get(self):
