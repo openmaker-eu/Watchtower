@@ -97,7 +97,7 @@ def getFeedsGoose(themename, date, cursor):
             cursor = length
         result['next_cursor'] = cursor
     for link in feeds:
-        if link['_id'] != [] and link['_id'][0] != None:
+        if link['_id'] != None:
             try:
                 g = Goose()
                 article = g.extract(url=link['_id'][0])
@@ -136,7 +136,7 @@ def getFeedsSummary(themename, date, cursor):
             cursor = length
         result['next_cursor'] = cursor
     for link in feeds:
-        if link['_id'] != [] and link['_id'][0] != None:
+        if link['_id'] != None:
             try:
                 s = summary.Summary(link['_id'][0])
                 s.extract()
