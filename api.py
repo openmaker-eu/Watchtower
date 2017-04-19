@@ -103,6 +103,7 @@ def getFeedsGoose(themename, date, cursor):
                 article = g.extract(url=link['_id'][0])
                 last_feeds.append({'url': link['_id'][0], 'im':article.top_image.src, 'title': article.title.upper(), 'description': article.meta_description})
             except:
+                print "a"
                 pass
     result['cursor_length'] = length
     result['feeds'] = last_feeds
