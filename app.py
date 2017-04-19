@@ -61,10 +61,10 @@ class Application(tornado.web.Application):
             (r"/api/get_feeds/(.*)/(.*)", FeedsHandler, {'mainT':mainT}),
             (r"/api/get_influencers/(.*)", InfluencersHandler, {'mainT':mainT}),
             (r"/api/get_feeds/(.*)", FeedsHandler, {'mainT':mainT}),
-            (r"/api/v11/get_themes", ThemesV11Handler, {'mainT':mainT}),
-            (r"/api/v11/get_feeds", FeedsV11Handler, {'mainT':mainT}),
-            (r"/api/v11/get_feeds_wgl", FeedsV11wglHandler, {'mainT':mainT}),
-            (r"/api/v11/get_feeds_wsl", FeedsV11wslHandler, {'mainT':mainT}),
+            (r"/api/v1.1/get_themes", ThemesV11Handler, {'mainT':mainT}),
+            (r"/api/v1.1/get_feeds", FeedsV11Handler, {'mainT':mainT}),
+            (r"/api/v1.1/get_feeds_wgl", FeedsV11wglHandler, {'mainT':mainT}),
+            (r"/api/v1.1/get_feeds_wsl", FeedsV11wslHandler, {'mainT':mainT}),
             (r"/(.*)", tornado.web.StaticFileHandler, {'path': settings['static_path']}),
         ]
         super(Application, self).__init__(handlers, **settings)
