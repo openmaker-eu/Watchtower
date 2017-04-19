@@ -100,9 +100,12 @@ def getFeedsGoose(themename, date, cursor):
         result['next_cursor'] = cursor
     for link in feeds:
         if link['_id'] != None:
-            g = Goose()
-            article = g.extract(url=link['_id'][0])
-            last_feeds.append({'url': link['_id'][0], 'im':article.top_image.src, 'title': article.title.upper(), 'description': article.meta_description})
+            try:
+                g = Goose()
+                article = g.extract(url=link['_id'][0])
+                last_feeds.append({'url': link['_id'][0], 'im':article.top_image.src, 'title': article.title.upper(), 'description': article.meta_description})
+            except:
+                pass
     result['cursor_length'] = length
     result['feeds'] = last_feeds
     return json.dumps(result, indent=4)
@@ -136,9 +139,12 @@ def getFeedsSummary(themename, date, cursor):
         result['next_cursor'] = cursor
     for link in feeds:
         if link['_id'] != None:
-            s = summary.Summary(link['_id'][0])
-            s.extract()
-            last_feeds.append({'url': link['_id'][0], 'im':str(s.image), 'title': str(s.title), 'description': str(s.description)})
+            try:
+                s = summary.Summary(link['_id'][0])
+                s.extract()
+                last_feeds.append({'url': link['_id'][0], 'im':str(s.image), 'title': str(s.title), 'description': str(s.description)})
+            except:
+                pass
     result['cursor_length'] = length
     result['feeds'] = last_feeds
     return json.dumps(result, indent=4)
