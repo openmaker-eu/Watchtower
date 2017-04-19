@@ -63,6 +63,8 @@ class Application(tornado.web.Application):
             (r"/api/get_feeds/(.*)", FeedsHandler, {'mainT':mainT}),
             (r"/api/v11/get_themes", ThemesV11Handler, {'mainT':mainT}),
             (r"/api/v11/get_feeds", FeedsV11Handler, {'mainT':mainT}),
+            (r"/api/v11/get_feeds_wgl", FeedsV11wglHandler, {'mainT':mainT}),
+            (r"/api/v11/get_feeds_wsl", FeedsV11wslHandler, {'mainT':mainT}),
             (r"/(.*)", tornado.web.StaticFileHandler, {'path': settings['static_path']}),
         ]
         super(Application, self).__init__(handlers, **settings)
@@ -88,6 +90,40 @@ class FeedsV11Handler(BaseHandler, TemplateRendering):
             date = 'all'
             pass
         feeds = api.getFeeds(themename, date, cursor)
+        self.set_header('Content-Type', 'application/json')
+        self.write(feeds)
+
+class FeedsV11wglHandler(BaseHandler, TemplateRendering):
+    def get(self):
+        themename = str(self.get_argument("themename"))
+        try:
+            cursor = int(self.get_argument("cursor"))
+        except:
+            cursor = 0
+            pass
+        try:
+            date = str(self.get_argument("date"))
+        except:
+            date = 'all'
+            pass
+        feeds = api.getFeedsGoose(themename, date, cursor)
+        self.set_header('Content-Type', 'application/json')
+        self.write(feeds)
+
+class FeedsV11wslHandler(BaseHandler, TemplateRendering):
+    def get(self):
+        themename = str(self.get_argument("themename"))
+        try:
+            cursor = int(self.get_argument("cursor"))
+        except:
+            cursor = 0
+            pass
+        try:
+            date = str(self.get_argument("date"))
+        except:
+            date = 'all'
+            pass
+        feeds = api.getFeedsSummary(themename, date, cursor)
         self.set_header('Content-Type', 'application/json')
         self.write(feeds)
 

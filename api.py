@@ -69,6 +69,84 @@ def getFeeds(themename, date, cursor):
     result['feeds'] = last_feeds
     return json.dumps(result, indent=4)
 
+def getFeedsGoose(themename, date, cursor):
+    dates=['all', 'yesterday', 'week', 'month']
+    result = {}
+    if date not in dates:
+        result['Error'] = 'invalid date'
+        return json.dumps(result, indent=4)
+    date = determine_date(date)
+    themeid = str(logic.getAlertId(themename))
+    length = len(list(Connection.Instance().db[themeid].aggregate([{'$match': {'timestamp_ms': {'$gte': date} }},\
+                                                                    {'$unwind': "$entities.urls" },\
+                                                                    {'$group' : {'_id' :"$entities.urls.expanded_url" , 'total':{'$sum': 1}}}])))
+    feeds = Connection.Instance().db[themeid].aggregate([{'$match': {'timestamp_ms': {'$gte': date} }},\
+                                                         {'$unwind': "$entities.urls" },\
+                                                         {'$group' : {'_id' :"$entities.urls.expanded_url" , 'total':{'$sum': 1}}},\
+                                                         {'$sort': {'total': -1}},\
+                                                         {'$skip': cursor},\
+                                                         {'$limit': 20}])
+    feeds = list(feeds)
+    last_feeds = []
+    if len(feeds) == 0:
+        print len(list(feeds))
+        last_feeds.append("Cursor is Empty.")
+    else:
+        cursor = int(cursor) + 20
+        if cursor >= length:
+            cursor = length
+        result['next_cursor'] = cursor
+    for link in feeds:
+        if link['_id'] != [] and link['_id'][0] != None:
+            try:
+                g = Goose()
+                article = g.extract(url=link['_id'][0])
+                last_feeds.append({'url': link['_id'][0], 'im':article.top_image.src, 'title': article.title.upper(), 'description': article.meta_description})
+            except:
+                pass
+    result['cursor_length'] = length
+    result['feeds'] = last_feeds
+    return json.dumps(result, indent=4)
+
+def getFeedsSummary(themename, date, cursor):
+    dates=['all', 'yesterday', 'week', 'month']
+    result = {}
+    if date not in dates:
+        result['Error'] = 'invalid date'
+        return json.dumps(result, indent=4)
+    date = determine_date(date)
+    themeid = str(logic.getAlertId(themename))
+    length = len(list(Connection.Instance().db[themeid].aggregate([{'$match': {'timestamp_ms': {'$gte': date} }},\
+                                                                    {'$unwind': "$entities.urls" },\
+                                                                    {'$group' : {'_id' :"$entities.urls.expanded_url" , 'total':{'$sum': 1}}}])))
+    feeds = Connection.Instance().db[themeid].aggregate([{'$match': {'timestamp_ms': {'$gte': date} }},\
+                                                         {'$unwind': "$entities.urls" },\
+                                                         {'$group' : {'_id' :"$entities.urls.expanded_url" , 'total':{'$sum': 1}}},\
+                                                         {'$sort': {'total': -1}},\
+                                                         {'$skip': cursor},\
+                                                         {'$limit': 20}])
+    feeds = list(feeds)
+    last_feeds = []
+    if len(feeds) == 0:
+        print len(list(feeds))
+        last_feeds.append("Cursor is Empty.")
+    else:
+        cursor = int(cursor) + 20
+        if cursor >= length:
+            cursor = length
+        result['next_cursor'] = cursor
+    for link in feeds:
+        if link['_id'] != [] and link['_id'][0] != None:
+            try:
+                s = summary.Summary(link['_id'][0])
+                s.extract()
+                last_feeds.append({'url': link['_id'][0], 'im':str(s.image), 'title': str(s.title), 'description': str(s.description)})
+            except:
+                pass
+    result['cursor_length'] = length
+    result['feeds'] = last_feeds
+    return json.dumps(result, indent=4)
+
 def determine_date(date):
     current_milli_time = int(round(time.time() * 1000))
     one_day = 86400000
