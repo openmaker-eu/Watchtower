@@ -6,5 +6,5 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 
 mainT = AddAlert()
-mainT.setup(getAllRunningAlertList())
+#mainT.setup(getAllRunningAlertList())
 webserverInit(mainT)
