@@ -236,6 +236,7 @@
                         console.log("I'm waiting");
                         if($('blockquote').length === 0) {
                             clearInterval(interval);
+                            $('.twitter-tweet-error').remove()
                             $('#spin').hide();
                         }
 
@@ -289,6 +290,7 @@
       var interval = setInterval(function() { // this code is executed every 500 milliseconds:
           if($('blockquote').length === $('.twitter-tweet-error').length ) {
               clearInterval(interval);
+              $('.twitter-tweet-error').remove()
               $('#spin').hide();
           }
 
@@ -324,6 +326,7 @@
                         var interval = setInterval(function() { // this code is executed every 500 milliseconds:
                             if($('blockquote').length === $('.twitter-tweet-error').length ) {
                                 clearInterval(interval);
+                                $('.twitter-tweet-error').remove()
                                 $('#spin').hide();
                             }
 
@@ -359,6 +362,7 @@
                         console.log("I'm waiting");
                         if($('blockquote').length === $('.twitter-tweet-error').length ) {
                             clearInterval(interval);
+                            $('.twitter-tweet-error').remove()
                             $('#spin').hide();
                         }
 
@@ -413,6 +417,7 @@
                     console.log("I'm waiting");
                     if($('blockquote').length === $('.twitter-tweet-error').length ) {
                         clearInterval(interval);
+                        $('.twitter-tweet-error').remove()
                         $('#spin').hide();
                     }
 
