@@ -16,6 +16,7 @@ def get_keywords(alertDic):
         alert = alertDic[key]
         keywords = keywords + alert['keywords']
     keywords = list(set(keywords))
+    print keywords
     return keywords
 
 def get_lang(alertDic):
