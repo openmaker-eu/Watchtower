@@ -42,11 +42,17 @@ def separates_tweet(alertDic, tweet):
         try:
             if tweet['lang'] in alert['lang']:
                 for keyword in alert['keywords']:
-                    keyword = re.compile(re.escape(keyword), re.IGNORECASE)
-                    if len(re.findall(keyword, str(tweet['text'].decode('utf-8')))) != 0:
-                        tweet['_id'] = ObjectId()
-                        Connection.Instance().db[str(alert['alertid'])].insert_one(tweet)
-                        break
+                    keyword = re.compile(keyword.replace(" ", "(.?)"), re.IGNORECASE)
+                    if 'extended_tweet' in i and 'full_text' in tweet['extended_tweet']:
+                        if re.search(keyword, str(tweet['extended_tweet']['full_text'].decode('utf-8'))):
+                            tweet['_id'] = ObjectId()
+                            Connection.Instance().db[str(alert['alertid'])].insert_one(tweet)
+                            break
+                    else:
+                        if re.search(keyword, str(tweet['text'].decode('utf-8'))):
+                            tweet['_id'] = ObjectId()
+                            Connection.Instance().db[str(alert['alertid'])].insert_one(tweet)
+                            break
         except KeyError:
             pass
 
@@ -80,7 +86,7 @@ class StdOutListener(StreamListener):
     def on_disconnect(self, notice):
         print ("Disconnect: {}".format(notice))
         self.connection = False
-        return
+        return True
 
     def on_error(self, status):
         print status
