@@ -242,6 +242,7 @@ class FeedHandler(BaseHandler, TemplateRendering):
                     'title': "Feed",
                     'tweets': logic.getTweets(alertid),
                     'alertid': alertid,
+                    'alertname': logic.getAlertName(alertid),
                     'comesAlert': True,
                     'type': "feed"
                 }
