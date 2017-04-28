@@ -1,6 +1,7 @@
 import pymongo
 from application.Connections import Connection
 import requests
+import time
 
 def determine_date(date):
     current_milli_time = int(round(time.time() * 1000))
