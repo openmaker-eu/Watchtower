@@ -70,3 +70,6 @@ def main():
             Connection.Instance().newsdB[str(alertid)].remove({'name': 'all'})
         else:
             Connection.Instance().newsdB[str(alertid)].insert_many({'name': 'all', 'all':allofthem})
+
+if __name__ == '__main__':
+    main()
