@@ -13,6 +13,7 @@ class Connection:
         try:
             self.MongoDBClient = pymongo.MongoClient('mongodb://admin:smio1EUp@138.68.92.181:27017/')
             self.db = self.MongoDBClient.openMakerdB
+            self.newsdb = self.MongoDBClient.newsdB
             self.feedDB = self.MongoDBClient.feedDB
             self.infDB = self.MongoDBClient.influenceRanks
             self.PostGreSQLConnect = psycopg2.connect("dbname='openmakerdb' user='openmakerpsql' host='138.68.92.181' password='smio1EUp'")
