@@ -18,7 +18,7 @@ def unshorten_url(url):
     return requests.head(url, allow_redirects=True).url
 
 def calculateLinks(alertid, date):
-    links = Connection.Instance().db[alertid].aggregate([{'$match': {'timestamp_ms': {'$gte': date} }},\
+    links = Connection.Instance().db[str(alertid)].aggregate([{'$match': {'timestamp_ms': {'$gte': date} }},\
                                                          {'$unwind': "$entities.urls" },\
                                                          {'$group' : {'_id' :"$entities.urls.expanded_url" , 'total':{'$sum': 1}}},\
                                                          {'$sort': {'total': -1}}])
