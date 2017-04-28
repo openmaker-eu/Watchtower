@@ -36,7 +36,9 @@ def calculateLinks(alertid, date):
                     image = article.top_image.src
                     description = article.meta_description
                     if image and description:
-                        result.append({'url': link, 'im':image, 'title': article.title.upper(), 'description': description})
+                        dic = {'url': link, 'im':image, 'title': article.title.upper(), 'description': description}
+                        if dic not in result:
+                            result.append(dic)
                 except Exception as e:
                     print e
                     pass
