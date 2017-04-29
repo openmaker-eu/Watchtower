@@ -41,9 +41,9 @@ def calculateLinks(alertid, date):
                         dic = {'url': link, 'im':image, 'title': article.title.upper(), 'description': description}
                         if dic not in result:
                             result.append(dic)
-                except Exception as e:
-                    print e
-                    pass
+            except Exception as e:
+                print e
+                pass
 
     return result
 
