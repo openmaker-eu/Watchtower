@@ -5,6 +5,8 @@ import time
 from goose import Goose
 import resource
 
+
+g = Goose({'browser_user_agent': 'Mozilla', 'parser_class':'lxml'})
 rsrc = resource.RLIMIT_DATA
 soft, hard = resource.getrlimit(rsrc)
 resource.setrlimit(rsrc, (512000000, hard)) #limit to one 512mb
@@ -38,9 +40,8 @@ def calculateLinks(alertid, date):
         if link['_id'] != None:
             try:
                 link = unshorten_url(link['_id'])
-                if 'ebay' not in link:
+                if 'ebay' not in link and 'msn' not in link:
                     print link
-                    g = Goose({'browser_user_agent': 'Mozilla', 'parser_class':'lxml'})
                     article = g.extract(url=link)
                     image = article.top_image.src
                     description = article.meta_description
