@@ -29,9 +29,10 @@ def calculateLinks(alertid, date):
     while len(result) < 100 and links != []:
         link = links.pop()
         if link['_id'] != None:
-            link = unshorten_url(link['_id'])
-            if 'ebay' not in link:
-                try:
+            try:
+                link = unshorten_url(link['_id'])
+                print link
+                if 'ebay' not in link:
                     g = Goose()
                     article = g.extract(url=link)
                     image = article.top_image.src
@@ -43,6 +44,7 @@ def calculateLinks(alertid, date):
                 except Exception as e:
                     print e
                     pass
+
     return result
 
 def main():
