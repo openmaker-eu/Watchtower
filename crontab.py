@@ -55,25 +55,25 @@ def main():
         if len(yesterday) != 0:
             Connection.Instance().newsdB[str(alertid)].remove({'name': 'yesterday'})
         else:
-            Connection.Instance().newsdB[str(alertid)].insert_many({'name': 'yesterday', 'yesterday':yesterday})
+            Connection.Instance().newsdB[str(alertid)].insert_one({'name': 'yesterday', 'yesterday':yesterday})
 
         week = calculateLinks(alerid, determine_date('week'))
         if len(week) != 0:
             Connection.Instance().newsdB[str(alertid)].remove({'name': 'week'})
         else:
-            Connection.Instance().newsdB[str(alertid)].insert_many({'name': 'week', 'week':week})
+            Connection.Instance().newsdB[str(alertid)].insert_one({'name': 'week', 'week':week})
 
         month = calculateLinks(alertid, determine_date('month'))
         if len(month) != 0:
             Connection.Instance().newsdB[str(alertid)].remove({'name': 'month'})
         else:
-            Connection.Instance().newsdB[str(alertid)].insert_many({'name': 'month', 'month':month})
+            Connection.Instance().newsdB[str(alertid)].insert_one({'name': 'month', 'month':month})
 
         allofthem = calculateLinks(alertid, determine_date('all'))
         if len(allofthem) != 0:
             Connection.Instance().newsdB[str(alertid)].remove({'name': 'all'})
         else:
-            Connection.Instance().newsdB[str(alertid)].insert_many({'name': 'all', 'all':allofthem})
+            Connection.Instance().newsdB[str(alertid)].insert_one({'name': 'all', 'all':allofthem})
 
 if __name__ == '__main__':
     main()
