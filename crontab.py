@@ -40,7 +40,7 @@ def calculateLinks(alertid, date):
                 link = unshorten_url(link['_id'])
                 if 'ebay' not in link:
                     print link
-                    g = Goose({'browser_user_agent': 'Mozilla', 'parser_class':'html.parser'})
+                    g = Goose({'browser_user_agent': 'Mozilla', 'parser_class':'lxml'})
                     article = g.extract(url=link)
                     image = article.top_image.src
                     description = article.meta_description
@@ -49,7 +49,7 @@ def calculateLinks(alertid, date):
                         if dic not in result:
                             result.append(dic)
             except Exception as e:
-                print e
+                print "exception",e
                 pass
 
     return result
