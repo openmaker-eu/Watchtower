@@ -3,6 +3,9 @@ from application.Connections import Connection
 import requests
 import time
 from goose import Goose
+import resource
+
+resource.setrlimit(rsrc, (512000000, hard)) #limit to one kilobyte
 
 def determine_date(date):
     current_milli_time = int(round(time.time() * 1000))
