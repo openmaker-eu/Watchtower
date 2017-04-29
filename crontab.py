@@ -57,7 +57,7 @@ def main():
         else:
             Connection.Instance().newsdB[str(alertid)].insert_one({'name': 'yesterday', 'yesterday':yesterday})
 
-        week = calculateLinks(alerid, determine_date('week'))
+        week = calculateLinks(alertid, determine_date('week'))
         if len(week) != 0:
             Connection.Instance().newsdB[str(alertid)].remove({'name': 'week'})
         else:
