@@ -11,7 +11,7 @@ def determine_date(date):
         return str(current_milli_time - one_day)
     elif date == 'week':
         return str(current_milli_time - 7 * one_day)
-    elif date == 'mouth':
+    elif date == 'month':
         return str(current_milli_time - 30 * one_day)
     return '0'
 
@@ -23,7 +23,7 @@ def calculateLinks(alertid, date):
                                                          {'$unwind': "$entities.urls" },\
                                                          {'$group' : {'_id' :"$entities.urls.expanded_url" , 'total':{'$sum': 1}}},\
                                                          {'$sort': {'total': -1}},\
-                                                         {'$limit': 20}])
+                                                         {'$limit': 500}])
     links = list(links)
     result = []
     while len(result) < 100 and links != []:
@@ -31,7 +31,6 @@ def calculateLinks(alertid, date):
         if link['_id'] != None:
             try:
                 link = unshorten_url(link['_id'])
-                print link
                 if 'ebay' not in link:
                     g = Goose()
                     article = g.extract(url=link)
@@ -47,37 +46,30 @@ def calculateLinks(alertid, date):
 
     return result
 
-def main():
-    userid = 4
-    Connection.Instance().cur.execute("Select alertid from alerts where userid = %s;", [userid])
-    alertid_list = list(Connection.Instance().cur.fetchall())
-    print alertid_list
 
-    while alertid_list != []:
-        alertid = alertid_list.pop()[0]
-        yesterday = calculateLinks(alertid, determine_date('yesterday'))
-        if len(yesterday) != 0:
-            Connection.Instance().newsdB[str(alertid)].remove({'name': 'yesterday'})
-        else:
-            Connection.Instance().newsdB[str(alertid)].insert_one({'name': 'yesterday', 'yesterday':yesterday})
+userid = 4
+Connection.Instance().cur.execute("Select alertid from alerts where userid = %s;", [userid])
+alertid_list = list(Connection.Instance().cur.fetchall())
+print alertid_list
 
-        week = calculateLinks(alertid, determine_date('week'))
-        if len(week) != 0:
-            Connection.Instance().newsdB[str(alertid)].remove({'name': 'week'})
-        else:
-            Connection.Instance().newsdB[str(alertid)].insert_one({'name': 'week', 'week':week})
+while alertid_list != []:
+    alertid = alertid_list.pop()[0]
+    yesterday = calculateLinks(alertid, determine_date('yesterday'))
+    if len(yesterday) != 0:
+        Connection.Instance().newsdB[str(alertid)].remove({'name': 'yesterday'})
+        Connection.Instance().newsdB[str(alertid)].insert_one({'name': 'yesterday', 'yesterday':yesterday})
 
-        month = calculateLinks(alertid, determine_date('month'))
-        if len(month) != 0:
-            Connection.Instance().newsdB[str(alertid)].remove({'name': 'month'})
-        else:
-            Connection.Instance().newsdB[str(alertid)].insert_one({'name': 'month', 'month':month})
+    week = calculateLinks(alertid, determine_date('week'))
+    if len(week) != 0:
+        Connection.Instance().newsdB[str(alertid)].remove({'name': 'week'})
+        Connection.Instance().newsdB[str(alertid)].insert_one({'name': 'week', 'week':week})
 
-        allofthem = calculateLinks(alertid, determine_date('all'))
-        if len(allofthem) != 0:
-            Connection.Instance().newsdB[str(alertid)].remove({'name': 'all'})
-        else:
-            Connection.Instance().newsdB[str(alertid)].insert_one({'name': 'all', 'all':allofthem})
+    month = calculateLinks(alertid, determine_date('month'))
+    if len(month) != 0:
+        Connection.Instance().newsdB[str(alertid)].remove({'name': 'month'})
+        Connection.Instance().newsdB[str(alertid)].insert_one({'name': 'month', 'month':month})
 
-if __name__ == '__main__':
-    main()
+    allofthem = calculateLinks(alertid, determine_date('all'))
+    if len(allofthem) != 0:
+        Connection.Instance().newsdB[str(alertid)].remove({'name': 'all'})s
+        Connection.Instance().newsdB[str(alertid)].insert_one({'name': 'all', 'all':allofthem})

@@ -158,7 +158,7 @@ def determine_date(date):
         return str(current_milli_time - one_day)
     elif date == 'week':
         return str(current_milli_time - 7 * one_day)
-    elif date == 'mouth':
+    elif date == 'month':
         return str(current_milli_time - 30 * one_day)
     return '0'
 
