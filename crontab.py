@@ -24,6 +24,7 @@ def calculateLinks(alertid, date):
                                                          {'$group' : {'_id' :"$entities.urls.expanded_url" , 'total':{'$sum': 1}}},\
                                                          {'$sort': {'total': -1}}])
     links = list(links)
+    print links
     result = []
     while result < 100 and links != []:
         link = links.pop()
@@ -47,10 +48,11 @@ def calculateLinks(alertid, date):
 def main():
     userid = 4
     Connection.Instance().cur.execute("Select alertid from alerts where userid = %s;", [userid])
-    alertid_list = list(Connection.Instance().cur.fetchall()[0])
+    alertid_list = list(Connection.Instance().cur.fetchall())
+    print alertid_list
 
     while alertid_list != []:
-        alertid = alertid_list.pop()
+        alertid = alertid_list.pop()[0]
         yesterday = calculateLinks(alertid, determine_date('yesterday'))
         if len(yesterday) != 0:
             Connection.Instance().newsdB[str(alertid)].remove({'name': 'yesterday'})
