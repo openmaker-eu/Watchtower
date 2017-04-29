@@ -5,6 +5,7 @@ import time
 from goose import Goose
 import resource
 
+rsrc = resource.RLIMIT_DATA
 resource.setrlimit(rsrc, (512000000, hard)) #limit to one kilobyte
 
 def determine_date(date):
