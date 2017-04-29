@@ -22,7 +22,8 @@ def calculateLinks(alertid, date):
     links = Connection.Instance().db[str(alertid)].aggregate([{'$match': {'timestamp_ms': {'$gte': date} }},\
                                                          {'$unwind': "$entities.urls" },\
                                                          {'$group' : {'_id' :"$entities.urls.expanded_url" , 'total':{'$sum': 1}}},\
-                                                         {'$sort': {'total': -1}}])
+                                                         {'$sort': {'total': -1}},\
+                                                         {'$limit': 20}])
     links = list(links)
     result = []
     while len(result) < 100 and links != []:
