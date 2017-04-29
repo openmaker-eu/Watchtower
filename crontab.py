@@ -25,7 +25,7 @@ def calculateLinks(alertid, date):
                                                          {'$sort': {'total': -1}}])
     links = list(links)
     result = []
-    while result < 100 and links != []:
+    while len(result) < 100 and links != []:
         link = links.pop()
         if link['_id'] != None:
             link = unshorten_url(link['_id'])
