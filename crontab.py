@@ -71,5 +71,5 @@ while alertid_list != []:
 
     allofthem = calculateLinks(alertid, determine_date('all'))
     if len(allofthem) != 0:
-        Connection.Instance().newsdB[str(alertid)].remove({'name': 'all'})s
+        Connection.Instance().newsdB[str(alertid)].remove({'name': 'all'})
         Connection.Instance().newsdB[str(alertid)].insert_one({'name': 'all', 'all':allofthem})
