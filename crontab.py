@@ -33,6 +33,7 @@ def calculateLinks(alertid, date):
     result = []
     while len(result) < 100 and links != []:
         print len(links)
+        print len(result)
         link = links.pop()
         if link['_id'] != None:
             try:
