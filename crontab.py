@@ -24,7 +24,6 @@ def calculateLinks(alertid, date):
                                                          {'$group' : {'_id' :"$entities.urls.expanded_url" , 'total':{'$sum': 1}}},\
                                                          {'$sort': {'total': -1}}])
     links = list(links)
-    print links
     result = []
     while result < 100 and links != []:
         link = links.pop()
