@@ -91,7 +91,7 @@ class FeedsV11Handler(BaseHandler, TemplateRendering):
         except:
             date = 'all'
             pass
-        feeds = newapi.getFeeds(themename, 0, date, cursor)
+        feeds = newapi.getFeeds(themename, 4, date, cursor)
         self.set_header('Content-Type', 'application/json')
         self.write(feeds)
 
