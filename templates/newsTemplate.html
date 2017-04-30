@@ -1,7 +1,7 @@
 {% for feed in feeds %}
 <div class="row margin-bottom-25" cursor="{{ cursor }}">
     <div class="col-md-3">
-            <img src="{{feed['im']}}">
+            <img src="{{feed['im']}}" class="img-responsive feed_img">
     </div>
     <div class="col-md-9">
         <p></p><h5><a href="{{feed['url']}}" target="_blank">{{feed['title']}}</a></h5><p></p>
