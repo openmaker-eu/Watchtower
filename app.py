@@ -72,7 +72,7 @@ class Application(tornado.web.Application):
 class ThemesV11Handler(BaseHandler, TemplateRendering):
     def get(self):
         print self.request.arguments
-        themes = api.getThemes(0)
+        themes = api.getThemes(4)
         self.set_header('Content-Type', 'application/json')
         self.write(themes)
 
@@ -89,7 +89,7 @@ class FeedsV11Handler(BaseHandler, TemplateRendering):
         except:
             date = 'all'
             pass
-        feeds = api.getFeeds(themename, date, cursor)
+        feeds = newapi.getFeeds(themename, 0, date, cursor)
         self.set_header('Content-Type', 'application/json')
         self.write(feeds)
 
