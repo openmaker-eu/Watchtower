@@ -2,7 +2,7 @@ import tornado.web
 import tornado.options
 import tornado.ioloop
 from tornado.escape import json_encode
-import logic, api
+import logic, api, newapi
 from jinja2 import Environment, FileSystemLoader, TemplateNotFound
 from threading import Thread
 import os
