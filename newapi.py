@@ -26,6 +26,6 @@ def getFeeds(themename, userid, date, cursor):
         if cursor >= length:
             cursor = length
         result['next_cursor'] = cursor
-    result['cursor_length'] = length
+    result['cursor_length'] = 100
     result['feeds'] = feeds
     return json.dumps(result, indent=4)
