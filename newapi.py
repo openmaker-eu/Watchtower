@@ -26,8 +26,8 @@ def getFeeds(themename, userid, date, cursor):
         feeds.append("Cursor is Empty.")
     else:
         cursor = int(cursor) + 20
-        if cursor >= length:
-            cursor = length
+        if cursor >= 100:
+            cursor = 100
         result['next_cursor'] = cursor
     result['cursor_length'] = 100
     result['feeds'] = feeds
