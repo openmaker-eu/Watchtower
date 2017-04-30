@@ -18,12 +18,9 @@ def getFeeds(themename, userid, date, cursor):
         result['Error'] = 'invalid date'
         return json.dumps(result, indent=4)
     themeid = str(logic.getAlertIdwithUserId(themename, int(userid)))
-    print themeid
     feeds = list(Connection.Instance().newsdB[themeid].find({'name': date}, {date: 1}))
-    print feeds
     feeds = list(feeds[0][date][cursor:cursor+20])
     if len(feeds) == 0:
-        print len(list(feeds))
         feeds.append("Cursor is Empty.")
     else:
         cursor = int(cursor) + 20
