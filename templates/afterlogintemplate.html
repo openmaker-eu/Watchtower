@@ -93,6 +93,9 @@
     {% if type == "feed" %}
       {% include 'feed.html'%}
     {% endif %}
+    {% if type == "news" %}
+      {% include 'news.html'%}
+    {% endif %}
     <!-- /.container -->
     <!-- Bootstrap core JavaScript
     ================================================== -->
@@ -424,6 +427,67 @@
                 }, 500);
             });
         }
+    </script>
+    {% endif %}
+
+    {% if type == "news" %}
+    <script>
+        $(".dropdown-menu").on('click', 'li a', function() {
+            var selText = $(this).children("h4").html();
+            $(this).parent('li').siblings().removeClass('active');
+            $(this).parents('.btn-group').find('.selection').html(selText);
+            $(this).parents('li').addClass("active");
+        });
+    </script>
+    <script>
+        $(document).ready(function() {
+            $(window).scroll(function() {
+                if ($(window).scrollTop() + $(window).height() == $(document).height()){
+                  if($('#newsDiv').length != 0){
+                    $("#spin").show();
+                    var ncursor = $("ol > div").last().attr("cursor");
+                    var aid = $("ol").attr("alertid");
+                    $.ajax({
+                        url: '/News/scroll',
+                        method: 'POST',
+                        data: {
+                            'next_cursor': ncursor,
+                            'alertid': aid
+                        }
+                    }).success(function(html) {
+                        $('#news').append(html);
+                        $("#spin").hide();
+                    });
+                  }
+                }
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function() {
+            $("#spin").spinner();
+            $('a.newsalerts').click(function() {
+                $('#newscontainer').empty();
+                $("#spin").show();
+                var aid = $(this).attr("data-id");
+                $.ajax({
+                    url: '/News',
+                    method: 'POST',
+                    data: {
+                        'alertid': aid
+                    },
+                    timeout: 10000,
+                    error: function () {
+                         $('#newscontainer').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");
+                         $("#spin").hide();
+                    }
+                }).success(function(html) {
+                    $('#newscontainer').empty();
+                    $('#newscontainer').append(html);
+                    $("#spin").hide();
+                });
+            });
+        });
     </script>
     {% endif %}
 </body>

@@ -52,6 +52,8 @@ class Application(tornado.web.Application):
             (r"/alertinfo/([0-9]*)", CreateEditAlertsHandler, {'mainT':mainT}),
             (r"/Feed/(.*)", FeedHandler, {'mainT':mainT}),
             (r"/Feed", FeedHandler, {'mainT':mainT}),
+            (r"/News/(.*)", NewsHandler, {'mainT':mainT}),
+            (r"/News", NewsHandler, {'mainT':mainT}),
             (r"/preview", PreviewHandler, {'mainT':mainT}),
             (r"/newTweets", NewTweetsHandler, {'mainT':mainT}),
             (r"/newTweets/(.*)", NewTweetsHandler, {'mainT':mainT}),
@@ -364,6 +366,69 @@ class NewTweetsHandler(BaseHandler, TemplateRendering):
             alertid = self.get_argument('alertid')
             newestId = self.get_argument('tweetid')
             content = str(logic.checkTweets(alertid, newestId))
+        self.write(content)
+
+class NewsHandler(BaseHandler, TemplateRendering):
+    @tornado.web.authenticated
+    def get(self, argument = None):
+        userid = tornado.escape.xhtml_escape(self.current_user)
+        template = 'afterlogintemplate.html'
+        if argument is not None:
+            try:
+                alertid = int(argument)
+                feeds = logic.getFeeds(alertid, 'all', 0)
+                variables = {
+                    'title': "News",
+                    'feeds': feeds['feeds'],
+                    'cursor': feeds['next_cursor'],
+                    'alertid': alertid,
+                    'alertname': logic.getAlertName(alertid),
+                    'comesAlert': True,
+                    'type': "news"
+                }
+                if len(variables['feeds']) == 0:
+                    self.write("<p style='color: red; font-size: 15px'><b>Ops! There is no tweet now.</b></p>")
+            except ValueError:
+                variables = {
+                    'title': "News",
+                    'alerts': logic.getAlertList(userid),
+                    'comesAlert': False,
+                    'type': "news"
+                }
+                pass
+        else:
+            variables = {
+                'title': "News",
+                'alerts': logic.getAlertList(userid),
+                'comesAlert': False,
+                'type': "news"
+            }
+        content = self.render_template(template, variables)
+        self.write(content)
+
+    @tornado.web.authenticated
+    def post(self, argument=None):
+        if argument is not None:
+            template = 'newsTemplate.html'
+            alertid = self.get_argument('alertid')
+            next_cursor = self.get_argument('next_cursor')
+            feeds = logic.getFeeds(alertid, 'all', next_cursor)
+            variables = {
+                'feeds': feeds['feeds'],
+                'cursor': feeds['next_cursor'],
+            }
+        else:
+            template = 'alertNews.html'
+            alertid = self.get_argument('alertid')
+            feeds = logic.getFeeds(alertid, 'all', 0)
+            variables = {
+                'feeds': feeds['feeds'],
+                'cursor': feeds['next_cursor'],
+                'alertid': alertid
+            }
+            if len(variables['feeds']) == 0:
+                self.write("<p style='color: red; font-size: 15px'><b>Ops! There is no tweet now.</b></p>")
+        content = self.render_template(template, variables)
         self.write(content)
 
 def main(mainT):
