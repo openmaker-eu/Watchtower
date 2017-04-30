@@ -450,6 +450,7 @@
                     $("#spin").show();
                     var ncursor = $("ol > div").last().attr("cursor");
                     var aid = $("ol").attr("alertid");
+                    console.log(ncursor);
                     $.ajax({
                         url: '/News/scroll',
                         method: 'POST',
