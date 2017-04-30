@@ -303,14 +303,10 @@ def getFeeds(alertid, date, cursor):
         return json.dumps(result, indent=4)
     feeds = list(Connection.Instance().newsdB[str(alertid)].find({'name': date}, {date: 1}))
     feeds = list(feeds[0][date][cursor:cursor+20])
-    if len(feeds) == 0:
-        print len(list(feeds))
-        feeds.append("Cursor is Empty.")
-    else:
-        cursor = int(cursor) + 20
-        if cursor >= 100:
-            cursor = 100
-        result['next_cursor'] = cursor
+    cursor = int(cursor) + 20
+    if cursor >= 100:
+        cursor = 100
+    result['next_cursor'] = cursor
     result['cursor_length'] = 100
     result['feeds'] = feeds
     return result
