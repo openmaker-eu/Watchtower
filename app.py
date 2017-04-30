@@ -412,7 +412,7 @@ class NewsHandler(BaseHandler, TemplateRendering):
             template = 'newsTemplate.html'
             alertid = self.get_argument('alertid')
             next_cursor = self.get_argument('next_cursor')
-            feeds = logic.getFeeds(alertid, 'all', str(next_cursor))
+            feeds = logic.getFeeds(alertid, 'all', int(next_cursor))
             variables = {
                 'feeds': feeds['feeds'],
                 'cursor': feeds['next_cursor'],
