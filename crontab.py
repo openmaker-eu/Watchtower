@@ -2,6 +2,7 @@ import pymongo
 from application.Connections import Connection
 import requests
 import time
+import summary
 from goose import Goose
 import resource
 
@@ -42,11 +43,17 @@ def calculateLinks(alertid, date):
                 link = unshorten_url(link['_id'])
                 if 'ebay' not in link and 'msn' not in link:
                     print link
-                    article = g.extract(url=link)
-                    image = article.top_image.src
-                    description = article.meta_description
+                    #article = g.extract(url=link)
+                    #image = article.top_image.src
+                    #description = article.meta_description
+                    #title = article.title.upper()
+                    s = summary.Summary(link)
+                    s.extract()
+                    image = str(s.image).encode('utf-8')
+                    title = str(s.title.encode('utf-8'))
+                    description = str(s.description.encode('utf-8'))
                     if image and description:
-                        dic = {'url': link, 'im':image, 'title': article.title.upper(), 'description': description}
+                        dic = {'url': link, 'im':image, 'title': title, 'description': description}
                         if dic not in result:
                             result.append(dic)
             except Exception as e:
