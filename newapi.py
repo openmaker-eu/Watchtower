@@ -18,7 +18,7 @@ def getFeeds(themename, userid, date, cursor):
         return json.dumps(result, indent=4)
     themeid = str(logic.getAlertIdwithUserId(themename, userid))
     feeds = list(Connection.Instance().db[themeid].find({'name': date}, {date: 1}))
-    feeds = list(feeds[0][yesterday][cursor:cursor+20])
+    feeds = list(feeds[0][date][cursor:cursor+20])
     if len(feeds) == 0:
         print len(list(feeds))
         feeds.append("Cursor is Empty.")
