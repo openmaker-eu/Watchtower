@@ -1,6 +1,7 @@
 import pymongo
 from application.Connections import Connection
 import logic
+import json
 
 def getThemes(userid):
     Connection.Instance().cur.execute("select alertid, alertname from alerts where userid = %s", [userid])
