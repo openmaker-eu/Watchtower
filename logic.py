@@ -295,7 +295,7 @@ def searchTweets(keywords, languages):
                 tweet['text'] = url.sub(ahref, tweet['text'])
     return tweets
 
-def getFeeds(alertid, date, cursor):
+def getNews(alertid, date, cursor):
     dates=['all', 'yesterday', 'week', 'month']
     result = {}
     if date not in dates:

@@ -376,7 +376,7 @@ class NewsHandler(BaseHandler, TemplateRendering):
         if argument is not None:
             try:
                 alertid = int(argument)
-                feeds = logic.getFeeds(alertid, 'all', 0)
+                feeds = logic.getNews(alertid, 'all', 0)
                 variables = {
                     'title': "News",
                     'feeds': feeds['feeds'],
@@ -412,7 +412,7 @@ class NewsHandler(BaseHandler, TemplateRendering):
             template = 'newsTemplate.html'
             alertid = self.get_argument('alertid')
             next_cursor = self.get_argument('next_cursor')
-            feeds = logic.getFeeds(alertid, 'all', int(next_cursor))
+            feeds = logic.getNews(alertid, 'all', int(next_cursor))
             variables = {
                 'feeds': feeds['feeds'],
                 'cursor': feeds['next_cursor'],
@@ -420,7 +420,7 @@ class NewsHandler(BaseHandler, TemplateRendering):
         else:
             template = 'alertNews.html'
             alertid = self.get_argument('alertid')
-            feeds = logic.getFeeds(alertid, 'all', 0)
+            feeds = logic.getNews(alertid, 'all', 0)
             variables = {
                 'feeds': feeds['feeds'],
                 'cursor': feeds['next_cursor'],
