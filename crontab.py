@@ -5,7 +5,7 @@ import time
 import summary
 from goose import Goose
 import resource
-
+from time import gmtime, strftime
 
 g = Goose({'browser_user_agent': 'Mozilla', 'parser_class':'lxml'})
 rsrc = resource.RLIMIT_DATA
@@ -73,19 +73,19 @@ while alertid_list != []:
     yesterday = calculateLinks(alertid, determine_date('yesterday'))
     if len(yesterday) != 0:
         Connection.Instance().newsdB[str(alertid)].remove({'name': 'yesterday'})
-        Connection.Instance().newsdB[str(alertid)].insert_one({'name': 'yesterday', 'yesterday':yesterday})
+        Connection.Instance().newsdB[str(alertid)].insert_one({'name': 'yesterday', 'yesterday':yesterday, 'date': strftime("%a, %d %b %Y %H:%M:%S", gmtime())})
 
     week = calculateLinks(alertid, determine_date('week'))
     if len(week) != 0:
         Connection.Instance().newsdB[str(alertid)].remove({'name': 'week'})
-        Connection.Instance().newsdB[str(alertid)].insert_one({'name': 'week', 'week':week})
+        Connection.Instance().newsdB[str(alertid)].insert_one({'name': 'week', 'week':week, 'date': strftime("%a, %d %b %Y %H:%M:%S", gmtime())})
 
     month = calculateLinks(alertid, determine_date('month'))
     if len(month) != 0:
         Connection.Instance().newsdB[str(alertid)].remove({'name': 'month'})
-        Connection.Instance().newsdB[str(alertid)].insert_one({'name': 'month', 'month':month})
+        Connection.Instance().newsdB[str(alertid)].insert_one({'name': 'month', 'month':month, 'date': strftime("%a, %d %b %Y %H:%M:%S", gmtime())})
 
     allofthem = calculateLinks(alertid, determine_date('all'))
     if len(allofthem) != 0:
         Connection.Instance().newsdB[str(alertid)].remove({'name': 'all'})
-        Connection.Instance().newsdB[str(alertid)].insert_one({'name': 'all', 'all':allofthem})
+        Connection.Instance().newsdB[str(alertid)].insert_one({'name': 'all', 'all':allofthem, 'date': strftime("%a, %d %b %Y %H:%M:%S", gmtime())})
