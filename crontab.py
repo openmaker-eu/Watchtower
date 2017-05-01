@@ -63,8 +63,7 @@ def calculateLinks(alertid, date):
     return result
 
 
-userid = 4
-Connection.Instance().cur.execute("Select alertid from alerts where userid = %s;", [userid])
+Connection.Instance().cur.execute("Select alertid from alerts;")
 alertid_list = list(Connection.Instance().cur.fetchall())
 print alertid_list
 
