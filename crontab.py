@@ -41,7 +41,7 @@ def calculateLinks(alertid, date):
         if link['_id'] != None:
             try:
                 link = unshorten_url(link['_id'])
-                if 'ebay' not in link and 'msn' not in link:
+                if 'ebay' not in link and 'gearbest' not in link:
                     print link
                     #article = g.extract(url=link)
                     #image = article.top_image.src
@@ -52,7 +52,7 @@ def calculateLinks(alertid, date):
                     image = str(s.image).encode('utf-8')
                     title = str(s.title.encode('utf-8'))
                     description = str(s.description.encode('utf-8'))
-                    if image and description:
+                    if image is not None and description is not None:
                         dic = {'url': link, 'im':image, 'title': title, 'description': description}
                         if dic not in result:
                             result.append(dic)
