@@ -52,7 +52,7 @@ def calculateLinks(alertid, date):
                     image = str(s.image).encode('utf-8')
                     title = str(s.title.encode('utf-8'))
                     description = str(s.description.encode('utf-8'))
-                    if image is not None and description is not None:
+                    if image is not 'None' and description is not 'None':
                         dic = {'url': link, 'im':image, 'title': title, 'description': description}
                         if dic not in result:
                             result.append(dic)
