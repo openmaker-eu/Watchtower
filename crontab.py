@@ -35,14 +35,11 @@ def calculateLinks(alertid, date):
     links = list(links)
     result = []
     while len(result) < 100 and links != []:
-        print len(links)
-        print len(result)
-        link = links.pop()
+        link = links.pop(0)
         if link['_id'] != None:
             try:
                 link = unshorten_url(link['_id'])
                 if 'ebay' not in link and 'gearbest' not in link:
-                    print link
                     #article = g.extract(url=link)
                     #image = article.top_image.src
                     #description = article.meta_description
@@ -57,34 +54,38 @@ def calculateLinks(alertid, date):
                         if dic not in result:
                             result.append(dic)
             except Exception as e:
-                print "exception",e
                 pass
 
     return result
 
+def main():
+    Connection.Instance().cur.execute("Select alertid from alerts;")
+    alertid_list = list(Connection.Instance().cur.fetchall())
+    print alertid_list
 
-Connection.Instance().cur.execute("Select alertid from alerts;")
-alertid_list = list(Connection.Instance().cur.fetchall())
-print alertid_list
+    while alertid_list != []:
+        alertid = alertid_list.pop()[0]
+        yesterday = calculateLinks(alertid, determine_date('yesterday'))
+        if len(yesterday) != 0:
+            Connection.Instance().newsdB[str(alertid)].remove({'name': 'yesterday'})
+            Connection.Instance().newsdB[str(alertid)].insert_one({'name': 'yesterday', 'yesterday':yesterday, 'date': strftime("%a, %d %b %Y %H:%M:%S", gmtime())})
 
-while alertid_list != []:
-    alertid = alertid_list.pop()[0]
-    yesterday = calculateLinks(alertid, determine_date('yesterday'))
-    if len(yesterday) != 0:
-        Connection.Instance().newsdB[str(alertid)].remove({'name': 'yesterday'})
-        Connection.Instance().newsdB[str(alertid)].insert_one({'name': 'yesterday', 'yesterday':yesterday, 'date': strftime("%a, %d %b %Y %H:%M:%S", gmtime())})
+        week = calculateLinks(alertid, determine_date('week'))
+        if len(week) != 0:
+            Connection.Instance().newsdB[str(alertid)].remove({'name': 'week'})
+            Connection.Instance().newsdB[str(alertid)].insert_one({'name': 'week', 'week':week, 'date': strftime("%a, %d %b %Y %H:%M:%S", gmtime())})
 
-    week = calculateLinks(alertid, determine_date('week'))
-    if len(week) != 0:
-        Connection.Instance().newsdB[str(alertid)].remove({'name': 'week'})
-        Connection.Instance().newsdB[str(alertid)].insert_one({'name': 'week', 'week':week, 'date': strftime("%a, %d %b %Y %H:%M:%S", gmtime())})
+        month = calculateLinks(alertid, determine_date('month'))
+        if len(month) != 0:
+            Connection.Instance().newsdB[str(alertid)].remove({'name': 'month'})
+            Connection.Instance().newsdB[str(alertid)].insert_one({'name': 'month', 'month':month, 'date': strftime("%a, %d %b %Y %H:%M:%S", gmtime())})
 
-    month = calculateLinks(alertid, determine_date('month'))
-    if len(month) != 0:
-        Connection.Instance().newsdB[str(alertid)].remove({'name': 'month'})
-        Connection.Instance().newsdB[str(alertid)].insert_one({'name': 'month', 'month':month, 'date': strftime("%a, %d %b %Y %H:%M:%S", gmtime())})
-
-    allofthem = calculateLinks(alertid, determine_date('all'))
-    if len(allofthem) != 0:
-        Connection.Instance().newsdB[str(alertid)].remove({'name': 'all'})
-        Connection.Instance().newsdB[str(alertid)].insert_one({'name': 'all', 'all':allofthem, 'date': strftime("%a, %d %b %Y %H:%M:%S", gmtime())})
+        print alertid, "fetched!"
+    """
+        allofthem = calculateLinks(alertid, determine_date('all'))
+        if len(allofthem) != 0:
+            Connection.Instance().newsdB[str(alertid)].remove({'name': 'all'})
+            Connection.Instance().newsdB[str(alertid)].insert_one({'name': 'all', 'all':allofthem, 'date': strftime("%a, %d %b %Y %H:%M:%S", gmtime())})
+    """
+if __name__ == '__main__':
+    main()

@@ -89,7 +89,7 @@ class FeedsV11Handler(BaseHandler, TemplateRendering):
         try:
             date = str(self.get_argument("date"))
         except:
-            date = 'all'
+            date = 'month'
             pass
         feeds = newapi.getFeeds(themename, 4, date, cursor)
         self.set_header('Content-Type', 'application/json')
@@ -106,7 +106,7 @@ class FeedsV11wglHandler(BaseHandler, TemplateRendering):
         try:
             date = str(self.get_argument("date"))
         except:
-            date = 'all'
+            date = 'month'
             pass
         feeds = api.getFeedsGoose(themename, date, cursor)
         self.set_header('Content-Type', 'application/json')
@@ -123,7 +123,7 @@ class FeedsV11wslHandler(BaseHandler, TemplateRendering):
         try:
             date = str(self.get_argument("date"))
         except:
-            date = 'all'
+            date = 'month'
             pass
         feeds = api.getFeedsSummary(themename, date, cursor)
         self.set_header('Content-Type', 'application/json')
@@ -376,7 +376,7 @@ class NewsHandler(BaseHandler, TemplateRendering):
         if argument is not None:
             try:
                 alertid = int(argument)
-                feeds = logic.getNews(alertid, 'all', 0)
+                feeds = logic.getNews(alertid, 'yesterday', 0)
                 variables = {
                     'title': "News",
                     'feeds': feeds['feeds'],
@@ -412,7 +412,7 @@ class NewsHandler(BaseHandler, TemplateRendering):
             template = 'newsTemplate.html'
             alertid = self.get_argument('alertid')
             next_cursor = self.get_argument('next_cursor')
-            feeds = logic.getNews(alertid, 'all', int(next_cursor))
+            feeds = logic.getNews(alertid, 'yesterday', int(next_cursor))
             variables = {
                 'feeds': feeds['feeds'],
                 'cursor': feeds['next_cursor'],
@@ -420,7 +420,7 @@ class NewsHandler(BaseHandler, TemplateRendering):
         else:
             template = 'alertNews.html'
             alertid = self.get_argument('alertid')
-            feeds = logic.getNews(alertid, 'all', 0)
+            feeds = logic.getNews(alertid, 'yesterday', 0)
             variables = {
                 'feeds': feeds['feeds'],
                 'cursor': feeds['next_cursor'],
