@@ -60,11 +60,11 @@ def calculateLinks(alertid, date):
 
 def main():
     Connection.Instance().cur.execute("Select alertid from alerts;")
-    alertid_list = list(Connection.Instance().cur.fetchall())
+    alertid_list = sorted(list(Connection.Instance().cur.fetchall()))
     print alertid_list
 
     while alertid_list != []:
-        alertid = alertid_list.pop()[0]
+        alertid = alertid_list.pop(0)[0]
         yesterday = calculateLinks(alertid, determine_date('yesterday'))
         if len(yesterday) != 0:
             Connection.Instance().newsdB[str(alertid)].remove({'name': 'yesterday'})
