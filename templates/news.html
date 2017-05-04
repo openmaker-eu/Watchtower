@@ -2,13 +2,13 @@
 {% if comesAlert %}
 <div class="container" style="margin-bottom:10px">
   <h2 style="margin-left:50px"><strong>{{alertname}}</strong></h2>
+</div>
+<div class="container" id="newscontainer" date="yesterday">
   <div class = "btn-group">
      <button onclick="getDate()" date="yesterday" class = "btn btn-success">Yesterday</button>
      <button onclick="getDate()" date="week" class = "btn btn-default">Week</button>
      <button onclick="getDate()" date="month" class = "btn btn-default">Month</button>
   </div>
-</div>
-<div class="container" id="newscontainer" date="yesterday">
   {% include 'alertNews.html' %}
 </div>
 {% else %}
@@ -29,12 +29,12 @@
               </ul>
           </div>
       </div>
-      <div class = "btn-group">
-         <button onclick="getDate()" date="yesterday" class = "btn btn-success">Yesterday</button>
-         <button onclick="getDate()" date="week" class = "btn btn-default">Week</button>
-         <button onclick="getDate()" date="month" class = "btn btn-default">Month</button>
-      </div>
   </div>
   <div class="container" id="newscontainer" date="yesterday">
+    <div class = "btn-group">
+       <button onclick="getDate()" date="yesterday" class = "btn btn-success">Yesterday</button>
+       <button onclick="getDate()" date="week" class = "btn btn-default">Week</button>
+       <button onclick="getDate()" date="month" class = "btn btn-default">Month</button>
+    </div>
   </div>
 {% endif %}
