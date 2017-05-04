@@ -474,6 +474,7 @@
             $('a.newsalerts').click(function() {
                 $('#newscontainer').empty();
                 $("#spin").show();
+                $("#date_buttons").show();
                 var aid = $(this).attr("data-id");
                 $.ajax({
                     url: '/News',

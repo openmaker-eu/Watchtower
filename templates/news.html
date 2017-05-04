@@ -29,12 +29,12 @@
               </ul>
           </div>
       </div>
+      <div class = "btn-group" id="date_buttons" style="display: none">
+         <button onclick="getDate()" date="yesterday" class = "btn btn-success">Yesterday</button>
+         <button onclick="getDate()" date="week" class = "btn btn-default">Week</button>
+         <button onclick="getDate()" date="month" class = "btn btn-default">Month</button>
+      </div>
   </div>
   <div class="container" id="newscontainer" date="yesterday">
-    <div class = "btn-group">
-       <button onclick="getDate()" date="yesterday" class = "btn btn-success">Yesterday</button>
-       <button onclick="getDate()" date="week" class = "btn btn-default">Week</button>
-       <button onclick="getDate()" date="month" class = "btn btn-default">Month</button>
-    </div>
   </div>
 {% endif %}
