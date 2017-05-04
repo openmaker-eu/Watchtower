@@ -450,12 +450,14 @@
                     $("#spin").show();
                     var ncursor = $("ol > div").last().attr("cursor");
                     var aid = $("ol").attr("alertid");
+                    var date = $('#newscontainer').attr("date");
                     $.ajax({
                         url: '/News/scroll',
                         method: 'POST',
                         data: {
                             'next_cursor': ncursor,
-                            'alertid': aid
+                            'alertid': aid,
+                            'date': date
                         }
                     }).success(function(html) {
                         $('#news').append(html);
@@ -477,7 +479,8 @@
                     url: '/News',
                     method: 'POST',
                     data: {
-                        'alertid': aid
+                        'alertid': aid,
+                        'date': 'yesterday'
                     },
                     timeout: 10000,
                     error: function () {
@@ -491,6 +494,32 @@
                 });
             });
         });
+    </script>
+    <script>
+    function getDate() {
+      $('#newscontainer').empty();
+      $("#spin").show();
+      var date = $(this).attr("date");
+      $('#newscontainer').attr('date', date);
+      var aid = $("ol").attr("alertid");
+      $.ajax({
+          url: '/News',
+          method: 'POST',
+          data: {
+              'alertid': aid,
+              'date': date
+          },
+          timeout: 10000,
+          error: function () {
+               $('#newscontainer').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");
+               $("#spin").hide();
+          }
+      }).success(function(html) {
+          $('#newscontainer').empty();
+          $('#newscontainer').append(html);
+          $("#spin").hide();
+      });
+    }
     </script>
     {% endif %}
 </body>

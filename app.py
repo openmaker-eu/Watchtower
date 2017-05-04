@@ -74,7 +74,6 @@ class Application(tornado.web.Application):
 
 class ThemesV11Handler(BaseHandler, TemplateRendering):
     def get(self):
-        print self.request.arguments
         themes = api.getThemes(4)
         self.set_header('Content-Type', 'application/json')
         self.write(themes)
@@ -141,7 +140,6 @@ class DocumentationHandler(BaseHandler, TemplateRendering):
 
 class Documentationv11Handler(BaseHandler, TemplateRendering):
     def get(self):
-        print "yes"
         template = 'apiv11.html'
         variables = {
             'title' : "Watchtower Api"
@@ -387,7 +385,8 @@ class NewsHandler(BaseHandler, TemplateRendering):
         if argument is not None:
             try:
                 alertid = int(argument)
-                feeds = logic.getNews(alertid, 'yesterday', 0)
+                date = date = self.get_argument('date') | 'yesterday'
+                feeds = logic.getNews(alertid, date, 0)
                 variables = {
                     'title': "News",
                     'feeds': feeds['feeds'],
@@ -423,7 +422,8 @@ class NewsHandler(BaseHandler, TemplateRendering):
             template = 'newsTemplate.html'
             alertid = self.get_argument('alertid')
             next_cursor = self.get_argument('next_cursor')
-            feeds = logic.getNews(alertid, 'yesterday', int(next_cursor))
+            date = self.get_argument('date') | 'yesterday'
+            feeds = logic.getNews(alertid, date, int(next_cursor))
             variables = {
                 'feeds': feeds['feeds'],
                 'cursor': feeds['next_cursor'],
@@ -431,7 +431,8 @@ class NewsHandler(BaseHandler, TemplateRendering):
         else:
             template = 'alertNews.html'
             alertid = self.get_argument('alertid')
-            feeds = logic.getNews(alertid, 'yesterday', 0)
+            date = self.get_argument('date') | 'yesterday'
+            feeds = logic.getNews(alertid, date, 0)
             variables = {
                 'feeds': feeds['feeds'],
                 'cursor': feeds['next_cursor'],
