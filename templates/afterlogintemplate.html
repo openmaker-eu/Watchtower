@@ -503,6 +503,18 @@
       var date = $(this).attr("date");
       $('#newscontainer').attr('date', date);
       var aid = $("ol").attr("alertid");
+      var children=$('#date_buttons').children();
+      children.each(function(){
+         $(this).removeClass('btn-default');
+         $(this).removeClass('btn-success');
+      });
+      children.each(function(){
+        if($(this).attr('date') == date){
+          $(this).addClass('btn-success');
+        }else{
+          $(this).addClass('btn-default');
+        }
+      });
       $.ajax({
           url: '/News',
           method: 'POST',
