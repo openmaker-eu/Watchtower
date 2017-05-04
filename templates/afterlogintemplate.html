@@ -499,10 +499,9 @@
     <script>
     function getDate() {
       var aid = $("ol").attr("alertid");
-      $('#newscontainer').empty();
       $("#spin").show();
       var date = $(this).attr("date");
-      $('#newscontainer').attr('date', date);
+      $('#newscontainer').attr("date", date);
       var children=$('#date_buttons').children();
       children.each(function(){
         if($(this).attr('date') == date){
