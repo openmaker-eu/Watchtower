@@ -385,7 +385,11 @@ class NewsHandler(BaseHandler, TemplateRendering):
         if argument is not None:
             try:
                 alertid = int(argument)
-                date = date = self.get_argument('date') | 'yesterday'
+                try:
+                    date =  self.get_argument('date')
+                except:
+                    date = 'yesterday'
+                    pass
                 feeds = logic.getNews(alertid, date, 0)
                 variables = {
                     'title': "News",
@@ -422,7 +426,11 @@ class NewsHandler(BaseHandler, TemplateRendering):
             template = 'newsTemplate.html'
             alertid = self.get_argument('alertid')
             next_cursor = self.get_argument('next_cursor')
-            date = self.get_argument('date') | 'yesterday'
+            try:
+                date =  self.get_argument('date')
+            except:
+                date = 'yesterday'
+                pass
             feeds = logic.getNews(alertid, date, int(next_cursor))
             variables = {
                 'feeds': feeds['feeds'],
@@ -431,7 +439,11 @@ class NewsHandler(BaseHandler, TemplateRendering):
         else:
             template = 'alertNews.html'
             alertid = self.get_argument('alertid')
-            date = self.get_argument('date') | 'yesterday'
+            try:
+                date =  self.get_argument('date')
+            except:
+                date = 'yesterday'
+                pass
             feeds = logic.getNews(alertid, date, 0)
             variables = {
                 'feeds': feeds['feeds'],
