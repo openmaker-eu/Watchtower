@@ -3,12 +3,12 @@
 <div class="container" style="margin-bottom:10px">
   <h2 style="margin-left:50px"><strong>{{alertname}}</strong></h2>
 </div>
+<div class = "btn-group" id="date_buttons" style="display: none; float: right; margin-bottom:10px">
+   <button onclick="getDate('yesterday');" date="yesterday" class = "btn btn-success">Yesterday</button>
+   <button onclick="getDate('week');" date="week" class = "btn btn-default">Week</button>
+   <button onclick="getDate('month');" date="month" class = "btn btn-default">Month</button>
+</div>
 <div class="container" id="newscontainer" date="yesterday">
-  <div class = "btn-group">
-     <button onclick="getDate('yesterday');" date="yesterday" class = "btn btn-success">Yesterday</button>
-     <button onclick="getDate('week');" date="week" class = "btn btn-default">Week</button>
-     <button onclick="getDate('month');" date="month" class = "btn btn-default">Month</button>
-  </div>
   {% include 'alertNews.html' %}
 </div>
 {% else %}
