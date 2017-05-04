@@ -58,7 +58,7 @@ class Application(tornado.web.Application):
             (r"/newTweets", NewTweetsHandler, {'mainT':mainT}),
             (r"/newTweets/(.*)", NewTweetsHandler, {'mainT':mainT}),
             (r"/api", DocumentationHandler, {'mainT':mainT}),
-            (r"/api/v1.1", Documentationv11Handler, {'mainT':mainT}),
+            (r"/api/v1\.1", Documentationv11Handler, {'mainT':mainT}),
             (r"/api/get_themes", ThemesHandler, {'mainT':mainT}),
             (r"/api/get_influencers/(.*)/(.*)", InfluencersHandler, {'mainT':mainT}),
             (r"/api/get_feeds/(.*)/(.*)", FeedsHandler, {'mainT':mainT}),
@@ -141,6 +141,7 @@ class DocumentationHandler(BaseHandler, TemplateRendering):
 
 class Documentationv11Handler(BaseHandler, TemplateRendering):
     def get(self):
+        print "yes"
         template = 'apiv11.html'
         variables = {
             'title' : "Watchtower Api"
