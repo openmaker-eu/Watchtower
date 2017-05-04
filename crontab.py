@@ -34,10 +34,11 @@ def calculateLinks(alertid, date):
                                                          {'$limit': 500}])
     links = list(links)
     result = []
-    while len(result) < 100 and links != []:
+    while len(result) < 60 and links != []:
         link = links.pop(0)
         if link['_id'] != None:
             try:
+                count = link['total']
                 link = unshorten_url(link['_id'])
                 if 'ebay' not in link and 'gearbest' not in link:
                     #article = g.extract(url=link)
@@ -49,9 +50,10 @@ def calculateLinks(alertid, date):
                     image = str(s.image).encode('utf-8')
                     title = str(s.title.encode('utf-8'))
                     description = str(s.description.encode('utf-8'))
-                    if image is not 'None' and description is not 'None':
-                        dic = {'url': link, 'im':image, 'title': title, 'description': description}
-                        if dic not in result:
+                    if image != "None" and description != "None":
+                        dic = {'url': link, 'im':image, 'title': title, 'description': description, 'popularity': total}
+                        if not next((item for item in result if item["title"] == dic['title'] and item["im"] == dic['im']\
+                         and item["description"] == dic['description']), False):
                             result.append(dic)
             except Exception as e:
                 pass
