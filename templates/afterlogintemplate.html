@@ -476,6 +476,18 @@
                 $("#spin").show();
                 $("#date_buttons").show();
                 var aid = $(this).attr("data-id");
+                var date = 'yesterday';
+                $('#newscontainer').attr("date", date);
+                var children=$('#date_buttons').children();
+                children.each(function(){
+                  if($(this).attr('date') == date){
+                    $(this).removeClass('btn-default');
+                    $(this).addClass('btn-success');
+                  }else{
+                    $(this).removeClass('btn-success');
+                    $(this).addClass('btn-default');
+                  }
+                });
                 $.ajax({
                     url: '/News',
                     method: 'POST',
