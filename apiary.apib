@@ -25,368 +25,135 @@ Watchtower is a simple API allowing consumers to view the given theme's influenc
             ]
         }
 
-## Influencers Collection [/get_influencers/{theme_name}]
-
-### List All Influencers of given theme [GET]
-
-+ Response 200 (application/json)
-
-        {
-            "next cursor": 20, 
-            "cursor length": 20, 
-            "influencers": [
-                {
-                    "username": "3dprintindustry", 
-                    "description_user": "Leading source for #3DPrinting news & information \u2013 industry reports, business directory, jobs board, and more.", 
-                    "name": "3D Printing Industry", 
-                    "location_user": "", 
-                    "lang_user": "en", 
-                    "img_url": "http://pbs.twimg.com/profile_images/721257833371734016/Kf1P-oEZ_normal.jpg", 
-                    "time_user": "London"
-                }, 
-                {
-                    "username": "3DPrintGirl", 
-                    "description_user": "Your source for The Latest 3D printing News", 
-                    "name": "3D Printing News", 
-                    "location_user": "New York", 
-                    "lang_user": "en", 
-                    "img_url": "http://pbs.twimg.com/profile_images/378800000641439947/778de2f93eaf9450956aa3c9547099b6_normal.jpeg", 
-                    "time_user": "Atlantic Time (Canada)"
-                }, 
-                {
-                    "username": "3dersorg", 
-                    "description_user": "https://t.co/WEflmhOa76 is your independent source for the latest 3D printing, 3D printer news, trends, insight and analysis.", 
-                    "name": "3D Printing & 3Ders", 
-                    "location_user": "World", 
-                    "lang_user": "en", 
-                    "img_url": "http://pbs.twimg.com/profile_images/697123922257518592/twesICYY_normal.jpg", 
-                    "time_user": "Amsterdam"
-                }, 
-                {
-                    "username": "3dsystems", 
-                    "description_user": "Enabling end-to-end digital design and manufacturing solutions to enhance and accelerate your workflow. #MfgInnovation", 
-                    "name": "3D Systems", 
-                    "location_user": "Rock Hill, SC", 
-                    "lang_user": "en", 
-                    "img_url": "http://pbs.twimg.com/profile_images/775394580929720320/4t72wWwG_normal.jpg", 
-                    "time_user": "Eastern Time (US & Canada)"
-                }, 
-                {
-                    "username": "shapeways", 
-                    "description_user": "A 3D printing marketplace where you can design, make, buy and sell amazing products. Show us your creations #Shap3dbyme", 
-                    "name": "Shapeways", 
-                    "location_user": "New York, NY", 
-                    "lang_user": "en", 
-                    "img_url": "http://pbs.twimg.com/profile_images/742424166159286278/KIpBYGPS_normal.jpg", 
-                    "time_user": "Eastern Time (US & Canada)"
-                }, 
-                {
-                    "username": "makerbot", 
-                    "description_user": "MakerBot's connected 3D printing solutions address the wider needs of professionals and educators, evolving their ideas from inspiration to innovation.", 
-                    "name": "MakerBot", 
-                    "location_user": "Brooklyn", 
-                    "lang_user": "en", 
-                    "img_url": "http://pbs.twimg.com/profile_images/458718156517679104/9XyyKdC6_normal.jpeg", 
-                    "time_user": "Eastern Time (US & Canada)"
-                }, 
-                {
-                    "username": "fabbaloo", 
-                    "description_user": "Fabbaloo provides deeper analysis of developments in current and future 3D Printing and Additive Manufacturing industries https://t.co/T820xhfZQP #3DPrinting", 
-                    "name": "Fabbaloo", 
-                    "location_user": "Worldwide and Beyond", 
-                    "lang_user": "en", 
-                    "img_url": "http://pbs.twimg.com/profile_images/432205864133353472/GSlzmJhf_normal.jpeg", 
-                    "time_user": "Mountain Time (US & Canada)"
-                }, 
-                {
-                    "username": "3DHubs", 
-                    "description_user": "The world\u2019s largest network of 3D printing services: https://t.co/RAdlsFhJz8. \n\nFounded by @briangarret @bram_zwart.", 
-                    "name": "3D Hubs", 
-                    "location_user": "Everywhere", 
-                    "lang_user": "en", 
-                    "img_url": "http://pbs.twimg.com/profile_images/459655442361114624/g2R4h-8j_normal.png", 
-                    "time_user": "Amsterdam"
-                }, 
-                {
-                    "username": "3DPrintBoard", 
-                    "description_user": "http://t.co/6HneczXiUp covers the latest breaking 3D printing and 3D printer news, before you see it elsewhere!", 
-                    "name": "3D Print .com", 
-                    "location_user": "Florida", 
-                    "lang_user": "en", 
-                    "img_url": "http://pbs.twimg.com/profile_images/676422405431029760/cDZEuj4a_normal.png", 
-                    "time_user": null
-                }, 
-                {
-                    "username": "ColorFabb", 
-                    "description_user": "ColorFabb. Producer of innovative and functional filaments for 3D Printing.", 
-                    "name": "ColorFabb", 
-                    "location_user": "Venlo, The Netherlands", 
-                    "lang_user": "en", 
-                    "img_url": "http://pbs.twimg.com/profile_images/459313313256439810/pFsvxt7A_normal.png", 
-                    "time_user": "Amsterdam"
-                }, 
-                {
-                    "username": "My3DPrinting", 
-                    "description_user": "All the latest 3D Printing News from around the World.", 
-                    "name": "3D Printing News", 
-                    "location_user": "", 
-                    "lang_user": "en", 
-                    "img_url": "http://pbs.twimg.com/profile_images/492375713849159681/wBgPUcgZ_normal.jpeg", 
-                    "time_user": "Eastern Time (US & Canada)"
-                }, 
-                {
-                    "username": "3dprinting", 
-                    "description_user": "Dutch part-time daydreamer skating tru the Carpathian Garden.Tweets from @Roemenie .Amazed about the worldchanging 3D Printing.Big fan of @Shapeways | \uf8ff |", 
-                    "name": "3D printing", 
-                    "location_user": "Bucharest / Rotterdam", 
-                    "lang_user": "en", 
-                    "img_url": "http://pbs.twimg.com/profile_images/596050983559569409/1Ro5lXax_normal.jpg", 
-                    "time_user": null
-                }, 
-                {
-                    "username": "3d_printers", 
-                    "description_user": "Interested in 3D printing? Follow us for the latest 3D printing news and join the conversation.", 
-                    "name": "Stratasys", 
-                    "location_user": "", 
-                    "lang_user": "en", 
-                    "img_url": "http://pbs.twimg.com/profile_images/649446346118709248/RWD5T3KS_normal.jpg", 
-                    "time_user": "UTC"
-                }, 
-                {
-                    "username": "3dprinting3d", 
-                    "description_user": "http://t.co/WIZOBci92B industry experts bring you the latest in 3D Printing news, commentary, jobs, videos and entertainment.", 
-                    "name": "3D Printing", 
-                    "location_user": "", 
-                    "lang_user": "en", 
-                    "img_url": "http://pbs.twimg.com/profile_images/2218578027/twitter-logo_normal.png", 
-                    "time_user": null
-                }, 
-                {
-                    "username": "3dprintingcom", 
-                    "description_user": "Everything about 3D Printing!", 
-                    "name": "3DPrinting.com", 
-                    "location_user": "", 
-                    "lang_user": "en", 
-                    "img_url": "http://pbs.twimg.com/profile_images/700663704887517184/oiO8VCdt_normal.png", 
-                    "time_user": "Amsterdam"
-                }, 
-                {
-                    "username": "Ultimaker", 
-                    "description_user": "Driven by technology and passionate about innovation, Ultimaker offers a range of high-quality 3D printers, software, materials, and support.", 
-                    "name": "Ultimaker", 
-                    "location_user": "", 
-                    "lang_user": "en", 
-                    "img_url": "http://pbs.twimg.com/profile_images/785883430332534784/09W2LPjg_normal.jpg", 
-                    "time_user": "Amsterdam"
-                }, 
-                {
-                    "username": "make", 
-                    "description_user": "DIY projects, How-tos, tech news, electronics, crafts and ideas.", 
-                    "name": "Make:", 
-                    "location_user": "San Francisco, CA - USA", 
-                    "lang_user": "en", 
-                    "img_url": "http://pbs.twimg.com/profile_images/783080298665775108/LESsgngz_normal.jpg", 
-                    "time_user": "Pacific Time (US & Canada)"
-                }, 
-                {
-                    "username": "imaterialise", 
-                    "description_user": "online 3D printing service and community for designers & inventors | World's largest 3D printing facility | Happy to meet you", 
-                    "name": "i.materialise", 
-                    "location_user": "Leuven, Belgium", 
-                    "lang_user": "en", 
-                    "img_url": "http://pbs.twimg.com/profile_images/710503015535538176/dxg6Ob_U_normal.jpg", 
-                    "time_user": "Brussels"
-                }, 
-                {
-                    "username": "3DPrintingFans", 
-                    "description_user": "We cover all the latest, breaking news surrounding 3D printing and 3D scanning", 
-                    "name": "3D Printing Fans", 
-                    "location_user": "", 
-                    "lang_user": "en", 
-                    "img_url": "http://pbs.twimg.com/profile_images/454979770195783681/e8MXCx3I_normal.jpeg", 
-                    "time_user": null
-                }, 
-                {
-                    "username": "3DPrintingIt", 
-                    "description_user": "3D Printing News, 3D Scanning News, Building of Electronics, Makers", 
-                    "name": "3D Printing", 
-                    "location_user": "", 
-                    "lang_user": "en", 
-                    "img_url": "http://pbs.twimg.com/profile_images/454975817374638080/EYF4cGTL_normal.jpeg", 
-                    "time_user": null
-                }
-            ]
-        }
-        
-## Feeds Collection [/get_feeds/{theme_name}]
+## Feeds Collection [/get_feeds?{theme_name}&{date}&{cursor}]
 
 ### List All feeds of given theme [GET]
 
 + Response 200 (application/json)
 
         {
-            "next cursor": 20,
-            "cursor length": 311,
+            "cursor_length": 60,
+            "next_cursor": 20,
             "feeds": [
                 {
-                    "username": "Build3dprinter", 
-                    "description": "\u201cWhat does this error message mean?!\u201d \u201cWait, why is there only half a print?\u201d \u201cBut\u2026 I JUST leveled it\u2026\u201d While owning (and maintaining) a desktop 3D printer", 
-                    "title": "DESKTOP VS. SERVICE-BASED 3D PRINTING: A TALE OF SPAGHETTI", 
-                    "url": "https://t.co/RoQkn8AdIx", 
-                    "userid": 393697898, 
-                    "im": "https://www.shapeways.com/blog/wp-content/uploads/2017/03/5795690693_3b69ab8658_b-712x532.jpg"
+                    "url": "https://www.kickstarter.com/projects/1340922673/mobillyo-arduino-compatible-with-ble-battery-and-s", 
+                    "im": "https://ksr-ugc.imgix.net/assets/015/576/236/87ca77e23cf82e5583868c89af940d8a_original.jpg?w=1024&h=576&fit=fill&bg=000000&v=1491923257&auto=format&q=92&s=c87735fb6f1a6ff9c255b11bdbf196e4", 
+                    "description": "All or nothing. This project will only be funded if it reaches its goal by Fri, May 12 2017 7:40 am EDT .", 
+                    "title": "Kickstarter"
                 }, 
                 {
-                    "username": "Just_Print_It", 
-                    "description": "After acquiring a 75% stake in German metal 3D printing company Concept Laser, GE has announced its plans for a massive expansion. The expansion will include a bigger HQ, increasing Concept Laser's employee base, and investing more.", 
-                    "title": "GE ANNOUNCES MAJOR EXPANSION OF METAL 3D PRINTING COMPANY CONCEPT LASER", 
-                    "url": "https://t.co/gvhVIABSD8", 
-                    "userid": 3688931057, 
-                    "im": "http://www.3ders.org/images2017/ge-announces-major-expansion-metal-3d-printing-comapny-concept-laser-150.jpg"
+                    "url": "https://github.com/trustedsec/social-engineer-toolkit", 
+                    "im": "https://avatars0.githubusercontent.com/u/3160808?v=3&s=400", 
+                    "description": "social-engineer-toolkit - The Social-Engineer Toolkit (SET) repository from TrustedSec - All new versions of SET will be deployed here.", 
+                    "title": "trustedsec/social-engineer-toolkit"
                 }, 
                 {
-                    "username": "ArtTeacherWendy", 
-                    "description": "One of the most inspirational aspects of covering the 3D printing space is the fact that we constantly have the opportunity to promote the use of the technology in schools around the world.", 
-                    "title": "5TH GRADERS UTILIZE 3D PRINTING TO CREATE THEIR OWN CUSTOM CITIES", 
-                    "url": "https://t.co/hVVkbPgfVO", 
-                    "userid": 274118810, 
-                    "im": "http://3dprint.com/wp-content/uploads/2015/05/cityfeatured.jpg"
+                    "url": "https://www.youtube.com/watch?v=hhDb1jccvi0&feature=youtu.be", 
+                    "im": "https://i.ytimg.com/vi/hhDb1jccvi0/maxresdefault.jpg", 
+                    "description": "Skittle Sorting Machine made for EGR 280 Sophomore design project at Oakland University.", 
+                    "title": "Skittle Sorting Machine - Arduino - Oakland University"
                 }, 
                 {
-                    "username": "1hourpro", 
-                    "description": "", 
-                    "title": "1 HOUR PRO ON", 
-                    "url": "https://t.co/jBzM652lXd", 
-                    "userid": 726139681352593409, 
-                    "im": "https://pbs.twimg.com/media/C6eURT7UoAAiIaB.jpg:large"
+                    "url": "https://www.youtube.com/watch?v=_jljkv5blM4", 
+                    "im": "https://i.ytimg.com/vi/_jljkv5blM4/maxresdefault.jpg", 
+                    "description": "Ayy lmao robotic eyes", 
+                    "title": "LOOK WITH YOUR SPECIAL EYES"
                 }, 
                 {
-                    "username": "PixelMyBlood", 
-                    "description": "Dr. Sloane Guy thought 3D printing models was just a gimmick, until he held one in his hands.", 
-                    "title": "HERE'S WHANVINCED A HEART SURGEON TO USE 3D PRINTING", 
-                    "url": "https://t.co/uwmKh4EzvR", 
-                    "userid": 709281494, 
-                    "im": "https://video-images.vice.com/_uncategorized/1488912324867-6.jpeg"
+                    "url": "https://www.industrialshields.com/", 
+                    "im": "https://www.industrialshields.com/wp-content/uploads/2016/02/Industrial-Shields-logo-1.png", 
+                    "description": "Industrial Shields develops, designs and produces Arduino PLC's using original Arudino boards, and Panel PC's using Raspberry Pi and Touchberry.", 
+                    "title": "Arduino based PLC Controller for Industrial Applications by Industrial Shields"
                 }, 
                 {
-                    "username": "anadalle", 
-                    "description": "", 
-                    "title": "ANA DALLE ON", 
-                    "url": "https://t.co/eC0MDX88OP", 
-                    "userid": 31276212, 
-                    "im": "https://pbs.twimg.com/media/C6eUUuWWUAAOAmC.jpg:large"
+                    "url": "https://store.boingboing.net/sales/arduino-ebook-bundle", 
+                    "im": "https://cdnp1.stackassets.com/604e01a9a55e99a4df826733e318fe96712139ec/store/c44f1020920812ed7f192e7bf49ad4014bff7205c0f9551cfff7d16147e5/sale_3304_image.jpg", 
+                    "description": "Arduino Enthusiast E-Book Bundle: Master This Popular Open-Source Electronics Platform with 8 E-Books (1,900+ Pages) of Project-Based Instruction", 
+                    "title": "Master This Popular Open-Source Electronics Platform with 8 E-Books (1,900+ Pages) of Project-Based Instruction"
                 }, 
                 {
-                    "username": "betdor", 
-                    "description": "Russia's first 3D-printed house was completed in 24 hours using a portable 3D printer", 
-                    "title": "WHEN LIFE GIVES YOU A 3D PRINTER, MAKE A HOUSE", 
-                    "url": "https://t.co/Q7ttlmSkX4", 
-                    "userid": 21208707, 
-                    "im": "http://core1.staticworld.net/images/article/2017/03/makerbot_lifestyle1-100712064-small.3x2.jpg"
+                    "url": "http://deeplocal.com/mocktailsmixer/", 
+                    "im": "https://s3.us-east-2.amazonaws.com/mocktails-mixer/imgs/social.jpg", 
+                    "description": "Serve up custom mixed drinks with a garnish of gab. deeplocal.com/mocktailsmixer.", 
+                    "title": "Google Assistant SDK: Mocktails Mixer."
                 }, 
                 {
-                    "username": "Druck3D", 
-                    "description": "", 
-                    "title": "3DRUCK | NEWS AROUND 3D-PRINT / NEUIGKEITEN RUND UM 3D-DRUCK", 
-                    "url": "https://t.co/a9dZswB1kk", 
-                    "userid": 2192387737, 
-                    "im": ""
+                    "url": "https://www.digitaltrends.com/cool-tech/best-arduino-projects/?utm_source=dlvr.it&utm_medium=twitter", 
+                    "im": "https://icdn4.digitaltrends.com/image/43441923-arduino-electronic-platform-for-hobbyists-1200x630-c.jpg", 
+                    "description": "If you really want to show off your DIY skills, Arduino projects can be useful, beautiful, and impressive. Check out some of our favorites.", 
+                    "title": "Looking for a fun electronics project? Here\u2019s 12 easy Arduino-based gizmos you can build"
                 }, 
                 {
-                    "username": "vanghelita", 
-                    "description": "", 
-                    "title": "3D PRINTING ON", 
-                    "url": "https://t.co/1guZKgWmgs", 
-                    "userid": 723063369662521344, 
-                    "im": "https://pbs.twimg.com/media/C6eLOb_U4AAjhAG.jpg:large"
+                    "url": "http://www.instructables.com/id/Arduino-LED-Coffee-Table/", 
+                    "im": "https://cdn.instructables.com/FYQ/8236/J1VCMB3K/FYQ8236J1VCMB3K.RECT2100.jpg", 
+                    "description": "This was my first real Arduino project and is also my first instructable so be kind in the comments :) I wanted to try and answer the questions that took me some time to figure out and provide detailed instructions so if you're very familiar with hobbyist electronics then you can probably skim through each step but if you're new to this it should provide you with everything you need.The aim of the project was to create a 12 x 12 pixel screen in a coffee table that can be controlled via bluetooth and used as a cool room light/play games on it.For this build you will need these parts: Arudino Mega (or clone) - https://www.amazon.co.uk/Arduino-Mega-2560-R3-Micr... Arduino micro SD Card Shield (I used this one and and soldered the headers on) - https://www.sparkfun.com/products/12761 Micro SD card - Any size will do but it must be formatted in FAT32 5m WS2812B ...", 
+                    "title": "Bluetooth Controlled Arduino LED Coffee Table: 9 Steps (with Pictures)"
                 }, 
                 {
-                    "username": "paul1978a", 
-                    "description": "This is a short video review of the DeltaWASP 20x40 ceramic 3D printer. For more information on the Italian group WASP go to http://www.wasproject.it/w/en/. source", 
-                    "title": "TESTING THE DELTAWASP 20\u00d740 CERAMIC 3D PRINTER | CATSPAW PRINTER SUPPLIES", 
-                    "url": "https://t.co/DdXaed3aFF", 
-                    "userid": 248248876, 
-                    "im": ""
+                    "url": "http://tinkerman.cat/fenderino-arducaster-the-coolest-guitar/", 
+                    "im": "http://tinkerman.cat/wp-content/uploads/2017/03/20170210_145702s.jpg", 
+                    "description": "The Fenderino is the coolest guitar ever. Well, I don't know much about guitars, but this one certainly looks different and it's really fun!", 
+                    "title": "Fenderino, the coolest guitar - Tinkerman"
                 }, 
                 {
-                    "username": "IamMental_Leaps", 
-                    "description": "", 
-                    "title": "ANJA M\u00dcLLER ON", 
-                    "url": "https://t.co/Mhz0AwKSfU", 
-                    "userid": 294033279, 
-                    "im": "https://pbs.twimg.com/media/C6eUm1tWMAI46S3.jpg:large"
+                    "url": "https://create.arduino.cc/projecthub/blitzkrieg/j-a-r-v-i-s-a-virtual-home-assistant-d61255?ref=search&ref_id=jarvis&offset=0", 
+                    "im": "https://hackster.imgix.net/uploads/attachments/279343/upload_front-01-01_wCzutCbYqr.jpg?auto=compress%2Cformat&w=400&h=300&fit=min", 
+                    "description": "J.A.R.V.I.S. is a personal home automation assistant for controlling electrical home appliances integrated with an augmented reality app. By Mantej Gill, Divyansh, and RITESH MUKHOPADHYAY.", 
+                    "title": "J.A.R.V.I.S. : A Virtual Home Assistant"
                 }, 
                 {
-                    "username": "flopback", 
-                    "description": "Sunwing 3d-printing-pen & 3D-printer-pen,Best Birthday DIY Toy for Kids with LED Display (Blue) by QuadPro in Toys & games | bittopper", 
-                    "title": "SUNWING 3D-PRINTING-PEN & 3D-PRINTER-PEN,BEST BIRTHDAY DIY TOY FOR KIDS WITH LED DISPLAY (BLUE) BY QUADPRO", 
-                    "url": "https://t.co/YJpwpuoZUp", 
-                    "userid": 828384258452516866, 
-                    "im": "https://www.bittopper.com/c/37/78/65/bittopper_377865d196e4db525f33035b9c57b59b-sunwing-3d-stereoscopic-drawing-doodling-printing-pen-arts.jpg"
+                    "url": "http://smartcampus.github.io/", 
+                    "im": "None", 
+                    "description": "Big Data is one of the most important research challenges for the 2020 horizon. This paradigm relies on the collection of tremendous amount of data to support the innovation in the upcoming decades. According to the IDC group, the amount of world data will be 44 times greater in this decade, from 0.8 zettabytes to 35 zettabytes.", 
+                    "title": "Home"
                 }, 
                 {
-                    "username": "3DPrintMaven", 
-                    "description": "Linear components made of Tribo-SLS material allow special shapes to be produced in just 48 hours.", 
-                    "title": "IGUS DERIVES LUBRICATION-FREE LINEAR AXES FROM 3D PRINTER", 
-                    "url": "https://t.co/gXQQzkbgnL", 
-                    "userid": 3298379074, 
-                    "im": "http://www.autocarpro.in/IMG/002/53002/web-pm6016-1.jpg"
+                    "url": "https://thenextweb.com/shareables/2017/04/20/teapot-dancing-robot-arduino/", 
+                    "im": "https://cdn2.tnwcdn.com/wp-content/blogs.dir/1/files/2017/04/Screen-Shot-2017-04-20-at-11.13.08.png", 
+                    "description": "One resourceful inventor has hooked his 3D-printed teapot to an Arduino board to create this cute little robot that also happens to dance.", 
+                    "title": "This cute dancing robot is actually a 3D-printed teapot hooked to an Arduino"
                 }, 
                 {
-                    "username": "Build3dprinter", 
-                    "description": "Mar 7, 2017 | By BenedictSwiss design duo Drzach and Suchy have used 3D printing to create some spectacular \u201cshadow clouds,\u201d 3D objects that cast different sha", 
-                    "title": "3D PRINTING HELPS DESIGN DUO DRZACH AND SUCHY REALIZE INCREDIBLE SHADOW CLOUDS", 
-                    "url": "https://t.co/7v2CWy7DoO", 
-                    "userid": 393697898, 
-                    "im": "http://i1.wp.com/b3dgeable.staging.wpengine.com/wp-content/uploads/2017/03/3d-printing-helps-design-duo-drzach-suchy-realize-incredible-shadow-clouds-12.jpg"
+                    "url": "https://de.mathworks.com/matlabcentral/fileexchange/58189-gesture-controlled-robotic-arm-using-kinect--simulink-support-for-kinect--and-arduino?s_eid=PSM_arlm&hootPostID=e60a0240a0c5d4e2aafe6a6f5cbc6a1d&requestedDomain=www.mathworks.com", 
+                    "im": "https://de.mathworks.com/matlabcentral/mlc-downloads/downloads/submissions/58189/versions/4/screenshot.png", 
+                    "description": "This is a Simulink Model to Control a Robotic Arm By Gestures that are captured using Kinect Sensor.", 
+                    "title": "Gesture Controlled Robotic Arm Using Kinect (Simulink Support For Kinect) and Arduino - File Exchange - MATLAB Central"
                 }, 
                 {
-                    "username": "Build3dprinter", 
-                    "description": "Mar 7, 2017 | By TessProdways' 3D printing technology has been adopted in the plastic injection sector by German microsystems engineering company", 
-                    "title": "HAHN-SCHICKARD OBTAINS PRODWAYS 3D PRINTING TECH TO MAKE INJECTION MOLDS", 
-                    "url": "https://t.co/JUq9amwWtu", 
-                    "userid": 393697898, 
-                    "im": "http://i0.wp.com/b3dgeable.staging.wpengine.com/wp-content/uploads/2017/03/hahn-schickard-obtains-prodways-3d-printing-tech-to-make-injection-molds-12.jpg"
+                    "url": "http://hackaday.com/2017/04/27/sous-vide-arduino-isnt-lost-in-translation/", 
+                    "im": "https://hackadaycom.files.wordpress.com/2017/04/sous600.png?w=600&h=600", 
+                    "description": "If your idea of a six-course meal is a small order of chicken nuggets, you might have missed the rise of sous vide among cooks. The idea is you seal food in a plastic pouch and then cook it in a water...", 
+                    "title": "Sous Vide Arduino isn\u2019t Lost in Translation"
                 }, 
                 {
-                    "username": "rockerchandru", 
-                    "description": "", 
-                    "title": "HOW 3D PRINTING IS CHANGING THE FABRIC OF CREATIVE RIGHTS", 
-                    "url": "https://t.co/oMf3TAwXEp", 
-                    "userid": 166115245, 
-                    "im": "http://feeds.thetimes.co.uk/web/imageserver/imageserver/image/methode%2Ftimes%2Fprod%2Fweb%2Fbin%2F2c88d4f8-040e-11e7-976a-0b4b9a1a67a3.jpg?crop=4090,2301,233,498"
+                    "url": "https://blog.hackster.io/the-paperino-is-an-epaper-display-for-your-particle-and-arduino-boards-cb3a52955c85", 
+                    "im": "https://cdn-images-1.medium.com/max/1200/1*gDvrBDOGnYHO7XJTI69kmQ.jpeg", 
+                    "description": "If you\u2019d like your project to output human-readable information, you normally turn to LEDs or other devices that drain precious current out\u2026", 
+                    "title": "The Paperino Is an ePaper Display for Your Particle and Arduino Boards"
                 }, 
                 {
-                    "username": "harleystmedsup", 
-                    "description": "", 
-                    "title": "THE ROLAND DG DWP-80S DENTAL PRINTER", 
-                    "url": "https://t.co/OmcQkGhoJQ", 
-                    "userid": 834319610056826880, 
-                    "im": "https://3dprinting.com/wp-content/uploads/2017/03/bannerfeatures-1.jpg"
+                    "url": "https://create.arduino.cc/projecthub/Arduino_Genuino/mkrfox1200-weather-monitor-6a94e2?ref=platform&ref_id=424_recent___&offset=5", 
+                    "im": "https://hackster.imgix.net/uploads/attachments/292700/socials_mkrfox1200_bVlDZFCxco.jpg?auto=compress%2Cformat&w=400&h=300&fit=min", 
+                    "description": "Turn your MKRFOX1200 into a battery-powered weather monitor that you can deploy EVERYWHERE. By Arduino_Genuino.", 
+                    "title": "MKRFOX1200 Weather Monitor"
                 }, 
                 {
-                    "username": "dailyedtechnews", 
-                    "description": "Did you know that Purple Mash lets your young children design models for 3D printing? Find out more here!", 
-                    "title": "3D PRINTING FOR KS1 WITH PURPLE MASH 2DESIGN AND MAKE", 
-                    "url": "https://t.co/FylsKQTCWu", 
-                    "userid": 2586242898, 
-                    "im": "https://i1.wp.com/www.whiteboardblog.co.uk/blog/wp-content/uploads/2016/01/2designscreen-1.jpg?resize=800%2C434"
+                    "url": "http://www.techrepublic.com/article/farming-for-the-future-how-one-company-uses-big-data-to-maximize-yields-and-minimize-impact/?platform=hootsuite", 
+                    "im": "https://tr3.cbsistatic.com/hub/i/r/2017/04/21/3467d1bc-317e-4eea-8a83-f6bf7d62c120/thumbnail/770x578/de94f8815db5ffa9a8c3e5f1e648b8a8/farmer-with-tablet.jpg", 
+                    "description": "Foris.io has a mission: Make farms more productive and protect the environment while doing it. With a combination of hardware and machine learning from IBM, Foris.io aims to change the way we farm.", 
+                    "title": "Farming for the future: How one company uses big data to maximize yields and minimize impact - TechRepublic"
                 }, 
                 {
-                    "username": "UKCelebrity", 
-                    "description": "The Rapid Additively Manufactured Ballistics Ordnance - or R.A.M.B.O - even fires printed grenades", 
-                    "title": "US ARMY WEAPONS EXPERTS UNVEIL NEW 'BATTLE-READY' GRENADE LAUNCHER MADE ON A 3D PRINTER", 
-                    "url": "https://t.co/cXQXCI1I2C", 
-                    "userid": 796713784450711552, 
-                    "im": "https://www.thesun.co.uk/wp-content/uploads/2017/03/nintchdbpict000307714531.jpg?strip=all&w=960&quality=100"
+                    "url": "http://cdm.link/2017/04/ardutouch-one-arduino-synthesizer-learning-kit-30/", 
+                    "im": "http://cdm.link/app/uploads/2017/04/ardutouch.jpg", 
+                    "description": "A $25-30 board has a touch keyboard, controls, and speaker - and teaches beginning DSP coding. Meet the creator, and learn why hackerspaces matter.", 
+                    "title": "ArduTouch is an all-in-one Arduino synthesizer learning kit for $30 - CDM Create Digital Music"
                 }, 
                 {
-                    "username": "danielnylen", 
-                    "description": "Sliperiet at Ume\u00e5 Arts Campus is in the process of making a 3D printed Tower of Babel using a novel hanging printer. This offers a low-cost solution and increased flexibility to print large volumes.", 
-                    "title": "THE SKY IS THE LIMIT FOR NEW LOW-COST 3D PRINTER - UME\u00c5 UNIVERSITY, SWEDEN", 
-                    "url": "https://t.co/Zx9ohmHtvm", 
-                    "userid": 91547517, 
-                    "im": ""
+                    "url": "http://madeintheusb.blogspot.de/2016/07/faster-serial-port-communication-from.html", 
+                    "im": "https://2.bp.blogspot.com/-6EQUqbxH3ZE/WM3U5Dq0piI/AAAAAAAAAgo/e2dKVv16UDAD61ZdoOXWI8FmrUiJ_qjpgCLcB/w1200-h630-p-k-no-nu/NusbioMCU_Square.2017.Rainbow.01.jpg", 
+                    "description": "Overview I was for a long time thinking that serial port communication on Windows and/or .NET was limited to 115 200 bauds, which translat...", 
+                    "title": "Faster serial port communication from .NET to Arduino"
                 }
             ]
         }
