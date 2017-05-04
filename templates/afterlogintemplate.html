@@ -505,16 +505,15 @@
       var aid = $("ol").attr("alertid");
       var children=$('#date_buttons').children();
       children.each(function(){
-         $(this).removeClass('btn-default');
-         $(this).removeClass('btn-success');
-      });
-      children.each(function(){
         if($(this).attr('date') == date){
+          $(this).removeClass('btn-default');
           $(this).addClass('btn-success');
         }else{
+          $(this).removeClass('btn-success');
           $(this).addClass('btn-default');
         }
       });
+      children.each(function(){
       $.ajax({
           url: '/News',
           method: 'POST',
