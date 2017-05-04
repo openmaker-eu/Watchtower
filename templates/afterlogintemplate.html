@@ -497,10 +497,9 @@
         });
     </script>
     <script>
-    function getDate() {
+    function getDate(date) {
       var aid = $("ol").attr("alertid");
       $("#spin").show();
-      var date = $(this).attr("date");
       console.log(date);
       $('#newscontainer').attr("date", date);
       var children=$('#date_buttons').children();
