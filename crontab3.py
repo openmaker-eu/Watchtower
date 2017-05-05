@@ -72,7 +72,7 @@ def determine_date(date):
 def unshorten_url(url):
     return head(url, allow_redirects=True).url
 
-@timeout_decorator.timeout(30, use_signals=False)
+@timeout_decorator.timeout(15, use_signals=False)
 def linkParser(link):
     print("working")
     try:
@@ -153,7 +153,7 @@ def main():
     parameters = createParameters(alertid_list)
     print(alertid_list)
 
-    pool = ThreadPool(2)
+    pool = ThreadPool(1)
     pool.map(calculateLinks, parameters)
     pool.wait_completion()
 
