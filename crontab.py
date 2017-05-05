@@ -1,3 +1,4 @@
+print "import"
 import pymongo
 from application.Connections import Connection
 import requests
