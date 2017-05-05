@@ -3,19 +3,15 @@ import pymongo
 from application.Connections import Connection
 import requests
 import time
-try:
-    import summary
-except Exception as e:
-    print e
-
+import summary
 #from goose import Goose
 import resource
 from time import gmtime, strftime
 from urlparse import urlparse
-#import tldextract
+import tldextract
 
 print "global"
-g = Goose({'browser_user_agent': 'Mozilla', 'parser_class':'lxml'})
+#g = Goose({'browser_user_agent': 'Mozilla', 'parser_class':'lxml'})
 rsrc = resource.RLIMIT_DATA
 soft, hard = resource.getrlimit(rsrc)
 resource.setrlimit(rsrc, (512000000, hard)) #limit to one 512mb
