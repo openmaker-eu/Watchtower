@@ -83,17 +83,17 @@ def linkParser(link):
         if domain not in unwanted_links:
             source = '{uri.scheme}://{uri.netloc}/'.format(uri=parsed_uri)
 
-            #g = Goose({'browser_user_agent': 'Mozilla', 'parser_class':'lxml'})
-            #article = g.extract(url=link)
-            #image = str(article.top_image.src)
-            #description = str(article.meta_description)
-            #title = article.title.upper()
+            g = Goose({'browser_user_agent': 'Mozilla', 'parser_class':'lxml'})
+            article = g.extract(url=link)
+            image = str(article.top_image.src)
+            description = str(article.meta_description)
+            title = article.title.upper()
 
-            s = summary.Summary(link)
-            s.extract()
-            image = str(s.image).encode('utf-8')
-            title = str(s.title.encode('utf-8'))
-            description = str(s.description.encode('utf-8'))
+            #s = summary.Summary(link)
+            #s.extract()
+            #image = str(s.image).encode('utf-8')
+            #title = str(s.title.encode('utf-8'))
+            #description = str(s.description.encode('utf-8'))
 
             if image != "None" and description != "None":
                 dic = {'url': link, 'im':image, 'title': title, 'description': description, 'popularity': int(count), 'source': source}
