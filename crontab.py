@@ -51,7 +51,7 @@ def calculateLinks(alertid, date):
                     title = str(s.title.encode('utf-8'))
                     description = str(s.description.encode('utf-8'))
                     if image != "None" and description != "None":
-                        dic = {'url': link, 'im':image, 'title': title, 'description': description, 'popularity': count}
+                        dic = {'url': link, 'im':image, 'title': title, 'description': description, 'popularity': int(count)}
                         if not next((item for item in result if item["title"] == dic['title'] and item["im"] == dic['im']\
                          and item["description"] == dic['description']), False):
                             result.append(dic)
@@ -60,7 +60,7 @@ def calculateLinks(alertid, date):
     return result
 
 def main():
-    Connection.Instance().cur.execute("Select alertid from alerts where userid = %s;", [4])
+    Connection.Instance().cur.execute("Select alertid from alerts;")
     alertid_list = sorted(list(Connection.Instance().cur.fetchall()))
     print alertid_list
 
