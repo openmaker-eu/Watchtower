@@ -83,11 +83,11 @@ def linkParser(link):
         if domain not in unwanted_links:
             source = '{uri.scheme}://{uri.netloc}/'.format(uri=parsed_uri)
 
-            g = Goose({'browser_user_agent': 'Mozilla', 'parser_class':'lxml'})
-            article = g.extract(url=link)
-            image = str(article.top_image.src)
-            description = str(article.meta_description)
-            title = article.title.upper()
+            #g = Goose({'browser_user_agent': 'Mozilla', 'parser_class':'lxml'})
+            #article = g.extract(url=link)
+            #image = str(article.top_image.src)
+            #description = str(article.meta_description)
+            #title = article.title.upper()
 
             #s = summary.Summary(link)
             #s.extract()
@@ -118,8 +118,9 @@ def calculateLinks(alertid, date):
     links = list(links)
     result = []
     while len(result) < 60 and links != []:
+
         link = links.pop(0)
-        print stringDate
+        print stringDate, len(result)
         if link['_id'] != None:
             try:
                 dic = linkParser(link)
