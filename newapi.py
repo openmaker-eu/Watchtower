@@ -31,7 +31,7 @@ def getFeeds(themename, userid, date, cursor):
     result['feeds'] = feeds
     return json.dumps(result, indent=4)
 
-def getInfluencers(themename, cursors):
+def getInfluencers(themename, cursor):
     result = {}
     if themename == "arduino":
         themename = "Arduino"
