@@ -53,7 +53,6 @@ class ThreadPool:
         """ Wait for completion of all the tasks in the queue """
         self.tasks.join()
 
-g = Goose({'browser_user_agent': 'Mozilla', 'parser_class':'lxml'})
 rsrc = RLIMIT_DATA
 soft, hard = getrlimit(rsrc)
 setrlimit(rsrc, (512000000, hard)) #limit to one 512mb
@@ -74,8 +73,8 @@ def determine_date(date):
 def unshorten_url(url):
     return head(url, allow_redirects=True).url
 
-@timeout_decorator.timeout(1, use_signals=False)
-def linkParser(link, result):
+@timeout_decorator.timeout(30, use_signals=False)
+def linkParser(link):
     try:
         count = link['total']
         link = unshorten_url(link['_id'])
@@ -83,23 +82,28 @@ def linkParser(link, result):
         domain = extract(link).domain
         if domain not in unwanted_links:
             source = '{uri.scheme}://{uri.netloc}/'.format(uri=parsed_uri)
-            article = g.extract(url=link)
-            image = str(article.top_image.src)
-            description = str(article.meta_description)
-            title = article.title.upper()
-            #s = summary.Summary(link)
-            #s.extract()
-            #image = str(s.image).encode('utf-8')
-            #title = str(s.title.encode('utf-8'))
-            #description = str(s.description.encode('utf-8'))
+
+            #g = Goose({'browser_user_agent': 'Mozilla', 'parser_class':'lxml'})
+            #article = g.extract(url=link)
+            #image = str(article.top_image.src)
+            #description = str(article.meta_description)
+            #title = article.title.upper()
+
+            s = summary.Summary(link)
+            s.extract()
+            image = str(s.image).encode('utf-8')
+            title = str(s.title.encode('utf-8'))
+            description = str(s.description.encode('utf-8'))
+
             if image != "None" and description != "None":
                 dic = {'url': link, 'im':image, 'title': title, 'description': description, 'popularity': int(count), 'source': source}
                 if not next((item for item in result if item["title"] == dic['title'] and item["im"] == dic['im']\
                  and item["description"] == dic['description']), False):
-                    result.append(dic)
+                    return dic
+                return {}
     except Exception as e:
+        return {}
         pass
-    return result
 
 def calculateLinks(alertid, date):
     print alertid, date
@@ -115,13 +119,16 @@ def calculateLinks(alertid, date):
     result = []
     while len(result) < 60 and links != []:
         link = links.pop(0)
+        print stringDate
         if link['_id'] != None:
             try:
-                result = linkParser(link, result)
+                dic = linkParser(link)
+                if(dic != None):
+                    result.append(linkParser(link))
             except:
                 pass
 
-    if len(result) != 0:
+    if result != []:
         Connection.Instance().newsdB[str(alertid)].remove({'name': stringDate})
         Connection.Instance().newsdB[str(alertid)].insert_one({'name': stringDate, stringDate:result, 'date': strftime("%a, %d %b %Y %H:%M:%S", gmtime())})
 
@@ -135,7 +142,7 @@ def main():
     alertid_list = sorted(list(Connection.Instance().cur.fetchall()))
     parameters = createParameters(alertid_list)
 
-    pool = ThreadPool(5)
+    pool = ThreadPool(3)
     pool.map(calculateLinks, parameters)
     pool.wait_completion()
 
