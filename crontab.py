@@ -55,7 +55,7 @@ class ThreadPool:
 
 rsrc = RLIMIT_DATA
 soft, hard = getrlimit(rsrc)
-setrlimit(rsrc, (512000000, hard)) #limit to one 512mb
+setrlimit(rsrc, (3*512000000, hard)) #limit to one 512mb
 
 unwanted_links = ['ebay', 'gearbest', 'abizy']
 
