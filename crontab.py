@@ -9,10 +9,12 @@ from time import gmtime, strftime
 from urlparse import urlparse
 import tldextract
 
+print "global"
 g = Goose({'browser_user_agent': 'Mozilla', 'parser_class':'lxml'})
 rsrc = resource.RLIMIT_DATA
 soft, hard = resource.getrlimit(rsrc)
 resource.setrlimit(rsrc, (512000000, hard)) #limit to one 512mb
+
 unwanted_links = ['ebay', 'gearbest', 'abizy']
 
 def determine_date(date):
@@ -66,6 +68,7 @@ def calculateLinks(alertid, date):
     return result
 
 def main():
+    print "main"
     Connection.Instance().cur.execute("Select alertid from alerts where userid = %s;", [4])
     alertid_list = sorted(list(Connection.Instance().cur.fetchall()))
     print alertid_list
