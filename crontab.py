@@ -123,7 +123,7 @@ def calculateLinks(alertid, date):
         if link['_id'] != None:
             try:
                 dic = linkParser(link)
-                if(dic != None):
+                if dic != None and dic != {}:
                     result.append(linkParser(link))
             except:
                 pass
