@@ -12,7 +12,7 @@ g = Goose({'browser_user_agent': 'Mozilla', 'parser_class':'lxml'})
 rsrc = resource.RLIMIT_DATA
 soft, hard = resource.getrlimit(rsrc)
 resource.setrlimit(rsrc, (512000000, hard)) #limit to one 512mb
-unwanted_links = ['ebay', 'gearbest']
+unwanted_links = ['ebay', 'gearbest', 'abizy']
 
 def determine_date(date):
     current_milli_time = int(round(time.time() * 1000))
