@@ -3,7 +3,7 @@ from application.Connections import Connection
 #from application.TimeOut import timeout
 from requests import head
 import summary
-#from goose import Goose
+from goose import Goose
 from resource import RLIMIT_DATA, getrlimit, setrlimit
 from time import gmtime, strftime, time
 from urlparse import urlparse
@@ -42,7 +42,6 @@ class ThreadPool:
 
     def add_task(self, func, *args, **kargs):
         """ Add a task to the queue """
-        print args
         self.tasks.put((func, args, kargs))
 
     def map(self, func, args_list):
@@ -54,7 +53,7 @@ class ThreadPool:
         """ Wait for completion of all the tasks in the queue """
         self.tasks.join()
 
-#g = Goose({'browser_user_agent': 'Mozilla', 'parser_class':'lxml'})
+g = Goose({'browser_user_agent': 'Mozilla', 'parser_class':'lxml'})
 rsrc = RLIMIT_DATA
 soft, hard = getrlimit(rsrc)
 setrlimit(rsrc, (512000000, hard)) #limit to one 512mb
@@ -75,7 +74,7 @@ def determine_date(date):
 def unshorten_url(url):
     return head(url, allow_redirects=True).url
 
-@timeout_decorator.timeout(30, use_signals=False)
+@timeout_decorator.timeout(1, use_signals=False)
 def linkParser(link, result):
     try:
         count = link['total']
@@ -84,15 +83,15 @@ def linkParser(link, result):
         domain = extract(link).domain
         if domain not in unwanted_links:
             source = '{uri.scheme}://{uri.netloc}/'.format(uri=parsed_uri)
-            #article = g.extract(url=link)
-            #image = article.top_image.src
-            #description = article.meta_description
-            #title = article.title.upper()
-            s = summary.Summary(link)
-            s.extract()
-            image = str(s.image).encode('utf-8')
-            title = str(s.title.encode('utf-8'))
-            description = str(s.description.encode('utf-8'))
+            article = g.extract(url=link)
+            image = str(article.top_image.src)
+            description = str(article.meta_description)
+            title = article.title.upper()
+            #s = summary.Summary(link)
+            #s.extract()
+            #image = str(s.image).encode('utf-8')
+            #title = str(s.title.encode('utf-8'))
+            #description = str(s.description.encode('utf-8'))
             if image != "None" and description != "None":
                 dic = {'url': link, 'im':image, 'title': title, 'description': description, 'popularity': int(count), 'source': source}
                 if not next((item for item in result if item["title"] == dic['title'] and item["im"] == dic['im']\
@@ -103,6 +102,7 @@ def linkParser(link, result):
     return result
 
 def calculateLinks(alertid, date):
+    print alertid, date
     stringDate = date
     date = determine_date(date)
     links = Connection.Instance().db[str(alertid)].aggregate([{'$match': {'timestamp_ms': {'$gte': date} }},\
@@ -116,7 +116,10 @@ def calculateLinks(alertid, date):
     while len(result) < 60 and links != []:
         link = links.pop(0)
         if link['_id'] != None:
-            result = linkParser(link, result)
+            try:
+                result = linkParser(link, result)
+            except:
+                pass
 
     if len(result) != 0:
         Connection.Instance().newsdB[str(alertid)].remove({'name': stringDate})
@@ -125,7 +128,7 @@ def calculateLinks(alertid, date):
 
 def createParameters(alertid_list):
     dates = ['yesterday', 'week', 'month']
-    return [(alertid[0],date) for alertid in alertid_list for date in dates]
+    return [[alertid[0],date] for alertid in alertid_list for date in dates]
 
 def main():
     Connection.Instance().cur.execute("Select alertid from alerts;")
