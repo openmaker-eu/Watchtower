@@ -1,6 +1,7 @@
+from __future__ import print_function
 import pymongo
 import psycopg2
-from utils.Singleton import Singleton
+from application.utils.Singleton import Singleton
 
 @Singleton
 class Connection:
@@ -18,7 +19,7 @@ class Connection:
             self.infDB = self.MongoDBClient.influenceRanks
             self.PostGreSQLConnect = psycopg2.connect("dbname='openmakerdb' user='openmakerpsql' host='138.68.92.181' password='smio1EUp'")
             self.cur = self.PostGreSQLConnect.cursor()
-            print "new connection"
+            print("new connection")
         except Exception as e:
-            print e
-            print "I am unable to connect to the database"
+            print(e)
+            print("I am unable to connect to the database")
