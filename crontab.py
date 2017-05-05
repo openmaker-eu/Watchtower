@@ -1,6 +1,6 @@
 print "import"
 import pymongo
-from application.Connections import Connection
+#from application.Connections import Connection
 import requests
 import time
 import summary
@@ -11,6 +11,10 @@ from urlparse import urlparse
 import tldextract
 
 print "global"
+
+MongoDBClient = pymongo.MongoClient('mongodb://admin:smio1EUp@138.68.92.181:27017/')
+db = MongoDBClient.openMakerdB
+
 g = Goose({'browser_user_agent': 'Mozilla', 'parser_class':'lxml'})
 rsrc = resource.RLIMIT_DATA
 soft, hard = resource.getrlimit(rsrc)
