@@ -304,9 +304,9 @@ def getNews(alertid, date, cursor):
     feeds = list(Connection.Instance().newsdB[str(alertid)].find({'name': date}, {date: 1}))
     feeds = list(feeds[0][date][cursor:cursor+20])
     cursor = int(cursor) + 20
-    if cursor >= 100:
-        cursor = 100
+    if cursor >= 60:
+        cursor = 60
     result['next_cursor'] = cursor
-    result['cursor_length'] = 100
+    result['cursor_length'] = 60
     result['feeds'] = feeds
     return result

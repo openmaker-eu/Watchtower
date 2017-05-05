@@ -57,7 +57,6 @@ def calculateLinks(alertid, date):
                             result.append(dic)
             except Exception as e:
                 pass
-
     return result
 
 def main():
