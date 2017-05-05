@@ -533,6 +533,7 @@
           },
           timeout: 10000,
           error: function () {
+               $('#newscontainer').empty();
                $('#newscontainer').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");
                $("#spin").hide();
           }
