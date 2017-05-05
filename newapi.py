@@ -53,4 +53,4 @@ def getInfluencers(themename, cursor):
         result['next_cursor'] = cursor
         result['influencers'] = influencers
     result['cursor_length'] = 20
-    return result
+    return json.dumps(result, indent=4)
