@@ -6,11 +6,13 @@ import summary
 from goose import Goose
 import resource
 from time import gmtime, strftime
+from urlparse import urlparse
 
 g = Goose({'browser_user_agent': 'Mozilla', 'parser_class':'lxml'})
 rsrc = resource.RLIMIT_DATA
 soft, hard = resource.getrlimit(rsrc)
 resource.setrlimit(rsrc, (512000000, hard)) #limit to one 512mb
+unwanted_links = ['ebay', 'gearbest']
 
 def determine_date(date):
     current_milli_time = int(round(time.time() * 1000))
@@ -40,7 +42,10 @@ def calculateLinks(alertid, date):
             try:
                 count = link['total']
                 link = unshorten_url(link['_id'])
-                if 'ebay' not in link and 'gearbest' not in link:
+                parsed_uri = urlparse(link)
+                domain = parsed_uri.netloc[:parsed_uri.netloc.index(".")]
+                if domain not in unwanted_links:
+                    source = '{uri.scheme}://{uri.netloc}/'.format(uri=parsed_uri)
                     #article = g.extract(url=link)
                     #image = article.top_image.src
                     #description = article.meta_description
@@ -51,7 +56,7 @@ def calculateLinks(alertid, date):
                     title = str(s.title.encode('utf-8'))
                     description = str(s.description.encode('utf-8'))
                     if image != "None" and description != "None":
-                        dic = {'url': link, 'im':image, 'title': title, 'description': description, 'popularity': int(count)}
+                        dic = {'url': link, 'im':image, 'title': title, 'description': description, 'popularity': int(count), 'source': source}
                         if not next((item for item in result if item["title"] == dic['title'] and item["im"] == dic['im']\
                          and item["description"] == dic['description']), False):
                             result.append(dic)
@@ -60,7 +65,7 @@ def calculateLinks(alertid, date):
     return result
 
 def main():
-    Connection.Instance().cur.execute("Select alertid from alerts;")
+    Connection.Instance().cur.execute("Select alertid from alerts where userid = %s;", [4])
     alertid_list = sorted(list(Connection.Instance().cur.fetchall()))
     print alertid_list
 
