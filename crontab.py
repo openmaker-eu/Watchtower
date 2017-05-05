@@ -7,6 +7,7 @@ from goose import Goose
 import resource
 from time import gmtime, strftime
 from urlparse import urlparse
+import tldextract
 
 g = Goose({'browser_user_agent': 'Mozilla', 'parser_class':'lxml'})
 rsrc = resource.RLIMIT_DATA
@@ -43,7 +44,7 @@ def calculateLinks(alertid, date):
                 count = link['total']
                 link = unshorten_url(link['_id'])
                 parsed_uri = urlparse(link)
-                domain = parsed_uri.netloc[:parsed_uri.netloc.index(".")]
+                domain = tldextract.extract(link).domain
                 if domain not in unwanted_links:
                     source = '{uri.scheme}://{uri.netloc}/'.format(uri=parsed_uri)
                     #article = g.extract(url=link)
