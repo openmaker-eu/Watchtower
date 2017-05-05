@@ -153,7 +153,7 @@ def main():
     parameters = createParameters(alertid_list)
     print(alertid_list)
 
-    pool = ThreadPool(4)
+    pool = ThreadPool(3)
     pool.map(calculateLinks, parameters)
     pool.wait_completion()
 
