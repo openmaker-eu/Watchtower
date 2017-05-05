@@ -1,9 +1,13 @@
 print "import"
 import pymongo
-#from application.Connections import Connection
+from application.Connections import Connection
 import requests
 import time
-#import summary
+try:
+    import summary
+except Exception as e:
+    print e
+
 #from goose import Goose
 import resource
 from time import gmtime, strftime
