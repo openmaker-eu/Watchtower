@@ -56,7 +56,7 @@ rsrc = RLIMIT_DATA
 soft, hard = getrlimit(rsrc)
 setrlimit(rsrc, (3*512000000, hard)) #limit to one 512mb
 
-unwanted_links = ['ebay', 'gearbest', 'abizy']
+unwanted_links = ['ebay', 'gearbest', 'abizy', 'twitter']
 
 def determine_date(date):
     current_milli_time = int(round(time() * 1000))
