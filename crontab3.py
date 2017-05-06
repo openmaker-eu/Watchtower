@@ -148,7 +148,7 @@ def createParameters(alertid_list):
     return [[alertid[0],date] for alertid in alertid_list for date in dates]
 
 def main():
-    Connection.Instance().cur.execute("Select alertid from alerts where userid != %s;", [4])
+    Connection.Instance().cur.execute("Select alertid from alerts;")
     alertid_list = sorted(list(Connection.Instance().cur.fetchall()))
     parameters = createParameters(alertid_list)
     print(alertid_list)
