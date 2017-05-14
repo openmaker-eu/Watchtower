@@ -126,9 +126,10 @@ def getAlert(alertid):
     if alertid != None:
         Connection.Instance().cur.execute("Select * from alerts where alertid = %s;", [alertid])
         var = Connection.Instance().cur.fetchone()
-        alert = {'alertid': var[0], 'name':var[2], 'keywords':var[3], 'lang': var[5].split(","), 'status': var[6], 'keywordlimit': var[8]}
+        alert = {'alertid': var[0], 'name':var[2], 'keywords':var[3], 'lang': var[5].split(","), 'status': var[6], 'keywordlimit': var[8],\
+                 'description': var[9]}
     else:
-        alert = {'alertid': "", 'name': "", 'keywords': "", 'lang': "", 'status': False, 'keywordlimit': 10}
+        alert = {'alertid': "", 'name': "", 'keywords': "", 'lang': "", 'status': False, 'keywordlimit': 10, 'description': ""}
     return alert
 
 # Take alertid and return that alert as not lists

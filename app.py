@@ -285,6 +285,7 @@ class CreateEditAlertsHandler(BaseHandler, TemplateRendering):
         userid = tornado.escape.xhtml_escape(self.current_user)
         alert = {}
         alert['keywords'] = ",".join(self.get_argument("keywords").split(","))
+        alert['description'] = self.get_argument("description")
         keywordlimit = 10 - len(self.get_argument("keywords").split(","))
         alert['keywordlimit'] = keywordlimit
         #alert['excludedkeywords'] = ",".join(self.get_argument("excludedkeywords").split(","))

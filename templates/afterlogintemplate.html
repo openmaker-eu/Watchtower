@@ -202,7 +202,7 @@
     <script>
         $(document).ready(function() {
             $('#previewbutton').click(function(e) {
-                $('.alert-form').find('input[name="alertname"], input[name="keywords"], select[name="languages"]').each(function(){
+                $('.alert-form').find('input[name="alertname"], input[name="description"], input[name="keywords"], select[name="languages"]').each(function(){
                   if( $(this).val() == "" || $(this).val() == null) {
                     e.preventDefault();
                     if($(this).attr("name") == "keywords"){
@@ -256,7 +256,7 @@
     <script>
 
     jQuery(document).ready(function() {
-        $('.alert-form  input[name="alertname"], .alert-form  select[name="languages"]').on('focus', function() {
+        $('.alert-form  input[name="alertname"], .alert-form  input[name="description"], .alert-form  select[name="languages"]').on('focus', function() {
           $(this).removeClass('input-error');
         });
         $(".keyword > .bootstrap-tagsinput").on('DOMSubtreeModified', function() {
@@ -265,7 +265,7 @@
 
         $('.alert-form').on('submit', function(e) {
 
-          $(this).find('input[name="alertname"], input[name="keywords"], select[name="languages"]').each(function(){
+          $(this).find('input[name="alertname"], input[name="description"], input[name="keywords"], select[name="languages"]').each(function(){
             if( $(this).val() == "" || $(this).val() == null) {
               e.preventDefault();
               if($(this).attr("name") == "keywords"){

@@ -3,13 +3,13 @@ import pymongo
 from application.Connections import Connection
 #from application.TimeOut import timeout
 from requests import head
-from resource import RLIMIT_DATA, getrlimit, setrlimit
 from time import gmtime, strftime, time
 from urllib.parse import urlparse
 from tldextract import extract
 from queue import Queue
 from threading import Thread
 import timeout_decorator
+from re import search, IGNORECASE
 
 class Worker(Thread):
     """ Thread executing tasks from a given tasks queue """
@@ -52,11 +52,7 @@ class ThreadPool:
         """ Wait for completion of all the tasks in the queue """
         self.tasks.join()
 
-rsrc = RLIMIT_DATA
-soft, hard = getrlimit(rsrc)
-setrlimit(rsrc, (3*512000000, hard)) #limit to one 512mb
-
-unwanted_links = ['ebay', 'gearbest', 'abizy', 'twitter']
+unwanted_links = ['ebay', 'gearbest', 'abizy', 'twitter', 'facebook', 'swarmapp']
 
 def determine_date(date):
     current_milli_time = int(round(time() * 1000))
@@ -94,6 +90,8 @@ def linkParser(link):
             description = article.summary
             title = article.title
 
+            if search(r"javascript is disabled error", description, IGNORECASE):
+                raise Exception("java script")
 
             #g = Goose({'browser_user_agent': 'Mozilla', 'parser_class':'lxml'})
             #article = g.extract(url=link)
@@ -153,7 +151,7 @@ def main():
     parameters = createParameters(alertid_list)
     print(alertid_list)
 
-    pool = ThreadPool(1)
+    pool = ThreadPool(5)
     pool.map(calculateLinks, parameters)
     pool.wait_completion()
 
