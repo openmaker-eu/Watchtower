@@ -180,7 +180,7 @@ def deleteAlert(alertid, mainT, userid):
 
 # Updates given alert information and kill its thread, then again start its thread.
 def updateAlert(alert, mainT, userid):
-    Connection.Instance().cur.execute("update alerts set userid = %s, keywords = %s , languages = %s, isrunning = %s, description = %s where alertid = %s;", [userid, alert['keywords'], alert['lang'], True, alert['alertid'], alert['description']])
+    Connection.Instance().cur.execute("update alerts set userid = %s, keywords = %s , languages = %s, isrunning = %s, description = %s where alertid = %s;", [userid, alert['keywords'], alert['lang'], True, alert['description'], alert['alertid']])
     Connection.Instance().PostGreSQLConnect.commit()
     alert = getAlertAllOfThemList(alert['alertid'])
     mainT.updateAlert(alert)
