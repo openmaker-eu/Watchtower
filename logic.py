@@ -163,7 +163,7 @@ def setUserAlertLimit(userid, setType):
 def addAlert(alert, mainT, userid):
     alert['alertid'] = getNextAlertId()
     now = strftime("%Y-%m-%d", gmtime())
-    Connection.Instance().cur.execute("INSERT INTO alerts (alertid, userid, alertname, keywords, languages, creationtime, keywordlimit, isrunning) values (%s, %s, %s, %s, %s, %s, %s, %s);", [alert['alertid'], userid, alert['name'], alert['keywords'], alert['lang'], now, alert['keywordlimit'], True])
+    Connection.Instance().cur.execute("INSERT INTO alerts (alertid, userid, alertname, keywords, languages, creationtime, keywordlimit, isrunning, description) values (%s, %s, %s, %s, %s, %s, %s, %s, %s);", [alert['alertid'], userid, alert['name'], alert['keywords'], alert['lang'], now, alert['keywordlimit'], True, alert['description']])
     Connection.Instance().PostGreSQLConnect.commit()
     alert = getAlertAllOfThemList(alert['alertid'])
     setUserAlertLimit(userid, 'decrement')
@@ -180,7 +180,7 @@ def deleteAlert(alertid, mainT, userid):
 
 # Updates given alert information and kill its thread, then again start its thread.
 def updateAlert(alert, mainT, userid):
-    Connection.Instance().cur.execute("update alerts set userid = %s, keywords = %s , languages = %s, isrunning = %s where alertid = %s;", [userid, alert['keywords'], alert['lang'], True, alert['alertid']])
+    Connection.Instance().cur.execute("update alerts set userid = %s, keywords = %s , languages = %s, isrunning = %s, description = %s where alertid = %s;", [userid, alert['keywords'], alert['lang'], True, alert['alertid'], alert['description']])
     Connection.Instance().PostGreSQLConnect.commit()
     alert = getAlertAllOfThemList(alert['alertid'])
     mainT.updateAlert(alert)
