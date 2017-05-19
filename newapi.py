@@ -17,14 +17,10 @@ def getFeeds(themename, themeid, userid, date, cursor):
         themeid = int(themeid)
     except:
         pass
-    print type(themeid), type(themename)
-    print themeid, themename
     if (str(themeid) != "None") and (themename == "None"):
-        print "yes"
         Connection.Instance().cur.execute("select alertname from alerts where alertid = %s", [themeid])
         var = Connection.Instance().cur.fetchall()
         themename = var[0][0]
-        print "girdi"
     if themeid != "None" or themename != "None":
         dates=['all', 'yesterday', 'week', 'month']
         result = {}
@@ -49,10 +45,8 @@ def getInfluencers(themename, themeid):
         themeid = int(themeid)
     except:
         pass
-    print type(themeid), type(themename)
-    print themeid, themename
     if (str(themeid) != "None") and (themename == "None"):
-        Connection.Instance().cur.execute("select alertid from alerts where alertid = %s", [themeid])
+        Connection.Instance().cur.execute("select alertname from alerts where alertid = %s", [themeid])
         var = Connection.Instance().cur.fetchall()
         themename = var[0][0]
     if themeid != "None" or themename != "None":
