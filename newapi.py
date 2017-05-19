@@ -7,16 +7,25 @@ def getThemes(userid):
     Connection.Instance().cur.execute("select alertid, alertname, description from alerts where userid = %s", [userid])
     var = Connection.Instance().cur.fetchall()
     themes = [{'alertid':i[0], 'name':i[1], 'description': i[2]} for i in var]
+    print themes
     result = {}
     result['themes'] = themes
     return json.dumps(result, indent=4)
 
 def getFeeds(themename, themeid, userid, date, cursor):
-    if themeid is not None and themename is None:
+    try:
+        themeid = int(themeid)
+    except:
+        pass
+    print type(themeid), type(themename)
+    print themeid, themename
+    if (str(themeid) != "None") and (themename == "None"):
+        print "yes"
         Connection.Instance().cur.execute("select alertid from alerts where alertid = %s", [themeid])
         var = Connection.Instance().cur.fetchall()
         themename = var[0][0]
-    if themeid is not None or themename is not None:
+        print "girdi"
+    if themeid != "None" or themename != "None":
         dates=['all', 'yesterday', 'week', 'month']
         result = {}
         if date not in dates:
@@ -36,11 +45,17 @@ def getFeeds(themename, themeid, userid, date, cursor):
     return json.dumps(result, indent=4)
 
 def getInfluencers(themename, themeid):
-    if themeid is not None and themename is None:
+    try:
+        themeid = int(themeid)
+    except:
+        pass
+    print type(themeid), type(themename)
+    print themeid, themename
+    if (str(themeid) != "None") and (themename == "None"):
         Connection.Instance().cur.execute("select alertid from alerts where alertid = %s", [themeid])
         var = Connection.Instance().cur.fetchall()
         themename = var[0][0]
-    if themeid is not None or themename is not None:
+    if themeid != "None" or themename != "None":
         result = {}
         if themename == "arduino":
             themename = "Arduino"

@@ -73,7 +73,7 @@ class Application(tornado.web.Application):
 
 class ThemesV11Handler(BaseHandler, TemplateRendering):
     def get(self):
-        themes = api.getThemes(4)
+        themes = newapi.getThemes(4)
         self.set_header('Content-Type', 'application/json')
         self.write(themes)
 
