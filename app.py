@@ -67,8 +67,6 @@ class Application(tornado.web.Application):
             (r"/api/v1.1/get_themes", ThemesV11Handler, {'mainT':mainT}),
             (r"/api/v1.1/get_feeds", FeedsV11Handler, {'mainT':mainT}),
             (r"/api/v1.1/get_influencers", InfluencersV11Handler, {'mainT':mainT}),
-            (r"/api/v1.1/get_feeds_wgl", FeedsV11wglHandler, {'mainT':mainT}),
-            (r"/api/v1.1/get_feeds_wsl", FeedsV11wslHandler, {'mainT':mainT}),
             (r"/(.*)", tornado.web.StaticFileHandler, {'path': settings['static_path']}),
         ]
         super(Application, self).__init__(handlers, **settings)
@@ -81,64 +79,25 @@ class ThemesV11Handler(BaseHandler, TemplateRendering):
 
 class FeedsV11Handler(BaseHandler, TemplateRendering):
     def get(self):
-        themename = str(self.get_argument("themename"))
+        themename = str(self.get_argument("themename", None))
+        themeid = str(self.get_argument("themeid", None))
         try:
             cursor = int(self.get_argument("cursor"))
+            if cursor == -1:
+                cursor = 0
         except:
             cursor = 0
             pass
-        try:
-            date = str(self.get_argument("date"))
-        except:
-            date = 'month'
-            pass
-        feeds = newapi.getFeeds(themename, 4, date, cursor)
+        date = str(self.get_argument("date", "month"))
+        feeds = newapi.getFeeds(themename, themeid , 4, date, cursor)
         self.set_header('Content-Type', 'application/json')
         self.write(feeds)
 
 class InfluencersV11Handler(BaseHandler, TemplateRendering):
     def get(self):
-        themename = str(self.get_argument("themename"))
-        try:
-            cursor = int(self.get_argument("cursor"))
-        except:
-            cursor = 0
-            pass
-        feeds = newapi.getInfluencers(themename, cursor)
-        self.set_header('Content-Type', 'application/json')
-        self.write(feeds)
-
-class FeedsV11wglHandler(BaseHandler, TemplateRendering):
-    def get(self):
-        themename = str(self.get_argument("themename"))
-        try:
-            cursor = int(self.get_argument("cursor"))
-        except:
-            cursor = 0
-            pass
-        try:
-            date = str(self.get_argument("date"))
-        except:
-            date = 'month'
-            pass
-        feeds = api.getFeedsGoose(themename, date, cursor)
-        self.set_header('Content-Type', 'application/json')
-        self.write(feeds)
-
-class FeedsV11wslHandler(BaseHandler, TemplateRendering):
-    def get(self):
-        themename = str(self.get_argument("themename"))
-        try:
-            cursor = int(self.get_argument("cursor"))
-        except:
-            cursor = 0
-            pass
-        try:
-            date = str(self.get_argument("date"))
-        except:
-            date = 'month'
-            pass
-        feeds = api.getFeedsSummary(themename, date, cursor)
+        themename = str(self.get_argument("themename", None))
+        themeid = str(self.get_argument("themeid", None))
+        feeds = newapi.getInfluencers(themename, themeid)
         self.set_header('Content-Type', 'application/json')
         self.write(feeds)
 
