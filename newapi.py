@@ -21,7 +21,7 @@ def getFeeds(themename, themeid, userid, date, cursor):
     print themeid, themename
     if (str(themeid) != "None") and (themename == "None"):
         print "yes"
-        Connection.Instance().cur.execute("select alertid from alerts where alertid = %s", [themeid])
+        Connection.Instance().cur.execute("select alertname from alerts where alertid = %s", [themeid])
         var = Connection.Instance().cur.fetchall()
         themename = var[0][0]
         print "girdi"
