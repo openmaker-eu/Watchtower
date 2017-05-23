@@ -18,7 +18,7 @@ def getFeeds(themename, themeid, userid, date, cursor):
     except:
         pass
     if (str(themeid) != "None") and (themename == "None"):
-        Connection.Instance().cur.execute("select alertname from alerts where alertid = %s and ispublish = %s;", [themeid, True])
+        Connection.Instance().cur.execute("select alertname from alerts where alertid = %s;", [themeid])
         var = Connection.Instance().cur.fetchall()
         themename = var[0][0]
     if themeid != "None" or themename != "None":
@@ -46,7 +46,7 @@ def getInfluencers(themename, themeid):
     except:
         pass
     if (str(themeid) != "None") and (themename == "None"):
-        Connection.Instance().cur.execute("select alertname from alerts where alertid = %s and ispublish = %s;", [themeid, True])
+        Connection.Instance().cur.execute("select alertname from alerts where alertid = %s;", [themeid])
         var = Connection.Instance().cur.fetchall()
         themename = var[0][0]
     if themeid != "None" or themename != "None":
