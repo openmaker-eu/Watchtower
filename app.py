@@ -195,8 +195,12 @@ class AlertsHandler(BaseHandler, TemplateRendering):
             info = logic.deleteAlert(alertid, self.mainT,userid)
         elif posttype == u'stop':
             info = logic.stopAlert(alertid, self.mainT)
-        else:
+        elif posttype == u'start'::
             info = logic.startAlert(alertid, self.mainT)
+        elif posttype == u'publish'::
+            info = logic.publishAlert(alertid)
+        elif posttype == u'unpublish'::
+            info = logic.unpublishAlert(alertid)
         template = "alerts.html"
         variables = {
             'title' : "Alerts",

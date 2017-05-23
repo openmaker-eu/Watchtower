@@ -33,6 +33,7 @@
                     <th>Edit</th>
                     <th>Remove</th>
                     <th>Start/Stop</th>
+                    <th>Publish/Unpublish</th>
                 </tr>
             </thead>
             <tbody>
@@ -60,6 +61,17 @@
                         {% else %}
                         <button onclick= "alertbuttonclick({{alert['alertid']}}, 'stop');" posttype = "stop" alertid = "{{alert['alertid']}}" class="btn btn-default">
                           <span class="glyphicon glyphicon-stop"></span>
+                        </button>
+                        {% endif %}
+                    </td>
+                    <td style="text-align:center">
+                        {% if not alert['publish'] %}
+                        <button onclick= "alertbuttonclick({{alert['alertid']}}, 'publish');" posttype = "publish" alertid = "{{alert['alertid']}}" class="btn btn-default">
+                          <span class="glyphicon glyphicon-eye-open"></span>
+                        </button>
+                        {% else %}
+                        <button onclick= "alertbuttonclick({{alert['alertid']}}, 'unpublish');" posttype = "unpublish" alertid = "{{alert['alertid']}}" class="btn btn-default">
+                          <span class="glyphicon glyphicon-eye-close"></span>
                         </button>
                         {% endif %}
                     </td>

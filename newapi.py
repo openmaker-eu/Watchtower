@@ -4,7 +4,7 @@ import logic
 import json
 
 def getThemes(userid):
-    Connection.Instance().cur.execute("select alertid, alertname, description from alerts where userid = %s", [userid])
+    Connection.Instance().cur.execute("select alertid, alertname, description from alerts where userid = %s ispublish = %s", [userid, True])
     var = Connection.Instance().cur.fetchall()
     themes = [{'alertid':i[0], 'name':i[1], 'description': i[2]} for i in var]
     print themes
@@ -18,7 +18,7 @@ def getFeeds(themename, themeid, userid, date, cursor):
     except:
         pass
     if (str(themeid) != "None") and (themename == "None"):
-        Connection.Instance().cur.execute("select alertname from alerts where alertid = %s", [themeid])
+        Connection.Instance().cur.execute("select alertname from alerts where alertid = %s ispublish = %s;", [themeid, True])
         var = Connection.Instance().cur.fetchall()
         themename = var[0][0]
     if themeid != "None" or themename != "None":
@@ -46,7 +46,7 @@ def getInfluencers(themename, themeid):
     except:
         pass
     if (str(themeid) != "None") and (themename == "None"):
-        Connection.Instance().cur.execute("select alertname from alerts where alertid = %s", [themeid])
+        Connection.Instance().cur.execute("select alertname from alerts where alertid = %s ispublish = %s;", [themeid, True])
         var = Connection.Instance().cur.fetchall()
         themename = var[0][0]
     if themeid != "None" or themename != "None":

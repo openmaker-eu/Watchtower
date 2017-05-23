@@ -99,7 +99,7 @@ def getAlertList(userid):
     Connection.Instance().cur.execute("Select * from alerts where userid = %s;", [userid])
     var = Connection.Instance().cur.fetchall()
     alerts = [{'alertid':i[0], 'name':i[2], 'keywords':i[3].split(","), 'lang': i[5].split(","),\
-               'status': i[6], 'creationTime': i[7]} for i in var]
+               'status': i[6], 'creationTime': i[7], 'publish': i[10]} for i in var]
     alerts = sorted(alerts, key=lambda k: k['alertid'])
     for alert in alerts:
         alert['tweetCount'] = Connection.Instance().db[str(alert['alertid'])].find().count()
@@ -198,6 +198,16 @@ def stopAlert(alertid, mainT):
     Connection.Instance().PostGreSQLConnect.commit()
     alert = getAlertAllOfThemList(alertid)
     mainT.delAlert(alert)
+
+# Publishs the given alert
+def publishAlert(alertid):
+    Connection.Instance().cur.execute("update alerts set ispublish = %s where alertid = %s;", [True, alertid])
+    Connection.Instance().PostGreSQLConnect.commit()
+
+# Unpublishs the given alert
+def unpublishAlert(alertid):
+    Connection.Instance().cur.execute("update alerts set ispublish = %s where alertid = %s;", [False, alertid])
+    Connection.Instance().PostGreSQLConnect.commit()
 
 def getTweets(alertid):
     tweets = Connection.Instance().db[str(alertid)].find({}, {'tweetDBId': 1, "text":1, "id":1, "user":1, 'created_at': 1, "_id":0}).sort([('tweetDBId' , pymongo.DESCENDING)]).limit(25)
