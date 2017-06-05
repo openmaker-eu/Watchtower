@@ -75,9 +75,8 @@ class StdOutListener(StreamListener):
         if self.terminate == False:
             tweet = json.loads(data)
             tweet['tweetDBId'] = get_next_tweets_sequence()
+            tweet['isClicked'] = False
             separates_tweet(self.alertDic, tweet)
-            tweet['_id'] = ObjectId()
-            Connection.Instance().db["all"].insert_one(tweet)
             self.connection = True
             return True
         else:
