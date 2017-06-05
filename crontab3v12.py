@@ -1,6 +1,7 @@
 from newspaper import Article
 import pymongo
 from application.Connections import Connection
+from application.ThreadPool import ThreadPool
 from requests import head
 from time import gmtime, strftime, time
 from urllib.parse import urlparse
@@ -51,19 +52,6 @@ class ThreadPool:
         """ Wait for completion of all the tasks in the queue """
         self.tasks.join()
 
-unwanted_links = ['ebay', 'gearbest', 'abizy', 'twitter', 'facebook', 'swarmapp']
-
-def determine_date(date):
-    current_milli_time = int(round(time() * 1000))
-    one_day = 86400000
-    if date == 'yesterday':
-        return str(current_milli_time - one_day)
-    elif date == 'week':
-        return str(current_milli_time - 7 * one_day)
-    elif date == 'month':
-        return str(current_milli_time - 30 * one_day)
-    return '0'
-
 def unshorten_url(url):
     return head(url, allow_redirects=True).url
 
@@ -92,18 +80,6 @@ def linkParser(link):
             if search(r"javascript is disabled error", description, IGNORECASE):
                 raise Exception("java script")
 
-            #g = Goose({'browser_user_agent': 'Mozilla', 'parser_class':'lxml'})
-            #article = g.extract(url=link)
-            #image = str(article.top_image.src)
-            #description = str(article.meta_description)
-            #title = article.title.upper()
-
-            #s = summary.Summary(link)
-            #s.extract()
-            #image = str(s.image).encode('utf-8')
-            #title = str(s.title.encode('utf-8'))
-            #description = str(s.description.encode('utf-8'))
-
             if image != "" and description != "" and title != "":
                 dic = {'url': link, 'im':image, 'title': title, 'description': description, 'keywords': keywords, 'popularity': int(count), 'source': source}
                 return dic
@@ -111,15 +87,12 @@ def linkParser(link):
         print(e)
         pass
 
-def calculateLinks(alertid, date):
-    print(alertid, date)
-    stringDate = date
-    date = determine_date(date)
-    links = Connection.Instance().db[str(alertid)].aggregate([{'$match': {'timestamp_ms': {'$gte': date} }},\
-                                                         {'$unwind': "$entities.urls" },\
-                                                         {'$group' : {'_id' :"$entities.urls.expanded_url" , 'total':{'$sum': 1}}},\
-                                                         {'$sort': {'total': -1}},\
-                                                         {'$limit': 500}])
+def calculateLinks(alertid):
+    alertid = int(alertid)
+    links = Connection.Instance().db[str(alertid)].aggregate([{'$match': {'timestamp_ms': {'$gte': date} }}, {'$unwind': "$entities.urls" }, \
+                                                              {'$group' : {'_id' :"$entities.urls.expanded_url" , 'total':{'$sum': 1}}},\
+                                                              {'$sort': {'total': -1}},\
+                                                              {'$limit': 500}])
 
     links = list(links)
     result = []
@@ -139,19 +112,13 @@ def calculateLinks(alertid, date):
         Connection.Instance().newsdB[str(alertid)].remove({'name': stringDate})
         Connection.Instance().newsdB[str(alertid)].insert_one({'name': stringDate, stringDate:result, 'date': strftime("%a, %d %b %Y %H:%M:%S", gmtime())})
 
-
-def createParameters(alertid_list):
-    dates = ['yesterday', 'week', 'month']
-    return [[alertid[0],date] for alertid in alertid_list for date in dates]
-
 def main():
     Connection.Instance().cur.execute("Select alertid from alerts;")
     alertid_list = sorted(list(Connection.Instance().cur.fetchall()))
-    parameters = createParameters(alertid_list)
     print(alertid_list)
 
     pool = ThreadPool(5)
-    pool.map(calculateLinks, parameters)
+    pool.map(calculateLinks, alertid_list)
     pool.wait_completion()
 
 if __name__ == '__main__':
