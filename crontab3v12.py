@@ -3,7 +3,7 @@ import pymongo
 from application.Connections import Connection
 from application.ThreadPool import ThreadPool
 from requests import head
-from time import gmtime, strftime, time
+from time import gmtime, strftime, time, sleep
 from urllib.parse import urlparse
 from tldextract import extract
 import timeout_decorator
@@ -30,6 +30,7 @@ def linkParser(link):
         url = link
         article = Article(url)
         article.download()
+        sleep(1)
         article.parse()
         image = article.top_image
 
