@@ -21,7 +21,7 @@ def get_next_links_sequence():
 def unshorten_url(url):
     return head(url, allow_redirects=True).url
 
-@timeout_decorator.timeout(30, use_signals=False)
+@timeout_decorator.timeout(20, use_signals=False)
 def linkParser(link):
     try:
         link = unshorten_url(link)
