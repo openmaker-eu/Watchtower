@@ -6,79 +6,78 @@ from requests import head
 from time import gmtime, strftime, time
 from urllib.parse import urlparse
 from tldextract import extract
-from queue import Queue
-from threading import Thread
 import timeout_decorator
 from re import search, IGNORECASE
+
+def get_next_links_sequence():
+    cursor = Connection.Instance().newsPoolDB["counters"].find_and_modify(
+            query= { '_id': "link_id" },
+            update= { '$inc': { 'seq': 1 } },
+            new= True,
+            upsert= True
+    )
+    return cursor['seq']
 
 def unshorten_url(url):
     return head(url, allow_redirects=True).url
 
-@timeout_decorator.timeout(15, use_signals=False)
+@timeout_decorator.timeout(30, use_signals=False)
 def linkParser(link):
-    print("working")
     try:
-        count = link['total']
-        link = unshorten_url(link['_id'])
+        link = unshorten_url(link)
         parsed_uri = urlparse(link)
-        domain = extract(link).domain
-        if domain not in unwanted_links:
-            source = '{uri.scheme}://{uri.netloc}/'.format(uri=parsed_uri)
+        source = '{uri.scheme}://{uri.netloc}/'.format(uri=parsed_uri)
+        url = link
+        article = Article(url)
+        article.download()
+        article.parse()
+        image = article.top_image
 
-            url = link
-            article = Article(url)
-            article.download()
-            article.parse()
-            image = article.top_image
+        article.nlp()
+        keywords = article.keywords
+        description = article.summary
+        title = article.title
 
-            article.nlp()
-            keywords = article.keywords
-            description = article.summary
-            title = article.title
+        if search(r"javascript is disabled error", description, IGNORECASE):
+            raise Exception("java script")
 
-            if search(r"javascript is disabled error", description, IGNORECASE):
-                raise Exception("java script")
-
-            if image != "" and description != "" and title != "":
-                dic = {'url': link, 'im':image, 'title': title, 'description': description, 'keywords': keywords, 'popularity': int(count), 'source': source}
-                return dic
+        if image != "" and description != "" and title != "":
+            dic = {'url': link, 'im':image, 'title': title, 'description': description, 'keywords': keywords, 'source': source}
+            return dic
     except Exception as e:
-        print(e)
+        print(e, '____parser_____')
         pass
 
 def calculateLinks(alertid):
     alertid = int(alertid)
-    links = Connection.Instance().db[str(alertid)].aggregate([{'$match': {'timestamp_ms': {'$gte': date} }}, {'$unwind': "$entities.urls" }, \
-                                                              {'$group' : {'_id' :"$entities.urls.expanded_url" , 'total':{'$sum': 1}}},\
-                                                              {'$sort': {'total': -1}},\
-                                                              {'$limit': 500}])
-
-    links = list(links)
-    result = []
-    while len(result) < 60 and links != []:
-        print(len(result))
-        link = links.pop(0)
-        if link['_id'] != None:
+    for tweet in Connection.Instance().db[str(alertid)].find({'isClicked': False}):
+        Connection.Instance().db[str(alertid)].find_one_and_update({'id':tweet['id']}, {'$set': {'isClicked': True}})
+        tweet_tuple = [tweet['id'], int(tweet['timestamp_ms'])]
+        for link in tweet['entities']['urls']:
+            link = link['expanded_url']
             try:
                 dic = linkParser(link)
-                if dic != None and not next((item for item in result if item["title"] == dic['title'] and item["im"] == dic['im']\
-                 and item["description"] == dic['description']), False):
-                    result.append(dic)
-            except:
+                if dic != None:
+                    if len(list(Connection.Instance().newsPoolDB[str(alertid)].find({'source':dic['source'], 'title':dic['title']}))) == 0:
+                        dic['link_id'] = get_next_links_sequence()
+                        dic['mentions']=[tweet_tuple]
+                        Connection.Instance().newsPoolDB[str(alertid)].insert_one(dic)
+                    else:
+                        Connection.Instance().newsPoolDB[str(alertid)].find_one_and_update({'source':dic['source'], 'title':dic['title']}, {'$push': {'mentions': tweet_tuple}})
+            except Exception as e:
+                print(e, '_____calculate_____')
                 pass
-
-    if result != []:
-        Connection.Instance().newsdB[str(alertid)].remove({'name': stringDate})
-        Connection.Instance().newsdB[str(alertid)].insert_one({'name': stringDate, stringDate:result, 'date': strftime("%a, %d %b %Y %H:%M:%S", gmtime())})
 
 def main():
     Connection.Instance().cur.execute("Select alertid from alerts;")
     alertid_list = sorted(list(Connection.Instance().cur.fetchall()))
     print(alertid_list)
+    alertid_list = [alertid[0] for alertid in alertid_list]
 
-    pool = ThreadPool(5)
-    pool.map(calculateLinks, alertid_list)
-    pool.wait_completion()
+    calculateLinks(0)
+    #pool = ThreadPool(5)
+    #pool.map(calculateLinks, alertid_list)
+    #pool.wait_completion()
 
 if __name__ == '__main__':
     main()

@@ -7,8 +7,6 @@ from requests import head
 from time import gmtime, strftime, time
 from urllib.parse import urlparse
 from tldextract import extract
-from queue import Queue
-from threading import Thread
 import timeout_decorator
 from re import search, IGNORECASE
 
@@ -112,7 +110,7 @@ def main():
     print(alertid_list)
 
     pool = ThreadPool(5)
-    pool.map(calculateLinks, *parameters)
+    pool.map(calculateLinks, parameters)
     pool.wait_completion()
 
 """
