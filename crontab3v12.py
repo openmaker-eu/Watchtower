@@ -66,7 +66,7 @@ def calculateLinks(alertid):
                     else:
                         Connection.Instance().newsPoolDB[str(alertid)].find_one_and_update({'source':dic['source'], 'title':dic['title']}, {'$push': {'mentions': tweet_tuple}})
             except Exception as e:
-                print('link: 'link)
+                print('link: ', link)
                 print(e, '_____calculate_____')
                 pass
 
