@@ -24,8 +24,9 @@ class Worker(Thread):
 
 class ThreadPool:
     """ Pool of threads consuming tasks from a queue """
-    def __init__(self, num_threads):
+    def __init__(self, num_threads, more_than_one_parameter):
         self.tasks = Queue(num_threads)
+        self.more_than_one_parameter = more_than_one_parameter
         for _ in range(num_threads):
             Worker(self.tasks)
 
@@ -36,7 +37,10 @@ class ThreadPool:
     def map(self, func, args_list):
         """ Add a list of tasks to the queue """
         for args in args_list:
-            self.add_task(func, *args)
+            if self.more_than_one_parameter:
+                self.add_task(func, *args)
+            else:
+                self.add_task(func, args)
 
     def wait_completion(self):
         """ Wait for completion of all the tasks in the queue """
