@@ -75,7 +75,7 @@ def main():
     alertid_list = sorted(list(Connection.Instance().cur.fetchall()))
     print(alertid_list)
     alertid_list = [alertid[0] for alertid in alertid_list]
-    pool = ThreadPool(3, False)
+    pool = ThreadPool(2, False)
     pool.map(calculateLinks, alertid_list)
     pool.wait_completion()
 
