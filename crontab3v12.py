@@ -61,7 +61,7 @@ def calculateLinks(alertid):
             try:
                 dic = linkParser(link)
                 if dic != None:
-                    if len(list(Connection.Instance().newsPoolDB[str(alertid)].find({'url':link}))) == 0:
+                    if len(list(Connection.Instance().newsPoolDB[str(alertid)].find({'url':link}))) != 0:
                         Connection.Instance().newsPoolDB[str(alertid)].find_one_and_update({'url': link}, {'$push': {'mentions': tweet_tuple}})
                     elif len(list(Connection.Instance().newsPoolDB[str(alertid)].find({'source':dic['source'], 'title':dic['title']}))) == 0:
                         dic['link_id'] = get_next_links_sequence()
