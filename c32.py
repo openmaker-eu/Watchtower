@@ -57,8 +57,8 @@ def calculateLinks(alertid):
             link = link['expanded_url']
             if link == None:
                 continue
-            link = unshorten_url(link)
             try:
+                link = unshorten_url(link)
                 dic = linkParser(link)
                 if dic != None:
                     if len(list(Connection.Instance().newsPoolDB[str(alertid)].find({'source':dic['source'], 'title':dic['title']}))) == 0:
