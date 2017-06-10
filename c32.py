@@ -54,12 +54,12 @@ def calculateLinks(alertid):
     for tweet in Connection.Instance().db[str(alertid)].find({'isClicked': False}):
         while(threading.activeCount() > 4):
             sleep(5)
-        th = threading.Thread(target=tweet_calculator, args=(tweet,))
+        th = threading.Thread(target=tweet_calculator, args=(tweet,alertid,))
         th.deamon = True
         th.start()
         th.join()
 
-def tweet_calculator(tweet):
+def tweet_calculator(tweet,alertid):
     Connection.Instance().db[str(alertid)].find_one_and_update({'id':tweet['id']}, {'$set': {'isClicked': True}})
     tweet_tuple = {'user_id': tweet['user']['id_str'], 'tweet_id': tweet['id_str'], 'timestamp_ms': int(tweet['timestamp_ms'])}
     for link in tweet['entities']['urls']:
