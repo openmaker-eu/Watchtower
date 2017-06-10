@@ -24,7 +24,6 @@ def unshorten_url(url):
 @timeout_decorator.timeout(20, use_signals=False)
 def linkParser(link):
     try:
-        link = unshorten_url(link)
         parsed_uri = urlparse(link)
         source = '{uri.scheme}://{uri.netloc}/'.format(uri=parsed_uri)
         url = link
@@ -58,6 +57,7 @@ def calculateLinks(alertid):
             link = link['expanded_url']
             if link == None:
                 continue
+            link = unshorten_url(link)
             try:
                 dic = linkParser(link)
                 if dic != None:
