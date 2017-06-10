@@ -54,7 +54,7 @@ def calculateLinks(alertid):
     for tweet in Connection.Instance().db[str(alertid)].find({'isClicked': False}):
         while(threading.activeCount() > 4):
             sleep(5)
-        th = Thread(target=tweet_calculator, args=(tweet,))
+        th = threading.Thread(target=tweet_calculator, args=(tweet,))
         th.deamon = True
         th.start()
         th.join()
