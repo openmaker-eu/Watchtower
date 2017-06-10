@@ -1,3 +1,4 @@
 psycopg2
 pymongo
 newspaper3k
+timeout_decorator

@@ -74,10 +74,10 @@ def calculateLinks(alertid):
 
 def main():
     Connection.Instance().cur.execute("Select alertid from alerts;")
-    alertid_list = sorted(list(Connection.Instance().cur.fetchall()))
+    alertid_list = sorted(list(Connection.Instance().cur.fetchall()), reverse=True)
     alertid_list = [alertid[0] for alertid in alertid_list]
     print(alertid_list)
-    pool = ThreadPool(2, False)
+    pool = ThreadPool(3, False)
     pool.map(calculateLinks, alertid_list)
     pool.wait_completion()
 
