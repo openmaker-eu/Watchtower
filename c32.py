@@ -8,6 +8,7 @@ from urllib.parse import urlparse
 from tldextract import extract
 import timeout_decorator
 from re import search, IGNORECASE
+import threading
 
 def get_next_links_sequence():
     cursor = Connection.Instance().newsPoolDB["counters"].find_and_modify(
