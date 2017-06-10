@@ -29,7 +29,6 @@ def linkParser(link):
         url = link
         article = Article(url)
         article.download()
-        sleep(1)
         article.parse()
         image = article.top_image
 
