@@ -59,12 +59,13 @@ def calculateLinks(alertid):
                 continue
             link = unshorten_url(link)
             try:
+                if len(list(Connection.Instance().newsPoolDB[str(alertid)].find({'url':link}))) != 0:
+                    print(alertid, " link var \n", tweet_tuple)
+                    Connection.Instance().newsPoolDB[str(alertid)].find_one_and_update({'url': link}, {'$push': {'mentions': tweet_tuple}})
+                    continue
                 dic = linkParser(link)
                 if dic != None:
-                    if len(list(Connection.Instance().newsPoolDB[str(alertid)].find({'url':link}))) != 0:
-                        print(alertid, " link var \n", tweet_tuple)
-                        Connection.Instance().newsPoolDB[str(alertid)].find_one_and_update({'url': link}, {'$push': {'mentions': tweet_tuple}})
-                    elif len(list(Connection.Instance().newsPoolDB[str(alertid)].find({'source':dic['source'], 'title':dic['title']}))) == 0:
+                    if len(list(Connection.Instance().newsPoolDB[str(alertid)].find({'source':dic['source'], 'title':dic['title']}))) == 0:
                         dic['link_id'] = get_next_links_sequence()
                         dic['mentions']=[tweet_tuple]
                         Connection.Instance().newsPoolDB[str(alertid)].insert_one(dic)
