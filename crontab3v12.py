@@ -59,8 +59,8 @@ def calculateLinks(alertid):
                 continue
             if link == None:
                 continue
-            link = unshorten_url(link)
             try:
+                link = unshorten_url(link)
                 if len(list(Connection.Instance().newsPoolDB[str(alertid)].find({'url':link}))) != 0:
                     print(alertid, " link var \n", tweet_tuple)
                     Connection.Instance().newsPoolDB[str(alertid)].find_one_and_update({'url': link}, {'$push': {'mentions': tweet_tuple}})
