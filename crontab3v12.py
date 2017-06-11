@@ -79,7 +79,7 @@ def calculateLinks(alertid):
                     print(e, '_____calculate_____')
                     pass
         except Exception as e:
-            print(e, '____Genel____')
+            print('Error on line {}'.format(sys.exc_info()[-1].tb_lineno), type(e).__name__, e, '____Genel____')
             pass
 
 def main():
