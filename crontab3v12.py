@@ -53,7 +53,7 @@ def calculateLinks(alertid):
             tweet_tuple = {'user_id': tweet['user']['id_str'], 'tweet_id': tweet['id_str'], 'timestamp_ms': int(tweet['timestamp_ms'])}
             for link in tweet['entities']['urls']:
                 link = link['expanded_url']
-                print link
+                print(link)
                 if link == None:
                     continue
                 if search('twitter', link):
