@@ -36,6 +36,7 @@ def linkParser(link):
         title = article.title
         if image != "" and description != "" and title != "":
             dic = {'url': link, 'im':image, 'title': title, 'description': description, 'keywords': keywords, 'source': source}
+            print('done')
             return dic
     except Exception as e:
         pass
