@@ -175,6 +175,7 @@ def deleteAlert(alertid, mainT, userid):
     setUserAlertLimit(userid, 'increment')
     mainT.delAlert(alert)
     Connection.Instance().db[str(alertid)].drop()
+    Connection.Instance().newsPoolDB[str(alertid)].drop()
     Connection.Instance().cur.execute("delete from alerts where alertid = %s;", [alertid])
     Connection.Instance().PostGreSQLConnect.commit()
 
