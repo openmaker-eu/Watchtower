@@ -80,7 +80,6 @@ class StdOutListener(StreamListener):
         if self.terminate == False:
             tweet = json.loads(data)
             tweet['tweetDBId'] = get_next_tweets_sequence()
-            tweet['isClicked'] = False
             separates_tweet(self.alertDic, tweet)
             self.connection = True
             return True
