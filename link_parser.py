@@ -39,7 +39,6 @@ def linkParser(link):
             dic = {'url': link, 'im':image, 'title': title, 'description': description, 'keywords': keywords, 'source': source}
             return dic
     except Exception as e:
-        print(e)
         pass
 
 def calculateLinks(alertid, tweet):
@@ -54,12 +53,10 @@ def calculateLinks(alertid, tweet):
                 continue
             try:
                 link = unshorten_url(link)
-                print(link)
                 if len(list(Connection.Instance().newsPoolDB[str(alertid)].find({'url':link}))) != 0:
                     Connection.Instance().newsPoolDB[str(alertid)].find_one_and_update({'url': link}, {'$push': {'mentions': tweet_tuple}})
                     continue
                 dic = linkParser(link)
-                print('dic: ', dic)
                 if dic != None:
                     if len(list(Connection.Instance().newsPoolDB[str(alertid)].find({'source':dic['source'], 'title':dic['title']}))) != 0:
                         Connection.Instance().newsPoolDB[str(alertid)].find_one_and_update({'source':dic['source'], 'title':dic['title']}, {'$push': {'mentions': tweet_tuple}})
@@ -68,7 +65,6 @@ def calculateLinks(alertid, tweet):
                         dic['mentions']=[tweet_tuple]
                         Connection.Instance().newsPoolDB[str(alertid)].insert_one(dic)
             except Exception as e:
-                print(e)
                 pass
     except Exception as e:
         pass

@@ -52,7 +52,7 @@ def linkParser(link):
 def calculateLinks(alertid):
     alertid = int(alertid)
     for tweet in Connection.Instance().db[str(alertid)].find({'isClicked': False}):
-        while(threading.activeCount() > 4):
+        while(threading.activeCount() > 9):
             sleep(5)
         th = threading.Thread(target=tweet_calculator, args=(tweet,alertid,))
         th.deamon = True
