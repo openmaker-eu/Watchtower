@@ -17,6 +17,7 @@ class Connection:
             self.newsdB = self.MongoDBClient.newsdB
             self.feedDB = self.MongoDBClient.feedDB
             self.newsPoolDB = self.MongoDBClient.newsPool
+            self.filteredNewsPoolDB = self.MongoDBClient.filteredNewsPool
             self.infDB = self.MongoDBClient.influenceRanks
             self.PostGreSQLConnect = psycopg2.connect("dbname='openmakerdb' user='openmakerpsql' host='138.68.92.181' password='smio1EUp'")
             self.cur = self.PostGreSQLConnect.cursor()
