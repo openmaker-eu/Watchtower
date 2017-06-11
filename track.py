@@ -50,13 +50,15 @@ def separates_tweet(alertDic, tweet):
                         if re.search(keyword, str(tweet['extended_tweet']['full_text'])):
                             tweet['_id'] = ObjectId()
                             Connection.Instance().db[str(alert['alertid'])].insert_one(tweet)
-                            link_parser.calculateLinks(alert['alertid'], tweet)
+                            if tweet['entities']['urls'] != []:
+                                link_parser.calculateLinks(alert['alertid'], tweet)
                             break
                     else:
                         if re.search(keyword, str(tweet['text'])):
                             tweet['_id'] = ObjectId()
                             Connection.Instance().db[str(alert['alertid'])].insert_one(tweet)
-                            link_parser.calculateLinks(alert['alertid'], tweet)
+                            if tweet['entities']['urls'] != []:
+                                link_parser.calculateLinks(alert['alertid'], tweet)
                             break
         except KeyError:
             pass

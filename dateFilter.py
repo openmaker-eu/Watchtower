@@ -36,8 +36,9 @@ def getDateList(alertid, date):
                 'keywords':1,
                 'popularity': {'$size': '$mentions'}
             }},
-        {'$sort': {'popularity': -1}},
-        {'$limit': 60}
+            {'$match': {'popularity' : {"$gt" : 0}}},
+            {'$sort': {'popularity': -1}},
+            {'$limit': 60}
     ]))
 
 def calculate_dates():
