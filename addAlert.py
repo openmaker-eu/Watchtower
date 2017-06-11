@@ -10,7 +10,6 @@ class AddAlert():
             for alert in alertList :
                 if str(alert['alertid']) not in self.alertDic:
                     self.alertDic[str(alert['alertid'])] = alert
-            print self.alertDic
             self.onlyThread = StreamCreator(self.alertDic)
             self.onlyThread.start()
 

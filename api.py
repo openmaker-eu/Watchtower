@@ -6,8 +6,6 @@ from time import gmtime, strftime, strptime
 import time
 import json
 import logic
-from goose import Goose
-import summary
 
 def getThemes(userid):
     Connection.Instance().cur.execute("select alertid, alertname from alerts where userid = %s", [userid])
@@ -17,28 +15,6 @@ def getThemes(userid):
     result['themes'] = themes
     return json.dumps(result, indent=4)
 
-"""
-feeddb degil once onu duzelt!!
-def getInfluencers(themename, date, cursor):
-    length = len(list(Connection.Instance().infDB[str(themename)].find({"type": "filteredUser"}, {"_id":0, "type": 0})))
-    if cursor is None:
-        influencers = Connection.Instance().infDB[str(themename)].find({"type": "filteredUser"}, {"_id":0, "type": 0}).skip(0).limit(20)
-        cursor = 0
-    else:
-        influencers = Connection.Instance().infDB[str(themename)].find({"type": "filteredUser"}, {"_id":0, "type": 0}).skip(int(cursor)).limit(20)
-    result = {}
-    influencers = list(influencers)
-    if len(influencers) == 0:
-        influencers.append("Cursor is Empty.")
-    else:
-        cursor = int(cursor) + 20
-        if cursor >= length:
-            cursor = length
-        result['next cursor'] = cursor
-    result['cursor length'] = length
-    result['influencers'] = influencers
-    return json.dumps(result, indent=4)
-"""
 def getFeeds(themename, date, cursor):
     dates=['all', 'yesterday', 'week', 'month']
     result = {}
@@ -59,7 +35,6 @@ def getFeeds(themename, date, cursor):
     feeds = list(feeds)
     last_feeds = []
     if len(feeds) == 0:
-        print len(list(feeds))
         last_feeds.append("Cursor is Empty.")
     else:
         cursor = int(cursor) + 20
@@ -91,7 +66,6 @@ def getFeedsGoose(themename, date, cursor):
     feeds = list(feeds)
     last_feeds = []
     if len(feeds) == 0:
-        print len(list(feeds))
         last_feeds.append("Cursor is Empty.")
     else:
         cursor = int(cursor) + 20
@@ -105,7 +79,6 @@ def getFeedsGoose(themename, date, cursor):
                 article = g.extract(url=link['_id'])
                 last_feeds.append({'url': link['_id'], 'im':article.top_image.src, 'title': article.title.upper(), 'description': article.meta_description})
             except Exception as e:
-                print e
                 pass
     result['cursor_length'] = length
     result['feeds'] = last_feeds
@@ -131,7 +104,6 @@ def getFeedsSummary(themename, date, cursor):
     feeds = list(feeds)
     last_feeds = []
     if len(feeds) == 0:
-        print len(list(feeds))
         last_feeds.append("Cursor is Empty.")
     else:
         cursor = int(cursor) + 20
@@ -145,7 +117,6 @@ def getFeedsSummary(themename, date, cursor):
                 s.extract()
                 last_feeds.append({'url': link['_id'], 'im':str(s.image), 'title': str(s.title), 'description': str(s.description)})
             except Exception as e:
-                print e
                 pass
     result['cursor_length'] = length
     result['feeds'] = last_feeds
@@ -161,28 +132,3 @@ def determine_date(date):
     elif date == 'month':
         return str(current_milli_time - 30 * one_day)
     return '0'
-
-
-
-
-
-
-"""
-    for link in feeds:
-        if link['_id'] != [] and link['_id'][0] != None:
-            print i
-            i = i+1
-            try:
-                s = summary.Summary(link['_id'][0])
-                s.extract()
-                last_feeds.append({'url': link['_id'][0], 'im':str(s.image), 'title': str(s.title), 'description': str(s.description)})
-            except:
-                pass
-
-            try:
-                g = Goose()
-                article = g.extract(url=link['_id'][0])
-                last_feeds.append({'url': link['_id'][0], 'im':article.top_image.src, 'title': article.title.upper(), 'description': article.meta_description})
-            except:
-                pass
-"""

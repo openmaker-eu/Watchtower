@@ -106,7 +106,6 @@ def linkParser(link):
         pass
 
 def calculateLinks(alertid, date):
-    print alertid, date
     stringDate = date
     date = determine_date(date)
     links = Connection.Instance().db[str(alertid)].aggregate([{'$match': {'timestamp_ms': {'$gte': date} }},\
@@ -120,7 +119,6 @@ def calculateLinks(alertid, date):
     while len(result) < 60 and links != []:
 
         link = links.pop(0)
-        print stringDate, len(result)
         if link['_id'] != None:
             try:
                 dic = linkParser(link)
@@ -165,7 +163,6 @@ def main():
             Connection.Instance().newsdB[str(alertid)].remove({'name': 'month'})
             Connection.Instance().newsdB[str(alertid)].insert_one({'name': 'month', 'month':month, 'date': strftime("%a, %d %b %Y %H:%M:%S", gmtime())})
 
-        print alertid, "fetched!"
 
 
         allofthem = calculateLinks(alertid, determine_date('all'))

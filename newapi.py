@@ -7,7 +7,6 @@ def getThemes(userid):
     Connection.Instance().cur.execute("select alertid, alertname, description from alerts where ispublish = %s", [True])
     var = Connection.Instance().cur.fetchall()
     themes = [{'alertid':i[0], 'name':i[1], 'description': i[2]} for i in var]
-    print themes
     result = {}
     result['themes'] = themes
     return json.dumps(result, indent=4)

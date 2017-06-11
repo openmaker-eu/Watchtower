@@ -10,6 +10,7 @@ import json
 import re
 from bson.objectid import ObjectId
 import link_parser
+import subprocess
 
 def get_keywords(alertDic):
     keywords = []
@@ -17,7 +18,6 @@ def get_keywords(alertDic):
         alert = alertDic[key]
         keywords = keywords + alert['keywords']
     keywords = list(set(keywords))
-    print keywords
     return keywords
 
 def get_lang(alertDic):
@@ -86,12 +86,10 @@ class StdOutListener(StreamListener):
             return False
 
     def on_disconnect(self, notice):
-        print ("Disconnect: {}".format(notice))
         self.connection = False
         return True
 
     def on_error(self, status):
-        print status
         if status == 420:
             return False
 
@@ -99,7 +97,6 @@ class StdOutListener(StreamListener):
         self.terminate = True
 
     def on_timeout(self):
-        print('Timeout...')
         return True # To continue listening
 
 class StreamCreator():
