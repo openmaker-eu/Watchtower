@@ -50,33 +50,37 @@ def calculateLinks(alertid):
     b = Connection.Instance().db[str(alertid)].find({'isClicked': False})
     print(b.count())
     for tweet in b:
-        print(int(tweet['id_str']))
-        Connection.Instance().db[str(alertid)].find_one_and_update({'id_str':tweet['id_str'], 'isClicked': False}, {'$set': {'isClicked': True}})
-        tweet_tuple = {'user_id': tweet['user']['id_str'], 'tweet_id': tweet['id_str'], 'timestamp_ms': int(tweet['timestamp_ms'])}
-        for link in tweet['entities']['urls']:
-            link = link['expanded_url']
-            if search('twitter', link):
-                continue
-            if link == None:
-                continue
-            try:
-                link = unshorten_url(link)
-                if len(list(Connection.Instance().newsPoolDB[str(alertid)].find({'url':link}))) != 0:
-                    print(alertid, " link var \n", tweet_tuple)
-                    Connection.Instance().newsPoolDB[str(alertid)].find_one_and_update({'url': link}, {'$push': {'mentions': tweet_tuple}})
+        try:
+            print(int(tweet['id_str']))
+            Connection.Instance().db[str(alertid)].find_one_and_update({'id_str':tweet['id_str'], 'isClicked': False}, {'$set': {'isClicked': True}})
+            tweet_tuple = {'user_id': tweet['user']['id_str'], 'tweet_id': tweet['id_str'], 'timestamp_ms': int(tweet['timestamp_ms'])}
+            for link in tweet['entities']['urls']:
+                link = link['expanded_url']
+                if search('twitter', link):
                     continue
-                dic = linkParser(link)
-                if dic != None:
-                    if len(list(Connection.Instance().newsPoolDB[str(alertid)].find({'source':dic['source'], 'title':dic['title']}))) == 0:
-                        dic['link_id'] = get_next_links_sequence()
-                        dic['mentions']=[tweet_tuple]
-                        Connection.Instance().newsPoolDB[str(alertid)].insert_one(dic)
-                    else:
-                        Connection.Instance().newsPoolDB[str(alertid)].find_one_and_update({'source':dic['source'], 'title':dic['title']}, {'$push': {'mentions': tweet_tuple}})
-            except Exception as e:
-                print('link: ', link)
-                print(e, '_____calculate_____')
-                pass
+                if link == None:
+                    continue
+                try:
+                    link = unshorten_url(link)
+                    if len(list(Connection.Instance().newsPoolDB[str(alertid)].find({'url':link}))) != 0:
+                        print(alertid, " link var \n", tweet_tuple)
+                        Connection.Instance().newsPoolDB[str(alertid)].find_one_and_update({'url': link}, {'$push': {'mentions': tweet_tuple}})
+                        continue
+                    dic = linkParser(link)
+                    if dic != None:
+                        if len(list(Connection.Instance().newsPoolDB[str(alertid)].find({'source':dic['source'], 'title':dic['title']}))) == 0:
+                            dic['link_id'] = get_next_links_sequence()
+                            dic['mentions']=[tweet_tuple]
+                            Connection.Instance().newsPoolDB[str(alertid)].insert_one(dic)
+                        else:
+                            Connection.Instance().newsPoolDB[str(alertid)].find_one_and_update({'source':dic['source'], 'title':dic['title']}, {'$push': {'mentions': tweet_tuple}})
+                except Exception as e:
+                    print('link: ', link)
+                    print(e, '_____calculate_____')
+                    pass
+        except Exception as e:
+            print(e, '____Genel____')
+            pass
 
 def main():
     Connection.Instance().cur.execute("Select alertid from alerts;")
