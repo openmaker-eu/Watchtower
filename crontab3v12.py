@@ -25,7 +25,7 @@ def unshorten_url(url):
 @timeout_decorator.timeout(15, use_signals=False)
 def linkParser(link):
     try:
-        print(link)
+        #print(link)
         parsed_uri = urlparse(link)
         source = '{uri.scheme}://{uri.netloc}/'.format(uri=parsed_uri)
         url = link
@@ -40,7 +40,7 @@ def linkParser(link):
             dic = {'url': link, 'im':image, 'title': title, 'description': description, 'keywords': keywords, 'source': source}
             return dic
     except Exception as e:
-        print(e, '____parser_____')
+        #print(e, '____parser_____')
         pass
 
 def calculateLinks(alertid):
@@ -61,7 +61,7 @@ def calculateLinks(alertid):
                 try:
                     link = unshorten_url(link)
                     if len(list(Connection.Instance().newsPoolDB[str(alertid)].find({'url':link}))) != 0:
-                        print(alertid, " link var \n", tweet_tuple)
+                        #print(alertid, " link var \n", tweet_tuple)
                         Connection.Instance().newsPoolDB[str(alertid)].find_one_and_update({'url': link}, {'$push': {'mentions': tweet_tuple}})
                         continue
                     dic = linkParser(link)
@@ -73,14 +73,12 @@ def calculateLinks(alertid):
                             dic['link_id'] = get_next_links_sequence()
                             dic['mentions']=[tweet_tuple]
                             Connection.Instance().newsPoolDB[str(alertid)].insert_one(dic)
-                    else:
-                        print(dic, '____NONE____')
                 except Exception as e:
-                    print('link: ', link)
-                    print(e, '_____calculate_____')
+                    #print('link: ', link)
+                    #print(e, '_____calculate_____')
                     pass
         except Exception as e:
-            print('Error on line {}'.format(sys.exc_info()[-1].tb_lineno), type(e).__name__, e, '____Genel____')
+            #print('Error on line {}'.format(sys.exc_info()[-1].tb_lineno), type(e).__name__, e, '____Genel____')
             pass
 
 def main():
