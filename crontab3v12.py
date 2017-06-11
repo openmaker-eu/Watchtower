@@ -25,7 +25,6 @@ def unshorten_url(url):
 def linkParser(link):
     try:
         print(link)
-        link = unshorten_url(link)
         parsed_uri = urlparse(link)
         source = '{uri.scheme}://{uri.netloc}/'.format(uri=parsed_uri)
         url = link
@@ -56,7 +55,8 @@ def calculateLinks(alertid):
                 link = link['expanded_url']
                 if link == None:
                     continue
-                if search('twitter', link):
+                link = unshorten_url(link)
+                if search('twitter', link) or search('twitter', link):
                     continue
                 try:
                     if len(list(Connection.Instance().newsPoolDB[str(alertid)].find({'url':link}))) != 0:

@@ -45,7 +45,7 @@ def calculate_dates():
     current_milli_time = int(round(time() * 1000))
     one_day = 86400000
     l.append(('yesterday', current_milli_time - one_day))
-    l.append(('week', current_milli_time - 7 * one_day))
+    l.append(('week', current_milli_time - 14 * one_day))
     l.append(('month', current_milli_time - 30 * one_day))
     return l
 
@@ -60,6 +60,7 @@ def calc(alertid, dates):
 
 def main():
     dates = calculate_dates()
+    print(dates)
     for alertid in Connection.Instance().db.collection_names():
         if alertid != u'counters':
             calc(alertid, dates)
