@@ -50,7 +50,7 @@ def calculateLinks(alertid):
     for tweet in b:
         try:
             print(int(tweet['id_str']))
-            Connection.Instance().db[str(alertid)].find_one_and_update({'id_str':tweet['id_str'], {'isClicked': {'$exist': True}, 'isClicked': False}, {'$set': {'isClicked': True}})
+            Connection.Instance().db[str(alertid)].find_one_and_update({'id_str':tweet['id_str'], 'isClicked': {'$exist': True}, 'isClicked': False}, {'$set': {'isClicked': True}})
             tweet_tuple = {'user_id': tweet['user']['id_str'], 'tweet_id': tweet['id_str'], 'timestamp_ms': int(tweet['timestamp_ms'])}
             for link in tweet['entities']['urls']:
                 link = link['expanded_url']
