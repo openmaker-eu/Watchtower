@@ -56,7 +56,7 @@ def calculateLinks(alertid):
                 if link == None:
                     continue
                 link = unshorten_url(link)
-                if search('twitter', link) or search('twitter', link):
+                if search('ebay', link) or search('twitter', link):
                     continue
                 try:
                     if len(list(Connection.Instance().newsPoolDB[str(alertid)].find({'url':link}))) != 0:
