@@ -55,6 +55,8 @@ def calculateLinks(alertid):
         tweet_tuple = {'user_id': tweet['user']['id_str'], 'tweet_id': tweet['id_str'], 'timestamp_ms': int(tweet['timestamp_ms'])}
         for link in tweet['entities']['urls']:
             link = link['expanded_url']
+            if search('twitter', link):
+                continue
             if link == None:
                 continue
             link = unshorten_url(link)
@@ -81,7 +83,8 @@ def main():
     alertid_list = sorted(list(Connection.Instance().cur.fetchall()), reverse=True)
     alertid_list = [alertid[0] for alertid in alertid_list]
     print(alertid_list)
-    pool = ThreadPool(3, False)
+    alertid_list = [33]
+    pool = ThreadPool(1, False)
     pool.map(calculateLinks, alertid_list)
     pool.wait_completion()
 
