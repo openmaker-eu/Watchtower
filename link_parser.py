@@ -22,7 +22,7 @@ def get_next_links_sequence():
 def unshorten_url(url):
     return head(url, allow_redirects=True).url
 
-@timeout_decorator.timeout(10, use_signals=True)
+@timeout_decorator.timeout(15, use_signals=False)
 def linkParser(link):
     try:
         parsed_uri = urlparse(link)
@@ -34,11 +34,12 @@ def linkParser(link):
         keywords = article.keywords
         description = article.summary
         title = article.title
-
+        print('done')
         if image != "" and description != "" and title != "":
             dic = {'url': link, 'im':image, 'title': title, 'description': description, 'keywords': keywords, 'source': source}
             return dic
     except Exception as e:
+        print(e)
         pass
 
 def calculateLinks(alertid, tweet):
@@ -53,10 +54,12 @@ def calculateLinks(alertid, tweet):
                 continue
             try:
                 link = unshorten_url(link)
+                print(link)
                 if len(list(Connection.Instance().newsPoolDB[str(alertid)].find({'url':link}))) != 0:
                     Connection.Instance().newsPoolDB[str(alertid)].find_one_and_update({'url': link}, {'$push': {'mentions': tweet_tuple}})
                     continue
                 dic = linkParser(link)
+                print('dic: ', dic)
                 if dic != None:
                     if len(list(Connection.Instance().newsPoolDB[str(alertid)].find({'source':dic['source'], 'title':dic['title']}))) != 0:
                         Connection.Instance().newsPoolDB[str(alertid)].find_one_and_update({'source':dic['source'], 'title':dic['title']}, {'$push': {'mentions': tweet_tuple}})
@@ -65,6 +68,7 @@ def calculateLinks(alertid, tweet):
                         dic['mentions']=[tweet_tuple]
                         Connection.Instance().newsPoolDB[str(alertid)].insert_one(dic)
             except Exception as e:
+                print(e)
                 pass
     except Exception as e:
         pass

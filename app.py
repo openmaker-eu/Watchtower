@@ -156,7 +156,7 @@ class LoginHandler(BaseHandler, TemplateRendering):
         self.write(content)
 
     def post(self):
-        userinfo = logic.getUserInfo(self.get_argument("username"))
+        userinfo = logic.getUserInfo(str(self.get_argument("username")))
         userInputPassword = str(self.get_argument("password"))
         if userInputPassword == userinfo['password']:
             self.set_secure_cookie("userid", str(userinfo['userid']))
@@ -253,7 +253,7 @@ class CreateEditAlertsHandler(BaseHandler, TemplateRendering):
         alert['keywordlimit'] = keywordlimit
         #alert['excludedkeywords'] = ",".join(self.get_argument("excludedkeywords").split(","))
         if len(self.request.arguments.get("languages")) != 0:
-            alert['lang'] = ",".join(self.request.arguments.get("languages"))
+            alert['lang'] = b','.join(self.request.arguments.get("languages")).decode("utf-8") 
         else:
             alert['lang'] = ""
         if alertid != None:

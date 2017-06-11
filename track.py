@@ -18,6 +18,7 @@ def get_keywords(alertDic):
         alert = alertDic[key]
         keywords = keywords + alert['keywords']
     keywords = list(set(keywords))
+    keywords = [str(keyword) for keyword in keywords]
     return keywords
 
 def get_lang(alertDic):
@@ -26,6 +27,7 @@ def get_lang(alertDic):
         alert = alertDic[key]
         lang = lang + alert['lang']
     lang = list(set(lang))
+    lang = [str(l) for l in lang]
     return lang
 
 def get_next_tweets_sequence():
@@ -45,13 +47,13 @@ def separates_tweet(alertDic, tweet):
                 for keyword in alert['keywords']:
                     keyword = re.compile(keyword.replace(" ", "(.?)"), re.IGNORECASE)
                     if 'extended_tweet' in tweet and 'full_text' in tweet['extended_tweet']:
-                        if re.search(keyword, str(tweet['extended_tweet']['full_text'].decode('utf-8'))):
+                        if re.search(keyword, str(tweet['extended_tweet']['full_text'])):
                             tweet['_id'] = ObjectId()
                             Connection.Instance().db[str(alert['alertid'])].insert_one(tweet)
                             link_parser.calculateLinks(alert['alertid'], tweet)
                             break
                     else:
-                        if re.search(keyword, str(tweet['text'].decode('utf-8'))):
+                        if re.search(keyword, str(tweet['text'])):
                             tweet['_id'] = ObjectId()
                             Connection.Instance().db[str(alert['alertid'])].insert_one(tweet)
                             link_parser.calculateLinks(alert['alertid'], tweet)
@@ -90,6 +92,7 @@ class StdOutListener(StreamListener):
         return True
 
     def on_error(self, status):
+        print(status)
         if status == 420:
             return False
 
