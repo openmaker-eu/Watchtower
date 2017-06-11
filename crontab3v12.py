@@ -45,7 +45,7 @@ def linkParser(link):
 
 def calculateLinks(alertid):
     alertid = int(alertid)
-    b = Connection.Instance().db[str(alertid)].find({{'isClicked': {'$exist': True}, 'isClicked': False})
+    b = Connection.Instance().db[str(alertid)].find({'isClicked': {'$exist': True}, 'isClicked': False})
     print(b.count())
     for tweet in b:
         try:
