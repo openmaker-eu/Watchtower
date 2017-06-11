@@ -1,5 +1,4 @@
 from newspaper import Article
-import pymongo
 from application.Connections import Connection
 from application.ThreadPool import ThreadPool
 from requests import head

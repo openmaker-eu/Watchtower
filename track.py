@@ -9,6 +9,7 @@ from application.Connections import Connection
 import json
 import re
 from bson.objectid import ObjectId
+import link_parser
 
 def get_keywords(alertDic):
     keywords = []
@@ -47,11 +48,13 @@ def separates_tweet(alertDic, tweet):
                         if re.search(keyword, str(tweet['extended_tweet']['full_text'].decode('utf-8'))):
                             tweet['_id'] = ObjectId()
                             Connection.Instance().db[str(alert['alertid'])].insert_one(tweet)
+                            link_parser.calculateLinks(alert['alertid'], tweet)
                             break
                     else:
                         if re.search(keyword, str(tweet['text'].decode('utf-8'))):
                             tweet['_id'] = ObjectId()
                             Connection.Instance().db[str(alert['alertid'])].insert_one(tweet)
+                            link_parser.calculateLinks(alert['alertid'], tweet)
                             break
         except KeyError:
             pass
