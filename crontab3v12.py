@@ -36,8 +36,12 @@ def linkParser(link):
         description = article.summary
         title = article.title
 
-        if search(r"javascript is disabled error", description, IGNORECASE):
-            raise Exception("java script")
+        if link == 'https://techcrunch.com/2017/05/02/the-overlord-proplus-is-a-3d-printer-for-making-really-tall-objects/?ncid=rss&utm_source=dlvr.it&utm_medium=twitter':
+            print(link)
+            print(image)
+            print(title)
+            print(description)
+            print(keywords)
 
         if image != "" and description != "" and title != "":
             dic = {'url': link, 'im':image, 'title': title, 'description': description, 'keywords': keywords, 'source': source}
