@@ -18,6 +18,7 @@ def get_next_links_sequence():
     )
     return cursor['seq']
 
+@timeout_decorator.timeout(10, use_signals=False)
 def unshorten_url(url):
     return head(url, allow_redirects=True).url
 
@@ -25,6 +26,7 @@ def unshorten_url(url):
 def linkParser(link):
     try:
         print(link)
+        link = unshorten_url(link)
         parsed_uri = urlparse(link)
         source = '{uri.scheme}://{uri.netloc}/'.format(uri=parsed_uri)
         url = link
@@ -53,13 +55,11 @@ def calculateLinks(alertid):
             tweet_tuple = {'user_id': tweet['user']['id_str'], 'tweet_id': tweet['id_str'], 'timestamp_ms': int(tweet['timestamp_ms'])}
             for link in tweet['entities']['urls']:
                 link = link['expanded_url']
-                print(link)
                 if link == None:
                     continue
                 if search('twitter', link):
                     continue
                 try:
-                    link = unshorten_url(link)
                     if len(list(Connection.Instance().newsPoolDB[str(alertid)].find({'url':link}))) != 0:
                         print(alertid, " link var \n", tweet_tuple)
                         Connection.Instance().newsPoolDB[str(alertid)].find_one_and_update({'url': link}, {'$push': {'mentions': tweet_tuple}})
