@@ -45,12 +45,12 @@ def linkParser(link):
 
 def calculateLinks(alertid):
     alertid = int(alertid)
-    b = Connection.Instance().db[str(alertid)].find({'isClicked': False})
+    b = Connection.Instance().db[str(alertid)].find({{'isClicked': {'$exist': True}, 'isClicked': False})
     print(b.count())
     for tweet in b:
         try:
             print(int(tweet['id_str']))
-            Connection.Instance().db[str(alertid)].find_one_and_update({'id_str':tweet['id_str'], 'isClicked': False}, {'$set': {'isClicked': True}})
+            Connection.Instance().db[str(alertid)].find_one_and_update({'id_str':tweet['id_str'], {'isClicked': {'$exist': True}, 'isClicked': False}, {'$set': {'isClicked': True}})
             tweet_tuple = {'user_id': tweet['user']['id_str'], 'tweet_id': tweet['id_str'], 'timestamp_ms': int(tweet['timestamp_ms'])}
             for link in tweet['entities']['urls']:
                 link = link['expanded_url']
@@ -85,7 +85,7 @@ def main():
     alertid_list = sorted(list(Connection.Instance().cur.fetchall()), reverse=True)
     alertid_list = [alertid[0] for alertid in alertid_list]
     print(alertid_list)
-    alertid_list = [32]
+    alertid_list = [31]
     pool = ThreadPool(1, False)
     pool.map(calculateLinks, alertid_list)
     pool.wait_completion()
