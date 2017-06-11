@@ -18,7 +18,6 @@ def get_next_links_sequence():
     )
     return cursor['seq']
 
-@timeout_decorator.timeout(10, use_signals=False)
 def unshorten_url(url):
     return head(url, allow_redirects=True).url
 
