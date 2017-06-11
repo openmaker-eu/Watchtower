@@ -22,7 +22,7 @@ def get_next_links_sequence():
 def unshorten_url(url):
     return head(url, allow_redirects=True).url
 
-@timeout_decorator.timeout(15, use_signals=False)
+@timeout_decorator.timeout(10, use_signals=False)
 def linkParser(link):
     try:
         #print(link)
@@ -86,7 +86,7 @@ def main():
     alertid_list = sorted(list(Connection.Instance().cur.fetchall()), reverse=True)
     alertid_list = [alertid[0] for alertid in alertid_list]
     print(alertid_list)
-    alertid_list = [21]
+    alertid_list = [30]
     pool = ThreadPool(1, False)
     pool.map(calculateLinks, alertid_list)
     pool.wait_completion()
