@@ -114,8 +114,13 @@ class StreamCreator():
         self.stream = Stream(self.auth, self.l)
         self.t = threading.Thread(target = self.stream.filter, kwargs = {'track':self.keywords, 'languages':self.lang} )
     def start(self):
-        self.t.deamon = True
-        self.t.start()
+        try:
+            self.t.deamon = True
+            self.t.start()
+        except Exception as e:
+            f = open('../log.txt', 'a+')
+            f.write(e)
+            f.close()
     def terminate(self):
         self.l.running = False
         self.l.stop()
