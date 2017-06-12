@@ -9,6 +9,7 @@ from tldextract import extract
 import timeout_decorator
 from re import search, IGNORECASE
 import sys
+from tldextract import extract
 
 def get_next_links_sequence():
     cursor = Connection.Instance().newsPoolDB["counters"].find_and_modify(
@@ -27,6 +28,7 @@ def linkParser(link):
     try:
         parsed_uri = urlparse(link)
         source = '{uri.scheme}://{uri.netloc}/'.format(uri=parsed_uri)
+        domain = extract(link).domain
         url = link
         article = Article(url)
         article.build()
@@ -35,7 +37,7 @@ def linkParser(link):
         description = article.summary
         title = article.title
         if image != "" and description != "" and title != "":
-            dic = {'url': link, 'im':image, 'title': title, 'description': description, 'keywords': keywords, 'source': source}
+            dic = {'url': link, 'im':image, 'title': title, 'domain': domain, 'description': description, 'keywords': keywords, 'source': source}
             print('done')
             return dic
     except Exception as e:
