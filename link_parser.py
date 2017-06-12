@@ -1,4 +1,3 @@
-#!/usr/bin/python3
 from newspaper import Article
 from application.Connections import Connection
 from application.ThreadPool import ThreadPool
