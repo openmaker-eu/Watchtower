@@ -1,7 +1,7 @@
 from application.Connections import Connection
 from time import gmtime, strftime, time
 
-def getDateList(alertid, date):
+def getDateList(alertid, date, forbidden_domain):
     return list(Connection.Instance().newsPoolDB[str(alertid)].aggregate([
         {'$project': {
                 'link_id':1,
@@ -12,6 +12,7 @@ def getDateList(alertid, date):
                 'description':1,
                 'title':1,
                 'keywords':1,
+                'domain':1,
                 'mentions': {
                     '$filter': {
                         'input': "$mentions",
@@ -27,6 +28,7 @@ def getDateList(alertid, date):
          },
         {'$project': {
                 'link_id':1,
+                'domain': 1,
                 'source':1,
                 '_id':0,
                 'im':1,
@@ -36,7 +38,10 @@ def getDateList(alertid, date):
                 'keywords':1,
                 'popularity': {'$size': '$mentions'}
             }},
-            {'$match': {'popularity' : {"$gt" : 0}}},
+            {'$match': {
+                'popularity' : {"$gt" : 0},
+                'domain': {'$nin': forbidden_domain}
+            }},
             {'$sort': {'popularity': -1}},
             {'$limit': 60}
     ]))
@@ -50,21 +55,23 @@ def calculate_dates():
     l.append(('month', current_milli_time - 30 * one_day))
     return l
 
-def calc(alertid, dates):
+def calc(alertid, dates, forbidden_domain):
     for date, current_milli_time in dates:
         result = {
             'name': date,
-            date: getDateList(alertid, current_milli_time),
-            'date': strftime("%a, %d %b %Y %H:%M:%S", gmtime())
+            date: getDateList(alertid, current_milli_time, forbidden_domain),
+            'modified_date': strftime("%a, %d %b %Y %H:%M:%S", gmtime())
         }
-        Connection.Instance().filteredNewsPoolDB[str(alertid)].insert_one(result)
+        if result[date] != []:
+            Connection.Instance().filteredNewsPoolDB[str(alertid)].remove({'name': result['name']})
+            Connection.Instance().filteredNewsPoolDB[str(alertid)].insert_one(result)
 
 def main():
     dates = calculate_dates()
     print(dates)
     for alertid in Connection.Instance().db.collection_names():
         if alertid != u'counters':
-            calc(alertid, dates)
+            calc(alertid, dates, [])
 
 if __name__ == '__main__':
     main()

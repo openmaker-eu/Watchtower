@@ -2,7 +2,7 @@ import tornado.web
 import tornado.options
 import tornado.ioloop
 from tornado.escape import json_encode
-import logic, api, newapi
+import logic, api, newapi, apiv12
 from jinja2 import Environment, FileSystemLoader, TemplateNotFound
 from threading import Thread
 import os
@@ -59,6 +59,7 @@ class Application(tornado.web.Application):
             (r"/newTweets/(.*)", NewTweetsHandler, {'mainT':mainT}),
             (r"/api", DocumentationHandler, {'mainT':mainT}),
             (r"/api/v1\.1", Documentationv11Handler, {'mainT':mainT}),
+            (r"/api/v1\.2", Documentationv12Handler, {'mainT':mainT}),
             (r"/api/get_themes", ThemesHandler, {'mainT':mainT}),
             (r"/api/get_influencers/(.*)/(.*)", InfluencersHandler, {'mainT':mainT}),
             (r"/api/get_feeds/(.*)/(.*)", FeedsHandler, {'mainT':mainT}),
@@ -67,9 +68,52 @@ class Application(tornado.web.Application):
             (r"/api/v1.1/get_themes", ThemesV11Handler, {'mainT':mainT}),
             (r"/api/v1.1/get_feeds", FeedsV11Handler, {'mainT':mainT}),
             (r"/api/v1.1/get_influencers", InfluencersV11Handler, {'mainT':mainT}),
+            (r"/api/v1.2/get_themes", ThemesV12Handler, {'mainT':mainT}),
+            (r"/api/v1.2/get_feeds", FeedsV12Handler, {'mainT':mainT}),
+            (r"/api/v1.2/get_influencers", InfluencersV12Handler, {'mainT':mainT}),
             (r"/(.*)", tornado.web.StaticFileHandler, {'path': settings['static_path']}),
         ]
         super(Application, self).__init__(handlers, **settings)
+
+class ThemesV12Handler(BaseHandler, TemplateRendering):
+    def get(self):
+        themes = apiv12.getThemes(4)
+        self.set_header('Content-Type', 'application/json')
+        self.write(themes)
+
+class FeedsV12Handler(BaseHandler, TemplateRendering):
+    def get(self):
+        themename = self.get_argument("themename", None)
+        themeid = self.get_argument("themeid", None)
+        forbidden_domain = self.get_argument("forbidden_domain", "").split(",")
+        try:
+            cursor = int(self.get_argument("cursor"))
+            if cursor == -1:
+                cursor = 0
+        except:
+            cursor = 0
+            pass
+        date = str(self.get_argument("date", "month"))
+        feeds = apiv12.getFeeds(themename, themeid, date, cursor, forbidden_domain)
+        self.set_header('Content-Type', 'application/json')
+        self.write(feeds)
+
+class InfluencersV12Handler(BaseHandler, TemplateRendering):
+    def get(self):
+        themename = str(self.get_argument("themename", None))
+        themeid = str(self.get_argument("themeid", None))
+        feeds = apiv12.getInfluencers(themename, themeid)
+        self.set_header('Content-Type', 'application/json')
+        self.write(feeds)
+
+class Documentationv12Handler(BaseHandler, TemplateRendering):
+    def get(self):
+        template = 'apiv12.html'
+        variables = {
+            'title' : "Watchtower Api v1.2"
+        }
+        content = self.render_template(template, variables)
+        self.write(content)
 
 class ThemesV11Handler(BaseHandler, TemplateRendering):
     def get(self):
@@ -101,15 +145,6 @@ class InfluencersV11Handler(BaseHandler, TemplateRendering):
         self.set_header('Content-Type', 'application/json')
         self.write(feeds)
 
-class DocumentationHandler(BaseHandler, TemplateRendering):
-    def get(self):
-        template = 'api.html'
-        variables = {
-            'title' : "Watchtower Api"
-        }
-        content = self.render_template(template, variables)
-        self.write(content)
-
 class Documentationv11Handler(BaseHandler, TemplateRendering):
     def get(self):
         template = 'apiv11.html'
@@ -136,6 +171,15 @@ class FeedsHandler(BaseHandler, TemplateRendering):
         feeds = logic.getFeeds(themename, cursor)
         self.set_header('Content-Type', 'application/json')
         self.write(feeds)
+
+class DocumentationHandler(BaseHandler, TemplateRendering):
+    def get(self):
+        template = 'api.html'
+        variables = {
+            'title' : "Watchtower Api"
+        }
+        content = self.render_template(template, variables)
+        self.write(content)
 
 class MainHandler(BaseHandler, TemplateRendering):
     def get(self):
@@ -253,7 +297,7 @@ class CreateEditAlertsHandler(BaseHandler, TemplateRendering):
         alert['keywordlimit'] = keywordlimit
         #alert['excludedkeywords'] = ",".join(self.get_argument("excludedkeywords").split(","))
         if len(self.request.arguments.get("languages")) != 0:
-            alert['lang'] = b','.join(self.request.arguments.get("languages")).decode("utf-8") 
+            alert['lang'] = b','.join(self.request.arguments.get("languages")).decode("utf-8")
         else:
             alert['lang'] = ""
         if alertid != None:
