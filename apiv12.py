@@ -7,7 +7,7 @@ import dateFilter, crontab3
 def getThemes(userid):
     Connection.Instance().cur.execute("select alertid, alertname, description from alerts where ispublish = %s", [True])
     var = Connection.Instance().cur.fetchall()
-    themes = [{'alertid':i[0], 'name':i[1], 'description': i[2]} for i in var]
+    themes = [{'themeid':i[0], 'themename':i[1], 'description': i[2]} for i in var]
     result = {}
     result['themes'] = themes
     return json.dumps(result, indent=4)

@@ -85,7 +85,7 @@ class FeedsV12Handler(BaseHandler, TemplateRendering):
     def get(self):
         themename = self.get_argument("themename", None)
         themeid = self.get_argument("themeid", None)
-        forbidden_domain = self.get_argument("forbidden_domain", "").split(",")
+        forbidden_domain = self.get_argument("forbidden_domains", "").split(",")
         try:
             cursor = int(self.get_argument("cursor"))
             if cursor == -1:
