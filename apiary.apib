@@ -1,0 +1,780 @@
+FORMAT: 1A
+HOST: http://138.68.92.181:8484/api/v1.2
+
+# Watchtower API v1.2
+
+Watchtower is a simple API allowing consumers to view the given theme's influencers and feeds.
+
+## Themes Collection [/v1.2/get_themes]
+
+### List All Themes [GET]
+
++ Response 200 (application/json)
+
+        {
+            "themes": [
+                {
+                    "alertid": 32,
+                    "name": "raspberry pi",
+                    "description": "Please, fill this area!"
+                },
+                {
+                    "alertid": 33,
+                    "name": "3d printer",
+                    "description": "Please, fill this area!"
+                },
+                {
+                    "alertid": 31,
+                    "name": "arduino",
+                    "description": "Please, fill this area!"
+                }
+            ]
+        }
+## Feeds Collection [/v1.2/get_feeds]
+
+### List All feeds of given theme [GET]
+
++ Response 200 (application/json)
+
+        {
+            "next_cursor": 20,
+            "next_cursor_str": "20",
+            "feeds": [
+                {
+                    "url": "https://3dprintingindustry.com/news/use-computer-aided-engineering-improve-3d-printer-115641/?utm_source=Twitter",
+                    "im": "https://3dprintingindustry.com/wp-content/uploads/2017/06/SIMSCALE_WORK_CLEAN_201511-2613.jpg",
+                    "title": "How to use computer aided engineering to improve a 3D printer",
+                    "description": "How to use computer aided engineering to improve a 3D printerThis month marks five years since I seriously got interested in 3D printing.\nWith the use computer aided engineering (CAE), RepRap designers could take a leap forward in their journey to making their printers perform better.\nI highly encourage you to enter the world of RepRap 3D printers is the place to go if you are looking for an engineering adventure.\nIn the case you want to learn how to leverage simulation for your own 3D printer designs you should join the free online workshop series organized in collaboration with SimScale.\nDuring the three weekly sessions, the participants will learn the fundamentals of engineering simulation/CAE and will expand their knowledge by improving the design of the RepRap 3D printer.",
+                    "keywords": [
+                        "engineering",
+                        "aided",
+                        "improve",
+                        "getting",
+                        "printers",
+                        "elements",
+                        "need",
+                        "simulation",
+                        "print",
+                        "computer",
+                        "reprap",
+                        "printer",
+                        "3d"
+                    ],
+                    "source": "https://3dprintingindustry.com/",
+                    "link_id": 24687,
+                    "domain": "3dprintingindustry",
+                    "popularity": 40
+                },
+                {
+                    "link_id": 6419,
+                    "source": "https://www.bittopper.com/",
+                    "im": "https://www.bittopper.com/c/37/78/65/bittopper_377865d196e4db525f33035b9c57b59b-sunwing-3d-stereoscopic-drawing-doodling-printing-pen-arts.jpg",
+                    "url": "https://www.bittopper.com/item/sunwing-3d-stereoscopic-drawing-doodling-printing-pen-arts/",
+                    "description": "What is SUNWING 3D pen ?\nSUNWING 3D printing pen is a tool for the creative minds of our generation.\n3D Pen has been significantly improved upon as compared to other models that already exist on the market.\nHow does the SUNWING 3D pen work ?\nThe SUNWING 3D Pen uses filaments that extrude from the nozzle/tip once heated within the pen.",
+                    "keywords": [
+                        "led",
+                        "plastic",
+                        "speed",
+                        "objects",
+                        "quadpro",
+                        "tool",
+                        "kids",
+                        "toy",
+                        "hand",
+                        "pen",
+                        "3d",
+                        "creative",
+                        "printing",
+                        "sunwing",
+                        "minds",
+                        "making",
+                        "instantly"
+                    ],
+                    "title": "Sunwing 3d-printing-pen & 3D-printer-pen,Best Birthday DIY Toy for Kids with LED Display (Blue) by QuadPro What is SUNWING 3D pen ? SUNWING 3D printing pen is a tool for the creative minds of our gene",
+                    "domain": "bittopper",
+                    "popularity": 22
+                },
+                {
+                    "url": "https://3dprint.com/177513/boat-and-ship-3d-printing/",
+                    "im": "https://3dprint.com/wp-content/uploads/2017/06/picture-1-.jpg",
+                    "title": "Boat and Ship Industry Ideal for 3D Printer R&D Tax Credits",
+                    "description": "Accordingly, developing 3D printing technology is ideal for this industry and analyzing 3D printer alternatives and integrating them into commercial marine facilities is often eligible for R&D tax credits.\nDrip TrayAlthough 3D printing may seem like a daunting idea, it is not too difficult for the average person to use.\nExisting designs that may be printed to be used as boat parts include sail slides, batten ends, and valve covers.\nIn 2013, HSVA purchased an Objet Eden 350V 3D printer in an effort to reduce costs and production time.\nCharles Goulding and Rafaella July of R&D Tax Savers discuss 3D printing and the maritime industry.",
+                    "keywords": [
+                        "rd",
+                        "printer",
+                        "3d",
+                        "spare",
+                        "parts",
+                        "tax",
+                        "printing",
+                        "need",
+                        "boat",
+                        "ideal",
+                        "technology",
+                        "credits",
+                        "industry",
+                        "ship"
+                    ],
+                    "source": "https://3dprint.com/",
+                    "link_id": 15368,
+                    "domain": "3dprint",
+                    "popularity": 11
+                },
+                {
+                    "link_id": 6586,
+                    "source": "https://3dprint.com/",
+                    "im": "https://3dprint.com/wp-content/uploads/2015/12/3dp_300x125-300x125.jpg",
+                    "url": "https://3dprint.com/",
+                    "description": "Anything Related to the 3D Printing Industry which doesn't belong in the our other folders goes here.Discuss the various 3D Printers on the Market.\nPlease make sure there isn't already a folder for the printer you wish to discuss in our Specific 3D Printer Folders.Discussion related to 3D Printer parts, such as hot ends, extruders, and anything else you may want to discuss related to printer parts, as well as filament, resin, and sintering powder.",
+                    "keywords": [
+                        "parts",
+                        "printer",
+                        "related",
+                        "sure",
+                        "manufacturing",
+                        "3d",
+                        "various",
+                        "printing",
+                        "wish",
+                        "additive",
+                        "sintering",
+                        "specific",
+                        "discuss",
+                        "voice"
+                    ],
+                    "title": "The Voice of 3D Printing / Additive Manufacturing",
+                    "domain": "3dprint",
+                    "popularity": 9
+                },
+                {
+                    "url": "https://www.livescience.com/59386-self-replicating-3d-printer-moon-bases.html?utm_source=twitter&utm_medium=social&utm_campaign=Feed%3A+Livesciencecom+%28LiveScience.com+Science+Headline+Feed%29&utm_content=buffer070d9",
+                    "im": "https://img.purch.com/h/1000/aHR0cDovL3d3dy5saXZlc2NpZW5jZS5jb20vaW1hZ2VzL2kvMDAwLzA5Mi84MzUvb3JpZ2luYWwvM0QtcHJpbnRlZC1tb3Rvci0wMDEuanBn",
+                    "title": "Self-Replicating 3D Printers Could Build Moon Bases, Fight Global Warming",
+                    "description": "The team is trying to make self-replicating 3D printers from materials that can be found on the moon.\nA 3D printer that could re-create itself from lunar material is in development at a university in Canada.\n[How Moon Bases and Lunar Colonies Work (Infographic)]The engineer envisions a single 3D printer could be delivered to the moon, where it would make thousands of its copies from surrounding lunar material.\nOnce there would be enough 3D printers, the self-replicating factory would focus on building all other equipment and infrastructure needed for human exploration.\nCredit: Alex Ellery via GIPHY\"We have looked at vacuum tubes because trying to create solid-state electronics would be virtually impossible on the moon,\" Ellery said.",
+                    "keywords": [
+                        "build",
+                        "3d",
+                        "printers",
+                        "global",
+                        "fight",
+                        "bases",
+                        "lunar",
+                        "ellery",
+                        "plastic",
+                        "material",
+                        "warming",
+                        "university",
+                        "moon",
+                        "selfreplicating",
+                        "3dprint",
+                        "motor"
+                    ],
+                    "source": "https://www.livescience.com/",
+                    "link_id": 16159,
+                    "domain": "livescience",
+                    "popularity": 8
+                },
+                {
+                    "link_id": 6937,
+                    "source": "http://www.digitalto3d.com/",
+                    "im": "http://www.digitalto3d.com/wp-content/uploads/2015/12/3d-printer-comparisons.jpg",
+                    "url": "http://www.digitalto3d.com/3d-printer-comparison-and-a-description-of-its-features/?utm_source=ReviveOldPost&utm_medium=social&utm_campaign=ReviveOldPost",
+                    "description": "There are several 3D printers available in the market to serve the purpose of 3D printing.\nTalking about the various kinds of 3D printers for 3D printer comparison, we can start with discussing the features of the Robo 3D R1 printer which happens to be a fully assembled printer with dimensions such as 8*9*10 inches in size and does the work of printing layers up to a maximum of hundred microns.\nFlash Forge 3D printer on the other hand, is another type of 3D printer has the overall dimensions of 320 X 467 X 381 millimeters, and packing dimensions of 580*450*550 millimeters.\nWhile talking about the Makerbot Replicator 3D printer, it happens to be the fastest and easiest when concerned with 3D modeling of good professional quality.\nThis kind of a printer comes with a metal frame that happens to be much hardy than printers of other types.",
+                    "keywords": [
+                        "printer",
+                        "replicator",
+                        "printers",
+                        "comes",
+                        "type",
+                        "plate",
+                        "machine",
+                        "3d",
+                        "comparison",
+                        "printing",
+                        "description",
+                        "kinds",
+                        "features"
+                    ],
+                    "title": "3D Printer Comparison and a Description of its Features",
+                    "domain": "digitalto3d",
+                    "popularity": 7
+                },
+                {
+                    "url": "https://3dprinterchat.com/",
+                    "link_id": 14112,
+                    "source": "https://3dprinterchat.com/",
+                    "title": "3D Printer Chat \u2013 3D Printing News, Articles, Reviews and How To\u00b4s",
+                    "keywords": [
+                        "market",
+                        "3d",
+                        "growing",
+                        "far",
+                        "successfully",
+                        "chat",
+                        "printer",
+                        "thats",
+                        "reviews",
+                        "labor",
+                        "idea",
+                        "stage",
+                        "articles",
+                        "harder",
+                        "fortunately",
+                        "tos",
+                        "printing"
+                    ],
+                    "description": "Being an entrepreneur is far from being an easy labor.\nThere are many, many difficulties to face before bringing your idea to the market.\nBut that's actually the beginning of a harder stage: Successfully growing your business.\nFortunately, there are",
+                    "im": "https://3dprinterchat.com/wp-content/uploads/2016/01/logo-9.png",
+                    "domain": "3dprinterchat",
+                    "popularity": 6
+                },
+                {
+                    "url": "https://www.3dprint.com/177513/boat-and-ship-3d-printing/",
+                    "im": "https://www.3dprint.com/wp-content/uploads/2017/06/picture-1-.jpg",
+                    "title": "Boat and Ship Industry Ideal for 3D Printer R&D Tax Credits",
+                    "description": "Accordingly, developing 3D printing technology is ideal for this industry and analyzing 3D printer alternatives and integrating them into commercial marine facilities is often eligible for R&D tax credits.\nDrip TrayAlthough 3D printing may seem like a daunting idea, it is not too difficult for the average person to use.\nExisting designs that may be printed to be used as boat parts include sail slides, batten ends, and valve covers.\nIn 2013, HSVA purchased an Objet Eden 350V 3D printer in an effort to reduce costs and production time.\nCharles Goulding and Rafaella July of R&D Tax Savers discuss 3D printing and the maritime industry.",
+                    "keywords": [
+                        "rd",
+                        "printer",
+                        "3d",
+                        "spare",
+                        "parts",
+                        "tax",
+                        "printing",
+                        "need",
+                        "boat",
+                        "ideal",
+                        "technology",
+                        "credits",
+                        "industry",
+                        "ship"
+                    ],
+                    "source": "https://www.3dprint.com/",
+                    "link_id": 17091,
+                    "domain": "3dprint",
+                    "popularity": 6
+                },
+                {
+                    "url": "https://www.i4u.com/2017/06/123306/3d-printer-houses-startup-contour-crafting-gets-funded-traditional-construction-compa?utm_source=dlvr.it&utm_medium=twitter",
+                    "im": "https://static1.i4u.com/sites/default/files/imagecache/main_image_large/images/2017/06/3ddrucker-contour-crafting-1.jpg",
+                    "title": "3D Printer For Houses Startup Contour Crafting Gets Funded By Traditional Construction Company",
+                    "description": "Contour Crafting Corporation is set to start series production of deployable robotic 3D construction printers.\n\u201cVery soon, we\u2019ll have the first series-ready deployable robotic 3D construction printer\u201d says Behrokh Khoshnevis, President and CEO of Contour Crafting Corporation.\nThe investment of a traditional construction technology company validates the technlogy Contour Crafting has developed.\nThe robotic 3D construction printers are designed for use wherever accommodation and infrastructure have to be provided rapidly and affordably.\nIn addition to manufacturing and selling robotic 3D construction printers, Contour Crafting Corporation also intends to provide on-site building construction as a service.",
+                    "keywords": [
+                        "printer",
+                        "gets",
+                        "construction",
+                        "company",
+                        "3d",
+                        "funded",
+                        "printers",
+                        "corporation",
+                        "building",
+                        "traditional",
+                        "houses",
+                        "khoshnevis",
+                        "robotic",
+                        "crafting",
+                        "technology",
+                        "startup",
+                        "contour"
+                    ],
+                    "source": "https://www.i4u.com/",
+                    "link_id": 17692,
+                    "domain": "i4u",
+                    "popularity": 5
+                },
+                {
+                    "title": "Win an Anet A8 3D Printer!",
+                    "link_id": 18142,
+                    "url": "https://contest.io/c/4fcnppcy",
+                    "source": "https://contest.io/",
+                    "keywords": [
+                        "win",
+                        "worldwide",
+                        "a8",
+                        "printerto",
+                        "window",
+                        "printer",
+                        "visit",
+                        "anet",
+                        "sponsors",
+                        "quarterly",
+                        "3d"
+                    ],
+                    "description": "Win an Anet A8 3D Printer!\nThis is a part of our Big Quarterly Giveaway at 3D PrinterChat together with Maker Hacks.\nThis Competition is Worldwide!\nWin a Anet A8 3D Printer!\nTo be Eligible To Win You Also Need to Visit Our Sponsors At https://3dprinterchat.com/win-a-3d-printer(Above Link Opens in a New Window)",
+                    "im": "http://contests-cdn.s3.amazonaws.com/11333/18830/0de4b1694bb07664622a0abda12ac7f1.jpg",
+                    "domain": "contest",
+                    "popularity": 5
+                },
+                {
+                    "link_id": 6482,
+                    "source": "https://www.amazon.co.uk/",
+                    "im": "https://images-eu.ssl-images-amazon.com/images/I/51+Dq1QEKZL._AC_US160_.jpg",
+                    "url": "https://www.amazon.co.uk/s/?_encoding=UTF8&camp=3194&creative=21334&linkCode=shr&tag=jonsinfocom-21&st=as:off&rh=i:aps,k:3d+printer,p_89:Riverside&keywords=3d+printer&qid=1454855873",
+                    "description": "Unlimited One-Day Delivery and morePrime members also enjoy exclusive access to movies and TV shows, two million songs and much more.",
+                    "keywords": [
+                        "printer",
+                        "songs",
+                        "unlimited",
+                        "movies",
+                        "members",
+                        "shows",
+                        "3d",
+                        "amazoncouk",
+                        "exclusive",
+                        "tv",
+                        "million",
+                        "oneday",
+                        "moreprime"
+                    ],
+                    "title": "Amazon.co.uk: 3d printer",
+                    "domain": "amazon",
+                    "popularity": 5
+                },
+                {
+                    "link_id": 6693,
+                    "source": "http://mashable.com/",
+                    "im": "http://i.amz.mshcdn.com/9ZiOQVehhRGvQoQmAtJOTZKO9V4=/1200x630/2017%2F03%2F03%2Fac%2F5ff546e4771040a9a93f8f7dba319eb2.b2a9d.jpg",
+                    "url": "http://mashable.com/2017/03/03/lowcost-house-3d-printed-in-a-day-/",
+                    "description": "This is the first residential house 3D-printed onsite with a mobile printer.\nIt only took 24 hours and costs $10,134.\nThe company, Apis Cor, hopes that this can provide an alternative to traditional construction methods and create affordable housing.",
+                    "keywords": [
+                        "residential",
+                        "traditional",
+                        "printer",
+                        "provide",
+                        "methods",
+                        "hours",
+                        "24",
+                        "3d",
+                        "onsite",
+                        "build",
+                        "house",
+                        "mobile",
+                        "entire",
+                        "housing",
+                        "took"
+                    ],
+                    "title": "Mobile 3D printer can build an entire house in just 24 hours",
+                    "domain": "mashable",
+                    "popularity": 4
+                },
+                {
+                    "url": "http://dennismedler3dprintingreviews.com/index.php/2017/06/10/alunar-metal-3d-printer-fully-assembled-high-precision-auto-leveling-fdm-desktop-3d-printing-machine-for-educationindustryfun-special-heated-bed/",
+                    "im": "http://dennismedler3dprintingreviews.com/wp-content/uploads/2017/06/51kx4aosNML.jpg",
+                    "title": "ALUNAR Metal 3D Printer Fully Assembled High Precision Auto-Leveling FDM Desktop 3D Printing Machine for Education/Industry/Fun Special Heated BedALUNAR Metal 3D Printer Fully Assembled High Precision",
+                    "description": "Any price and availability information displayed on [relevant Amazon Site(s), as applicable] at the time of purchase will apply to the purchase of this product.\nProduct DescriptionWhy Alunar 3D printingExpand or discover a new hobby3D printing opens up a new world of creative possibility and self-expression.\nWith 3D printing, if you can dream it, you can make it.\nPersonalize and customize items3D printing gives you the ability to design something unique through endless personalization and customization opportunities.\nExpand your creation by using the Alunar 3D Printer with other tools to create multi-material projects.",
+                    "keywords": [
+                        "purchase",
+                        "degree",
+                        "axis",
+                        "high",
+                        "positioning",
+                        "head",
+                        "printing",
+                        "machine",
+                        "assembled",
+                        "print",
+                        "special",
+                        "89",
+                        "power",
+                        "fully",
+                        "precision",
+                        "printer",
+                        "3d",
+                        "metal"
+                    ],
+                    "source": "http://dennismedler3dprintingreviews.com/",
+                    "link_id": 21887,
+                    "domain": "dennismedler3dprintingreviews",
+                    "popularity": 4
+                },
+                {
+                    "url": "http://www.middletownpress.com/health/20170611/cheshire-man-using-3d-printer-at-new-havens-makehaven-to-build-prosthetic-hands-for-kids",
+                    "im": "http://www.middletownpress.com/apps/pbcsi.dll/storyimage/MI/20170611/NEWS/170619956/AR/0/AR-170619956.jpg?Maxh=1500&Maxw=1500",
+                    "title": "Cheshire man using 3D printer at New Haven\u2019s MakeHaven to build prosthetic hands for kids",
+                    "description": "His new membership to MakeHaven gave him access to the organization\u2019s three-dimensional printers and, together with plans from the Prosthetic Kids Hand Challenge, he\u2019s been creating prosthetic hands for children.\nAdvertisementTechnology helps those in needO\u2019Donnell sends his hands to the Hand Challenge, which tests them and sends them on to those who request them.\nIn order to use the plastic hand, which is built from more than 25 3D-printed parts, as well as fishing line and tensioners, the child must still have a wrist.\nBesides the hands, O\u2019Donnell also has been experimenting with a robotic arm.\n\u2026 They would be more single purpose.\u201dHe said MakeHaven\u2019s 3D printers, MakerBot Replicator 2\u2019s, are suited for the prosthetic hands he\u2019s making, which will fit a 3- or 4-year-old.",
+                    "keywords": [
+                        "challenge",
+                        "things",
+                        "prosthetic",
+                        "man",
+                        "build",
+                        "hand",
+                        "odonnell",
+                        "need",
+                        "makehaven",
+                        "craft",
+                        "using",
+                        "plastic",
+                        "cheshire",
+                        "kids",
+                        "havens",
+                        "hands",
+                        "printer",
+                        "theres"
+                    ],
+                    "source": "http://www.middletownpress.com/",
+                    "link_id": 22235,
+                    "domain": "middletownpress",
+                    "popularity": 4
+                },
+                {
+                    "url": "https://3dprint.com/167712/boston-engineering-rize-one/",
+                    "im": "https://3dprint.com/wp-content/uploads/2017/03/Rize-Boston-featured.png",
+                    "title": "Rize One 3D Printer Case Study: Cut the Post-Processing, Cut the Costs & Time in 3D Printing",
+                    "description": "Boston Engineering works hard to beat its competition and solve client challenges, by quickly getting products to market or designing the products themselves.\nAs the desktop 3D printer is portable, environmentally-friendly, and requires no post-processing, it\u2019s safe to use in an office environment \u2013 by design.\nRecently, one of our clients took a Rize 3D printed part back to his office to show his team.\nFirst off, the printer itself cost a lot less than the company\u2019s existing FDM 3D printer.\nDePiano hopes that as the Boston Engineering team grows bigger, they will be able to add an additional Rize One 3D printer upstairs.",
+                    "keywords": [
+                        "engineering",
+                        "printed",
+                        "costs",
+                        "study",
+                        "engineers",
+                        "printing",
+                        "rize",
+                        "postprocessing",
+                        "parts",
+                        "case",
+                        "speed",
+                        "cut",
+                        "boston",
+                        "printer",
+                        "3d"
+                    ],
+                    "source": "https://3dprint.com/",
+                    "link_id": 22615,
+                    "domain": "3dprint",
+                    "popularity": 4
+                },
+                {
+                    "url": "https://www.youtube.com/watch?v=pEV_lTtuz6U&feature=youtu.be&a",
+                    "im": "https://i.ytimg.com/vi/pEV_lTtuz6U/hqdefault.jpg",
+                    "title": "3D Printer with auto ejection system. Open Source.",
+                    "description": "Autoplay Wenn Autoplay aktiviert ist, wird die Wiedergabe automatisch mit einem der aktuellen Videovorschl\u00e4ge fortgesetzt.\nN\u00e4chstes Video",
+                    "keywords": [
+                        "printer",
+                        "ejection",
+                        "3d",
+                        "auto",
+                        "videovorschl\u00e4ge",
+                        "system",
+                        "fortgesetztn\u00e4chstes",
+                        "open",
+                        "ist",
+                        "wiedergabe",
+                        "einem",
+                        "mit",
+                        "source",
+                        "autoplay",
+                        "wird",
+                        "wenn",
+                        "video"
+                    ],
+                    "source": "https://www.youtube.com/",
+                    "link_id": 19948,
+                    "domain": "youtube",
+                    "popularity": 4
+                },
+                {
+                    "url": "https://www.space.com/37101-self-replicating-3d-printer-moon-bases.html",
+                    "im": "https://img.purch.com/h/1000/aHR0cDovL3d3dy5zcGFjZS5jb20vaW1hZ2VzL2kvMDAwLzA2Ni83MTAvb3JpZ2luYWwvM0QtcHJpbnRlZC1tb3Rvci0wMDEuanBn",
+                    "title": "Self-Replicating 3D Printers Could Build Moon Bases, Fight Global Warming",
+                    "description": "The team is trying to make self-replicating 3D printers from materials that can be found on the moon.\nA 3D printer that could re-create itself from lunar material is in development at a university in Canada.\n[How Moon Bases and Lunar Colonies Work (Infographic)]The engineer envisions a single 3D printer could be delivered to the moon, where it would make thousands of its copies from surrounding lunar material.\nOnce there would be enough 3D printers, the self-replicating factory would focus on building all other equipment and infrastructure needed for human exploration.\nCredit: Alex Ellery via GIPHY\"We have looked at vacuum tubes because trying to create solid-state electronics would be virtually impossible on the moon,\" Ellery said.",
+                    "keywords": [
+                        "build",
+                        "3d",
+                        "printers",
+                        "global",
+                        "fight",
+                        "bases",
+                        "lunar",
+                        "ellery",
+                        "plastic",
+                        "material",
+                        "warming",
+                        "university",
+                        "moon",
+                        "selfreplicating",
+                        "3dprint",
+                        "motor"
+                    ],
+                    "source": "https://www.space.com/",
+                    "link_id": 17178,
+                    "domain": "space",
+                    "popularity": 4
+                },
+                {
+                    "url": "http://dennismedler3dprintingreviews.com/index.php/2017/06/11/happisland-16-piece-3d-printer-tool-kit-3d-print-clean-up-kit-with-convenient-storage-case/",
+                    "im": "http://dennismedler3dprintingreviews.com/wp-content/uploads/2017/06/51LPo4NDB7L.jpg",
+                    "title": "Happisland 16 Piece 3D Printer Tool Kit, 3D Print Clean-Up Kit with convenient storage caseHappisland 16 Piece 3D Printer Tool Kit, 3D Print Clean-Up Kit with convenient storage case - Dennis Medler 3",
+                    "description": "Price: $11.99Product prices and availability are accurate as of the date/time indicated and are subject to change.\nAny price and availability information displayed on [relevant Amazon Site(s), as applicable] at the time of purchase will apply to the purchase of this product.",
+                    "keywords": [
+                        "printer",
+                        "3d",
+                        "subject",
+                        "indicated",
+                        "cleanup",
+                        "price",
+                        "storage",
+                        "16",
+                        "convenient",
+                        "print",
+                        "availability",
+                        "information",
+                        "piece",
+                        "prices",
+                        "kit",
+                        "relevant",
+                        "sites",
+                        "product",
+                        "purchase",
+                        "tool"
+                    ],
+                    "source": "http://dennismedler3dprintingreviews.com/",
+                    "link_id": 20011,
+                    "domain": "dennismedler3dprintingreviews",
+                    "popularity": 3
+                },
+                {
+                    "url": "http://news.bio-based.eu/3d-printer-inks-from-the-woods/",
+                    "im": "http://news.bio-based.eu/media/2017/05/Cellulose-ink-stopperbild-300x200.jpeg",
+                    "title": "3D printer inks from the woods",
+                    "description": "Empa researchers have succeeded in developing an environmentally friendly ink for 3D printing based on cellulose nanocrystals.\nIn order to produce 3D microstructured materials for composite applications, for instance, Empa researchers have been using a 3D printing method called \u201cDirect Ink Writing\u201d for the past year (DIW, see box).\nDuring this process, a viscous substance \u2013 the printing ink \u2013 is squeezed out of the printing nozzles and deposited onto a surface, pretty much like a pasta machine.\nThe final product is cellulose nanocrystals, tiny rod-like structures that are 120 nanometers long and have a diameter of 6.5 nanometers.\nAnd it is these nanocrystals that researchers wanted to use to create a new type of environmentally friendly 3D printing ink.",
+                    "keywords": [
+                        "woods",
+                        "inks",
+                        "researchers",
+                        "cnc",
+                        "printing",
+                        "empa",
+                        "cellulose",
+                        "nanocrystals",
+                        "siqueira",
+                        "ink",
+                        "printer",
+                        "3d",
+                        "mechanical"
+                    ],
+                    "source": "http://news.bio-based.eu/",
+                    "link_id": 22745,
+                    "domain": "bio-based",
+                    "popularity": 3
+                },
+                {
+                    "description": "There's a big wow factor that comes with 3D printing \u2013 kids want to study and explore this magic machine that turns nothing into something.\nAs prevalent as those subjects are, the 3D printer works for just about any subject.\nSo when you invest in a 3D printer, it's not just going to one department.\nHere's How 3D Printing Works Across All Subjects:Math \u2013 3D printers can help students grasp abstract math problems that may be confusing or inaccessible on paper.\nMuch like with engineering, students can sketch and create models of artistic pieces using the 3D printer.",
+                    "keywords": [
+                        "printers",
+                        "3d",
+                        "great",
+                        "students",
+                        "school",
+                        "kids",
+                        "way",
+                        "create",
+                        "models",
+                        "sarah_darren",
+                        "invest",
+                        "printer",
+                        "printing"
+                    ],
+                    "link_id": 13545,
+                    "source": "http://www.teachercast.net/",
+                    "im": "http://www.teachercast.net/wp-content/uploads/2017/05/Schools-Using-3D-Printers.png",
+                    "url": "http://www.teachercast.net/2017/05/03/3d-printers-for-school/",
+                    "title": "Why Your School Should Invest in a 3D Printer by @Sarah_Darren",
+                    "domain": "teachercast",
+                    "popularity": 3
+                }
+            ]
+        }
+        
+        
+## Influencers Collection [/v1.2/get_influencers]
+
+### List All influencers of given theme [GET]
+
++ Response 200 (application/json)
+
+        {
+            "influencers": [
+                {
+                    "username": "3dprintindustry",
+                    "location_user": "",
+                    "name": "3D Printing Industry",
+                    "img_url": "http://pbs.twimg.com/profile_images/721257833371734016/Kf1P-oEZ_normal.jpg",
+                    "lang_user": "en",
+                    "time_user": "London",
+                    "description_user": "Leading source for #3DPrinting news & information \u2013 industry reports, business directory, jobs board, and more."
+                },
+                {
+                    "username": "3DPrintGirl",
+                    "location_user": "New York",
+                    "name": "3D Printing News",
+                    "img_url": "http://pbs.twimg.com/profile_images/378800000641439947/778de2f93eaf9450956aa3c9547099b6_normal.jpeg",
+                    "lang_user": "en",
+                    "time_user": "Atlantic Time (Canada)",
+                    "description_user": "Your source for The Latest 3D printing News"
+                },
+                {
+                    "username": "3dersorg",
+                    "location_user": "World",
+                    "name": "3D Printing & 3Ders",
+                    "img_url": "http://pbs.twimg.com/profile_images/697123922257518592/twesICYY_normal.jpg",
+                    "lang_user": "en",
+                    "time_user": "Amsterdam",
+                    "description_user": "https://t.co/WEflmhOa76 is your independent source for the latest 3D printing, 3D printer news, trends, insight and analysis."
+                },
+                {
+                    "username": "3dsystems",
+                    "location_user": "Rock Hill, SC",
+                    "name": "3D Systems",
+                    "img_url": "http://pbs.twimg.com/profile_images/775394580929720320/4t72wWwG_normal.jpg",
+                    "lang_user": "en",
+                    "time_user": "Eastern Time (US & Canada)",
+                    "description_user": "Enabling end-to-end digital design and manufacturing solutions to enhance and accelerate your workflow. #MfgInnovation"
+                },
+                {
+                    "username": "shapeways",
+                    "location_user": "New York, NY",
+                    "name": "Shapeways",
+                    "img_url": "http://pbs.twimg.com/profile_images/742424166159286278/KIpBYGPS_normal.jpg",
+                    "lang_user": "en",
+                    "time_user": "Eastern Time (US & Canada)",
+                    "description_user": "A 3D printing marketplace where you can design, make, buy and sell amazing products. Show us your creations #Shap3dbyme"
+                },
+                {
+                    "username": "makerbot",
+                    "location_user": "Brooklyn",
+                    "name": "MakerBot",
+                    "img_url": "http://pbs.twimg.com/profile_images/458718156517679104/9XyyKdC6_normal.jpeg",
+                    "lang_user": "en",
+                    "time_user": "Eastern Time (US & Canada)",
+                    "description_user": "MakerBot's connected 3D printing solutions address the wider needs of professionals and educators, evolving their ideas from inspiration to innovation."
+                },
+                {
+                    "username": "fabbaloo",
+                    "location_user": "Worldwide and Beyond",
+                    "name": "Fabbaloo",
+                    "img_url": "http://pbs.twimg.com/profile_images/432205864133353472/GSlzmJhf_normal.jpeg",
+                    "lang_user": "en",
+                    "time_user": "Mountain Time (US & Canada)",
+                    "description_user": "Fabbaloo provides deeper analysis of developments in current and future 3D Printing and Additive Manufacturing industries https://t.co/T820xhfZQP #3DPrinting"
+                },
+                {
+                    "username": "3DHubs",
+                    "location_user": "Everywhere",
+                    "name": "3D Hubs",
+                    "img_url": "http://pbs.twimg.com/profile_images/459655442361114624/g2R4h-8j_normal.png",
+                    "lang_user": "en",
+                    "time_user": "Amsterdam",
+                    "description_user": "The world\u2019s largest network of 3D printing services: https://t.co/RAdlsFhJz8. \n\nFounded by @briangarret @bram_zwart."
+                },
+                {
+                    "username": "3DPrintBoard",
+                    "location_user": "Florida",
+                    "name": "3D Print .com",
+                    "img_url": "http://pbs.twimg.com/profile_images/676422405431029760/cDZEuj4a_normal.png",
+                    "lang_user": "en",
+                    "time_user": null,
+                    "description_user": "http://t.co/6HneczXiUp covers the latest breaking 3D printing and 3D printer news, before you see it elsewhere!"
+                },
+                {
+                    "username": "ColorFabb",
+                    "location_user": "Venlo, The Netherlands",
+                    "name": "ColorFabb",
+                    "img_url": "http://pbs.twimg.com/profile_images/459313313256439810/pFsvxt7A_normal.png",
+                    "lang_user": "en",
+                    "time_user": "Amsterdam",
+                    "description_user": "ColorFabb. Producer of innovative and functional filaments for 3D Printing."
+                },
+                {
+                    "username": "My3DPrinting",
+                    "location_user": "",
+                    "name": "3D Printing News",
+                    "img_url": "http://pbs.twimg.com/profile_images/492375713849159681/wBgPUcgZ_normal.jpeg",
+                    "lang_user": "en",
+                    "time_user": "Eastern Time (US & Canada)",
+                    "description_user": "All the latest 3D Printing News from around the World."
+                },
+                {
+                    "username": "3dprinting",
+                    "location_user": "Bucharest / Rotterdam",
+                    "name": "3D printing",
+                    "img_url": "http://pbs.twimg.com/profile_images/596050983559569409/1Ro5lXax_normal.jpg",
+                    "lang_user": "en",
+                    "time_user": null,
+                    "description_user": "Dutch part-time daydreamer skating tru the Carpathian Garden.Tweets from @Roemenie .Amazed about the worldchanging 3D Printing.Big fan of @Shapeways | \uf8ff |"
+                },
+                {
+                    "username": "3d_printers",
+                    "location_user": "",
+                    "name": "Stratasys",
+                    "img_url": "http://pbs.twimg.com/profile_images/649446346118709248/RWD5T3KS_normal.jpg",
+                    "lang_user": "en",
+                    "time_user": "UTC",
+                    "description_user": "Interested in 3D printing? Follow us for the latest 3D printing news and join the conversation."
+                },
+                {
+                    "username": "3dprinting3d",
+                    "location_user": "",
+                    "name": "3D Printing",
+                    "img_url": "http://pbs.twimg.com/profile_images/2218578027/twitter-logo_normal.png",
+                    "lang_user": "en",
+                    "time_user": null,
+                    "description_user": "http://t.co/WIZOBci92B industry experts bring you the latest in 3D Printing news, commentary, jobs, videos and entertainment."
+                },
+                {
+                    "username": "3dprintingcom",
+                    "location_user": "",
+                    "name": "3DPrinting.com",
+                    "img_url": "http://pbs.twimg.com/profile_images/700663704887517184/oiO8VCdt_normal.png",
+                    "lang_user": "en",
+                    "time_user": "Amsterdam",
+                    "description_user": "Everything about 3D Printing!"
+                },
+                {
+                    "username": "Ultimaker",
+                    "location_user": "",
+                    "name": "Ultimaker",
+                    "img_url": "http://pbs.twimg.com/profile_images/785883430332534784/09W2LPjg_normal.jpg",
+                    "lang_user": "en",
+                    "time_user": "Amsterdam",
+                    "description_user": "Driven by technology and passionate about innovation, Ultimaker offers a range of high-quality 3D printers, software, materials, and support."
+                },
+                {
+                    "username": "make",
+                    "location_user": "San Francisco, CA - USA",
+                    "name": "Make:",
+                    "img_url": "http://pbs.twimg.com/profile_images/783080298665775108/LESsgngz_normal.jpg",
+                    "lang_user": "en",
+                    "time_user": "Pacific Time (US & Canada)",
+                    "description_user": "DIY projects, How-tos, tech news, electronics, crafts and ideas."
+                },
+                {
+                    "username": "imaterialise",
+                    "location_user": "Leuven, Belgium",
+                    "name": "i.materialise",
+                    "img_url": "http://pbs.twimg.com/profile_images/710503015535538176/dxg6Ob_U_normal.jpg",
+                    "lang_user": "en",
+                    "time_user": "Brussels",
+                    "description_user": "online 3D printing service and community for designers & inventors | World's largest 3D printing facility | Happy to meet you"
+                },
+                {
+                    "username": "3DPrintingFans",
+                    "location_user": "",
+                    "name": "3D Printing Fans",
+                    "img_url": "http://pbs.twimg.com/profile_images/454979770195783681/e8MXCx3I_normal.jpeg",
+                    "lang_user": "en",
+                    "time_user": null,
+                    "description_user": "We cover all the latest, breaking news surrounding 3D printing and 3D scanning"
+                },
+                {
+                    "username": "3DPrintingIt",
+                    "location_user": "",
+                    "name": "3D Printing",
+                    "img_url": "http://pbs.twimg.com/profile_images/454975817374638080/EYF4cGTL_normal.jpeg",
+                    "lang_user": "en",
+                    "time_user": null,
+                    "description_user": "3D Printing News, 3D Scanning News, Building of Electronics, Makers"
+                }
+            ]
+        }
