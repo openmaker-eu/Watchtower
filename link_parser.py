@@ -22,7 +22,7 @@ def get_next_links_sequence():
 def unshorten_url(url):
     return head(url, allow_redirects=True).url
 
-@timeout_decorator.timeout(15, use_signals=False)
+@timeout_decorator.timeout(8, use_signals=False)
 def linkParser(link):
     try:
         parsed_uri = urlparse(link)
@@ -66,6 +66,7 @@ def calculateLinks(alertid, tweet):
                         dic['mentions']=[tweet_tuple]
                         Connection.Instance().newsPoolDB[str(alertid)].insert_one(dic)
             except Exception as e:
+                print(e)
                 pass
     except Exception as e:
         pass
