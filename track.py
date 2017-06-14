@@ -119,7 +119,7 @@ class StreamCreator():
         self.keywords = get_keywords(alertDic= alertDic)
         self.lang = get_lang(alertDic= alertDic)
         self.alerts = get_alerts(alertDic= alertDic)
-        print(alerts)
+        print(self.alerts)
         self.auth = OAuthHandler(consumer_key, consumer_secret)
         self.auth.set_access_token(access_token, access_secret)
         self.stream = Stream(self.auth, self.l)
