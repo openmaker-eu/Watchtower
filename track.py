@@ -26,8 +26,6 @@ def get_alerts(alertDic):
     for key in alertDic:
         alert = alertDic[key]
         alerts = alerts + [alert['alertid']]
-    alerts = list(set(keywords))
-    alerts = [str(alert) for alert in alerts]
     return alerts
 
 def get_lang(alertDic):
