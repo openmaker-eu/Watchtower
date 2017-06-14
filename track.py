@@ -112,8 +112,7 @@ class StreamCreator():
         self.auth = OAuthHandler(consumer_key, consumer_secret)
         self.auth.set_access_token(access_token, access_secret)
         self.stream = Stream(self.auth, self.l)
-        """
-        #change
+
         try:
             self.stream.filter(track= self.keywords, languages=self.lang, async=True)
         except Exception as e:
@@ -122,8 +121,8 @@ class StreamCreator():
             f.write(e)
             f.close()
             continue
-        """
-        self.t = threading.Thread(target = self.stream.filter, kwargs = {'track':self.keywords, 'languages':self.lang} )
+
+        """self.t = threading.Thread(target = self.stream.filter, kwargs = {'track':self.keywords, 'languages':self.lang} )
     def start(self):
         try:
             self.t.deamon = True
@@ -131,13 +130,14 @@ class StreamCreator():
         except Exception as e:
             f = open('../log.txt', 'a+')
             f.write(e)
-            f.close()
+            f.close()"""
     def terminate(self):
         self.l.running = False
         self.l.stop()
         self.l.terminate = True
     def checkAlive(self):
-        return self.t.isAlive()
+        return True
+        #self.t.isAlive()
     def checkConnection(self):
         if self.l is not None:
             return self.l.connection
