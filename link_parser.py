@@ -66,6 +66,7 @@ def calculateLinks(alertid, tweet):
                         dic['mentions']=[tweet_tuple]
                         Connection.Instance().newsPoolDB[str(alertid)].insert_one(dic)
             except Exception as e:
+                print(link)
                 print(e)
                 pass
     except Exception as e:
