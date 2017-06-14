@@ -21,6 +21,15 @@ def get_keywords(alertDic):
     keywords = [str(keyword) for keyword in keywords]
     return keywords
 
+def get_alerts(alertDic):
+    alerts = []
+    for key in alertDic:
+        alert = alertDic[key]
+        alerts = alerts + alert['alertid']
+    alerts = list(set(keywords))
+    alerts = [str(alert) for alert in alerts]
+    return alerts
+
 def get_lang(alertDic):
     lang = []
     for key in alertDic:
@@ -107,8 +116,12 @@ class StreamCreator():
     def __init__(self,alertDic):
         #This handles Twitter authetification and the connection to Twitter Streaming API
         self.l = StdOutListener(alertDic)
+
+        """ TODO merge keywords langs and alerts in one method """
         self.keywords = get_keywords(alertDic= alertDic)
         self.lang = get_lang(alertDic= alertDic)
+        self.alerts = get_alerts(alertDic= alertDic)
+        print(alerts)
         self.auth = OAuthHandler(consumer_key, consumer_secret)
         self.auth.set_access_token(access_token, access_secret)
         self.stream = Stream(self.auth, self.l)
