@@ -67,7 +67,11 @@ def separates_tweet(alertDic, tweet):
                             if tweet['entities']['urls'] != []:
                                 link_parser.calculateLinks(alert['alertid'], tweet)
                             break
-        except KeyError:
+        except Exception as e:
+            print(e)
+            f = open('../log.txt', 'a+')
+            f.write('separates_tweet func: ', e)
+            f.close()
             pass
 
 # Accessing Twitter API
