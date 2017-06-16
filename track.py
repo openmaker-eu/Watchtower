@@ -70,8 +70,9 @@ def separates_tweet(alertDic, tweet):
         except Exception as e:
             print(e)
             f = open('../log.txt', 'a+')
-            s = 'separates_tweet func: ', e
+            s = 'separates_tweet func: ', str(e)
             f.write(s)
+            f.write()
             f.close()
             pass
 
@@ -148,7 +149,8 @@ class StreamCreator():
             except Exception as e:
                 print(e)
                 f = open('../log.txt', 'a+')
-                f.write(e)
+                f.write(str(e))
+                f.write()
                 f.close()
                 continue
     def terminate(self):
