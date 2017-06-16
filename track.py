@@ -141,14 +141,15 @@ class StreamCreator():
             f.close()"""
 
     def loop(self):
-        try:
-            self.stream.filter(track= self.keywords, languages=self.lang, async=True)
-        except Exception as e:
-            print(e)
-            f = open('../log.txt', 'a+')
-            f.write(e)
-            f.close()
-            loop()
+        while True:  #Endless loop: personalize to suit your own purposes
+            try:
+                self.stream.filter(track= self.keywords, languages=self.lang, async=True)
+            except Exception as e:
+                print(e)
+                f = open('../log.txt', 'a+')
+                f.write(e)
+                f.close()
+                continue
     def terminate(self):
         self.l.running = False
         self.l.stop()
