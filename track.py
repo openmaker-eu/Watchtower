@@ -70,7 +70,8 @@ def separates_tweet(alertDic, tweet):
         except Exception as e:
             print(e)
             f = open('../log.txt', 'a+')
-            f.write('separates_tweet func: ', e)
+            s = 'separates_tweet func: ', e
+            f.write(s)
             f.close()
             pass
 
