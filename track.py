@@ -72,7 +72,7 @@ def separates_tweet(alertDic, tweet):
             f = open('../log.txt', 'a+')
             s = 'separates_tweet func: ', str(e)
             f.write(s)
-            f.write()
+            f.write('\n\n\n')
             f.close()
             pass
 
@@ -150,7 +150,7 @@ class StreamCreator():
                 print(e)
                 f = open('../log.txt', 'a+')
                 f.write(str(e))
-                f.write()
+                f.write('\n\n\n')
                 f.close()
                 continue
     def terminate(self):
