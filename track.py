@@ -145,7 +145,7 @@ class StreamCreator():
     def loop(self):
         while True:  #Endless loop: personalize to suit your own purposes
             try:
-                self.stream.filter(track= self.keywords, languages=self.lang, async=True)
+                self.stream.filter(track= self.keywords, languages=self.lang, async=False)
             except Exception as e:
                 print(e)
                 f = open('../log.txt', 'a+')
