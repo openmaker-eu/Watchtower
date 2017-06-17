@@ -107,6 +107,10 @@ class StdOutListener(StreamListener):
 
     def on_error(self, status):
         print(status)
+        if status == 420:
+            self.running = False
+            self.stop()
+            return False
 
     def stop(self):
         self.terminate = True
@@ -155,7 +159,6 @@ class StreamCreator():
         self.l.running = False
         self.l.stop()
         self.l.terminate = True
-        self.t.terminate()
         del self.t
     def checkAlive(self):
         self.t.isAlive()
