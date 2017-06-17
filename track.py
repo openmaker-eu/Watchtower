@@ -129,11 +129,8 @@ class StreamCreator():
         self.auth = OAuthHandler(consumer_key, consumer_secret)
         self.auth.set_access_token(access_token, access_secret)
         self.stream = Stream(self.auth, self.l)
-        self.loop()
-
-
-        """self.t = threading.Thread(target = self.stream.filter, kwargs = {'track':self.keywords, 'languages':self.lang} )
-    def start(self):
+        self.t = threading.Thread(target = self.loop)
+    """def start(self):
         try:
             self.t.deamon = True
             self.t.start()
@@ -143,7 +140,7 @@ class StreamCreator():
             f.close()"""
 
     def loop(self):
-        while True:  #Endless loop: personalize to suit your own purposes
+        while True:
             try:
                 self.stream.filter(track= self.keywords, languages=self.lang, async=False)
             except Exception as e:
