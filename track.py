@@ -152,10 +152,12 @@ class StreamCreator():
                 f.write('\n\n\n')
                 f.close()
                 continue
+
     def terminate(self):
         self.l.running = False
         self.l.stop()
         self.l.terminate = True
+        del self.t
     def checkAlive(self):
         return True
         #self.t.isAlive()
