@@ -12,30 +12,24 @@ from bson.objectid import ObjectId
 import link_parser
 import subprocess
 
-def get_keywords(alertDic):
+def get_info(alertDic):
     keywords = []
-    for key in alertDic:
-        alert = alertDic[key]
-        keywords = keywords + alert['keywords']
-    keywords = list(set(keywords))
-    keywords = [str(keyword) for keyword in keywords]
-    return keywords
-
-def get_alerts(alertDic):
     alerts = []
     for key in alertDic:
         alert = alertDic[key]
         alerts = alerts + [alert['alertid']]
-    return sorted(alerts)
-
-def get_lang(alertDic):
-    lang = []
-    for key in alertDic:
-        alert = alertDic[key]
+        keywords = keywords + alert['keywords']
         lang = lang + alert['lang']
     lang = list(set(lang))
     lang = [str(l) for l in lang]
-    return lang
+    keywords = list(set(keywords))
+    keywords = [str(keyword) for keyword in keywords]
+    result = {
+        'alerts' : sorted(alerts),
+        'keywords' : keywords,
+        'lang' : lang
+    }
+    return keywords
 
 def get_next_tweets_sequence():
     cursor = Connection.Instance().db["counters"].find_and_modify(
@@ -67,13 +61,7 @@ def separates_tweet(alertDic, tweet):
                             if tweet['entities']['urls'] != []:
                                 link_parser.calculateLinks(alert['alertid'], tweet)
                             break
-        except Exception as e:
-            print(e)
-            f = open('../log.txt', 'a+')
-            s = 'separates_tweet func: ', str(e)
-            f.write(s)
-            f.write('\n\n\n')
-            f.close()
+        except KeyError:
             pass
 
 # Accessing Twitter API
@@ -108,8 +96,6 @@ class StdOutListener(StreamListener):
     def on_error(self, status):
         print(status)
         if status == 420:
-            self.running = False
-            self.stop()
             return False
 
     def stop(self):
@@ -124,44 +110,31 @@ class StreamCreator():
         self.l = StdOutListener(alertDic)
 
         """ TODO merge keywords langs and alerts in one method """
-        self.keywords = get_keywords(alertDic= alertDic)
-        self.lang = get_lang(alertDic= alertDic)
-        self.alerts = get_alerts(alertDic= alertDic)
+        self.info = get_info(alertDic= alertDic)
+        self.keywords = self.info['keywords']
+        self.lang = self.info['lang']
+        self.alerts = self.info['alerts']
         print(self.alerts)
+        print(self.keywords)
+        print(self.lang)
         self.auth = OAuthHandler(consumer_key, consumer_secret)
         self.auth.set_access_token(access_token, access_secret)
         self.stream = Stream(self.auth, self.l)
-        self.t = threading.Thread(target = self.loop)
-
+        self.t = threading.Thread(target = self.stream.filter, kwargs = {'track':self.keywords, 'languages':self.lang} )
     def start(self):
         try:
             self.t.deamon = True
             self.t.start()
         except Exception as e:
             f = open('../log.txt', 'a+')
-            f.write(str(e))
-            f.write('\n\n\n')
+            f.write(e)
             f.close()
-
-    def loop(self):
-        while True:
-            try:
-                self.stream.filter(track= self.keywords, languages=self.lang, async=False)
-            except Exception as e:
-                print(e)
-                f = open('../log.txt', 'a+')
-                f.write(str(e))
-                f.write('\n\n\n')
-                f.close()
-                continue
-
     def terminate(self):
         self.l.running = False
         self.l.stop()
         self.l.terminate = True
-        del self.t
     def checkAlive(self):
-        self.t.isAlive()
+        return self.t.isAlive()
     def checkConnection(self):
         if self.l is not None:
             return self.l.connection
