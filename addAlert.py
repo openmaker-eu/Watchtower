@@ -36,6 +36,7 @@ class AddAlert():
 
     def killThread(self):
         self.onlyThread.terminate()
+        del self.onlyThread
         self.onlyThread = None
 
     def checkThread(self):
