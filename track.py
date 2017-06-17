@@ -130,14 +130,16 @@ class StreamCreator():
         self.auth.set_access_token(access_token, access_secret)
         self.stream = Stream(self.auth, self.l)
         self.t = threading.Thread(target = self.loop)
-    """def start(self):
+
+    def start(self):
         try:
             self.t.deamon = True
             self.t.start()
         except Exception as e:
             f = open('../log.txt', 'a+')
-            f.write(e)
-            f.close()"""
+            f.write(str(e))
+            f.write('\n\n\n')
+            f.close()
 
     def loop(self):
         while True:
