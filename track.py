@@ -45,23 +45,23 @@ def separates_tweet(alertDic, tweet):
     try:
         for key in alertDic:
             alert = alertDic[key]
-                if tweet['lang'] in alert['lang']:
-                    for keyword in alert['keywords']:
-                        keyword = re.compile(keyword.replace(" ", "(.?)"), re.IGNORECASE)
-                        if 'extended_tweet' in tweet and 'full_text' in tweet['extended_tweet']:
-                            if re.search(keyword, str(tweet['extended_tweet']['full_text'])):
-                                tweet['_id'] = ObjectId()
-                                Connection.Instance().db[str(alert['alertid'])].insert_one(tweet)
-                                if tweet['entities']['urls'] != []:
-                                    link_parser.calculateLinks(alert['alertid'], tweet)
-                                break
-                        else:
-                            if re.search(keyword, str(tweet['text'])):
-                                tweet['_id'] = ObjectId()
-                                Connection.Instance().db[str(alert['alertid'])].insert_one(tweet)
-                                if tweet['entities']['urls'] != []:
-                                    link_parser.calculateLinks(alert['alertid'], tweet)
-                                break
+            if tweet['lang'] in alert['lang']:
+                for keyword in alert['keywords']:
+                    keyword = re.compile(keyword.replace(" ", "(.?)"), re.IGNORECASE)
+                    if 'extended_tweet' in tweet and 'full_text' in tweet['extended_tweet']:
+                        if re.search(keyword, str(tweet['extended_tweet']['full_text'])):
+                            tweet['_id'] = ObjectId()
+                            Connection.Instance().db[str(alert['alertid'])].insert_one(tweet)
+                            if tweet['entities']['urls'] != []:
+                                link_parser.calculateLinks(alert['alertid'], tweet)
+                            break
+                    else:
+                        if re.search(keyword, str(tweet['text'])):
+                            tweet['_id'] = ObjectId()
+                            Connection.Instance().db[str(alert['alertid'])].insert_one(tweet)
+                            if tweet['entities']['urls'] != []:
+                                link_parser.calculateLinks(alert['alertid'], tweet)
+                            break
     except Exception as e:
         f = open('../log.txt', 'a+')
         f.write(str(e))
