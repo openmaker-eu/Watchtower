@@ -42,28 +42,31 @@ def get_next_tweets_sequence():
     return cursor['seq']
 
 def separates_tweet(alertDic, tweet):
-    for key in alertDic:
-        alert = alertDic[key]
-        try:
-            if tweet['lang'] in alert['lang']:
-                for keyword in alert['keywords']:
-                    keyword = re.compile(keyword.replace(" ", "(.?)"), re.IGNORECASE)
-                    if 'extended_tweet' in tweet and 'full_text' in tweet['extended_tweet']:
-                        if re.search(keyword, str(tweet['extended_tweet']['full_text'])):
-                            tweet['_id'] = ObjectId()
-                            Connection.Instance().db[str(alert['alertid'])].insert_one(tweet)
-                            if tweet['entities']['urls'] != []:
-                                link_parser.calculateLinks(alert['alertid'], tweet)
-                            break
-                    else:
-                        if re.search(keyword, str(tweet['text'])):
-                            tweet['_id'] = ObjectId()
-                            Connection.Instance().db[str(alert['alertid'])].insert_one(tweet)
-                            if tweet['entities']['urls'] != []:
-                                link_parser.calculateLinks(alert['alertid'], tweet)
-                            break
-        except KeyError:
-            pass
+    try:
+        for key in alertDic:
+            alert = alertDic[key]
+                if tweet['lang'] in alert['lang']:
+                    for keyword in alert['keywords']:
+                        keyword = re.compile(keyword.replace(" ", "(.?)"), re.IGNORECASE)
+                        if 'extended_tweet' in tweet and 'full_text' in tweet['extended_tweet']:
+                            if re.search(keyword, str(tweet['extended_tweet']['full_text'])):
+                                tweet['_id'] = ObjectId()
+                                Connection.Instance().db[str(alert['alertid'])].insert_one(tweet)
+                                if tweet['entities']['urls'] != []:
+                                    link_parser.calculateLinks(alert['alertid'], tweet)
+                                break
+                        else:
+                            if re.search(keyword, str(tweet['text'])):
+                                tweet['_id'] = ObjectId()
+                                Connection.Instance().db[str(alert['alertid'])].insert_one(tweet)
+                                if tweet['entities']['urls'] != []:
+                                    link_parser.calculateLinks(alert['alertid'], tweet)
+                                break
+    except Exception as e:
+        f = open('../log.txt', 'a+')
+        f.write(str(e))
+        f.close()
+        pass
 
 # Accessing Twitter API
 consumer_key = "utTM4qfuhmzeLUxRkBb1xb12P" # API key
@@ -128,7 +131,7 @@ class StreamCreator():
             self.t.start()
         except Exception as e:
             f = open('../log.txt', 'a+')
-            f.write(e)
+            f.write(str(e))
             f.close()
     def terminate(self):
         self.l.running = False
