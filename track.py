@@ -15,6 +15,7 @@ import subprocess
 def get_info(alertDic):
     keywords = []
     alerts = []
+    lang = []
     for key in alertDic:
         alert = alertDic[key]
         alerts = alerts + [alert['alertid']]
