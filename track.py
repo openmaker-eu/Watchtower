@@ -155,6 +155,7 @@ class StreamCreator():
         self.l.running = False
         self.l.stop()
         self.l.terminate = True
+        self.t.terminate()
         del self.t
     def checkAlive(self):
         self.t.isAlive()
