@@ -30,7 +30,7 @@ def get_info(alertDic):
         'keywords' : keywords,
         'lang' : lang
     }
-    return keywords
+    return result
 
 def get_next_tweets_sequence():
     cursor = Connection.Instance().db["counters"].find_and_modify(
