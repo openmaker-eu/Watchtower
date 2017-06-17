@@ -64,7 +64,10 @@ def separates_tweet(alertDic, tweet):
                             break
     except Exception as e:
         f = open('../log.txt', 'a+')
+        s = '\n\n tweet lang: ',  tweet['lang']
+        f.write(s)
         f.write(str(e))
+        f.write('\n\n')
         f.close()
         pass
 
@@ -131,7 +134,9 @@ class StreamCreator():
             self.t.start()
         except Exception as e:
             f = open('../log.txt', 'a+')
+            f.write('\n\n exception thread')
             f.write(str(e))
+            f.write('\n\n')
             f.close()
     def terminate(self):
         self.l.running = False
