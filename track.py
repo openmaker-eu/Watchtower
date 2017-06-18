@@ -87,7 +87,7 @@ class StdOutListener(StreamListener):
         self.connection = True
         super(StdOutListener, self).__init__()
 
-    def on_data(self, date):
+    def on_data(self, data):
         if self.terminate == False:
             try:
                 tweet = json.loads(data)
