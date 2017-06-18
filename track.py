@@ -87,10 +87,10 @@ class StdOutListener(StreamListener):
         self.connection = True
         super(StdOutListener, self).__init__()
 
-    def on_data(self, data):
+    def on_status(self, status):
         if self.terminate == False:
             try:
-                tweet = json.loads(data)
+                tweet = json.loads(status)
                 tweet['tweetDBId'] = get_next_tweets_sequence()
                 separates_tweet(self.alertDic, tweet)
                 self.connection = True
