@@ -66,6 +66,7 @@ def separates_tweet(alertDic, tweet):
         f = open('../log.txt', 'a+')
         s = '\n\n tweet lang: ',  tweet['lang']
         f.write(s)
+        f.write('\n')
         f.write(str(e))
         f.write('\n\n')
         f.close()
@@ -88,11 +89,22 @@ class StdOutListener(StreamListener):
 
     def on_data(self, data):
         if self.terminate == False:
-            tweet = json.loads(data)
-            tweet['tweetDBId'] = get_next_tweets_sequence()
-            separates_tweet(self.alertDic, tweet)
-            self.connection = True
-            return True
+            try:
+                tweet = json.loads(data)
+                tweet['tweetDBId'] = get_next_tweets_sequence()
+                separates_tweet(self.alertDic, tweet)
+                self.connection = True
+                return True
+            except Exception as e:
+                f = open('../log.txt', 'a+')
+                s = '\n\n on_data : '
+                f.write(s)
+                f.write('\n')
+                f.write(str(e))
+                f.write('\n\n')
+                f.close()
+                pass
+                return True
         else:
             return False
 
@@ -135,6 +147,7 @@ class StreamCreator():
         except Exception as e:
             f = open('../log.txt', 'a+')
             f.write('\n\n exception thread')
+            f.write('\n')
             f.write(str(e))
             f.write('\n\n')
             f.close()
