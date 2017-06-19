@@ -106,7 +106,7 @@ class StdOutListener(StreamListener):
         self.alertDic = alertDic
         self.terminate = False
         self.connection = True
-        self.pool = ThreadPool(10, False)
+        self.pool = ThreadPool(6, False)
         #self.q = Queue(connection=Redis())
         super(StdOutListener, self).__init__()
 

@@ -71,6 +71,8 @@ class Application(tornado.web.Application):
             (r"/api/v1.2/get_themes", ThemesV12Handler, {'mainT':mainT}),
             (r"/api/v1.2/get_feeds", FeedsV12Handler, {'mainT':mainT}),
             (r"/api/v1.2/get_influencers", InfluencersV12Handler, {'mainT':mainT}),
+            (r"/api/v1.2/get_search", SearchV12Handler, {'mainT':mainT}),
+            (r"/api/v1.2/get_news", NewsV12Handler, {'mainT':mainT}),
             (r"/(.*)", tornado.web.StaticFileHandler, {'path': settings['static_path']}),
         ]
         super(Application, self).__init__(handlers, **settings)
@@ -99,6 +101,22 @@ class FeedsV12Handler(BaseHandler, TemplateRendering):
         self.write(feeds)
 
 class InfluencersV12Handler(BaseHandler, TemplateRendering):
+    def get(self):
+        themename = str(self.get_argument("themename", None))
+        themeid = str(self.get_argument("themeid", None))
+        feeds = apiv12.getInfluencers(themename, themeid)
+        self.set_header('Content-Type', 'application/json')
+        self.write(feeds)
+
+class SearchV12Handler(BaseHandler, TemplateRendering):
+    def get(self):
+        themename = str(self.get_argument("themename", None))
+        themeid = str(self.get_argument("themeid", None))
+        feeds = apiv12.getInfluencers(themename, themeid)
+        self.set_header('Content-Type', 'application/json')
+        self.write(feeds)
+
+class NewsV12Handler(BaseHandler, TemplateRendering):
     def get(self):
         themename = str(self.get_argument("themename", None))
         themeid = str(self.get_argument("themeid", None))
