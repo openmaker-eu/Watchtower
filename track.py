@@ -89,9 +89,12 @@ def separates_tweet(alertDic, tweet):
 
 def redis_tweet(data):
     print('in the worker')
-    tweet = json.loads(data['data'])
-    tweet['tweetDBId'] = get_next_tweets_sequence()
-    separates_tweet(data['alertdic'], tweet)
+    try:
+        tweet = json.loads(data['data'])
+        tweet['tweetDBId'] = get_next_tweets_sequence()
+        separates_tweet(data['alertdic'], tweet)
+    except Exception as e:
+        print(str(e))
 
 # Accessing Twitter API
 consumer_key = "utTM4qfuhmzeLUxRkBb1xb12P" # API key
