@@ -12,6 +12,8 @@ from bson.objectid import ObjectId
 import link_parser
 import subprocess
 from application.ThreadPool import ThreadPool
+from redis import Redis
+from rq import Queue
 
 def get_info(alertDic):
     keywords = []
@@ -42,7 +44,7 @@ def get_next_tweets_sequence():
     )
     return cursor['seq']
 
-def separates_tweet(alertDic, tweet, pool):
+def separates_tweet(alertDic, tweet):
     try:
         for key in alertDic:
             alert = alertDic[key]
@@ -60,8 +62,7 @@ def separates_tweet(alertDic, tweet, pool):
                                     'tweet_id': tweet['id_str'],
                                     'urls': tweet['entities']['urls']
                                 }
-                                link_tuple = (alert['alertid'], temp)
-                                pool.add_task(link_parser.calculateLinks, link_tuple)
+                                link_parser.calculateLinks(alert['alertid'], temp)
                             break
                     else:
                         if re.search(keyword, str(tweet['text'])):
@@ -74,8 +75,7 @@ def separates_tweet(alertDic, tweet, pool):
                                     'tweet_id': tweet['id_str'],
                                     'urls': tweet['entities']['urls']
                                 }
-                                link_tuple = (alert['alertid'], temp)
-                                pool.add_task(link_parser.calculateLinks, link_tuple)
+                                link_parser.calculateLinks(alert['alertid'], temp)
                             break
     except Exception as e:
         f = open('../log.txt', 'a+')
@@ -86,6 +86,12 @@ def separates_tweet(alertDic, tweet, pool):
         f.write('\n\n')
         f.close()
         pass
+
+def redis_tweet(data):
+    print('in the worker')
+    tweet = json.loads(data['data'])
+    tweet['tweetDBId'] = get_next_tweets_sequence()
+    separates_tweet(data['alertdic'], tweet)
 
 # Accessing Twitter API
 consumer_key = "utTM4qfuhmzeLUxRkBb1xb12P" # API key
@@ -100,16 +106,18 @@ class StdOutListener(StreamListener):
         self.alertDic = alertDic
         self.terminate = False
         self.connection = True
-        self.pool = ThreadPool(1, True)
+        self.pool = ThreadPool(5, False)
+        self.q = Queue(connection=Redis())
         super(StdOutListener, self).__init__()
 
     def on_data(self, data):
         if self.terminate == False:
             try:
-                tweet = json.loads(data)
-                tweet['tweetDBId'] = get_next_tweets_sequence()
-                separates_tweet(self.alertDic, tweet, self.pool)
-                self.connection = True
+                dicc = {
+                    'data': data,
+                    'alertdic': self.alertDic
+                }
+                self.pool.add_task(redis_tweet, dicc)
                 return True
             except Exception as e:
                 f = open('../log.txt', 'a+')
