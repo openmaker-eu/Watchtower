@@ -107,7 +107,7 @@ class StdOutListener(StreamListener):
         self.terminate = False
         self.connection = True
         self.pool = ThreadPool(5, False)
-        self.q = Queue(connection=Redis())
+        #self.q = Queue(connection=Redis())
         super(StdOutListener, self).__init__()
 
     def on_data(self, data):
