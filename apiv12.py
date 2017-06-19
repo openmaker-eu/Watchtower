@@ -82,7 +82,7 @@ def getNews(themename, themeid, news_ids):
         var = Connection.Instance().cur.fetchall()
         themename = var[0][0]
     if themeid != None or themename != None:
-        themeid = str(logic.getAlertId(themename))
+        themeid = str(logic.getAlertId(themename)) ?? themeid
         news_ids = [int(one_id) for one_id in news_ids]
 
         links = Connection.Instance().newsPoolDB[str(themeid)].find({'link_id': {'$in': news_ids}})
