@@ -43,7 +43,7 @@ def getFeeds(themename, themeid, date, cursor, forbidden_domain):
         result['next_cursor_str'] = str(cursor)
         result['feeds'] = feeds
     else:
-        result['feeds'] = "theme not found"
+        return json.dumps({'feeds': "theme not found"}, indent=4)
     return json.dumps(result, indent=4)
 
 def getInfluencers(themename, themeid):
@@ -67,5 +67,27 @@ def getInfluencers(themename, themeid):
         influencers = list(Connection.Instance().infDB[str(themename)].find({"type": "filteredUser"}, {"_id":0, "type": 0}))
         result['influencers'] = influencers
     else:
-        result['influencers'] = "theme not found"
+        return json.dumps({'influencers': "theme not found"}, indent=4)
+    return json.dumps(result, indent=4)
+
+def getNews(themename, themeid, news_ids):
+    if news_ids == [""]:
+        return json.dumps({'links': "Links not found"}, indent=4)
+    try:
+        themeid = int(themeid)
+    except:
+        pass
+    if (str(themeid) != None) and (themename == None):
+        Connection.Instance().cur.execute("select alertname from alerts where alertid = %s;", [themeid])
+        var = Connection.Instance().cur.fetchall()
+        themename = var[0][0]
+    if themeid != None or themename != None:
+        themeid = str(logic.getAlertId(themename))
+        news_ids = [int(one_id) for one_id in news_ids]
+
+        links = Connection.Instance().newsPoolDB[str(themeid)].find({'link_id': {'$in': news_ids}})
+
+        return json.dumps({'links': links}, indent=4)
+    else:
+        return json.dumps({'links': "Links not found"}, indent=4)
     return json.dumps(result, indent=4)

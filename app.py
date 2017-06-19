@@ -104,25 +104,27 @@ class InfluencersV12Handler(BaseHandler, TemplateRendering):
     def get(self):
         themename = str(self.get_argument("themename", None))
         themeid = str(self.get_argument("themeid", None))
-        feeds = apiv12.getInfluencers(themename, themeid)
+        influencers = apiv12.getInfluencers(themename, themeid)
         self.set_header('Content-Type', 'application/json')
-        self.write(feeds)
+        self.write(influencers)
 
 class SearchV12Handler(BaseHandler, TemplateRendering):
     def get(self):
         themename = str(self.get_argument("themename", None))
         themeid = str(self.get_argument("themeid", None))
-        feeds = apiv12.getInfluencers(themename, themeid)
+        keywords = str(self.get_argument('keywords', None))
+        news = apiv12.getSearch(themename, themeid)
         self.set_header('Content-Type', 'application/json')
-        self.write(feeds)
+        self.write(news)
 
 class NewsV12Handler(BaseHandler, TemplateRendering):
     def get(self):
         themename = str(self.get_argument("themename", None))
         themeid = str(self.get_argument("themeid", None))
-        feeds = apiv12.getInfluencers(themename, themeid)
+        news_ids = self.get_argument('news_ids', "").split(",")
+        news = apiv12.getNews(themename, themeid, news_ids)
         self.set_header('Content-Type', 'application/json')
-        self.write(feeds)
+        self.write(news)
 
 class Documentationv12Handler(BaseHandler, TemplateRendering):
     def get(self):
@@ -159,9 +161,9 @@ class InfluencersV11Handler(BaseHandler, TemplateRendering):
     def get(self):
         themename = str(self.get_argument("themename", None))
         themeid = str(self.get_argument("themeid", None))
-        feeds = newapi.getInfluencers(themename, themeid)
+        influencers = newapi.getInfluencers(themename, themeid)
         self.set_header('Content-Type', 'application/json')
-        self.write(feeds)
+        self.write(influencers)
 
 class Documentationv11Handler(BaseHandler, TemplateRendering):
     def get(self):
