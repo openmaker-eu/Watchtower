@@ -110,17 +110,17 @@ class InfluencersV12Handler(BaseHandler, TemplateRendering):
 
 class SearchV12Handler(BaseHandler, TemplateRendering):
     def get(self):
-        themename = str(self.get_argument("themename", None))
-        themeid = str(self.get_argument("themeid", None))
-        keywords = str(self.get_argument('keywords', None))
+        themename = self.get_argument("themename", None)
+        themeid = self.get_argument("themeid", None)
+        keywords = self.get_argument('keywords', None)
         news = apiv12.getSearch(themename, themeid)
         self.set_header('Content-Type', 'application/json')
         self.write(news)
 
 class NewsV12Handler(BaseHandler, TemplateRendering):
     def get(self):
-        themename = str(self.get_argument("themename", None))
-        themeid = str(self.get_argument("themeid", None))
+        themename = self.get_argument("themename", None)
+        themeid = self.get_argument("themeid", None)
         news_ids = self.get_argument('news_ids', "").split(",")
         news = apiv12.getNews(themename, themeid, news_ids)
         self.set_header('Content-Type', 'application/json')
