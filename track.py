@@ -94,7 +94,7 @@ def redis_tweet(data):
         tweet['tweetDBId'] = get_next_tweets_sequence()
         separates_tweet(data['alertdic'], tweet)
     except Exception as e:
-        print(str(e))
+        print('redis_tweet: ', str(e))
 
 # Accessing Twitter API
 consumer_key = "utTM4qfuhmzeLUxRkBb1xb12P" # API key
