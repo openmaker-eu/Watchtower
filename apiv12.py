@@ -60,12 +60,12 @@ def getFeeds(themename, themeid, date, cursor, forbidden_domain):
 
 def getInfluencers(themename, themeid):
     if themeid == None and themename == None:
-        return json.dumps({'feeds': "theme not found"}, indent=4)
+        return json.dumps({'influencers': "theme not found"}, indent=4)
     elif themeid == None and themename != None:
         try:
             themeid = str(logic.getAlertId(themename))
         except:
-            return json.dumps({'feeds': "theme not found"}, indent=4)
+            return json.dumps({'influencers': "theme not found"}, indent=4)
     elif themeid != None and themename == None:
         try:
             themeid = int(themeid)
@@ -73,14 +73,14 @@ def getInfluencers(themename, themeid):
             var = Connection.Instance().cur.fetchall()
             themename = var[0][0]
         except:
-            return json.dumps({'feeds': "theme not found"}, indent=4)
+            return json.dumps({'influencers': "theme not found"}, indent=4)
     else:
         try:
             temp_themeid = str(logic.getAlertId(themename))
         except:
-            return json.dumps({'feeds': "theme not found"}, indent=4)
+            return json.dumps({'influencers': "theme not found"}, indent=4)
         if str(temp_themeid) != str(themeid):
-            return json.dumps({'feeds': "theme not found"}, indent=4)
+            return json.dumps({'influencers': "theme not found"}, indent=4)
 
     result = {}
     if themename == "arduino":
@@ -97,15 +97,15 @@ def getInfluencers(themename, themeid):
 
 def getNews(themename, themeid, news_ids):
     if news_ids == [""]:
-        return json.dumps({'links': "Links not found"}, indent=4)
+        return json.dumps({'news': "Links not found"}, indent=4)
 
     if themeid == None and themename == None:
-        return json.dumps({'feeds': "theme not found"}, indent=4)
+        return json.dumps({'news': "theme not found"}, indent=4)
     elif themeid == None and themename != None:
         try:
             themeid = str(logic.getAlertId(themename))
         except:
-            return json.dumps({'feeds': "theme not found"}, indent=4)
+            return json.dumps({'news': "theme not found"}, indent=4)
     elif themeid != None and themename == None:
         try:
             themeid = int(themeid)
@@ -113,17 +113,17 @@ def getNews(themename, themeid, news_ids):
             var = Connection.Instance().cur.fetchall()
             themename = var[0][0]
         except:
-            return json.dumps({'feeds': "theme not found"}, indent=4)
+            return json.dumps({'news': "theme not found"}, indent=4)
     else:
         try:
             temp_themeid = str(logic.getAlertId(themename))
         except:
-            return json.dumps({'feeds': "theme not found"}, indent=4)
+            return json.dumps({'news': "theme not found"}, indent=4)
         if str(temp_themeid) != str(themeid):
-            return json.dumps({'feeds': "theme not found"}, indent=4)
+            return json.dumps({'news': "theme not found"}, indent=4)
 
     news_ids = [int(one_id) for one_id in news_ids]
 
-    links = Connection.Instance().newsPoolDB[str(themeid)].find({'link_id': {'$in': news_ids}})
+    news = Connection.Instance().newsPoolDB[str(themeid)].find({'link_id': {'$in': news_ids}})
 
-    return json.dumps({'links': links}, indent=4)
+    return json.dumps({'news': links}, indent=4)
