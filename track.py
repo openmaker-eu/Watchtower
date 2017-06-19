@@ -11,6 +11,7 @@ import re
 from bson.objectid import ObjectId
 import link_parser
 import subprocess
+from application.ThreadPool import ThreadPool
 
 def get_info(alertDic):
     keywords = []
@@ -41,7 +42,7 @@ def get_next_tweets_sequence():
     )
     return cursor['seq']
 
-def separates_tweet(alertDic, tweet):
+def separates_tweet(alertDic, tweet, pool):
     try:
         for key in alertDic:
             alert = alertDic[key]
@@ -53,14 +54,28 @@ def separates_tweet(alertDic, tweet):
                             tweet['_id'] = ObjectId()
                             Connection.Instance().db[str(alert['alertid'])].insert_one(tweet)
                             if tweet['entities']['urls'] != []:
-                                link_parser.calculateLinks(alert['alertid'], tweet)
+                                temp = {
+                                    'userid': tweet['user']['id_str'],
+                                    'timestamp_ms': int(tweet['timestamp_ms']),
+                                    'tweet_id': tweet['id_str'],
+                                    'urls': tweet['entities']['urls']
+                                }
+                                link_tuple = (alert['alertid'], temp)
+                                pool.add_task(link_parser.calculateLinks, link_tuple)
                             break
                     else:
                         if re.search(keyword, str(tweet['text'])):
                             tweet['_id'] = ObjectId()
                             Connection.Instance().db[str(alert['alertid'])].insert_one(tweet)
                             if tweet['entities']['urls'] != []:
-                                link_parser.calculateLinks(alert['alertid'], tweet)
+                                temp = {
+                                    'userid': tweet['user']['id_str'],
+                                    'timestamp_ms': int(tweet['timestamp_ms']),
+                                    'tweet_id': tweet['id_str'],
+                                    'urls': tweet['entities']['urls']
+                                }
+                                link_tuple = (alert['alertid'], temp)
+                                pool.add_task(link_parser.calculateLinks, link_tuple)
                             break
     except Exception as e:
         f = open('../log.txt', 'a+')
@@ -85,6 +100,7 @@ class StdOutListener(StreamListener):
         self.alertDic = alertDic
         self.terminate = False
         self.connection = True
+        self.pool = ThreadPool(1, False)
         super(StdOutListener, self).__init__()
 
     def on_data(self, data):
@@ -92,7 +108,7 @@ class StdOutListener(StreamListener):
             try:
                 tweet = json.loads(data)
                 tweet['tweetDBId'] = get_next_tweets_sequence()
-                separates_tweet(self.alertDic, tweet)
+                separates_tweet(self.alertDic, tweet, self.pool)
                 self.connection = True
                 return True
             except Exception as e:

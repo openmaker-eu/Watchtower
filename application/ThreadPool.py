@@ -32,15 +32,15 @@ class ThreadPool:
 
     def add_task(self, func, *args, **kargs):
         """ Add a task to the queue """
-        self.tasks.put((func, args, kargs))
+        if self.more_than_one_parameter:
+            self.tasks.put((func, *args, kargs))
+        else:
+            self.tasks.put((func, args, kargs))
 
     def map(self, func, args_list):
         """ Add a list of tasks to the queue """
         for args in args_list:
-            if self.more_than_one_parameter:
-                self.add_task(func, *args)
-            else:
-                self.add_task(func, args)
+            self.add_task(func, args)
 
     def wait_completion(self):
         """ Wait for completion of all the tasks in the queue """
