@@ -98,7 +98,7 @@ def getInfluencers(themename, themeid):
 def getNews(news_ids, keywords):
     if news_ids == [""] and keywords == [""]:
         return json.dumps({'news': "Empty news id list"}, indent=4)
-    elif news_ids != [""] and keywords == [""]
+    elif news_ids != [""] and keywords == [""]:
         news_ids = [int(one_id) for one_id in news_ids]
         news = []
         for alertid in Connection.Instance().newsPoolDB.collection_names():
