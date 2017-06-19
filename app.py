@@ -102,8 +102,8 @@ class FeedsV12Handler(BaseHandler, TemplateRendering):
 
 class InfluencersV12Handler(BaseHandler, TemplateRendering):
     def get(self):
-        themename = str(self.get_argument("themename", None))
-        themeid = str(self.get_argument("themeid", None))
+        themename = self.get_argument("themename", None)
+        themeid = self.get_argument("themeid", None)
         influencers = apiv12.getInfluencers(themename, themeid)
         self.set_header('Content-Type', 'application/json')
         self.write(influencers)
