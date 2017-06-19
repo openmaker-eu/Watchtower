@@ -3,6 +3,7 @@ from application.Connections import Connection
 import logic
 import json
 import dateFilter, crontab3
+import re
 
 def getThemes(userid):
     Connection.Instance().cur.execute("select alertid, alertname, description from alerts where ispublish = %s", [True])
@@ -105,7 +106,7 @@ def getNews(news_ids, keywords):
             news = news + list(Connection.Instance().newsPoolDB[str(alertid)].find({'link_id': {'$in': news_ids}}, {"_id":0}))
         return json.dumps({'news': news}, indent=4)
     elif news_ids == [""] and keywords != [""]:
-        keywords = ["/"+key+"/" for key in keywords]
+        keywords = [re.compile(key, re.IGNORECASE) for key in keywords]
         news = []
         for alertid in Connection.Instance().newsPoolDB.collection_names():
             for key in keywords:
