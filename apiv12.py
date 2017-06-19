@@ -128,6 +128,6 @@ def getNews(themename, themeid, news_ids):
 
     news_ids = [int(one_id) for one_id in news_ids]
 
-    news = Connection.Instance().newsPoolDB[str(themeid)].find({'link_id': {'$in': news_ids}})
+    news = list(Connection.Instance().newsPoolDB[str(themeid)].find({'link_id': {'$in': news_ids}}))
 
     return json.dumps({'news': news}, indent=4)
