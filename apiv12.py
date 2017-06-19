@@ -101,12 +101,15 @@ def getNews(themename, themeid, news_ids):
 
     if themeid == None and themename == None:
         return json.dumps({'news': "theme not found"}, indent=4)
+        print("ikiside yok")
     elif themeid == None and themename != None:
+        print("id yok")
         try:
             themeid = str(logic.getAlertId(themename))
         except:
             return json.dumps({'news': "theme not found"}, indent=4)
     elif themeid != None and themename == None:
+        print("name yok")
         try:
             themeid = int(themeid)
             Connection.Instance().cur.execute("select alertname from alerts where alertid = %s;", [themeid])
@@ -115,6 +118,7 @@ def getNews(themename, themeid, news_ids):
         except:
             return json.dumps({'news': "theme not found"}, indent=4)
     else:
+        print("ikiside var")
         try:
             temp_themeid = str(logic.getAlertId(themename))
         except:
