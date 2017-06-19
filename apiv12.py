@@ -112,4 +112,4 @@ def getNews(news_ids, keywords):
                 news = news + list(Connection.Instance().newsPoolDB[str(alertid)].find({'$or': [{'title': key}, {'description': key}]}, {"_id":0}))
         return json.dumps({'news': news}, indent=4)
     else:
-        return json.dumps({'news': "Except one argument for one request"}, indent=4)
+        return json.dumps({'news': "Accepts one argument for one request"}, indent=4)
