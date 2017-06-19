@@ -122,7 +122,8 @@ class NewsV12Handler(BaseHandler, TemplateRendering):
         """themename = self.get_argument("themename", None)
         themeid = self.get_argument("themeid", None)"""
         news_ids = self.get_argument('news_ids', "").split(",")
-        news = apiv12.getNews(news_ids)
+        keywords = self.get_argument('keywords', "").split(",")
+        news = apiv12.getNews(news_ids, keywords)
         self.set_header('Content-Type', 'application/json')
         self.write(news)
 

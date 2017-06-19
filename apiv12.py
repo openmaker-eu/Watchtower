@@ -95,14 +95,21 @@ def getInfluencers(themename, themeid):
 
     return json.dumps(result, indent=4)
 
-def getNews(news_ids):
-    if news_ids == [""]:
+def getNews(news_ids, keywords):
+    if news_ids == [""] and keywords == [""]:
         return json.dumps({'news': "Empty news id list"}, indent=4)
-        
-    news_ids = [int(one_id) for one_id in news_ids]
-
-    news = []
-    for alertid in Connection.Instance().newsPoolDB.collection_names():
-        news = news + list(Connection.Instance().newsPoolDB[str(alertid)].find({'link_id': {'$in': news_ids}}, {"_id":0}))
-
-    return json.dumps({'news': news}, indent=4)
+    elif news_ids != [""] and keywords == [""]
+        news_ids = [int(one_id) for one_id in news_ids]
+        news = []
+        for alertid in Connection.Instance().newsPoolDB.collection_names():
+            news = news + list(Connection.Instance().newsPoolDB[str(alertid)].find({'link_id': {'$in': news_ids}}, {"_id":0}))
+        return json.dumps({'news': news}, indent=4)
+    elif news_ids == [""] and keywords != [""]:
+        keywords = ["/"+key+"/" for key in keywords]
+        news = []
+        for alertid in Connection.Instance().newsPoolDB.collection_names():
+            for key in keywords:
+                news = news + list(Connection.Instance().newsPoolDB[str(alertid)].find({'$or': [{'title': key}, {'description': key}]}, {"_id":0}))
+        return json.dumps({'news': news}, indent=4)
+    else:
+        return json.dumps({'news': "Except one argument for one request"}, indent=4)
