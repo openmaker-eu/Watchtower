@@ -119,10 +119,10 @@ class SearchV12Handler(BaseHandler, TemplateRendering):
 
 class NewsV12Handler(BaseHandler, TemplateRendering):
     def get(self):
-        themename = self.get_argument("themename", None)
-        themeid = self.get_argument("themeid", None)
+        """themename = self.get_argument("themename", None)
+        themeid = self.get_argument("themeid", None)"""
         news_ids = self.get_argument('news_ids', "").split(",")
-        news = apiv12.getNews(themename, themeid, news_ids)
+        news = apiv12.getNews(news_ids)
         self.set_header('Content-Type', 'application/json')
         self.write(news)
 
