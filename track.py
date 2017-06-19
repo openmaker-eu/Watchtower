@@ -12,8 +12,8 @@ from bson.objectid import ObjectId
 import link_parser
 import subprocess
 from application.ThreadPool import ThreadPool
-from redis import Redis
-from rq import Queue
+#from redis import Redis
+#from rq import Queue
 
 def get_info(alertDic):
     keywords = []
