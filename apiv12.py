@@ -130,4 +130,4 @@ def getNews(themename, themeid, news_ids):
 
     news = Connection.Instance().newsPoolDB[str(themeid)].find({'link_id': {'$in': news_ids}})
 
-    return json.dumps({'news': links}, indent=4)
+    return json.dumps({'news': news}, indent=4)
