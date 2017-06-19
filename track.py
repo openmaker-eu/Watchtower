@@ -79,7 +79,7 @@ def separates_tweet(alertDic, tweet, pool):
                             break
     except Exception as e:
         f = open('../log.txt', 'a+')
-        s = '\n\n tweet lang: ',  tweet['lang']
+        s = '\n\n tweet lang: ' +  tweet['lang']
         f.write(s)
         f.write('\n')
         f.write(str(e))
