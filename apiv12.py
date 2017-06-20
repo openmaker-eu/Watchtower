@@ -117,7 +117,7 @@ def getNews(news_ids, keywords, cursor):
 
         next_cursor = cursor + 20
         if len(news) < cursor+20:
-            next_cursor = -1
+            next_cursor = 0
 
         result = {
             'next_cursor': next_cursor,
