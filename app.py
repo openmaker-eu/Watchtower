@@ -432,17 +432,18 @@ class NewsHandler(BaseHandler, TemplateRendering):
                 except:
                     date = 'yesterday'
                     pass
-                feeds = logic.getNews(alertid, date, 0)
-                variables = {
-                    'title': "News",
-                    'feeds': feeds['feeds'],
-                    'cursor': feeds['next_cursor'],
-                    'alertid': alertid,
-                    'alertname': logic.getAlertName(alertid),
-                    'comesAlert': True,
-                    'type': "news"
-                }
-                if len(variables['feeds']) == 0:
+                try:
+                    feeds = logic.getNews(alertid, date, 0)
+                    variables = {
+                        'title': "News",
+                        'feeds': feeds['feeds'],
+                        'cursor': feeds['next_cursor'],
+                        'alertid': alertid,
+                        'alertname': logic.getAlertName(alertid),
+                        'comesAlert': True,
+                        'type': "news"
+                    }
+                except:
                     self.write("<p style='color: red; font-size: 15px'><b>Ops! There is no tweet now.</b></p>")
             except ValueError:
                 variables = {
