@@ -107,7 +107,7 @@ def main():
     Connection.Instance().cur.execute("Select alertid from alerts;")
     alertid_list = sorted(list(Connection.Instance().cur.fetchall()))
     parameters = createParameters(alertid_list)
-    alertid_list = [31,32,33]
+    alertid_list = [31,32,33,37,38,39]
     dates = ['yesterday', 'week', 'month']
     parameters = [[alert, date] for alert in alertid_list for date in dates]
     print(alertid_list)
