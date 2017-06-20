@@ -126,4 +126,10 @@ def getNews(news_ids, keywords, cursor):
         }
         return json.dumps(result, indent=4)
     else:
-        return json.dumps({'news': "Accepts one argument for one request"}, indent=4)
+        keywords = [re.compile(key, re.IGNORECASE) for key in keywords]
+        news = []
+        for alertid in Connection.Instance().newsPoolDB.collection_names():
+            for key in keywords:
+                news = news + list(Connection.Instance().newsPoolDB[str(alertid)].find({'link_id': {'$in': news_ids}, '$or': [{'title': key}, {'description': key}]}, {"_id":0}))
+                
+        return json.dumps({'news': news}, indent=4)
