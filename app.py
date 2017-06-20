@@ -71,7 +71,6 @@ class Application(tornado.web.Application):
             (r"/api/v1.2/get_themes", ThemesV12Handler, {'mainT':mainT}),
             (r"/api/v1.2/get_feeds", FeedsV12Handler, {'mainT':mainT}),
             (r"/api/v1.2/get_influencers", InfluencersV12Handler, {'mainT':mainT}),
-            (r"/api/v1.2/get_search", SearchV12Handler, {'mainT':mainT}),
             (r"/api/v1.2/get_news", NewsV12Handler, {'mainT':mainT}),
             (r"/(.*)", tornado.web.StaticFileHandler, {'path': settings['static_path']}),
         ]
@@ -108,22 +107,20 @@ class InfluencersV12Handler(BaseHandler, TemplateRendering):
         self.set_header('Content-Type', 'application/json')
         self.write(influencers)
 
-class SearchV12Handler(BaseHandler, TemplateRendering):
-    def get(self):
-        themename = self.get_argument("themename", None)
-        themeid = self.get_argument("themeid", None)
-        keywords = self.get_argument('keywords', None)
-        news = apiv12.getSearch(themename, themeid)
-        self.set_header('Content-Type', 'application/json')
-        self.write(news)
-
 class NewsV12Handler(BaseHandler, TemplateRendering):
     def get(self):
         """themename = self.get_argument("themename", None)
         themeid = self.get_argument("themeid", None)"""
         news_ids = self.get_argument('news_ids', "").split(",")
         keywords = self.get_argument('keywords', "").split(",")
-        news = apiv12.getNews(news_ids, keywords)
+        try:
+            cursor = int(self.get_argument("cursor"))
+            if cursor == -1:
+                cursor = 0
+        except:
+            cursor = 0
+            pass
+        news = apiv12.getNews(news_ids, keywords, cursor)
         self.set_header('Content-Type', 'application/json')
         self.write(news)
 
