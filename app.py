@@ -445,7 +445,7 @@ class NewsHandler(BaseHandler, TemplateRendering):
                         'type': "news"
                     }
                 except:
-                    self.write("<p style='color: red; font-size: 15px'><b>Ops! There is no tweet now.</b></p>")
+                    self.write("<p style='color: red; font-size: 15px'><b>Ops! There is no feed now.</b></p>")
             except ValueError:
                 variables = {
                     'title': "News",
