@@ -422,6 +422,7 @@ class NewTweetsHandler(BaseHandler, TemplateRendering):
 class NewsHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
     def get(self, argument = None):
+        variables = {}
         userid = tornado.escape.xhtml_escape(self.current_user)
         template = 'afterlogintemplate.html'
         if argument is not None:
@@ -465,6 +466,7 @@ class NewsHandler(BaseHandler, TemplateRendering):
 
     @tornado.web.authenticated
     def post(self, argument=None):
+        variables = {}
         if argument is not None:
             template = 'newsTemplate.html'
             alertid = self.get_argument('alertid')
