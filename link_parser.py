@@ -26,7 +26,7 @@ def unshorten_url(url):
 def linkParser(link):
     try:
         parsed_uri = urlparse(link)
-        source = '{uri.scheme}://{uri.netloc}/'.format(uri=parsed_uri)
+        source = '{uri.netloc}'.format(uri=parsed_uri)
         domain = extract(link).domain
         url = link
         article = Article(url)
