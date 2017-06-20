@@ -473,12 +473,13 @@ class NewsHandler(BaseHandler, TemplateRendering):
             except:
                 date = 'yesterday'
                 pass
-            feeds = logic.getNews(alertid, date, int(next_cursor))
-            variables = {
-                'feeds': feeds['feeds'],
-                'cursor': feeds['next_cursor'],
-            }
-            if len(variables['feeds']) == 0:
+            try:
+                feeds = logic.getNews(alertid, date, int(next_cursor))
+                variables = {
+                    'feeds': feeds['feeds'],
+                    'cursor': feeds['next_cursor'],
+                }
+            except:
                 self.write("<p style='color: red; font-size: 15px'><b>Ops! There is no feed now.</b></p>")
         else:
             template = 'alertNews.html'
@@ -488,13 +489,14 @@ class NewsHandler(BaseHandler, TemplateRendering):
             except:
                 date = 'yesterday'
                 pass
-            feeds = logic.getNews(alertid, date, 0)
-            variables = {
-                'feeds': feeds['feeds'],
-                'cursor': feeds['next_cursor'],
-                'alertid': alertid
-            }
-            if len(variables['feeds']) == 0:
+            try:
+                feeds = logic.getNews(alertid, date, 0)
+                variables = {
+                    'feeds': feeds['feeds'],
+                    'cursor': feeds['next_cursor'],
+                    'alertid': alertid
+                }
+            except:
                 self.write("<p style='color: red; font-size: 15px'><b>Ops! There is no feed now.</b></p>")
         content = self.render_template(template, variables)
         self.write(content)
