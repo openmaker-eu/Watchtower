@@ -120,8 +120,8 @@ def getNews(news_ids, keywords, cursor):
             next_cursor = -1
 
         result = {
-            'next_cursor': cursor + 20,
-            'next_cursor_str': str(cursor+20),
+            'next_cursor': next_cursor,
+            'next_cursor_str': str(next_cursor),
             'news': news[cursor:cursor+20]
         }
         return json.dumps(result, indent=4)
