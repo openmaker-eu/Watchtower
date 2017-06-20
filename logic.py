@@ -315,6 +315,8 @@ def getNews(alertid, date, cursor):
         result['Error'] = 'invalid date'
         return json.dumps(result, indent=4)
     feeds = list(Connection.Instance().newsdB[str(alertid)].find({'name': date}, {date: 1}))
+    if feeds == []:
+        return {'next_cursor': 0, 'cursor_length': 0, 'feeds': 'News is empty'}
     feeds = list(feeds[0][date][cursor:cursor+20])
     cursor = int(cursor) + 20
     if cursor >= 60:
