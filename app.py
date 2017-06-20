@@ -478,6 +478,8 @@ class NewsHandler(BaseHandler, TemplateRendering):
                 'feeds': feeds['feeds'],
                 'cursor': feeds['next_cursor'],
             }
+            if len(variables['feeds']) == 0:
+                self.write("<p style='color: red; font-size: 15px'><b>Ops! There is no feed now.</b></p>")
         else:
             template = 'alertNews.html'
             alertid = self.get_argument('alertid')
