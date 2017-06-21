@@ -35,7 +35,7 @@ def linkParser(link):
         parsed_uri = urlparse(link)
         domain = extract(link).domain
         if domain not in unwanted_links:
-            source = '{uri.scheme}://{uri.netloc}/'.format(uri=parsed_uri)
+            source = '{uri.netloc}'.format(uri=parsed_uri)
 
             url = link
             article = Article(url)
