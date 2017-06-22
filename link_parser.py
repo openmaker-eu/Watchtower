@@ -57,6 +57,7 @@ def calculateLinks(alertid, tweet):
             try:
                 link = unshorten_url(link)
                 if len(list(Connection.Instance().newsPoolDB[str(alertid)].find({'url':link}))) != 0:
+                    print("found in db")
                     Connection.Instance().newsPoolDB[str(alertid)].find_one_and_update({'url': link}, {'$push': {'mentions': tweet_tuple}})
                     continue
                 dic = linkParser(link)
