@@ -41,7 +41,7 @@ def linkParser(link):
     except Exception as e:
         pass
 
-@timeout_decorator.timeout(5, use_signals=False)
+@timeout_decorator.timeout(5, use_signals=True)
 def calculateLinks(alertid, tweet):
     print("processing...")
     alertid = int(alertid)
@@ -86,14 +86,8 @@ def main():
                 tweets = list(Connection.Instance().db[str(collection)].find({'isprocessed': {'$exists': True}, 'isprocessed': False},\
                  {'id_str':1, '_id':0, 'timestamp_ms':1, 'user.id_str':1, 'entities.urls':1}).limit(LIMIT))
                 print(len(tweets))
-                params = createParameters(collection, tweets)
-                pool = ThreadPool(4, True)
-                pool.map(calculateLinks, params)
-                pool.wait_completion()
-
-"""
                 for tweet in tweets:
-                    calculateLinks(collection, tweet)"""
+                    calculateLinks(collection, tweet)
 
 if __name__ == '__main__':
     main()
