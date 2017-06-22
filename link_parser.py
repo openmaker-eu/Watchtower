@@ -82,7 +82,7 @@ def main():
         for collection in sorted(list(Connection.Instance().db.collection_names()), reverse=True):
             if str(collection) != 'counters':
                 print('id: ', collection)
-                LIMIT = 100 if (str(collection) in '31,32,33,37,38,39') else 50
+                LIMIT = 30 if (str(collection) in '31,32,33,37,38,39') else 10
                 tweets = list(Connection.Instance().db[str(collection)].find({'isprocessed': {'$exists': True}, 'isprocessed': False},\
                  {'id_str':1, '_id':0, 'timestamp_ms':1, 'user.id_str':1, 'entities.urls':1}).limit(LIMIT))
                 print(len(tweets))
