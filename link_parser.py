@@ -90,7 +90,6 @@ def main():
                 pool = ThreadPool(4,True)
                 pool.map(calculateLinks, params)
                 pool.wait_completion()
-        time.sleep(5)
 
 if __name__ == '__main__':
     main()

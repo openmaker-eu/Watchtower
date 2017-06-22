@@ -52,18 +52,18 @@ def separates_tweet(alertDic, tweet):
                         if re.search(keyword, str(tweet['extended_tweet']['full_text'])):
                             tweet['_id'] = ObjectId()
                             if tweet['entities']['urls'] != []:
-                                tweet['isprocessed'] = True
-                            else:
                                 tweet['isprocessed'] = False
+                            else:
+                                tweet['isprocessed'] = True
                             Connection.Instance().db[str(alert['alertid'])].insert_one(tweet)
                             break
                     else:
                         if re.search(keyword, str(tweet['text'])):
                             tweet['_id'] = ObjectId()
                             if tweet['entities']['urls'] != []:
-                                tweet['isprocessed'] = True
-                            else:
                                 tweet['isprocessed'] = False
+                            else:
+                                tweet['isprocessed'] = True
                             Connection.Instance().db[str(alert['alertid'])].insert_one(tweet)
                             break
     except Exception as e:
