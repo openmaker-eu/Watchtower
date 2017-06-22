@@ -314,7 +314,7 @@ def getNews(alertid, date, cursor):
     if date not in dates:
         result['Error'] = 'invalid date'
         return json.dumps(result, indent=4)
-    feeds = list(Connection.Instance().newsdB[str(alertid)].find({'name': date}, {date: 1}))
+    feeds = list(Connection.Instance().filteredNewsPoolDB[str(alertid)].find({'name': date}, {date: 1}))
     feeds = list(feeds[0][date][cursor:cursor+20])
     cursor = int(cursor) + 20
     if cursor >= 60:
