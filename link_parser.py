@@ -7,7 +7,7 @@ from urllib.parse import urlparse
 from tldextract import extract
 import timeout_decorator
 from re import search, IGNORECASE
-import sys
+import sys, time
 from tldextract import extract
 
 def get_next_links_sequence():
@@ -44,9 +44,10 @@ def linkParser(link):
 
 def calculateLinks(alertid, tweet):
     alertid = int(alertid)
+    Connection.Instance().db[str(alertid)].find_one_and_update({'id_str':tweet['id_str'], 'isprocessed': {'$exists': True}, 'isprocessed': False}, {'$set': {'isprocessed': True}})
     try:
-        tweet_tuple = {'user_id': tweet['userid'], 'tweet_id': tweet['tweet_id'], 'timestamp_ms': int(tweet['timestamp_ms'])}
-        for link in tweet['urls']:
+        tweet_tuple = {'user_id': tweet['user']['id_str'], 'tweet_id': tweet['id_str'], 'timestamp_ms': int(tweet['timestamp_ms'])}
+        for link in tweet['entities']['urls']:
             link = link['expanded_url']
             if link == None:
                 continue
@@ -70,4 +71,26 @@ def calculateLinks(alertid, tweet):
                 print(e)
                 pass
     except Exception as e:
+        print(e)
         pass
+
+def createParameters(alertid, tweets):
+    return [[alertid,tweet] for tweet in tweets]
+
+def main():
+    while True:
+        for collection in Connection.Instance().db.collection_names():
+            if str(collection) != 'counters':
+                print('id: ', collection)
+                LIMIT = 100 if (str(collection) in '31,32,33,37,38,39') else 50
+                tweets = list(Connection.Instance().db[str(collection)].find({'isprocessed': {'$exists': True}, 'isprocessed': False},\
+                 {'id_str':1, '_id':0, 'timestamp_ms':1, 'user.id_str':1, 'entities.urls':1}).limit(LIMIT))
+                print(len(tweets))
+                params = createParameters(str(collection), tweets)
+                pool = ThreadPool(4,True)
+                pool.map(calculateLinks, params)
+                pool.wait_completion()
+        time.sleep(5)
+
+if __name__ == '__main__':
+    main()

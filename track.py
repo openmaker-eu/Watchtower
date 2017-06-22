@@ -11,9 +11,6 @@ import re
 from bson.objectid import ObjectId
 import link_parser
 import subprocess
-from application.ThreadPool import ThreadPool
-#from redis import Redis
-#from rq import Queue
 
 def get_info(alertDic):
     keywords = []
@@ -54,28 +51,20 @@ def separates_tweet(alertDic, tweet):
                     if 'extended_tweet' in tweet and 'full_text' in tweet['extended_tweet']:
                         if re.search(keyword, str(tweet['extended_tweet']['full_text'])):
                             tweet['_id'] = ObjectId()
-                            Connection.Instance().db[str(alert['alertid'])].insert_one(tweet)
                             if tweet['entities']['urls'] != []:
-                                temp = {
-                                    'userid': tweet['user']['id_str'],
-                                    'timestamp_ms': int(tweet['timestamp_ms']),
-                                    'tweet_id': tweet['id_str'],
-                                    'urls': tweet['entities']['urls']
-                                }
-                                link_parser.calculateLinks(alert['alertid'], temp)
+                                tweet['isprocessed'] = True
+                            else:
+                                tweet['isprocessed'] = False
+                            Connection.Instance().db[str(alert['alertid'])].insert_one(tweet)
                             break
                     else:
                         if re.search(keyword, str(tweet['text'])):
                             tweet['_id'] = ObjectId()
-                            Connection.Instance().db[str(alert['alertid'])].insert_one(tweet)
                             if tweet['entities']['urls'] != []:
-                                temp = {
-                                    'userid': tweet['user']['id_str'],
-                                    'timestamp_ms': int(tweet['timestamp_ms']),
-                                    'tweet_id': tweet['id_str'],
-                                    'urls': tweet['entities']['urls']
-                                }
-                                link_parser.calculateLinks(alert['alertid'], temp)
+                                tweet['isprocessed'] = True
+                            else:
+                                tweet['isprocessed'] = False
+                            Connection.Instance().db[str(alert['alertid'])].insert_one(tweet)
                             break
     except Exception as e:
         f = open('../log.txt', 'a+')
@@ -86,15 +75,6 @@ def separates_tweet(alertDic, tweet):
         f.write('\n\n')
         f.close()
         pass
-
-def redis_tweet(data):
-    print('in the worker')
-    try:
-        tweet = json.loads(data['data'])
-        tweet['tweetDBId'] = get_next_tweets_sequence()
-        separates_tweet(data['alertdic'], tweet)
-    except Exception as e:
-        print('redis_tweet: ', str(e))
 
 # Accessing Twitter API
 consumer_key = "utTM4qfuhmzeLUxRkBb1xb12P" # API key
@@ -109,18 +89,14 @@ class StdOutListener(StreamListener):
         self.alertDic = alertDic
         self.terminate = False
         self.connection = True
-        self.pool = ThreadPool(6, False)
-        #self.q = Queue(connection=Redis())
         super(StdOutListener, self).__init__()
 
     def on_data(self, data):
         if self.terminate == False:
             try:
-                dicc = {
-                    'data': data,
-                    'alertdic': self.alertDic
-                }
-                self.pool.add_task(redis_tweet, dicc)
+                tweet = json.loads(data)
+                tweet['tweetDBId'] = get_next_tweets_sequence()
+                separates_tweet(self.alertDic, tweet)
                 return True
             except Exception as e:
                 f = open('../log.txt', 'a+')
