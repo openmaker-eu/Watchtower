@@ -16,7 +16,7 @@ while True:
              {'id_str':1, '_id':0, 'timestamp_ms':1, 'user.id_str':1, 'entities.urls':1}))
             print(len(tweets))
             for tweet in tweets:
-                Connection.Instance().db[str(alertid)].find_one_and_update({'id_str':tweet['id_str'], 'redis': {'$exists': True}, 'redis': False}, {'$set': {'redis': True}})
+                Connection.Instance().db[str(collection)].find_one_and_update({'id_str':tweet['id_str'], 'redis': {'$exists': True}, 'redis': False}, {'$set': {'redis': True}})
                 data = {
                     'alertid' : collection,
                     'tweet': tweet
