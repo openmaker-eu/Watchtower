@@ -97,6 +97,7 @@ class StdOutListener(StreamListener):
                 print("tweet geldii!!")
                 tweet = json.loads(data)
                 tweet['tweetDBId'] = get_next_tweets_sequence()
+                tweet['redis'] = False
                 separates_tweet(self.alertDic, tweet)
                 return True
             except Exception as e:

@@ -9,6 +9,8 @@ import timeout_decorator
 from re import search, IGNORECASE
 import sys, time
 from tldextract import extract
+from rq import Queue
+from redis import Redis
 
 def get_next_links_sequence():
     cursor = Connection.Instance().newsPoolDB["counters"].find_and_modify(
@@ -41,8 +43,9 @@ def linkParser(link):
     except Exception as e:
         pass
 
-@timeout_decorator.timeout(5, use_signals=True)
-def calculateLinks(alertid, tweet):
+def calculateLinks(data):
+    alertid = data['alertid']
+    tweet = data['tweet']
     print("processing...")
     alertid = int(alertid)
     Connection.Instance().db[str(alertid)].find_one_and_update({'id_str':tweet['id_str'], 'isprocessed': {'$exists': True}, 'isprocessed': False}, {'$set': {'isprocessed': True}})
@@ -76,18 +79,3 @@ def calculateLinks(alertid, tweet):
 
 def createParameters(alertid, tweets):
     return [[alertid,tweet] for tweet in tweets]
-
-def main():
-    while True:
-        for collection in sorted(list(Connection.Instance().db.collection_names()), reverse=True):
-            if str(collection) != 'counters':
-                print('id: ', collection)
-                LIMIT = 30 if (str(collection) in '31,32,33,37,38,39') else 10
-                tweets = list(Connection.Instance().db[str(collection)].find({'isprocessed': {'$exists': True}, 'isprocessed': False},\
-                 {'id_str':1, '_id':0, 'timestamp_ms':1, 'user.id_str':1, 'entities.urls':1}).limit(LIMIT))
-                print(len(tweets))
-                for tweet in tweets:
-                    calculateLinks(collection, tweet)
-
-if __name__ == '__main__':
-    main()

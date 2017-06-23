@@ -12,7 +12,7 @@ class Connection:
 
     def __init__(self):
         try:
-            self.MongoDBClient = pymongo.MongoClient('mongodb://admin:smio1EUp@138.68.92.181:27017/')
+            self.MongoDBClient = pymongo.MongoClient('mongodb://admin:smio1EUp@138.68.92.181:27017/', connect=False)
             self.db = self.MongoDBClient.openMakerdB
             self.newsdB = self.MongoDBClient.newsdB
             self.feedDB = self.MongoDBClient.feedDB
