@@ -61,11 +61,11 @@ def separates_tweet(alertDic, tweet):
                     else:
                         if re.search(keyword, str(tweet['text'])):
                             tweet['_id'] = ObjectId()
-                            if tweet['entities']['urls'] != []:
+                            if tweet['entities']['urls'] == [] or tweet['entities']['urls'][0]['expanded_url'] == None:
+                                tweet['isprocessed'] = True
+                            else:
                                 tweet['redis'] = False
                                 tweet['isprocessed'] = False
-                            else:
-                                tweet['isprocessed'] = True
                             Connection.Instance().db[str(alert['alertid'])].insert_one(tweet)
                             break
     except Exception as e:
