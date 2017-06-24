@@ -52,6 +52,7 @@ def separates_tweet(alertDic, tweet):
                         if re.search(keyword, str(tweet['extended_tweet']['full_text'])):
                             tweet['_id'] = ObjectId()
                             if tweet['entities']['urls'] != []:
+                                tweet['redis'] = False
                                 tweet['isprocessed'] = False
                             else:
                                 tweet['isprocessed'] = True
@@ -61,6 +62,7 @@ def separates_tweet(alertDic, tweet):
                         if re.search(keyword, str(tweet['text'])):
                             tweet['_id'] = ObjectId()
                             if tweet['entities']['urls'] != []:
+                                tweet['redis'] = False
                                 tweet['isprocessed'] = False
                             else:
                                 tweet['isprocessed'] = True
@@ -97,7 +99,6 @@ class StdOutListener(StreamListener):
                 print("tweet geldii!!")
                 tweet = json.loads(data)
                 tweet['tweetDBId'] = get_next_tweets_sequence()
-                tweet['redis'] = False
                 separates_tweet(self.alertDic, tweet)
                 return True
             except Exception as e:
