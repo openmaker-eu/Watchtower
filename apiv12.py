@@ -99,13 +99,23 @@ def getInfluencers(themename, themeid):
 def getNews(news_ids, keywords, cursor):
     cursor = int(cursor)
     if news_ids == [""] and keywords == [""]:
-        return json.dumps({'news': "Empty news id list"}, indent=4)
+        return json.dumps({'news': "Empty news id list", 'next_cursor': 0, 'next_cursor_str': "0"}, indent=4)
     elif news_ids != [""] and keywords == [""]:
         news_ids = [int(one_id) for one_id in news_ids]
         news = []
         for alertid in Connection.Instance().newsPoolDB.collection_names():
-            news = news + list(Connection.Instance().newsPoolDB[str(alertid)].find({'link_id': {'$in': news_ids}}, {"_id":0, 'mentions': 0}))
-        return json.dumps({'news': news}, indent=4)
+            news = news + list(Connection.Instance().newsPoolDB[str(alertid)].find({'link_id': {'$in': news_ids}}, {"_id":0, 'mentions': 0, 'bookmark':0}))
+
+        next_cursor = cursor + 20
+        if len(news) < cursor+20:
+            next_cursor = 0
+
+        result = {
+            'next_cursor': next_cursor,
+            'next_cursor_str': str(next_cursor),
+            'news': news[cursor:cursor+20]
+        }
+        return json.dumps(result, indent=4)
     elif news_ids == [""] and keywords != [""]:
         keywords = [re.compile(key, re.IGNORECASE) for key in keywords]
         news = []
@@ -113,7 +123,7 @@ def getNews(news_ids, keywords, cursor):
             if len(news) >= cursor+20:
                 break
             for key in keywords:
-                news = news + list(Connection.Instance().newsPoolDB[str(alertid)].find({'$or': [{'title': key}, {'description': key}]}, {"_id":0, 'mentions': 0}))
+                news = news + list(Connection.Instance().newsPoolDB[str(alertid)].find({'$or': [{'title': key}, {'description': key}]}, {"_id":0, 'mentions': 0, 'bookmark':0}))
 
         next_cursor = cursor + 20
         if len(news) < cursor+20:
@@ -131,6 +141,15 @@ def getNews(news_ids, keywords, cursor):
         news = []
         for alertid in Connection.Instance().newsPoolDB.collection_names():
             for key in keywords:
-                news = news + list(Connection.Instance().newsPoolDB[str(alertid)].find({'link_id': {'$in': news_ids}, '$or': [{'title': key}, {'description': key}]}, {"_id":0, 'mentions': 0}))
+                news = news + list(Connection.Instance().newsPoolDB[str(alertid)].find({'link_id': {'$in': news_ids}, '$or': [{'title': key}, {'description': key}]}, {"_id":0, 'mentions': 0, 'bookmark':0}))
 
-        return json.dumps({'news': news}, indent=4)
+        next_cursor = cursor + 20
+        if len(news) < cursor+20:
+            next_cursor = 0
+
+        result = {
+            'next_cursor': next_cursor,
+            'next_cursor_str': str(next_cursor),
+            'news': news[cursor:cursor+20]
+        }
+        return json.dumps(result, indent=4)

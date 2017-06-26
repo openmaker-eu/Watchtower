@@ -1,7 +1,9 @@
 <div id="spin" style=" z-index: 100;"></div>
 {% if comesAlert %}
 <div class="container" style="margin-bottom:10px">
-  <h2 style="margin-left:50px"><strong>{{alertname}}</strong></h2>
+    <div class="row">
+    <h2 style="margin-left:50px"><strong>{{alertname}}</strong></h2>
+  </div>
 </div>
   <div class="container" id="feedcontainer">
     {% include 'alertFeed.html' %}

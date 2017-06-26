@@ -545,6 +545,25 @@
       });
     }
     </script>
+    <script>
+    function dummy(posttype, link_id) {
+      $("#spin").show();
+      var aid = $("ol").attr("alertid");
+      $.ajax({
+          url: '/bookmark',
+          method: 'POST',
+          data: {
+              'alertid': aid,
+              'posttype': posttype,
+              'link_id': link_id
+          },
+      }).success(function(html) {
+          $('#'.concat(link_id)).empty();
+          $('#'.concat(link_id)).append(html);
+          $("#spin").hide();
+      });
+    }
+    </script>
     {% endif %}
 </body>
 

@@ -3,7 +3,8 @@ import search
 import pymongo
 from application.Connections import Connection
 from time import gmtime, strftime, strptime
-import json
+import json, datetime
+import dateFilter
 
 def getThemes():
     names = Connection.Instance().feedDB.collection_names()
@@ -72,7 +73,7 @@ def getAllAlertList():
     Connection.Instance().cur.execute("Select * from alerts;")
     var = Connection.Instance().cur.fetchall()
     alerts = [{'alertid':i[0], 'name':i[2], 'keywords':i[3].split(","), \
-               'lang': i[5].split(","), 'status': i[6], 'creationTime': i[7]} for i in var]
+               'lang': i[5].split(","), 'status': i[6], 'creationTime': i[7], 'domains': i[11].split(",")} for i in var]
     alerts = sorted(alerts, key=lambda k: k['alertid'])
     return alerts
 
@@ -99,7 +100,7 @@ def getAlertList(userid):
     Connection.Instance().cur.execute("Select * from alerts where userid = %s;", [userid])
     var = Connection.Instance().cur.fetchall()
     alerts = [{'alertid':i[0], 'name':i[2], 'keywords':i[3].split(","), 'lang': i[5].split(","),\
-               'status': i[6], 'creationTime': i[7], 'publish': i[10]} for i in var]
+               'status': i[6], 'creationTime': i[7], 'publish': i[10], 'domains': i[11].split(",")} for i in var]
     alerts = sorted(alerts, key=lambda k: k['alertid'])
     for alert in alerts:
         alert['tweetCount'] = Connection.Instance().db[str(alert['alertid'])].find().count()
@@ -127,7 +128,7 @@ def getAlert(alertid):
         Connection.Instance().cur.execute("Select * from alerts where alertid = %s;", [alertid])
         var = Connection.Instance().cur.fetchone()
         alert = {'alertid': var[0], 'name':var[2], 'keywords':var[3], 'lang': var[5].split(","), 'status': var[6], 'keywordlimit': var[8],\
-                 'description': var[9]}
+                 'description': var[9], 'domains': var[11]}
     else:
         alert = {'alertid': "", 'name': "", 'keywords': "", 'lang': "", 'status': False, 'keywordlimit': 10, 'description': ""}
     return alert
@@ -163,7 +164,7 @@ def setUserAlertLimit(userid, setType):
 def addAlert(alert, mainT, userid):
     alert['alertid'] = getNextAlertId()
     now = strftime("%Y-%m-%d", gmtime())
-    Connection.Instance().cur.execute("INSERT INTO alerts (alertid, userid, alertname, keywords, languages, creationtime, keywordlimit, isrunning, description) values (%s, %s, %s, %s, %s, %s, %s, %s, %s);", [alert['alertid'], userid, alert['name'], alert['keywords'], alert['lang'], now, alert['keywordlimit'], True, alert['description']])
+    Connection.Instance().cur.execute("INSERT INTO alerts (alertid, userid, alertname, keywords, languages, creationtime, keywordlimit, isrunning, description, domains, bookmarks) values (%s, %s, %s, %s, %s, %s, %s, %s, %s);", [alert['alertid'], userid, alert['name'], alert['keywords'], alert['lang'], now, alert['keywordlimit'], True, alert['description'], alert['domains'], []])
     Connection.Instance().PostGreSQLConnect.commit()
     alert = getAlertAllOfThemList(alert['alertid'])
     setUserAlertLimit(userid, 'decrement')
@@ -182,7 +183,7 @@ def deleteAlert(alertid, mainT, userid):
 
 # Updates given alert information and kill its thread, then again start its thread.
 def updateAlert(alert, mainT, userid):
-    Connection.Instance().cur.execute("update alerts set userid = %s, keywords = %s , languages = %s, isrunning = %s, description = %s where alertid = %s;", [userid, alert['keywords'], alert['lang'], True, alert['description'], alert['alertid']])
+    Connection.Instance().cur.execute("update alerts set userid = %s, keywords = %s , languages = %s, domains = %s, isrunning = %s, description = %s where alertid = %s;", [userid, alert['keywords'], alert['lang'], alert['domains'], True, alert['description'], alert['alertid']])
     Connection.Instance().PostGreSQLConnect.commit()
     alert = getAlertAllOfThemList(alert['alertid'])
     mainT.updateAlert(alert)
@@ -210,6 +211,38 @@ def publishAlert(alertid):
 def unpublishAlert(alertid):
     Connection.Instance().cur.execute("update alerts set ispublish = %s where alertid = %s;", [False, alertid])
     Connection.Instance().PostGreSQLConnect.commit()
+
+# Adds bookmark
+def addBookmark(alertid, link_id):
+    link_id = int(link_id)
+    Connection.Instance().newsPoolDB[str(alertid)].find_one_and_update({'link_id': link_id}, {'$set': {'bookmark': True, 'bookmark_date': datetime.datetime.utcnow()}})
+    Connection.Instance().cur.execute("Select bookmarks from alerts where alertid = %s;", [int(alertid)])
+    bookmarks = Connection.Instance().cur.fetchall()[0][0]
+    bookmarks.insert(0, link_id)
+    bookmarks = list(sorted(set(bookmarks), key=bookmarks.index))
+    Connection.Instance().cur.execute("update alerts set bookmarks = %s where alertid = %s;", [bookmarks, int(alertid)])
+    Connection.Instance().PostGreSQLConnect.commit()
+    Connection.Instance().cur.execute("Select domains from alerts where alertid = %s;", [int(alertid)])
+    domains = Connection.Instance().cur.fetchall()[0][0]
+    dateFilter.calc(alertid, domains.split(","))
+    content = """<a href="javascript:;" onclick="dummy('remove', '{}')" style="color: #000000;text-decoration: none;"><span style="float:right;color:#808080;font-size:24px" align="right" class="glyphicon glyphicon-bookmark"></span></a>""".format(link_id)
+    return content
+
+# Removes bookmarks
+def removeBookmark(alertid, link_id):
+    link_id = int(link_id)
+    Connection.Instance().newsPoolDB[str(alertid)].find_one_and_update({'link_id': link_id}, {'$set': {'bookmark': False, 'bookmark_date': None}})
+    Connection.Instance().cur.execute("Select bookmarks from alerts where alertid = %s;", [int(alertid)])
+    bookmarks = Connection.Instance().cur.fetchall()[0][0]
+    bookmarks.remove(link_id)
+    bookmarks = list(sorted(set(bookmarks), key=bookmarks.index))
+    Connection.Instance().cur.execute("update alerts set bookmarks = %s where alertid = %s;", [bookmarks, int(alertid)])
+    Connection.Instance().PostGreSQLConnect.commit()
+    Connection.Instance().cur.execute("Select domains from alerts where alertid = %s;", [int(alertid)])
+    domains = Connection.Instance().cur.fetchall()[0][0]
+    dateFilter.calc(alertid, domains.split(","))
+    content = """<a href="javascript:;" onclick="dummy('add', '{}')" style="color: #000000;text-decoration: none;"><span style="float:right;color:#D70000;font-size:24px" align="right" class="glyphicon glyphicon-bookmark"></span></a>""".format(link_id)
+    return content
 
 def getTweets(alertid):
     tweets = Connection.Instance().db[str(alertid)].find({}, {'tweetDBId': 1, "text":1, "id":1, "user":1, 'created_at': 1, "_id":0}).sort([('tweetDBId' , pymongo.DESCENDING)]).limit(25)
@@ -309,6 +342,23 @@ def searchTweets(keywords, languages):
     return tweets
 
 def getNews(alertid, date, cursor):
+    if date == 'bookmarks':
+        Connection.Instance().cur.execute("Select bookmarks from alerts where alertid = %s;", [int(alertid)])
+        bookmarks = Connection.Instance().cur.fetchall()[0][0]
+        bookmarks = [int(one_id) for one_id in bookmarks]
+        news = list(Connection.Instance().newsPoolDB[str(alertid)].find({'link_id': {'$in': bookmarks}}, {"_id":0, 'mentions': 0}).sort([('bookmark_date', pymongo.DESCENDING)]))
+        news = news[cursor:cursor+20]
+
+        cursor = int(cursor) + 20
+        if cursor >= 60:
+            cursor = 60
+
+        result = {
+            'next_cursor': cursor,
+            'cursor_length': len(bookmarks),
+            'feeds': news
+        }
+        return result
     dates=['all', 'yesterday', 'week', 'month']
     result = {}
     if date not in dates:
@@ -316,6 +366,7 @@ def getNews(alertid, date, cursor):
         return json.dumps(result, indent=4)
     feeds = list(Connection.Instance().filteredNewsPoolDB[str(alertid)].find({'name': date}, {date: 1}))
     feeds = list(feeds[0][date][cursor:cursor+20])
+
     cursor = int(cursor) + 20
     if cursor >= 60:
         cursor = 60

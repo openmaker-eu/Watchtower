@@ -6,8 +6,21 @@
     <div class="col-md-9">
       <p></p>
       <a href="{{feed['url']}}" target="_blank" style="color: #000000;text-decoration: none;">
-      <h4 style="margin-bottom:4px;"> <span> <strong>{{feed['title']}}</strong></span> </h4></a>
-      <a style="color:#666666;text-decoration: none;" href="{{feed['source']}}" target="_blank">{{feed['source']}}</a> <p></p>
+      <h4 style="margin-bottom:4px;">
+        <div id="{{feed['link_id']}}">
+          {% if not feed['bookmark'] %}
+          <a href="javascript:;" onclick="dummy('add', '{{feed['link_id']}}')" style="color: #000000;text-decoration: none;">
+            <span style="float:right;color:#D70000;font-size:24px" align="right" class="glyphicon glyphicon-bookmark"></span>
+          </a>
+          {% else %}
+          <a href="javascript:;" onclick="dummy('remove', '{{feed['link_id']}}')" style="color: #000000;text-decoration: none;">
+            <span style="float:right;color:#808080;font-size:24px" align="right" class="glyphicon glyphicon-bookmark"></span>
+          </a>
+          {% endif %}
+        </div>
+        <span> <strong>{{feed['title']}}</strong></span></a>
+      </h4>
+      <a style="color:#666666;text-decoration: none;" href="{{feed['source']}}" target="_blank">{{feed['source']}}</a><p></p>
         <p>
         </p><p>{{feed['description']}}</p>
         <p></p>

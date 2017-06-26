@@ -55,6 +55,7 @@ class Application(tornado.web.Application):
             (r"/News/(.*)", NewsHandler, {'mainT':mainT}),
             (r"/News", NewsHandler, {'mainT':mainT}),
             (r"/preview", PreviewHandler, {'mainT':mainT}),
+            (r"/bookmark", BookmarkHandler, {'mainT':mainT}),
             (r"/newTweets", NewTweetsHandler, {'mainT':mainT}),
             (r"/newTweets/(.*)", NewTweetsHandler, {'mainT':mainT}),
             (r"/api", DocumentationHandler, {'mainT':mainT}),
@@ -310,6 +311,9 @@ class CreateEditAlertsHandler(BaseHandler, TemplateRendering):
         userid = tornado.escape.xhtml_escape(self.current_user)
         alert = {}
         alert['keywords'] = ",".join(self.get_argument("keywords").split(","))
+
+        alert['domains'] = ",".join(self.get_argument("domains").split(","))
+        print(alert['domains'])
         alert['description'] = self.get_argument("description")
         keywordlimit = 10 - len(self.get_argument("keywords").split(","))
         alert['keywordlimit'] = keywordlimit
@@ -340,6 +344,19 @@ class PreviewHandler(BaseHandler, TemplateRendering):
         if len(variables['tweets']) == 0:
             self.write("<p style='color: red; font-size: 15px'><b>Ops! There is no tweet now.</b></p>")
         content = self.render_template(template, variables)
+        self.write(content)
+
+class BookmarkHandler(BaseHandler, TemplateRendering):
+    @tornado.web.authenticated
+    def post(self):
+        link_id = self.get_argument("link_id")
+        alertid = self.get_argument("alertid")
+        posttype = self.get_argument("posttype")
+        if posttype == "add":
+            content = logic.addBookmark(alertid, link_id)
+        else:
+            content = logic.removeBookmark(alertid, link_id)
+
         self.write(content)
 
 class FeedHandler(BaseHandler, TemplateRendering):
@@ -442,7 +459,7 @@ class NewsHandler(BaseHandler, TemplateRendering):
                         'type': "news"
                     }
                 except:
-                    self.write("<p style='color: red; font-size: 15px'><b>Ops! There is no feed now.</b></p>")
+                    self.write("<p style='color: red; font-size: 15px'><b>Ops! There is no news now.</b></p>")
             except ValueError:
                 variables = {
                     'title': "News",
@@ -479,8 +496,9 @@ class NewsHandler(BaseHandler, TemplateRendering):
                     'feeds': feeds['feeds'],
                     'cursor': feeds['next_cursor'],
                 }
-            except:
-                self.write("<p style='color: red; font-size: 15px'><b>Ops! There is no feed now.</b></p>")
+            except Exception as e:
+                print(e)
+                self.write("<p style='color: red; font-size: 15px'><b>Ops! There is no news now.</b></p>")
         else:
             template = 'alertNews.html'
             alertid = self.get_argument('alertid')
@@ -496,8 +514,9 @@ class NewsHandler(BaseHandler, TemplateRendering):
                     'cursor': feeds['next_cursor'],
                     'alertid': alertid
                 }
-            except:
-                self.write("<p style='color: red; font-size: 15px'><b>Ops! There is no feed now.</b></p>")
+            except Exception as e:
+                print(e)
+                self.write("<p style='color: red; font-size: 15px'><b>Ops! There is no news now.</b></p>")
         content = self.render_template(template, variables)
         self.write(content)
 

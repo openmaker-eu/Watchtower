@@ -13,6 +13,8 @@ def getDateList(alertid, date, forbidden_domain):
                 'title':1,
                 'keywords':1,
                 'domain':1,
+                'bookmark':1,
+                'bookmark_date':1,
                 'mentions': {
                     '$filter': {
                         'input': "$mentions",
@@ -36,6 +38,8 @@ def getDateList(alertid, date, forbidden_domain):
                 'description':1,
                 'title':1,
                 'keywords':1,
+                'bookmark':1,
+                'bookmark_date':1,
                 'popularity': {'$size': '$mentions'}
             }},
             {'$match': {
@@ -55,7 +59,8 @@ def calculate_dates():
     l.append(('month', current_milli_time - 30 * one_day))
     return l
 
-def calc(alertid, dates, forbidden_domain):
+def calc(alertid, forbidden_domain):
+    dates = calculate_dates()
     for date, current_milli_time in dates:
         result = {
             'name': date,
@@ -67,11 +72,10 @@ def calc(alertid, dates, forbidden_domain):
             Connection.Instance().filteredNewsPoolDB[str(alertid)].insert_one(result)
 
 def main():
-    dates = calculate_dates()
-    print(dates)
-    for alertid in Connection.Instance().db.collection_names():
-        if alertid != u'counters':
-            calc(alertid, dates, [])
+    Connection.Instance().cur.execute("Select alertid,domains from alerts;")
+    alert_list = Connection.Instance().cur.fetchall()
+    for alert in alert_list:
+        calc(alert[0], alert[1].split(","))
 
 if __name__ == '__main__':
     main()

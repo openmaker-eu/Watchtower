@@ -68,6 +68,7 @@ def calculateLinks(data):
                     else:
                         dic['link_id'] = get_next_links_sequence()
                         dic['mentions']=[tweet_tuple]
+                        dic['bookmark']=False
                         Connection.Instance().newsPoolDB[str(alertid)].insert_one(dic)
             except Exception as e:
                 print(link)
