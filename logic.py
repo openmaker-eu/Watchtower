@@ -160,6 +160,15 @@ def setUserAlertLimit(userid, setType):
     Connection.Instance().cur.execute("update users set alertlimit = %s where userid = %s", [newLimit, userid])
     Connection.Instance().PostGreSQLConnect.commit()
 
+def banDomain(alertid, domain):
+    Connection.Instance().cur.execute("select domains from alerts where alertid = %s", [int(alertid)])
+    domains = Connection.Instance().cur.fetchall()[0][0]
+    domains = domains.split(",")
+    domains.append(domain)
+    domains = ",".join(domains)
+    Connection.Instance().cur.execute("update alerts set domains = %s where alertid;", [domains, int(alertid)])
+    Connection.Instance().PostGreSQLConnect.commit()
+
 # Take alert information, give an id and add it DB
 def addAlert(alert, mainT, userid):
     alert['alertid'] = getNextAlertId()

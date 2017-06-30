@@ -7,6 +7,9 @@
       <p></p>
       <a href="{{feed['url']}}" target="_blank" style="color: #000000;text-decoration: none;">
       <h4 style="margin-bottom:4px;">
+        <a href="javascript:;" onclick="ban_domain('{{feed['domain']}}')" style="color: #000000;text-decoration: none;">
+          <span style="float:right;font-size:24px" align="right" class="glyphicon glyphicon-ban-circle"></span>
+        </a>
         <div id="{{feed['link_id']}}">
           {% if not feed['bookmark'] %}
           <a href="javascript:;" onclick="dummy('add', '{{feed['link_id']}}')" style="color: #000000;text-decoration: none;">

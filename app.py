@@ -56,6 +56,7 @@ class Application(tornado.web.Application):
             (r"/News", NewsHandler, {'mainT':mainT}),
             (r"/preview", PreviewHandler, {'mainT':mainT}),
             (r"/bookmark", BookmarkHandler, {'mainT':mainT}),
+            (r"/domain", DomainHandler, {'mainT':mainT}),
             (r"/newTweets", NewTweetsHandler, {'mainT':mainT}),
             (r"/newTweets/(.*)", NewTweetsHandler, {'mainT':mainT}),
             (r"/api", DocumentationHandler, {'mainT':mainT}),
@@ -358,8 +359,15 @@ class BookmarkHandler(BaseHandler, TemplateRendering):
             content = logic.addBookmark(alertid, link_id)
         else:
             content = logic.removeBookmark(alertid, link_id)
-
         self.write(content)
+
+class BookmarkHandler(BaseHandler, TemplateRendering):
+    @tornado.web.authenticated
+    def post(self):
+        domain = self.get_argument("domain")
+        alertid = self.get_argument("alertid")
+        logic.banDomain(alertid, domain)
+        self.write({})
 
 class FeedHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated

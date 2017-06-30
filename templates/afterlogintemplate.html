@@ -564,6 +564,22 @@
       });
     }
     </script>
+    <script>
+    function ban_domain(domain) {
+      $("#spin").show();
+      var aid = $("ol").attr("alertid");
+      $.ajax({
+          url: '/domain',
+          method: 'POST',
+          data: {
+              'alertid': aid,
+              'domain': domain
+          },
+      }).success(function(html) {
+          $("#spin").hide();
+      });
+    }
+    </script>
     {% endif %}
 </body>
 
