@@ -165,7 +165,9 @@ def banDomain(alertid, domain):
     domains = Connection.Instance().cur.fetchall()[0][0]
     domains = domains.split(",")
     domains.append(domain)
-    domains.remove("")
+    if "" in domains:
+        domains.remove("")
+    domains = list(set(domains))
     dateFilter.calc(alertid, domains)
     domains = ",".join(domains)
     Connection.Instance().cur.execute("update alerts set domains = %s where alertid = %s;", [domains, int(alertid)])
