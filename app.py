@@ -361,7 +361,7 @@ class BookmarkHandler(BaseHandler, TemplateRendering):
             content = logic.removeBookmark(alertid, link_id)
         self.write(content)
 
-class BookmarkHandler(BaseHandler, TemplateRendering):
+class DomainHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
     def post(self):
         domain = self.get_argument("domain")
