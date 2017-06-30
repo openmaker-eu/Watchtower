@@ -166,6 +166,7 @@ def banDomain(alertid, domain):
     domains = domains.split(",")
     domains.append(domain)
     domains.remove("")
+    dateFilter.calc(alertid, domains)
     domains = ",".join(domains)
     Connection.Instance().cur.execute("update alerts set domains = %s where alertid = %s;", [domains, int(alertid)])
     Connection.Instance().PostGreSQLConnect.commit()
