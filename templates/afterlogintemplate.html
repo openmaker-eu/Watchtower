@@ -576,7 +576,7 @@
               'domain': domain
           },
       }).success(function(html) {
-        $("[domain='".concat(domain)).concat("']")).remove();
+        $("[domain='".concat(domain).concat("']")).remove();
         $("#spin").hide();
       });
     }
