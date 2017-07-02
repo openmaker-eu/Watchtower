@@ -5,7 +5,6 @@
     </div>
     <div class="col-md-9">
       <p></p>
-      <a href="{{feed['url']}}" target="_blank" style="color: #000000;text-decoration: none;">
       <h4 style="margin-bottom:4px;">
         <div>
           <a href="javascript:;" onclick="ban_domain('{{feed['domain']}}')" style="color: #000000;text-decoration: none;">
@@ -23,7 +22,7 @@
           </a>
           {% endif %}
         </div>
-        <span> <strong>{{feed['title']}}</strong></span></a>
+        <a href="{{feed['url']}}" target="_blank" style="color: #000000;text-decoration: none;"><span> <strong>{{feed['title']}}</strong></span></a>
       </h4>
       <a style="margin-bottom:3px;color:#666666;text-decoration: none;" href="{{feed['source']}}" target="_blank">{{feed['source']}}</a><br>
       <p style="margin-top:-3px"><small>{{feed['domain']}}</small></p><p></p>
