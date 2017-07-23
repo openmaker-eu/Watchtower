@@ -1,6 +1,7 @@
 from newspaper import Article
 from application.Connections import Connection
 from application.ThreadPool import ThreadPool
+import application.utils.location.get_locations as get_location
 from requests import head
 from time import gmtime, strftime, time, sleep
 from urllib.parse import urlparse
@@ -36,8 +37,24 @@ def linkParser(link):
         keywords = article.keywords
         description = article.summary
         title = article.title
+        published_at = article.publish_date
+        language = article.meta_lang
+        author = article.author
+
+        places = get_location.get_place_context(text=description)
+
+        location = {
+            "countries": places.countries,
+            "country_mentions" : places.country_mentions,
+            "cities" : places.cities,
+            "city_mentions" : places.city_mentions
+        }
+
         if image != "" and description != "" and title != "":
-            dic = {'url': link, 'im':image, 'title': title, 'domain': domain, 'description': description, 'keywords': keywords, 'source': source}
+            dic = {'url': link, 'im':image, 'title': title, 'domain': domain,\
+            'description': description, 'keywords': keywords, 'source': source,\
+            'published_at': published_at, 'language': language, 'location': location,\
+            'author': author}
             print('done')
             return dic
     except Exception as e:
@@ -50,7 +67,17 @@ def calculateLinks(data):
     alertid = int(alertid)
     Connection.Instance().db[str(alertid)].find_one_and_update({'id_str':tweet['id_str'], 'isprocessed': {'$exists': True}, 'isprocessed': False}, {'$set': {'isprocessed': True}})
     try:
-        tweet_tuple = {'user_id': tweet['user']['id_str'], 'tweet_id': tweet['id_str'], 'timestamp_ms': int(tweet['timestamp_ms'])}
+        lang = None
+        location = None
+
+        try:
+            lang = tweet['user']['lang']
+            location = tweet['user']['location']
+        except:
+            pass
+            
+        tweet_tuple = {'user_id': tweet['user']['id_str'], 'tweet_id': tweet['id_str'],\
+         'timestamp_ms': int(tweet['timestamp_ms']), 'language': lang, 'location': location}
         for link in tweet['entities']['urls']:
             link = link['expanded_url']
             if link == None:
@@ -64,7 +91,10 @@ def calculateLinks(data):
                 dic = linkParser(link)
                 if dic != None:
                     if len(list(Connection.Instance().newsPoolDB[str(alertid)].find({'domain':dic['domain'], 'title':dic['title']}))) != 0:
-                        Connection.Instance().newsPoolDB[str(alertid)].find_one_and_update({'source':dic['source'], 'title':dic['title']}, {'$push': {'mentions': tweet_tuple}})
+                        Connection.Instance().newsPoolDB[str(alertid)]\
+                        .find_one_and_update(\
+                        {'source':dic['source'], 'title':dic['title']}, \
+                        {'$push': {'mentions': tweet_tuple}, 'published_at': dic['published_at'], 'language': dic['language'], 'author': dic['author']})
                     else:
                         dic['link_id'] = get_next_links_sequence()
                         dic['mentions']=[tweet_tuple]

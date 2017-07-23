@@ -13,7 +13,7 @@ while True:
         if str(collection) != 'counters':
             print('id: ', collection)
             tweets = list(Connection.Instance().db[str(collection)].find({'isprocessed': {'$exists': True}, 'redis': {'$exists': True}, 'isprocessed': False, 'redis': False},\
-             {'id_str':1, '_id':0, 'timestamp_ms':1, 'user.id_str':1, 'entities.urls':1}))
+             {'id_str':1, '_id':0, 'timestamp_ms':1, 'user':1, 'entities.urls':1}))
             print(len(tweets))
             for tweet in tweets:
                 Connection.Instance().db[str(collection)].find_one_and_update({'id_str':tweet['id_str'], 'redis': {'$exists': True}, 'redis': False}, {'$set': {'redis': True, 'isprocessed': True}})
