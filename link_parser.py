@@ -12,6 +12,7 @@ import sys, time
 from tldextract import extract
 from rq import Queue
 from redis import Redis
+import json
 
 def get_next_links_sequence():
     cursor = Connection.Instance().newsPoolDB["counters"].find_and_modify(
@@ -38,7 +39,7 @@ def linkParser(link):
     title = article.title
     published_at = article.publish_date
     language = article.meta_lang
-    author = article.author
+    author = article.authors
 
     places = get_location.get_place_context(text=description)
 
