@@ -26,39 +26,36 @@ def unshorten_url(url):
     return head(url, allow_redirects=True).url
 
 def linkParser(link):
-    try:
-        parsed_uri = urlparse(link)
-        source = '{uri.netloc}'.format(uri=parsed_uri)
-        domain = extract(link).domain
-        url = link
-        article = Article(url)
-        article.build()
-        image = article.top_image
-        keywords = article.keywords
-        description = article.summary
-        title = article.title
-        published_at = article.publish_date
-        language = article.meta_lang
-        author = article.author
+    parsed_uri = urlparse(link)
+    source = '{uri.netloc}'.format(uri=parsed_uri)
+    domain = extract(link).domain
+    url = link
+    article = Article(url)
+    article.build()
+    image = article.top_image
+    keywords = article.keywords
+    description = article.summary
+    title = article.title
+    published_at = article.publish_date
+    language = article.meta_lang
+    author = article.author
 
-        places = get_location.get_place_context(text=description)
+    places = get_location.get_place_context(text=description)
 
-        location = {
-            "countries": places.countries,
-            "country_mentions" : places.country_mentions,
-            "cities" : places.cities,
-            "city_mentions" : places.city_mentions
-        }
+    location = {
+        "countries": places.countries,
+        "country_mentions" : places.country_mentions,
+        "cities" : places.cities,
+        "city_mentions" : places.city_mentions
+    }
 
-        if image != "" and description != "" and title != "":
-            dic = {'url': link, 'im':image, 'title': title, 'domain': domain,\
-            'description': description, 'keywords': keywords, 'source': source,\
-            'published_at': published_at, 'language': language, 'location': location,\
-            'author': author}
-            print('done')
-            return dic
-    except Exception as e:
-        pass
+    if image != "" and description != "" and title != "":
+        dic = {'url': link, 'im':image, 'title': title, 'domain': domain,\
+        'description': description, 'keywords': keywords, 'source': source,\
+        'published_at': published_at, 'language': language, 'location': location,\
+        'author': author}
+        print('done')
+        return dic
 
 def calculateLinks(data):
     alertid = data['alertid']
@@ -75,7 +72,7 @@ def calculateLinks(data):
             location = tweet['user']['location']
         except:
             pass
-            
+
         tweet_tuple = {'user_id': tweet['user']['id_str'], 'tweet_id': tweet['id_str'],\
          'timestamp_ms': int(tweet['timestamp_ms']), 'language': lang, 'location': location}
         for link in tweet['entities']['urls']:
