@@ -23,5 +23,5 @@ while True:
                 }
                 q.enqueue_call(func=link_parser.calculateLinks,
                    args=(data,),
-                   timeout=6)
+                   timeout=20)
     time.sleep(15)
