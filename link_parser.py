@@ -37,9 +37,20 @@ def linkParser(link):
     keywords = article.keywords
     description = article.summary
     title = article.title
-    published_at = article.publish_date
-    language = article.meta_lang
-    author = article.authors
+    try:
+        published_at = article.publish_date
+    except:
+        published_at = None
+
+    try:
+        language = article.meta_lang
+    except:
+        language = None
+
+    try:
+        author = article.authors
+    except:
+        author = None
 
     places = get_location.get_place_context(text=description)
 
