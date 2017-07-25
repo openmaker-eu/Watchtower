@@ -30,27 +30,31 @@ def linkParser(link):
     parsed_uri = urlparse(link)
     source = '{uri.netloc}'.format(uri=parsed_uri)
     domain = extract(link).domain
-    url = link
-    article = Article(url)
+    article = Article(link)
     article.build()
     image = article.top_image
     keywords = article.keywords
     description = article.summary
     title = article.title
+
     try:
         published_at = article.publish_date
     except:
         published_at = None
+        print("\n\n\n")
+        pass
 
     try:
         language = article.meta_lang
     except:
         language = None
+        pass
 
     try:
         author = article.authors
     except:
         author = None
+        pass
 
     places = get_location.get_place_context(text=description)
 
@@ -103,7 +107,7 @@ def calculateLinks(data):
                         Connection.Instance().newsPoolDB[str(alertid)]\
                         .find_one_and_update(\
                         {'source':dic['source'], 'title':dic['title']}, \
-                        {'$push': {'mentions': tweet_tuple}, 'published_at': dic['published_at'], 'language': dic['language'], 'author': dic['author']})
+                        {'$push': {'mentions': tweet_tuple}, '$set': {'published_at': dic['published_at'], 'language': dic['language'], 'author': dic['author']}})
                     else:
                         dic['link_id'] = get_next_links_sequence()
                         dic['mentions']=[tweet_tuple]
