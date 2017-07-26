@@ -3,7 +3,17 @@ from application.Connections import Connection
 import logic
 import json
 import dateFilter, crontab3
-import re
+import re, datetime
+from bson import json_util
+import bson.objectid
+
+def my_handler(x):
+    if isinstance(x, datetime.datetime):
+        return x.strftime("%H:%M:%S %d-%m-%Y")
+    elif isinstance(x, bson.objectid.ObjectId):
+        return str(x)
+    else:
+        raise TypeError(x)
 
 def getThemes(userid):
     Connection.Instance().cur.execute("select alertid, alertname, description from alerts where ispublish = %s", [True])
@@ -96,60 +106,56 @@ def getInfluencers(themename, themeid):
 
     return json.dumps(result, indent=4)
 
-def getNews(news_ids, keywords, cursor):
+def getNews(news_ids, keywords, cursor, since, until):
     cursor = int(cursor)
-    if news_ids == [""] and keywords == [""]:
+    if news_ids == [""] and keywords == [""] and since == "" and until == "":
         return json.dumps({'news': "Empty news id list", 'next_cursor': 0, 'next_cursor_str': "0"}, indent=4)
-    elif news_ids != [""] and keywords == [""]:
-        news_ids = [int(one_id) for one_id in news_ids]
-        news = []
-        for alertid in Connection.Instance().newsPoolDB.collection_names():
-            news = news + list(Connection.Instance().newsPoolDB[str(alertid)].find({'link_id': {'$in': news_ids}}, {"_id":0, 'mentions': 0, 'bookmark':0}))
 
-        next_cursor = cursor + 20
-        if len(news) < cursor+20:
-            next_cursor = 0
+    find_dictionary = {}
+    date_dictionary = {}
+    news_ids_in_dictionary = None
+    keywords_in_dictionary = None
+    since_in_dictionary = None
+    until_in_dictionary = None
 
-        result = {
-            'next_cursor': next_cursor,
-            'next_cursor_str': str(next_cursor),
-            'news': news[cursor:cursor+20]
-        }
-        return json.dumps(result, indent=4)
-    elif news_ids == [""] and keywords != [""]:
-        keywords = [re.compile(key, re.IGNORECASE) for key in keywords]
-        news = []
-        for alertid in Connection.Instance().newsPoolDB.collection_names():
-            if len(news) >= cursor+20:
-                break
-            for key in keywords:
-                news = news + list(Connection.Instance().newsPoolDB[str(alertid)].find({'$or': [{'title': key}, {'description': key}]}, {"_id":0, 'mentions': 0, 'bookmark':0}))
+    if news_ids != [""]:
+        news_ids_in_dictionary = [int(one_id) for one_id in news_ids]
+        find_dictionary['link_id'] = {'$in': news_ids_in_dictionary}
 
-        next_cursor = cursor + 20
-        if len(news) < cursor+20:
-            next_cursor = 0
+    if keywords != [""]:
+        keywords_in_dictionary = [re.compile(key, re.IGNORECASE) for key in keywords]
+        find_dictionary['$or'] = [{'title': {'$in': keywords_in_dictionary}}, {'description': {'$in': keywords_in_dictionary}}]
 
-        result = {
-            'next_cursor': next_cursor,
-            'next_cursor_str': str(next_cursor),
-            'news': news[cursor:cursor+20]
-        }
-        return json.dumps(result, indent=4)
-    else:
-        keywords = [re.compile(key, re.IGNORECASE) for key in keywords]
-        news_ids = [int(one_id) for one_id in news_ids]
-        news = []
-        for alertid in Connection.Instance().newsPoolDB.collection_names():
-            for key in keywords:
-                news = news + list(Connection.Instance().newsPoolDB[str(alertid)].find({'link_id': {'$in': news_ids}, '$or': [{'title': key}, {'description': key}]}, {"_id":0, 'mentions': 0, 'bookmark':0}))
+    if since != "":
+        try:
+            since_in_dictionary = datetime.datetime.strptime(since, "%d-%m-%Y")
+            date_dictionary['$gte'] =  since_in_dictionary
+        except ValueError:
+            return json.dumps({'error': "please, enter a valid since day. DAY-MONTH-YEAR"}, indent=4)
 
-        next_cursor = cursor + 20
-        if len(news) < cursor+20:
-            next_cursor = 0
+    if until != "":
+        try:
+            until_in_dictionary = datetime.datetime.strptime(until, "%d-%m-%Y")
+            date_dictionary['$lte'] =  until_in_dictionary
+        except ValueError:
+            return json.dumps({'error': "please, enter a valid since day. DAY-MONTH-YEAR"}, indent=4)
 
-        result = {
-            'next_cursor': next_cursor,
-            'next_cursor_str': str(next_cursor),
-            'news': news[cursor:cursor+20]
-        }
-        return json.dumps(result, indent=4)
+    if date_dictionary != {}:
+        find_dictionary['published_at'] = date_dictionary
+
+    news = []
+    for alertid in Connection.Instance().newsPoolDB.collection_names():
+        if len(news) >= cursor+20:
+            break
+        news = news + list(Connection.Instance().newsPoolDB[str(alertid)].find(find_dictionary, {"_id":0, 'mentions': 0, 'bookmark':0}))
+
+    next_cursor = cursor + 20
+    if len(news) < cursor+20:
+        next_cursor = 0
+
+    result = {
+        'next_cursor': next_cursor,
+        'next_cursor_str': str(next_cursor),
+        'news': news[cursor:cursor+20]
+    }
+    return json.dumps(result, indent=4, default=my_handler)
