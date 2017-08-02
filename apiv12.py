@@ -176,6 +176,8 @@ def getNews(news_ids, keywords, languages, cities, countries, user_location, use
         find_dictionary['published_at'] = date_dictionary
 
     aggregate_dictionary.append({'$match': find_dictionary})
+    if user_language == [""] and user_location == [""]:
+        aggregate_dictionary.append({'$project': {'mentions':0}})
     aggregate_dictionary.append({'$project': {'_id': 0, 'bookmark':0, 'bookmark_date':0}})
 
     print(aggregate_dictionary)
