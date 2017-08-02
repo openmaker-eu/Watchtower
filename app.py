@@ -54,6 +54,9 @@ class Application(tornado.web.Application):
             (r"/Feed", FeedHandler, {'mainT':mainT}),
             (r"/News/(.*)", NewsHandler, {'mainT':mainT}),
             (r"/News", NewsHandler, {'mainT':mainT}),
+            (r"/Search", SearchHandler, {'mainT':mainT}),
+            (r"/get_news", SearchNewsHandler, {'mainT':mainT}),
+            (r"/get_news/(.*)", SearchNewsHandler, {'mainT':mainT}),
             (r"/preview", PreviewHandler, {'mainT':mainT}),
             (r"/bookmark", BookmarkHandler, {'mainT':mainT}),
             (r"/domain", DomainHandler, {'mainT':mainT}),
@@ -535,6 +538,48 @@ class NewsHandler(BaseHandler, TemplateRendering):
             except Exception as e:
                 print(e)
                 self.write("<p style='color: red; font-size: 15px'><b>Ops! There is no news now.</b></p>")
+        content = self.render_template(template, variables)
+        self.write(content)
+
+class SearchHandler(BaseHandler, TemplateRendering):
+    @tornado.web.authenticated
+    def get(self):
+        variables = {}
+        userid = tornado.escape.xhtml_escape(self.current_user)
+        template = 'afterlogintemplate.html'
+        variables = {
+            'title': "Search",
+            'type': "search"
+        }
+
+        content = self.render_template(template, variables)
+        self.write(content)
+
+class SearchNewsHandler(BaseHandler, TemplateRendering):
+    @tornado.web.authenticated
+    def get(self, argument=None):
+        keywords = self.get_argument('keywords').split(",")
+        languages = self.get_argument('languages').split(",")
+        countries = self.get_argument('countries').split(",")
+        cities = self.get_argument('cities').split(",")
+        user_location = self.get_argument("mention_location").split(",")
+        user_language = self.get_argument('mention_language').split(",")
+        cursor = self.get_argument("cursor")
+        since = ""
+        until = ""
+
+        if argument is not None:
+            template = 'newsTemplate.html'
+        else:
+            template = "alertNews.html"
+
+        news = apiv12.getNews([""], keywords, languages, cities, countries, user_location, user_language, cursor, since, until)
+        news = json.loads(news)
+        variables = {
+            'feeds': news['news'],
+            'cursor': news['next_cursor_str']
+        }
+
         content = self.render_template(template, variables)
         self.write(content)
 

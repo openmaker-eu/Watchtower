@@ -67,6 +67,9 @@
                     <li {% if type=="news" %} class="active" {% endif %}>
                         <a href="/News">News</a>
                     </li>
+                    <li {% if type=="search" %} class="active" {% endif %}>
+                        <a href="/Search">Search</a>
+                    </li>
                     <li {% if type=="feed" %} class="active" {% endif %}>
                         <a href="/Feed">Conversations</a>
                     </li>
@@ -98,6 +101,9 @@
     {% endif %}
     {% if type == "news" %}
       {% include 'news.html'%}
+    {% endif %}
+    {% if type == "search" %}
+      {% include 'search.html'%}
     {% endif %}
     <!-- /.container -->
     <!-- Bootstrap core JavaScript
@@ -580,6 +586,125 @@
         $("#spin").hide();
       });
     }
+    </script>
+    {% endif %}
+    {% if type == "search" %}
+    <script src="/js/typeahead.bundle.min.js"></script>
+    <script src="/js/angular.min.js"></script>
+    <script src="/js/rainbow.min.js"></script>
+    <script src="/js/bootstrap-tagsinput.min.js"></script>
+    <script src="/js/bootstrap-tagsinput-angular.min.js"></script>
+    <script src="/js/generic.js"></script>
+    <script src="/js/jquery.babypaunch.spinner.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#searchButton').click(function(e) {
+                console.log("lalsdlasd");
+                $("#spin").spinner();
+                $('#newscontainer').empty();
+                $("#spin").show();
+                var keys = $("#keywords").val();
+                var cities = $("#cities").val();
+                var countries = $("#countries").val();
+                var langs;
+                if($("#languages").val() === null) {
+                  langs = "";
+                } else {
+                  langs = $("#languages").val().join();
+                }
+                var mention_location = $("#mention_location").val();
+                var mention_language;
+                if($("#mention_language").val() === null) {
+                  mention_language = "";
+                } else {
+                  mention_language = $("#mention_language").val().join();
+                }
+                var ncursor;
+                if ($("ol > div").last().attr("cursor") === undefined) {
+                  ncursor = 0;
+                } else {
+                  ncursor = $("ol > div").last().attr("cursor");
+                }
+
+
+                $.ajax({
+                    url: '/get_news',
+                    method: 'GET',
+                    data: {
+                        'keywords': keys,
+                        'languages': langs,
+                        'cities': cities,
+                        'countries': countries,
+                        'mention_language': mention_language,
+                        'mention_location': mention_location,
+                        'cursor': ncursor
+                    },
+                    timeout: 10000,
+                    error: function () {
+                         $('#preview').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");
+                         $("#spin").hide();
+                    }
+                }).success(function(html) {
+                    $('#newscontainer').append(html);
+                    $("#spin").hide();
+                });
+              });
+            });
+    </script>
+
+    <script>
+        $(document).ready(function() {
+            $(window).scroll(function() {
+                if ($(window).scrollTop() + $(window).height() == $(document).height()){
+                    $("#spin").show();
+                    var keys = $("#keywords").val();
+                    var cities = $("#cities").val();
+                    var countries = $("#countries").val();
+                    var langs;
+                    if($("#languages").val() === null) {
+                      langs = "";
+                    } else {
+                      langs = $("#languages").val().join();
+                    }
+                    var mention_location = $("#mention_location").val();
+                    var mention_language;
+                    if($("#mention_language").val() === null) {
+                      mention_language = "";
+                    } else {
+                      mention_language = $("#mention_language").val().join();
+                    }
+                    var ncursor;
+                    if ($("ol > div").last().attr("cursor") === undefined) {
+                      ncursor = 0;
+                    } else {
+                      ncursor = $("ol > div").last().attr("cursor");
+                    }
+
+
+                    $.ajax({
+                        url: '/get_news/scroll',
+                        method: 'GET',
+                        data: {
+                            'keywords': keys,
+                            'languages': langs,
+                            'cities': cities,
+                            'countries': countries,
+                            'mention_language': mention_language,
+                            'mention_location': mention_location,
+                            'cursor': ncursor
+                        },
+                        timeout: 10000,
+                        error: function () {
+                             $('#preview').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");
+                             $("#spin").hide();
+                        }
+                    }).success(function(html) {
+                        $('#news').append(html);
+                        $("#spin").hide();
+                    });
+                }
+            });
+        });
     </script>
     {% endif %}
 </body>
