@@ -62,16 +62,16 @@
             <div id="navbar" class="collapse navbar-collapse">
                 <ul class="nav navbar-nav">
                     <li {% if type=="alertlist" or type=="editAlert" or type=="createAlert" %} class="active" {% endif %}>
-                        <a href="/Alerts">Alerts</a>
-                    </li>
-                    <li {% if type=="feed" %} class="active" {% endif %}>
-                        <a href="/Feed">Feed</a>
+                        <a href="/Alerts">Topics</a>
                     </li>
                     <li {% if type=="news" %} class="active" {% endif %}>
                         <a href="/News">News</a>
                     </li>
+                    <li {% if type=="feed" %} class="active" {% endif %}>
+                        <a href="/Feed">Conversations</a>
+                    </li>
                     <li {% if type=="influencer" %} class="active" {% endif %}>
-                        <a href="#">Influencers</a>
+                        <a href="#">Audience</a>
                     </li>
                     <li>
                         <a href="/logout">Logout</a>

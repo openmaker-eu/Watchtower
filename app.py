@@ -115,8 +115,14 @@ class NewsV12Handler(BaseHandler, TemplateRendering):
         themeid = self.get_argument("themeid", None)"""
         news_ids = self.get_argument('news_ids', "").split(",")
         keywords = self.get_argument('keywords', "").split(",")
+        languages = self.get_argument('languages', "").split(",")
+        countries = self.get_argument('countries', "").split(",")
+        cities = self.get_argument('cities', "").split(",")
+        user_location = self.get_argument('mention_location', "").split(",")
+        user_language = self.get_argument('mention_language', "").split(",")
         since = self.get_argument('since', "")
         until = self.get_argument('until', "")
+        print(countries)
         try:
             cursor = int(self.get_argument("cursor"))
             if cursor == -1:
@@ -124,7 +130,7 @@ class NewsV12Handler(BaseHandler, TemplateRendering):
         except:
             cursor = 0
             pass
-        news = apiv12.getNews(news_ids, keywords, cursor, since, until)
+        news = apiv12.getNews(news_ids, keywords, languages, cities, countries, user_location, user_language, cursor, since, until)
         self.set_header('Content-Type', 'application/json')
         self.write(news)
 

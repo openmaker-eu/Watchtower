@@ -106,13 +106,21 @@ def getInfluencers(themename, themeid):
 
     return json.dumps(result, indent=4)
 
-def getNews(news_ids, keywords, cursor, since, until):
+def getNews(news_ids, keywords, languages, cities, countries, user_location, user_language, cursor, since, until):
     cursor = int(cursor)
-    if news_ids == [""] and keywords == [""] and since == "" and until == "":
+    if news_ids == [""] and keywords == [""] and since == "" and until == "" and\
+     languages == [""] and cities == [""] and countries == [""] and user_location == [""]\
+     and user_language == [""]:
         return json.dumps({'news': "Empty news id list", 'next_cursor': 0, 'next_cursor_str': "0"}, indent=4)
 
+    aggregate_dictionary = []
     find_dictionary = {}
     date_dictionary = {}
+    language_dictionary = None
+    city_dictionary = None
+    country_dictionary = None
+    user_location_dictionary = None
+    user_language_dictionary = None
     news_ids_in_dictionary = None
     keywords_in_dictionary = None
     since_in_dictionary = None
@@ -125,6 +133,30 @@ def getNews(news_ids, keywords, cursor, since, until):
     if keywords != [""]:
         keywords_in_dictionary = [re.compile(key, re.IGNORECASE) for key in keywords]
         find_dictionary['$or'] = [{'title': {'$in': keywords_in_dictionary}}, {'description': {'$in': keywords_in_dictionary}}]
+
+    if languages != [""]:
+        language_dictionary = [lang for lang in languages]
+        find_dictionary['language'] = {'$in': language_dictionary}
+
+    if cities != [""]:
+        city_dictionary = [re.compile(city, re.IGNORECASE) for city in cities]
+        find_dictionary['location.cities'] = {'$in': city_dictionary}
+        aggregate_dictionary.append({'$unwind': '$location.cities'})
+
+    if countries != [""]:
+        country_dictionary = [re.compile(country, re.IGNORECASE) for country in countries]
+        find_dictionary['location.countries'] = {'$in': country_dictionary}
+        aggregate_dictionary.append({'$unwind': '$location.countries'})
+
+    if user_location != [""]:
+        user_location_dictionary = [re.compile(city, re.IGNORECASE) for city in user_location]
+        find_dictionary['mentions.location'] = {'$in': user_location_dictionary}
+        aggregate_dictionary.append({'$unwind': '$mentions'})
+
+    if user_language != [""]:
+        user_language_dictionary = [re.compile(country, re.IGNORECASE) for country in user_language]
+        find_dictionary['mentions.language'] = {'$in': user_language_dictionary}
+        aggregate_dictionary.append({'$unwind': '$mentions'})
 
     if since != "":
         try:
@@ -143,11 +175,16 @@ def getNews(news_ids, keywords, cursor, since, until):
     if date_dictionary != {}:
         find_dictionary['published_at'] = date_dictionary
 
+    aggregate_dictionary.append({'$match': find_dictionary})
+    aggregate_dictionary.append({'$project': {'_id': 0, 'bookmark':0, 'bookmark_date':0}})
+
+    print(aggregate_dictionary)
+
     news = []
     for alertid in Connection.Instance().newsPoolDB.collection_names():
         if len(news) >= cursor+20:
             break
-        news = news + list(Connection.Instance().newsPoolDB[str(alertid)].find(find_dictionary, {"_id":0, 'mentions': 0, 'bookmark':0}))
+        news = news + list(Connection.Instance().newsPoolDB[str(alertid)].aggregate(aggregate_dictionary))
 
     next_cursor = cursor + 20
     if len(news) < cursor+20:
