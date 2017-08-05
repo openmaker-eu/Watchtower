@@ -675,33 +675,34 @@
                     }
                     var ncursor;
                     if ($("ol > div").last().attr("cursor") === undefined) {
-                      ncursor = 0;
+                      ncursor = -1;
                     } else {
                       ncursor = $("ol > div").last().attr("cursor");
                     }
 
-
-                    $.ajax({
-                        url: '/get_news/scroll',
-                        method: 'GET',
-                        data: {
-                            'keywords': keys,
-                            'languages': langs,
-                            'cities': cities,
-                            'countries': countries,
-                            'mention_language': mention_language,
-                            'mention_location': mention_location,
-                            'cursor': ncursor
-                        },
-                        timeout: 10000,
-                        error: function () {
-                             $('#preview').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");
-                             $("#spin").hide();
-                        }
-                    }).success(function(html) {
-                        $('#news').append(html);
-                        $("#spin").hide();
-                    });
+                    if (ncursor !== 0) {
+                      $.ajax({
+                          url: '/get_news/scroll',
+                          method: 'GET',
+                          data: {
+                              'keywords': keys,
+                              'languages': langs,
+                              'cities': cities,
+                              'countries': countries,
+                              'mention_language': mention_language,
+                              'mention_location': mention_location,
+                              'cursor': ncursor
+                          },
+                          timeout: 10000,
+                          error: function () {
+                               $('#preview').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");
+                               $("#spin").hide();
+                          }
+                      }).success(function(html) {
+                          $('#news').append(html);
+                          $("#spin").hide();
+                      });
+                    }
                 }
             });
         });

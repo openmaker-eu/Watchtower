@@ -568,6 +568,14 @@ class SearchNewsHandler(BaseHandler, TemplateRendering):
         since = ""
         until = ""
 
+        try:
+            cursor = int(self.get_argument("cursor"))
+            if cursor == -1:
+                cursor = 0
+        except:
+            cursor = 0
+            pass
+
         if argument is not None:
             template = 'newsTemplate.html'
         else:
