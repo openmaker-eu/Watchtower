@@ -180,6 +180,8 @@ def getNews(news_ids, keywords, languages, cities, countries, user_location, use
         aggregate_dictionary.append({'$project': {'mentions':0}})
     aggregate_dictionary.append({'$project': {'_id': 0, 'bookmark':0, 'bookmark_date':0}})
 
+    aggregate_dictionary.append({'$sort': {'link_id' : -1}})
+
     print(aggregate_dictionary)
 
     news = []
@@ -197,4 +199,5 @@ def getNews(news_ids, keywords, languages, cities, countries, user_location, use
         'next_cursor_str': str(next_cursor),
         'news': news[cursor:cursor+20]
     }
+
     return json.dumps(result, indent=4, default=my_handler)
