@@ -22,7 +22,7 @@ def get_influencer(alert_id, alert_keywords_list):
         Connection.Instance().infDB[str(alert_id)].insert_one(user_dict)
 
 
-Connection.Instance().cur.execute("select alertid, keywords from alerts;")
+Connection.Instance().cur.execute("select alertid, alertname from alerts;")
 alerts = Connection.Instance().cur.fetchall()
 
 print(len(alerts))

@@ -1,0 +1,31 @@
+<div id="spin" style=" z-index: 100;"></div>
+{% if comesAlert %}
+<div class="container" style="margin-bottom:20px">
+  <div class="row">
+    <h2 style="margin-left:50px"><strong>{{alertname}}</strong></h2>
+  </div>
+</div>
+<div class="container" style="margin-top:20px" id="audiencecontainer">
+  {% include 'alertAudience.html' %}
+</div>
+{% else %}
+  <div class="container" style="margin-bottom:20px">
+      <h2><strong>Audience</strong></h2>
+      <div class="row">
+          <div class="btn-group" class="col-xs-6">
+              <a class="btn btn-default dropdown-toggle btn-blog " data-toggle="dropdown" href="#" id="dropdownMenu1" style="width:200px;"><span class="selection pull-left">Select an option </span>
+      <span class="pull-right glyphiconglyphicon-chevron-down caret" style="float:right;margin-top:10px;"></span></a>
+              <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+                  {% for alert in alerts %}
+                  <li>
+                      <a data-id="{{alert['alertid']}}" class="audiencealerts">
+                          <h4> <span> {{alert['name']}}</span> </h4></a>
+                  </li>
+                  {% endfor %}
+              </ul>
+          </div>
+      </div>
+  </div>
+  <div class="container" id="audiencecontainer">
+  </div>
+{% endif %}

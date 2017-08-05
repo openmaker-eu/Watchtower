@@ -393,3 +393,6 @@ def getNews(alertid, date, cursor):
     result['cursor_length'] = 60
     result['feeds'] = feeds
     return result
+
+def getAudiences(alertid):
+    return list(Connection.Instance().infDB[str(alertid)].find({}).sort([('rank', pymongo.ASCENDING)]))

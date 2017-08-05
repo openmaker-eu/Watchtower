@@ -57,6 +57,7 @@ class Application(tornado.web.Application):
             (r"/Search", SearchHandler, {'mainT':mainT}),
             (r"/get_news", SearchNewsHandler, {'mainT':mainT}),
             (r"/get_news/(.*)", SearchNewsHandler, {'mainT':mainT}),
+            (r"/Audience", AudienceHandler, {'mainT':mainT}),
             (r"/preview", PreviewHandler, {'mainT':mainT}),
             (r"/bookmark", BookmarkHandler, {'mainT':mainT}),
             (r"/domain", DomainHandler, {'mainT':mainT}),
@@ -587,6 +588,61 @@ class SearchNewsHandler(BaseHandler, TemplateRendering):
             'cursor': news['next_cursor_str']
         }
 
+        content = self.render_template(template, variables)
+        self.write(content)
+
+class AudienceHandler(BaseHandler, TemplateRendering):
+    @tornado.web.authenticated
+    def get(self, argument=None):
+        variables = {}
+        userid = tornado.escape.xhtml_escape(self.current_user)
+        template = 'afterlogintemplate.html'
+        if argument is not None:
+            try:
+                alertid = int(argument)
+                try:
+                    audiences = logic.getAudiences(alertid)
+                    variables = {
+                        'title': "Audience",
+                        'alertname': logic.getAlertName(alertid),
+                        'audiences': audiences,
+                        'comesAlert': True,
+                        'type': "audiences"
+                    }
+                except:
+                    self.write("<p style='color: red; font-size: 15px'><b>Ops! There is no news now.</b></p>")
+            except ValueError:
+                variables = {
+                    'title': "Audience",
+                    'alerts': logic.getAlertList(userid),
+                    'comesAlert': False,
+                    'type': "audience"
+                }
+                pass
+        else:
+            variables = {
+                'title': "Audience",
+                'alerts': logic.getAlertList(userid),
+                'comesAlert': False,
+                'type': "audience"
+            }
+        content = self.render_template(template, variables)
+        self.write(content)
+
+    @tornado.web.authenticated
+    def post(self):
+        variables = {}
+        template = 'alertAudience.html'
+        alertid = self.get_argument('alertid')
+        try:
+            audiences = logic.getAudiences(alertid)
+            variables = {
+                'audiences': audiences,
+                'alertid': alertid
+            }
+        except Exception as e:
+            print(e)
+            self.write("<p style='color: red; font-size: 15px'><b>Ops! There is no audience now.</b></p>")
         content = self.render_template(template, variables)
         self.write(content)
 
