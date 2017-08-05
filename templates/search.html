@@ -8,13 +8,13 @@
       <input type="text" id="keywords" name= "keywords" class="form-control" data-role="tagsinput"/>
   </div>
 
-  <div class="form-group">
+  <div class="form-group" style="display:none">
       <label>Cities</label>
       <br>
       <input type="text" id="cities" name= "cities" class="form-control" data-role="tagsinput"/>
   </div>
 
-  <div class="form-group">
+  <div class="form-group" style="display:none">
       <label>Countries</label>
       <br>
       <input type="text" id="countries" name= "countries" class="form-control" data-role="tagsinput"/>
@@ -24,6 +24,7 @@
   <div class="form-group">
       <label for="Languages">Languages</label>
       <select size="7" class="form-control" name= "languages" id="languages" multiple="multiple">
+          <option id="opt" value="en">Any Language</option>
           <option id="opt" value="en">English</option>
           <option id="opt" value="fr">French</option>
           <option id="opt" value="de">German</option>
@@ -35,14 +36,14 @@
 
   </div>
 
-  <div class="form-group">
+  <div class="form-group" style="display:none">
       <label>Mention Location</label>
       <br>
       <input type="text" id="mention_location" name= "mention_location" class="form-control" data-role="tagsinput"/>
   </div>
 
   <!-- Select Multiple -->
-  <div class="form-group">
+  <div class="form-group" style="display:none">
       <label for="Mention_Languages">Mention Languages</label>
       <select size="7" class="form-control" name= "mention_language" id="mention_language" multiple="multiple">
           <option id="opt" value="en">English</option>
