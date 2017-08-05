@@ -231,13 +231,12 @@ class LoginHandler(BaseHandler, TemplateRendering):
         self.write(content)
 
     def post(self):
-        userinfo = logic.getUserInfo(str(self.get_argument("username")))
-        userInputPassword = str(self.get_argument("password"))
-        if userInputPassword == userinfo['password']:
-            self.set_secure_cookie("userid", str(userinfo['userid']))
-            self.redirect(self.get_argument('next', '/Alerts'))
+        login_info = logic.login(str(self.get_argument("username")), str(self.get_argument("password")))
+        if login_info['response']:
+            self.set_secure_cookie("userid", str(login_info['userid']))
+            self.write({'response': True, 'redirectUrl': self.get_argument('next', '/Alerts')})
         else:
-            self.write("Information is not correct")
+            self.write(json.dumps(login_info))
 
 class LogoutHandler(BaseHandler, TemplateRendering):
     def get(self):

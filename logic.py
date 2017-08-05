@@ -58,10 +58,16 @@ def getAlertLimit(userid):
     fetched = Connection.Instance().cur.fetchall()
     return fetched[0][0]
 
-def getUserInfo(username):
+def login(username, password):
     Connection.Instance().cur.execute("select * from users where username = %s", [username])
     fetched = Connection.Instance().cur.fetchall()
-    return {'userid': fetched[0][0], 'password': fetched[0][2]}
+    if len(fetched) == 0:
+        return {'response': False, 'error_type': 1, 'message': 'Invalid username'}
+
+    if password != fetched[0][2]:
+        return {'response': False, 'error_type': 2, 'message': 'Invalid password'}
+
+    return {'response': True, 'userid': fetched[0][0]}
 
 def getAllRunningAlertList():
     Connection.Instance().cur.execute("Select * from alerts where isrunning = %s;", [True])

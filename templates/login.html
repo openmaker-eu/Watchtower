@@ -14,6 +14,31 @@
     <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
     <link rel="stylesheet" href="/css/form-elements.css">
     <link rel="stylesheet" href="/css/style.css">
+    <style type="text/css">
+      @import url("//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css");
+
+      .spinner {
+        display: inline-block;
+        opacity: 0;
+        max-width: 0;
+
+        -webkit-transition: opacity 0.25s, max-width 0.45s;
+        -moz-transition: opacity 0.25s, max-width 0.45s;
+        -o-transition: opacity 0.25s, max-width 0.45s;
+        transition: opacity 0.25s, max-width 0.45s; /* Duration fixed since we animate additional hidden width */
+      }
+
+      .has-spinner.active {
+        cursor:progress;
+      }
+
+      .has-spinner.active .spinner {
+        opacity: 1;
+        max-width: 50px; /* More than it will ever come, notice that this affects on animation duration */
+      }
+    </style>
+
+
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -57,7 +82,12 @@
                                     <label class="sr-only" for="form-password">Password</label>
                                     <input type="password" name="password" placeholder="Password" class="form-password form-control" id="form-password">
                                 </div>
-                                <button type="submit" class="btn">Sign in!</button>
+                                <p>
+                            		  <a class="btn btn-md btn-success has-spinner">
+                            		    <span class="spinner"><i class="fa fa-refresh fa-spin"></i></span>
+                            		    Login
+                            		  </a>
+                            		</p>
                             </form>
                         </div>
                     </div>
@@ -96,30 +126,79 @@
             Fullscreen background
         */
         $.backstretch("../static/images/1.jpeg");
-        /*
-            Form validation
-        */
-        $('.login-form input[type="text"], .login-form input[type="password"], .login-form textarea').on('focus', function() {
-          $(this).removeClass('input-error');
-        });
-
-        $('.login-form').on('submit', function(e) {
-
-          $(this).find('input[type="text"], input[type="password"], textarea').each(function(){
-            if( $(this).val() == "" ) {
-              e.preventDefault();
-              $(this).addClass('input-error');
-            }
-            else {
-              $(this).removeClass('input-error');
-            }
-          });
-
-        });
-
 
     });
 
+    </script>
+
+    <script>
+        $(document).ready(function() {
+            $('.has-spinner').click(function(e) {
+              $('.login-form input[type="text"], .login-form input[type="password"], .login-form textarea').on('focus', function() {
+                $(this).removeClass('input-error');
+              });
+
+              $('.login-form').on('submit', function(e) {
+
+                $(this).find('input[type="text"], input[type="password"], textarea').each(function(){
+                  if( $(this).val() == "" ) {
+                    e.preventDefault();
+                    $(this).addClass('input-error');
+                  }
+                  else {
+                    $(this).removeClass('input-error');
+                  }
+                });
+
+              });
+              if($('.input-error').length == 0){
+                if ($("#form-password").parent().next(".validation").length != 0) // only add if not added
+                {
+                 $("#form-password").parent().next(".validation").remove();
+                }
+                if ($("#form-username").parent().next(".validation").length != 0) // only add if not added
+                {
+                 $("#form-username").parent().next(".validation").remove();
+                }
+                $(this).toggleClass('active');
+                var username = $("#form-username").val();
+                var password = $("#form-password").val();
+
+                $.ajax({
+                    url: '/login',
+                    method: 'POST',
+                    data: {
+                        'username': username,
+                        'password': password
+                    },
+                    timeout: 10000,
+                    error: function () {
+                      alert("Please, try again later.");
+                    }
+                }).success(function(response) {
+                  $(".has-spinner").toggleClass('active');
+                  if(response.response) {
+                    location.href = response.redirectUrl;
+                  }
+                  var returnedData = JSON.parse(response);
+                  var str = "<div class='validation' style='color:red;margin-top: -10px;margin-bottom:10px;'>".concat(returnedData.message.concat("</div>"));
+                  if(returnedData.error_type == 2) {
+                    if ($("#form-password").parent().next(".validation").length == 0) // only add if not added
+                    {
+                        $("#form-password").parent().after(str);
+
+                    }
+                  } else {
+                    if ($("#form-username").parent().next(".validation").length == 0) // only add if not added
+                    {
+                        $("#form-username").parent().after(str);
+
+                    }
+                  }
+                });
+              }
+            });
+          });
     </script>
 
 
