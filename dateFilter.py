@@ -5,6 +5,7 @@ def getDateList(alertid, date, forbidden_domain):
     return list(Connection.Instance().newsPoolDB[str(alertid)].aggregate([
         {'$project': {
                 'link_id':1,
+                'published_at': 1,
                 'source':1,
                 '_id':0,
                 'im':1,
@@ -30,6 +31,7 @@ def getDateList(alertid, date, forbidden_domain):
          },
         {'$project': {
                 'link_id':1,
+                'published_at': 1,
                 'domain': 1,
                 'source':1,
                 '_id':0,
