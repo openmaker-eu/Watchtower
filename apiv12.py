@@ -9,7 +9,7 @@ import bson.objectid
 
 def my_handler(x):
     if isinstance(x, datetime.datetime):
-        return x.strftime("%H:%M:%S %d-%m-%Y")
+        return x.strftime("%d-%m-%Y")
     elif isinstance(x, bson.objectid.ObjectId):
         return str(x)
     else:
