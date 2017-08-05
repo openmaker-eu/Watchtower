@@ -782,66 +782,76 @@ Watchtower is a simple API allowing consumers to view the given theme's influenc
 
 ## News Collection [/get_news]
 
-### List All News of given keywords and news (one of them is enough)[GET]
+### List All News of given filter[GET]
 
 + Response 200 (application/json)
 
         {
+            "next_cursor": 0,
+            "next_cursor_str": "0",
             "news": [
                 {
-                    "link_id": 5364,
-                    "source": "www.dintrin.com",
-                    "im": "https://i1.wp.com/images-eu.ssl-images-amazon.com/images/I/51Ox7MSeoBL.jpg?fit=500%2C500&ssl=1",
-                    "url": "http://www.dintrin.com/producto/kuman-3-5-inches-touch-screen-display-monitor-480x320-lcd-touch-screen-kit-with-16gb-tf-card-for-raspberry-pi-3-model-b-sc06tf/",
-                    "description": "Enviar a direcci\u00f3n de correo electr\u00f3nicoSu NombreTu direcci\u00f3n de correo electr\u00f3nicoLa entrada no fue enviada.\n\u00a1Comprueba tus direcciones de correo electr\u00f3nico!\nError en la comprobaci\u00f3n de email.\nPor favor, vuelve a intentarloLo sentimos, tu blog no puede compartir entradas por correo electr\u00f3nico.",
+                    "url": "http://www.seattletimes.com/opinion/editorials/join-tech-workers-in-helping-homeless-youth/?platform=hootsuite",
+                    "im": "http://www.seattletimes.com/wp-content/themes/st_refresh/img/st-meta-facebook.png",
+                    "title": "Join tech workers in helping homeless youth",
+                    "domain": "seattletimes",
+                    "description": "Join your neighbors and co-workers in contributing to a school-supply drive this summer.\nTHERE\u2019S a certain symmetry in the idea of a group of Seattle tech workers using their free time to give back to the community by focusing on the issue of homelessness.\nThe group is focused on education and advocacy but also wants to create opportunities for tech workers to make a difference.\nOne recent giving-back opportunity involved the Seattle/King County Coalition on Homelessness\u2019 annual effort to provide homeless kids with backpacks full of school supplies.\n\u201cThe notion that there are thousands of homeless youth going to school is mind blowing,\u201d Retford said.",
                     "keywords": [
-                        "pi",
-                        "correo",
-                        "la",
-                        "puede",
-                        "monitor",
-                        "nombretu",
-                        "tf",
-                        "vuelve",
-                        "kuman",
-                        "direcci\u00f3n",
-                        "screen",
-                        "sc06tf",
-                        "raspberry",
-                        "por",
-                        "touch",
-                        "sentimos",
-                        "tu",
-                        "tus",
-                        "lcd",
-                        "model"
-                    ],
-                    "title": "Kuman 3.5 Inches Touch Screen Display Monitor 480\u00d7320 LCD Touch screen Kit with 16GB TF card for Raspberry Pi 3 Model B SC06+TF",
-                    "domain": "dintrin"
-                },
-                {
-                    "description": "I am already a failed Raspberry Pi project attempter who is now looking for resources.\nFurthermore: I am trying to wire a USB SNES controller to the Pi Zero in some way.\nI want to make an HDMI out Pi system to connect to a television inside of the SNES controller.\nEither that or I want to create a standalone Pi system with a display.\nIs this possible using the USB SNES controller?",
-                    "url": "https://www.reddit.com/r/RASPBERRY_PI_PROJECTS/comments/6bosvx/help_with_basics/",
-                    "im": "https://www.redditstatic.com/icon.png",
-                    "keywords": [
-                        "controller",
-                        "failed",
-                        "help",
-                        "snes",
+                        "schoolsupply",
+                        "drive",
+                        "supplies",
+                        "seattle",
+                        "school",
+                        "join",
+                        "helping",
+                        "readers",
+                        "homeless",
                         "tech",
-                        "inside",
-                        "usb",
-                        "pi",
-                        "basics",
-                        "system",
-                        "using",
-                        "original",
-                        "raspberry"
+                        "backpacks",
+                        "workers",
+                        "youth",
+                        "homelessness"
                     ],
-                    "title": "Help with Basics : RASPBERRY",
-                    "link_id": 23456,
-                    "source": "www.reddit.com",
-                    "domain": "reddit"
+                    "source": "www.seattletimes.com",
+                    "published_at": "12:01:00 23-07-2017",
+                    "language": "en",
+                    "location": {
+                        "countries": "United States",
+                        "country_mentions": [
+                            [
+                                "United States",
+                                1
+                            ]
+                        ],
+                        "cities": "Seattle",
+                        "city_mentions": [
+                            [
+                                "Seattle",
+                                1
+                            ]
+                        ]
+                    },
+                    "author": [
+                        "Seattle Times Editorial Board",
+                        "The Seattle Times",
+                        "Editorial Board Members Are Editorial Page Editor Kate Riley",
+                        "Frank A. Blethen",
+                        "Donna Gordon Blankinship",
+                        "Brier Dudley",
+                        "Mark Higgins",
+                        "Jonathan Martin",
+                        "William K. Blethen",
+                        "Emeritus"
+                    ],
+                    "link_id": 129971,
+                    "mentions": {
+                        "user_id": "17491146",
+                        "tweet_id": "889894345549197312",
+                        "timestamp_ms": 1501002320073,
+                        "language": "en",
+                        "location": "3141B N. Lincoln Ave., Chicago, IL"
+                    },
+                    "forbidden": false
                 }
             ]
         }
