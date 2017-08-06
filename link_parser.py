@@ -127,8 +127,3 @@ def calculateLinks(data):
 
 def createParameters(alertid, tweets):
     return [[alertid,tweet] for tweet in tweets]
-
-
-if __name__ == '__main__':
-    d = linkParser("https://semiengineering.com/iot-myth-busting/")
-    print(d['published_at'])
