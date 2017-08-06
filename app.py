@@ -559,6 +559,7 @@ class SearchNewsHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
     def get(self, argument=None):
         keywords = self.get_argument('keywords').split(",")
+        domains = self.get_argument('domains').split(",")
         languages = self.get_argument('languages').split(",")
         countries = self.get_argument('countries').split(",")
         cities = self.get_argument('cities').split(",")
@@ -581,7 +582,7 @@ class SearchNewsHandler(BaseHandler, TemplateRendering):
         else:
             template = "alertNews.html"
 
-        news = apiv12.getNews([""], keywords, languages, cities, countries, user_location, user_language, cursor, since, until)
+        news = apiv12.getNews([""], keywords, languages, cities, countries, user_location, user_language, cursor, since, until, domains)
         news = json.loads(news)
         variables = {
             'feeds': news['news'],

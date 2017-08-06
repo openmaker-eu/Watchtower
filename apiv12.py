@@ -106,11 +106,11 @@ def getInfluencers(themename, themeid):
 
     return json.dumps(result, indent=4)
 
-def getNews(news_ids, keywords, languages, cities, countries, user_location, user_language, cursor, since, until):
+def getNews(news_ids, keywords, languages, cities, countries, user_location, user_language, cursor, since, until, domains):
     cursor = int(cursor)
     if news_ids == [""] and keywords == [""] and since == "" and until == "" and\
      languages == [""] and cities == [""] and countries == [""] and user_location == [""]\
-     and user_language == [""]:
+     and user_language == [""] and domains == [""]:
         return json.dumps({'news': "Empty news id list", 'next_cursor': 0, 'next_cursor_str': "0"}, indent=4)
 
     aggregate_dictionary = []
@@ -123,6 +123,7 @@ def getNews(news_ids, keywords, languages, cities, countries, user_location, use
     user_language_dictionary = None
     news_ids_in_dictionary = None
     keywords_in_dictionary = None
+    domains_in_dictionary = None
     since_in_dictionary = None
     until_in_dictionary = None
 
@@ -133,6 +134,10 @@ def getNews(news_ids, keywords, languages, cities, countries, user_location, use
     if keywords != [""]:
         keywords_in_dictionary = [re.compile(key, re.IGNORECASE) for key in keywords]
         find_dictionary['$or'] = [{'title': {'$in': keywords_in_dictionary}}, {'description': {'$in': keywords_in_dictionary}}]
+
+    if domains != [""]:
+        domains_in_dictionary = [re.compile(key, re.IGNORECASE) for key in domains]
+        find_dictionary['domain'] = {'$nin': keywords_in_dictionary}
 
     if languages != [""]:
         language_dictionary = [lang for lang in languages]
