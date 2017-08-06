@@ -134,7 +134,7 @@ class NewsV12Handler(BaseHandler, TemplateRendering):
         except:
             cursor = 0
             pass
-        news = apiv12.getNews(news_ids, keywords, languages, cities, countries, user_location, user_language, cursor, since, until)
+        news = apiv12.getNews(news_ids, keywords, languages, cities, countries, user_location, user_language, cursor, since, until, [""])
         self.set_header('Content-Type', 'application/json')
         self.write(news)
 
@@ -583,6 +583,8 @@ class SearchNewsHandler(BaseHandler, TemplateRendering):
             template = "alertNews.html"
 
         news = apiv12.getNews([""], keywords, languages, cities, countries, user_location, user_language, cursor, since, until, domains)
+        if news['news'] == []:
+            self.write("<p style='color: red; font-size: 15px'><b>Ops! There is no news now.</b></p>")
         news = json.loads(news)
         variables = {
             'feeds': news['news'],

@@ -111,7 +111,7 @@ def getNews(news_ids, keywords, languages, cities, countries, user_location, use
     if news_ids == [""] and keywords == [""] and since == "" and until == "" and\
      languages == [""] and cities == [""] and countries == [""] and user_location == [""]\
      and user_language == [""] and domains == [""]:
-        return json.dumps({'news': "Empty news id list", 'next_cursor': 0, 'next_cursor_str': "0"}, indent=4)
+        return json.dumps({'news': [], 'next_cursor': 0, 'next_cursor_str': "0"}, indent=4)
 
     aggregate_dictionary = []
     find_dictionary = {}
