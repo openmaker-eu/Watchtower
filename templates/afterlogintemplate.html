@@ -607,6 +607,7 @@
                 $('#newscontainer').empty();
                 $("#spin").show();
                 var keys = $("#keywords").val();
+                var domains = $("#domains").val();
                 var cities = $("#cities").val();
                 var countries = $("#countries").val();
                 var langs;
@@ -635,6 +636,7 @@
                     method: 'GET',
                     data: {
                         'keywords': keys,
+                        'domains': domains,
                         'languages': langs,
                         'cities': cities,
                         'countries': countries,
