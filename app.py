@@ -583,9 +583,9 @@ class SearchNewsHandler(BaseHandler, TemplateRendering):
             template = "alertNews.html"
 
         news = apiv12.getNews([""], keywords, languages, cities, countries, user_location, user_language, cursor, since, until, domains)
+        news = json.loads(news)
         if news['news'] == []:
             self.write("<p style='color: red; font-size: 15px'><b>Ops! There is no news now.</b></p>")
-        news = json.loads(news)
         variables = {
             'feeds': news['news'],
             'cursor': news['next_cursor_str']
