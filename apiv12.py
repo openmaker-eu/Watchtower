@@ -137,7 +137,7 @@ def getNews(news_ids, keywords, languages, cities, countries, user_location, use
 
     if domains != [""]:
         domains_in_dictionary = [re.compile(key, re.IGNORECASE) for key in domains]
-        find_dictionary['domain'] = {'$nin': keywords_in_dictionary}
+        find_dictionary['domain'] = {'$nin': domains_in_dictionary}
 
     if languages != [""]:
         language_dictionary = [lang for lang in languages]
