@@ -2,6 +2,7 @@ from newspaper import Article
 from application.Connections import Connection
 from application.ThreadPool import ThreadPool
 import application.utils.location.get_locations as get_location
+import application.utils.dateExtractor as dateExtractor
 from requests import head
 from time import gmtime, strftime, time, sleep
 from urllib.parse import urlparse
@@ -38,9 +39,10 @@ def linkParser(link):
     title = article.title
 
     try:
-        published_at = article.publish_date
-    except:
+        published_at = dateExtractor.extractArticlePublishedDate(link)
+    except Exception as e:
         published_at = None
+        print(e)
         print("\n\n\n")
         pass
 
@@ -125,3 +127,8 @@ def calculateLinks(data):
 
 def createParameters(alertid, tweets):
     return [[alertid,tweet] for tweet in tweets]
+
+
+if __name__ == '__main__':
+    d = linkParser("https://semiengineering.com/iot-myth-busting/")
+    print(d['published_at'])
