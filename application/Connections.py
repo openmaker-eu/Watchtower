@@ -16,6 +16,7 @@ class Connection:
             self.db = self.MongoDBClient.openMakerdB
             self.newsdB = self.MongoDBClient.newsdB
             self.feedDB = self.MongoDBClient.feedDB
+            self.redditFacebookDB = self.MongoDBClient.redditFacebookDB
             self.newsPoolDB = self.MongoDBClient.newsPool
             self.filteredNewsPoolDB = self.MongoDBClient.filteredNewsPool
             self.infDB = self.MongoDBClient.influenceRanks
