@@ -380,67 +380,6 @@ class DomainHandler(BaseHandler, TemplateRendering):
         logic.banDomain(alertid, domain)
         self.write({})
 
-"""
-Bunu silmeyelim kalsın.
-
-class FeedHandler(BaseHandler, TemplateRendering):
-    @tornado.web.authenticated
-    def get(self, argument = None):
-        userid = tornado.escape.xhtml_escape(self.current_user)
-        template = 'afterlogintemplate.html'
-        if argument is not None:
-            try:
-                alertid = int(argument)
-                variables = {
-                    'title': "Feed",
-                    'tweets': logic.getTweets(alertid),
-                    'alertid': alertid,
-                    'alertname': logic.getAlertName(alertid),
-                    'comesAlert': True,
-                    'type': "feed"
-                }
-                if len(variables['tweets']) == 0:
-                    self.write("<p style='color: red; font-size: 15px'><b>Ops! There is no tweet now.</b></p>")
-            except ValueError:
-                variables = {
-                    'title': "Feed",
-                    'alerts': logic.getAlertList(userid),
-                    'comesAlert': False,
-                    'type': "feed"
-                }
-                pass
-        else:
-            variables = {
-                'title': "Feed",
-                'alerts': logic.getAlertList(userid),
-                'comesAlert': False,
-                'type': "feed"
-            }
-        content = self.render_template(template, variables)
-        self.write(content)
-
-    @tornado.web.authenticated
-    def post(self, argument=None):
-        if argument is not None:
-            template = 'tweetsTemplate.html'
-            alertid = self.get_argument('alertid')
-            lastTweetId = self.get_argument('lastTweetId')
-            variables = {
-                'tweets': logic.getSkipTweets(alertid, lastTweetId)
-            }
-        else:
-            template = 'alertFeed.html'
-            alertid = self.get_argument('alertid')
-            variables = {
-                'tweets': logic.getTweets(alertid),
-                'alertid': alertid
-            }
-            if len(variables['tweets']) == 0:
-                self.write("<p style='color: red; font-size: 15px'><b>Ops! There is no tweet now.</b></p>")
-        content = self.render_template(template, variables)
-        self.write(content)
-"""
-
 class FeedHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
     def get(self, argument = None):
