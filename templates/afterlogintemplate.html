@@ -71,8 +71,8 @@
                     <li {% if type=="news" %} class="active" {% endif %}>
                         <a href="/News">News</a>
                     </li>
-                    <li {% if type=="feed" %} class="active" {% endif %}>
-                        <a href="/Feed">Conversations</a>
+                    <li {% if type=="conversation" %} class="active" {% endif %}>
+                        <a href="/Conversations">Conversations</a>
                     </li>
                     <li {% if type=="influencer" %} class="active" {% endif %}>
                         <a href="/Audience">Audience</a>
@@ -97,8 +97,8 @@
     {% if type == "createAlert" %}
       {% include 'alertForm.html' %}
     {% endif %}
-    {% if type == "feed" %}
-      {% include 'feed.html'%}
+    {% if type == "conversation" %}
+      {% include 'conversation.html'%}
     {% endif %}
     {% if type == "news" %}
       {% include 'news.html'%}

@@ -1,0 +1,88 @@
+<link rel="stylesheet" type="text/css" href="static/css/conversation.css"/>
+
+{% for post in docs %}
+	<div class="post">
+
+			<div class="post-box">
+
+				<span>
+					{% if post["source"] == "reddit" %}
+						<img src="static/images/r-logo.png" alt="logo" style="width:30px;height:30px">
+					{% else %}
+						<img src="static/images/fb-logo.png" alt="logo" style="width:30px;height:30px">
+					{% endif %}
+				</span>
+
+				<span style="font-size:1.2em;font-weight:bold">
+					{{ post["title"] }}<br><br>
+				</span>
+
+				{% if post["post_text"]|length == 0 %}
+					<div id="post-text">
+						<a href="{{ post["url"] }}" target="_blank">
+							{{ post["url"] }}
+						</a>
+					</div>
+				{% else %}
+					<div id="post-text">
+						{{ post["post_text"] }}
+					</div>
+				{% endif %}
+
+  				<a id="read-more-post-button" class="btn btn-xs" onclick="readMorePost(this)">Read More</a>
+
+			</div>
+
+			<span>
+				<a onclick="openComment(this)" id="open-comment-button">+</a>
+			</span>
+
+			<span>
+				view {{ post["commentNumber"] }} comments
+			</span>
+
+			<div class="comments all-comments-closed" >
+			{% for item in post["comments"] %}
+				{% if not loop.first %}
+					{% if item["relative_indent"] == 0 %}
+						</div>
+					{% elif item["relative_indent"]<0 %}
+						{% for i in range(-1*item["relative_indent"]+1) %}
+							</div>
+						{% endfor %}
+					{% endif %}
+				{% endif %}
+
+				<div></div>
+
+				<div class="author-id">
+					<a onclick="openInnerComment(this)" id="open-comment-button">-</a>
+				  	<h5 style="display:inline">{{ item["comment_author"] }}</h5>
+				  	<p style="display:inline">{{ item["created_time"] }}</p>
+				</div>
+
+				<div class="comment-box">
+
+			  		<div class="{{ item["indent_number"] }}">
+
+				  		<div>
+
+				  			<div class="comment-text">
+				  				{{ item["comment_text"] }}
+				  			</div>
+
+			  				<a id="read-more-comment-button" class="btn btn-xs" onclick="readMore(this)">Read More</a>
+
+				  		</div>
+
+    				</div> 
+			  		{% if loop.last %}
+			  			{% for i in range(item["indent_number"]+1) %}
+								</div>
+							{% endfor %}
+			  		{% endif %}
+			{% endfor %}
+		</div>
+	</div>
+{% endfor %}
+

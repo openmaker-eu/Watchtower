@@ -23,7 +23,7 @@ settings = dict(
 )
 
 class TemplateRendering:
-    def render_template(self, template_name, variables):
+    def render_template(self, template_name, variables = {}):
         env = Environment(loader = FileSystemLoader(settings['template_path']))
         try:
             template = env.get_template(template_name)
@@ -52,6 +52,10 @@ class Application(tornado.web.Application):
             (r"/alertinfo/([0-9]*)", CreateEditAlertsHandler, {'mainT':mainT}),
             (r"/Feed/(.*)", FeedHandler, {'mainT':mainT}),
             (r"/Feed", FeedHandler, {'mainT':mainT}),
+            (r"/Conversations/(.*)", ConversationPageHandler, {'mainT':mainT}),
+            (r"/Conversations", ConversationPageHandler, {'mainT':mainT}),
+            (r"/Comments/(.*)", ConversationHandler, {'mainT':mainT}),
+            (r"/Comments", ConversationHandler, {'mainT':mainT}),
             (r"/News/(.*)", NewsHandler, {'mainT':mainT}),
             (r"/News", NewsHandler, {'mainT':mainT}),
             (r"/Search", SearchHandler, {'mainT':mainT}),
@@ -78,9 +82,22 @@ class Application(tornado.web.Application):
             (r"/api/v1.2/get_feeds", FeedsV12Handler, {'mainT':mainT}),
             (r"/api/v1.2/get_influencers", InfluencersV12Handler, {'mainT':mainT}),
             (r"/api/v1.2/get_news", NewsV12Handler, {'mainT':mainT}),
+            (r"/api/v1.2/get_conversation", ConversationHandler, {'mainT':mainT}),
             (r"/(.*)", tornado.web.StaticFileHandler, {'path': settings['static_path']}),
         ]
         super(Application, self).__init__(handlers, **settings)
+
+class ConversationPageHandler(BaseHandler, TemplateRendering):
+    def get(self):
+        self.write(self.render_template("conversation.html"))
+
+class ConversationHandler(BaseHandler, TemplateRendering):
+    def get(self):
+        topic = self.get_argument("dropDownItem")
+        timeFilter = self.get_argument("timeFilter")
+        paging = self.get_argument("paging")
+        docs = apiv12.getConversations(topic,timeFilter,paging)
+        self.write(self.render_template("submission.html", {"docs":docs}))
 
 class ThemesV12Handler(BaseHandler, TemplateRendering):
     def get(self):

@@ -6,6 +6,39 @@ import dateFilter, crontab3
 import re, datetime
 from bson import json_util
 import bson.objectid
+from datetime import datetime
+
+def getConversations(topic, timeFilter, paging):
+
+    keys = Connection.Instance().redditFacebookDB['tokens'].find_one()['reddit']
+    collection = Connection.Instance().redditFacebookDB['conversations']
+    curser = collection.find({"time_filter" : timeFilter, "topic" : topic}, {"posts": { "$slice": [ int(paging), 10 ] }, "_id":0})
+    for document in curser:
+        docs = []
+        for submission in document["posts"]:
+            if not submission["numberOfComments"]:
+                continue
+            comments = []
+            for comment in submission["comments"]:
+                comment["relative_indent"] = 0
+                if submission['source'] == 'reddit':
+                    comment["created_time"] = datetime.fromtimestamp(int(comment["created_time"])).strftime("%Y-%m-%d %H:%M:%S")
+                else:
+                    comment["created_time"] = comment["created_time"][:10]+" "+comment["created_time"][11:18]
+                comments.append(comment)
+            temp = {"paging":paging,"title":submission["title"],"source":submission["source"],"comments":comments,"url":submission["url"],"commentNumber":submission["numberOfComments"]}
+            if "post_text" in submission:
+                temp["post_text"] = submission["post_text"]
+            else:
+                temp["post_text"] = ""
+            docs.append(temp)
+        prev = 0
+        for values in docs:
+            for current in values["comments"]:
+                current["relative_indent"] = current["indent_number"] - prev
+                prev = current["indent_number"]
+        return docs
+
 
 def my_handler(x):
     if isinstance(x, datetime.datetime):
