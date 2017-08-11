@@ -1,56 +1,27 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Conversations</title>
-
-        <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon"> 
-
-        <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css">
-        <link rel="stylesheet" type="text/css" href="static/css/conversation.css"/>
-        <script type="text/javascript" src="static/js/jquery-3.2.1.min.js"></script>
-        <script type="text/javascript" src="static/js/conversation.js"></script>
-
-        <!-- Latest compiled and minified CSS -->
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-
-        <!-- jQuery library -->
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-
-        <!-- Latest compiled JavaScript -->
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    </head>
-    <body style="background-color: #efefed;overflow: auto">
-
-      
-
-      <h1 style="text-align:center">Conversations</h1>
-      
-
-      <div id="selectors" style="margin:0 20% auto">
-        <div style="display:inline-block">
-          <select id="dropdown-content">
-            <option value="select-an-option" id="default-selected">Select a Topic</option>
-            <option value="arduino">Arduino</option>
-            <option value="raspberry_pi">Raspberry Pi</option>
-          </select>
-        </div>
-
-        <div class="btn-group" role="group" aria-label="..." id="date_buttons" style="float:right; visibility:hidden">
-          <button onclick='getConversations(this,"day")' type="button" class="btn btn-default date" id="day">Day</button>
-          <button onclick='getConversations(this,"week")' type="button" class="btn btn-default date" id="week">Week</button>
-          <button onclick='getConversations(this,"month")' type="button" class="btn btn-default date" id="month">Month</button>
-        </div>
-
-      </div>
-
-      <div id="all-comments"></div>
-
-      <div class="loader"></div>
-
-    </body>
-</html>
+<div class="container" style="margin-bottom:10px">
+    <h2><strong>Conversations</strong></h2>
+    <div class="row">
 
 
+<div id="selectors" style="margin:0 20% auto">
+  <div style="display:inline-block">
+    <select id="dropdown-content">
+      <option value="select-an-option" id="default-selected">Select a Topic</option>
+      <option value="arduino">Arduino</option>
+      <option value="raspberry_pi">Raspberry Pi</option>
+    </select>
+  </div>
 
+  <div class="btn-group" role="group" aria-label="..." id="date_buttons" style="float:right; visibility:hidden">
+    <button onclick='getConversations(this,"day")' type="button" class="btn btn-default date" id="day">Day</button>
+    <button onclick='getConversations(this,"week")' type="button" class="btn btn-default date" id="week">Week</button>
+    <button onclick='getConversations(this,"month")' type="button" class="btn btn-default date" id="month">Month</button>
+  </div>
 
+</div>
 
+<div id="all-comments"></div>
+
+<div class="loader"></div>
+</div>
+</div>

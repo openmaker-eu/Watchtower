@@ -75,6 +75,7 @@ class Application(tornado.web.Application):
             (r"/api/get_feeds/(.*)/(.*)", FeedsHandler, {'mainT':mainT}),
             (r"/api/get_influencers/(.*)", InfluencersHandler, {'mainT':mainT}),
             (r"/api/get_feeds/(.*)", FeedsHandler, {'mainT':mainT}),
+            (r"/getPages", PagesHandler, {'mainT':mainT}),
             (r"/api/v1.1/get_themes", ThemesV11Handler, {'mainT':mainT}),
             (r"/api/v1.1/get_feeds", FeedsV11Handler, {'mainT':mainT}),
             (r"/api/v1.1/get_influencers", InfluencersV11Handler, {'mainT':mainT}),
@@ -89,7 +90,15 @@ class Application(tornado.web.Application):
 
 class ConversationPageHandler(BaseHandler, TemplateRendering):
     def get(self):
-        self.write(self.render_template("conversation.html"))
+        self.mainT.checkThread()
+        userid = tornado.escape.xhtml_escape(self.current_user)
+        template = 'afterlogintemplate.html'
+        variables = {
+            'title' : "Conversations",
+            'type' : "conversation"
+        }
+        content = self.render_template(template, variables)
+        self.write(content)
 
 class ConversationHandler(BaseHandler, TemplateRendering):
     def get(self):
@@ -663,6 +672,19 @@ class AudienceHandler(BaseHandler, TemplateRendering):
         except Exception as e:
             print(e)
             self.write("<p style='color: red; font-size: 15px'><b>Ops! There is no audience now.</b></p>")
+        content = self.render_template(template, variables)
+        self.write(content)
+
+class PagesHandler(BaseHandler, TemplateRendering):
+    @tornado.web.authenticated
+    def get(self):
+        template = 'pages.html'
+        keywordsList = self.get_argument("keywords").split(",")
+
+        variables = {
+            'facebookPages': logic.sourceSelectionFromFacebook(keywordsList),
+            'redditSubreddits': logic.sourceSelectionFromReddit(keywordsList)
+        }
         content = self.render_template(template, variables)
         self.write(content)
 

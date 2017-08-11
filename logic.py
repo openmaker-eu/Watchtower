@@ -3,8 +3,43 @@ import search
 import pymongo
 from application.Connections import Connection
 from time import gmtime, strftime, strptime
-import json, datetime
+import json
 import dateFilter
+import facebook
+import requests
+import urllib
+from datetime import datetime, timedelta
+import operator
+from praw.models import MoreComments
+import praw
+
+def sourceSelectionFromFacebook(topicList):
+    my_token = Connection.Instance().redditFacebookDB['tokens'].find_one()["facebook"]["token"]
+    graph = facebook.GraphAPI(access_token=my_token, version="2.7")
+    allGroupsAndPages = []
+    for topic in topicList:
+        groups, pages = [], []
+        s = graph.get_object("search?q="+topic+"&type=page&limit=3")
+        for search in s["data"]:
+            pages.append({"page_id":search["id"],"page_name":search["name"]})
+        s = graph.get_object("search?q="+topic+"&type=group&limit=3")
+        for search in s["data"]:
+            if search["privacy"] == "OPEN":
+                groups.append({"group_id":search["id"],"group_name":search["name"]})
+        allGroupsAndPages.append({"topic":topic, "groups":groups, "pages":pages})
+    return allGroupsAndPages
+
+def sourceSelectionFromReddit(topicList):
+    keys = Connection.Instance().redditFacebookDB['tokens'].find_one()["reddit"]
+    reddit = praw.Reddit(client_id=keys["client_id"],
+                        client_secret=keys["client_secret"],
+                        user_agent=keys["user_agent"],
+                        api_type=keys["api_type"])
+    allSubreddits = []
+    for topic in topicList:
+        subreddits = reddit.subreddits.search_by_name(topic)
+        allSubreddits.append({"topic":topic, "subreddits":subreddits})
+    return allSubreddits
 
 def getThemes():
     names = Connection.Instance().feedDB.collection_names()

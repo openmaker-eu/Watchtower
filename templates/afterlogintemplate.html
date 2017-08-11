@@ -8,6 +8,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
     <title>{{title}}</title>
+
     <!-- Bootstrap core CSS -->
     <link href="/css/bootstrap.css" rel="stylesheet">
     <!-- Custom styles for this template -->
@@ -48,6 +49,15 @@
             border-radius: 50%;
         }
     </style>
+
+    {% if type == "conversation" %}
+    <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon">
+
+    <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="static/css/conversation.css"/>
+    <script type="text/javascript" src="static/js/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="static/js/conversation.js"></script>
+    {% endif %}
 
 </head>
 
