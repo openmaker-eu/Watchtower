@@ -4,4 +4,4 @@ newspaper3k
 timeout_decorator
 tweepy
 praw
-facebook
+facebook-sdk
