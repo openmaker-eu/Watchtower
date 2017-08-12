@@ -619,6 +619,25 @@
     }
     </script>
     <script>
+    function sentiment(posttype, link_id) {
+      $("#spin").show();
+      var aid = $("ol").attr("alertid");
+      $.ajax({
+          url: '/sentiment',
+          method: 'POST',
+          data: {
+              'alertid': aid,
+              'posttype': posttype,
+              'link_id': link_id
+          },
+      }).success(function(html) {
+          $('#sentiment_'.concat(link_id)).empty();
+          $('#sentiment_'.concat(link_id)).append(html);
+          $("#spin").hide();
+      });
+    }
+    </script>
+    <script>
     function ban_domain(domain) {
       $("#spin").show();
       var aid = $("ol").attr("alertid");

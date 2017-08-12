@@ -1,4 +1,6 @@
-<link rel="stylesheet" type="text/css" href="static/css/conversation.css"/>
+{% if docs|length == 0 %}
+<p style='color: red; font-size: 15px'><b>Conversations Feed is empty.</b></p>
+{% endif %}
 
 {% for post in docs %}
 	<div class="post">
@@ -75,7 +77,7 @@
 
 				  		</div>
 
-    				</div> 
+    				</div>
 			  		{% if loop.last %}
 			  			{% for i in range(item["indent_number"]+1) %}
 								</div>
@@ -85,4 +87,3 @@
 		</div>
 	</div>
 {% endfor %}
-

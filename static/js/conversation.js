@@ -1,9 +1,10 @@
 var lastPostScrollNumber = 0;
 var isReadyForLoading = true;
+var topic_id = -1;
 
 $(document).ready(function(){
-	var dropDownItem;
-    $("#dropdown-content").change(function(){
+	$('a.feedalerts').click(function() {
+			topic_id = $(this).attr("data-id");
     	getConversations($("#day"), "day");
     	lastPostScrollNumber = 0;
     });
@@ -18,48 +19,49 @@ $(document).ready(function(){
 
 function loadNewConversations() {
 	var date = $(".btn-success")[0].id;
-	dropDownItem = $("#dropdown-content").val();
 	$(".loader").css("visibility","visible");
 	$.ajax({
 	    type: "GET",
 	    url: "/Comments",
-	    data: { dropDownItem: dropDownItem, timeFilter: date, paging: lastPostScrollNumber},
+	    data: { topic_id: topic_id, timeFilter: date, paging: lastPostScrollNumber},
 	    success: function (response) {
 	        console.log("success");
 	    	isReadyForLoading = true;
 	        $(".loader").css("visibility","hidden");
 	        lastPostScrollNumber += 10;
-	        $("#all-comments").append(response);
+					 $("#all-comments").append(response);
 	        console.log(lastPostScrollNumber);
 	        updateReadMores();
 	    },
 	    error: function (response){
 	        console.log("failed");
+					 $("#all-comments").empty();
+					 $("#all-comments").append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");
 	    }
 	});
 }
 
-
 function getConversations(clickedButton,date) {
-	$(".btn-success").removeClass("btn-success");	
+	$(".btn-success").removeClass("btn-success");
+	$("#all-comments").empty();
 	$(clickedButton).addClass("btn-success");
-	$("#default-selected").remove();
-	dropDownItem = $("#dropdown-content").val();
 	lastPostScrollNumber = 0;
 	$.ajax({
 	    type: "GET",
 	    url: "/Comments",
-	    data: { dropDownItem: dropDownItem, timeFilter: date, paging: lastPostScrollNumber},
+	    data: { topic_id: topic_id, timeFilter: date, paging: lastPostScrollNumber},
 	    success: function (response) {
+				console.log(response);
 	        console.log("success");
 	        lastPostScrollNumber += 10;
 	        $("#all-comments").empty();
-	        $("#all-comments").append(response);
+					$("#all-comments").append(response);
 	        $(".btn-group").css("visibility","visible")
 	        updateReadMores();
 	    },
 	    error: function (response){
 	        console.log("failed");
+					$("#all-comments").append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");
 	    }
 	});
 }
@@ -70,7 +72,7 @@ function updateReadMores() {
 		if(allButtons[i].previousElementSibling != null){
 		    if(!(allButtons[i].previousElementSibling.offsetHeight < allButtons[i].previousElementSibling.scrollHeight)){
 		    	allButtons[i].remove();
-		    	
+
 		    }
 		}
 	}

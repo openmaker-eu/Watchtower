@@ -8,11 +8,8 @@ from bson import json_util
 import bson.objectid
 from datetime import datetime
 
-def getConversations(topic, timeFilter, paging):
-
-    keys = Connection.Instance().redditFacebookDB['tokens'].find_one()['reddit']
-    collection = Connection.Instance().redditFacebookDB['conversations']
-    curser = collection.find({"time_filter" : timeFilter, "topic" : topic}, {"posts": { "$slice": [ int(paging), 10 ] }, "_id":0})
+def getConversations(topic_id, timeFilter, paging):
+    curser = Connection.Instance().conversations[str(topic_id)].find({"time_filter" : timeFilter}, {"posts": { "$slice": [ int(paging), 10 ] }, "_id":0})
     for document in curser:
         docs = []
         for submission in document["posts"]:

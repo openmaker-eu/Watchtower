@@ -63,6 +63,7 @@ class Application(tornado.web.Application):
             (r"/get_news/(.*)", SearchNewsHandler, {'mainT':mainT}),
             (r"/Audience", AudienceHandler, {'mainT':mainT}),
             (r"/preview", PreviewHandler, {'mainT':mainT}),
+            (r"/sentiment", SentimentHandler, {'mainT':mainT}),
             (r"/bookmark", BookmarkHandler, {'mainT':mainT}),
             (r"/domain", DomainHandler, {'mainT':mainT}),
             (r"/newTweets", NewTweetsHandler, {'mainT':mainT}),
@@ -95,6 +96,7 @@ class ConversationPageHandler(BaseHandler, TemplateRendering):
         template = 'afterlogintemplate.html'
         variables = {
             'title' : "Conversations",
+            'alerts': logic.getAlertList(userid),
             'type' : "conversation"
         }
         content = self.render_template(template, variables)
@@ -102,10 +104,12 @@ class ConversationPageHandler(BaseHandler, TemplateRendering):
 
 class ConversationHandler(BaseHandler, TemplateRendering):
     def get(self):
-        topic = self.get_argument("dropDownItem")
+        topic_id = self.get_argument("topic_id")
         timeFilter = self.get_argument("timeFilter")
         paging = self.get_argument("paging")
-        docs = apiv12.getConversations(topic,timeFilter,paging)
+        docs = apiv12.getConversations(topic_id,timeFilter,paging)
+        if docs == None:
+            docs = []
         self.write(self.render_template("submission.html", {"docs":docs}))
 
 class ThemesV12Handler(BaseHandler, TemplateRendering):
@@ -406,6 +410,20 @@ class BookmarkHandler(BaseHandler, TemplateRendering):
             content = logic.addBookmark(alertid, link_id)
         else:
             content = logic.removeBookmark(alertid, link_id)
+        self.write(content)
+
+class SentimentHandler(BaseHandler, TemplateRendering):
+    @tornado.web.authenticated
+    def post(self):
+        link_id = self.get_argument("link_id")
+        alertid = self.get_argument("alertid")
+        posttype = self.get_argument("posttype")
+        if posttype == "positive":
+            content = logic.sentimentPositive(alertid, link_id)
+        elif posttype == "negative":
+            content = logic.sentimentNegative(alertid, link_id)
+        else:
+            content = logic.sentimentNotr(alertid, link_id)
         self.write(content)
 
 class DomainHandler(BaseHandler, TemplateRendering):

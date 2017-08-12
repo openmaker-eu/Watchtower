@@ -303,6 +303,57 @@ def removeBookmark(alertid, link_id):
     content = """<a href="javascript:;" onclick="dummy('add', '{}')" style="color: #000000;text-decoration: none;"><span style="float:right;color:#D70000;font-size:24px" align="right" class="glyphicon glyphicon-bookmark"></span></a>""".format(link_id)
     return content
 
+def sentimentPositive(alertid, link_id):
+    link_id = int(link_id)
+    Connection.Instance().newsPoolDB[str(alertid)].find_one_and_update({'link_id': link_id}, {'$set': {'sentiment': 1}})
+    Connection.Instance().cur.execute("Select domains from alerts where alertid = %s;", [int(alertid)])
+    domains = Connection.Instance().cur.fetchall()[0][0]
+    dateFilter.calc(alertid, domains.split(","))
+    content = """<a href="javascript:;" onclick="sentiment('positive', '{}')" style="color: #000000;text-decoration: none;">
+<span style="float:right;color:#66BB6A;font-size:24px" align="right" class="glyphicon glyphicon-ok-sign"></span>
+</a>
+<a href="javascript:;" onclick="sentiment('notr', '{}')" style="color: #000000;text-decoration: none;">
+<span style="float:right;color:#BDBDBD;font-size:24px" align="right" class="glyphicon glyphicon-question-sign"></span>
+</a>
+<a href="javascript:;" onclick="sentiment('negative', '{}')" style="color: #000000;text-decoration: none;">
+<span style="float:right;color:#BDBDBD;font-size:24px" align="right" class="glyphicon glyphicon-remove-sign"></span>
+</a>""".format(link_id, link_id, link_id)
+    return content
+
+def sentimentNegative(alertid, link_id):
+    link_id = int(link_id)
+    Connection.Instance().newsPoolDB[str(alertid)].find_one_and_update({'link_id': link_id}, {'$set': {'sentiment': -1}})
+    Connection.Instance().cur.execute("Select domains from alerts where alertid = %s;", [int(alertid)])
+    domains = Connection.Instance().cur.fetchall()[0][0]
+    dateFilter.calc(alertid, domains.split(","))
+    content = """<a href="javascript:;" onclick="sentiment('positive', '{}')" style="color: #000000;text-decoration: none;">
+<span style="float:right;color:#BDBDBD;font-size:24px" align="right" class="glyphicon glyphicon-ok-sign"></span>
+</a>
+<a href="javascript:;" onclick="sentiment('notr', '{}')" style="color: #000000;text-decoration: none;">
+<span style="float:right;color:#BDBDBD;font-size:24px" align="right" class="glyphicon glyphicon-question-sign"></span>
+</a>
+<a href="javascript:;" onclick="sentiment('negative', '{}')" style="color: #000000;text-decoration: none;">
+<span style="float:right;color:#66BB6A;font-size:24px" align="right" class="glyphicon glyphicon-remove-sign"></span>
+</a>""".format(link_id, link_id, link_id)
+    return content
+
+def sentimentNotr(alertid, link_id):
+    link_id = int(link_id)
+    Connection.Instance().newsPoolDB[str(alertid)].find_one_and_update({'link_id': link_id}, {'$set': {'sentiment': 0}})
+    Connection.Instance().cur.execute("Select domains from alerts where alertid = %s;", [int(alertid)])
+    domains = Connection.Instance().cur.fetchall()[0][0]
+    dateFilter.calc(alertid, domains.split(","))
+    content = """<a href="javascript:;" onclick="sentiment('positive', '{}')" style="color: #000000;text-decoration: none;">
+<span style="float:right;color:#BDBDBD;font-size:24px" align="right" class="glyphicon glyphicon-ok-sign"></span>
+</a>
+<a href="javascript:;" onclick="sentiment('notr', '{}')" style="color: #000000;text-decoration: none;">
+<span style="float:right;color:#66BB6A;font-size:24px" align="right" class="glyphicon glyphicon-question-sign"></span>
+</a>
+<a href="javascript:;" onclick="sentiment('negative', '{}')" style="color: #000000;text-decoration: none;">
+<span style="float:right;color:#BDBDBD;font-size:24px" align="right" class="glyphicon glyphicon-remove-sign"></span>
+</a>""".format(link_id, link_id, link_id)
+    return content
+
 def getTweets(alertid):
     tweets = Connection.Instance().db[str(alertid)].find({}, {'tweetDBId': 1, "text":1, "id":1, "user":1, 'created_at': 1, "_id":0}).sort([('tweetDBId' , pymongo.DESCENDING)]).limit(25)
     tweets = list(tweets)
