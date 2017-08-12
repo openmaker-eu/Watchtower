@@ -362,6 +362,16 @@ class CreateEditAlertsHandler(BaseHandler, TemplateRendering):
             alert['lang'] = b','.join(self.request.arguments.get("languages")).decode("utf-8")
         else:
             alert['lang'] = ""
+        if len(self.request.arguments.get("facebookpages")) != 0:
+            alert['pages'] = b','.join(self.request.arguments.get("facebookpages")).decode("utf-8")
+        else:
+            alert['pages'] = ""
+        if len(self.request.arguments.get("subreddits")) != 0:
+            alert['subreddits'] = b','.join(self.request.arguments.get("subreddits")).decode("utf-8")
+        else:
+            alert['subreddits'] = ""
+
+        print(alert['subreddits'], alert['pages'])
         if alertid != None:
             alert['alertid'] = alertid
             logic.updateAlert(alert, self.mainT, userid)
@@ -681,10 +691,18 @@ class PagesHandler(BaseHandler, TemplateRendering):
         template = 'pages.html'
         keywordsList = self.get_argument("keywords").split(",")
 
+        if keywordsList != ['']:
+            sourceSelection = logic.sourceSelection(keywordsList)
+        else:
+            sourceSelection = {'pages': [], 'subreddits': []}
+
         variables = {
-            'facebookPages': logic.sourceSelectionFromFacebook(keywordsList),
-            'redditSubreddits': logic.sourceSelectionFromReddit(keywordsList)
+            'facebookpages': sourceSelection['pages'],
+            'redditsubreddits': sourceSelection['subreddits']
         }
+
+        print(variables)
+
         content = self.render_template(template, variables)
         self.write(content)
 

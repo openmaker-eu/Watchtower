@@ -29,10 +29,6 @@
         	border-color: #de615e;
         }
 
-        #opt {
-            font-size: 16px;
-        }
-
         .bootstrap-tagsinput {
             width: 100%;
         }
@@ -220,6 +216,44 @@
     };
     $(document).ready(main);
     </script>
+
+    <script>
+        $(document).ready(function() {
+            $('#findpages').click(function(e) {
+                $('.alert-form').find('input[name="keywords"]').each(function(){
+                  if( $(this).val() == "" || $(this).val() == null) {
+                    e.preventDefault();
+                    $(".keyword > .bootstrap-tagsinput").addClass("input-error");
+                  }
+                  else {
+                    $(this).removeClass('input-error');
+                  }
+                });
+              if($('.input-error').length == 0){
+                $("#spin").spinner();
+                $('#pages').empty();
+                $("#spin").show();
+                var keys = $("#keywords").val();
+                $.ajax({
+                    url: '/getPages',
+                    method: 'GET',
+                    data: {
+                        'keywords': keys,
+                    },
+                    timeout: 10000,
+                    error: function () {
+                         $('#pages').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");
+                         $("#spin").hide();
+                    }
+                }).success(function(html) {
+                    $('#pages').append(html);
+                    $("#spin").hide();
+                });
+              }
+              });
+            });
+    </script>
+
     <script>
         $(document).ready(function() {
             $('#previewbutton').click(function(e) {
@@ -227,7 +261,7 @@
                   if( $(this).val() == "" || $(this).val() == null) {
                     e.preventDefault();
                     if($(this).attr("name") == "keywords"){
-                      $(".bootstrap-tagsinput").addClass("input-error");
+                      $(".keyword > .bootstrap-tagsinput").addClass("input-error");
                     }
                     else{
                       $(this).addClass('input-error');

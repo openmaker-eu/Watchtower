@@ -1,19 +1,18 @@
-<div class="form-group">
-    <label for="FBPages" style="font-size: 18px">Facebook Pages</label>
-    <select size="{{len(facebookpages)}}" class="form-control" name= "facebookpages" id="facebookpages" multiple="multiple">
-      {% for facebookpage in facebookpages %}
-        <option id="opt" value="en" {% if "en" in alert['lang'] %}selected="active"{% endif %}>English</option>
-      {% endfor %}
-    </select>
+<div class="col-sm-6" style="margin-bottom:15px;margin-top:15px">
+  <label for="FBPages">Facebook Pages</label>
+  <select size="5" class="form-control" name="facebookpages" id="facebookpages" multiple="multiple">
+    {% for facebookpage in facebookpages %}
+      <option id="opt" value="{{facebookpage['page_id']}}">{{facebookpage['page_name']}}</option>
+    {% endfor %}
+  </select>
 
 </div>
-
-<div class="form-group">
-    <label for="Subreddits" style="font-size: 18px">Subreddits</label>
-    <select size="7" class="form-control" name= "subreddits" id="subreddits" multiple="multiple">
-      {% for alert in alerts %}
-        <option id="opt" value="en" {% if "en" in alert['lang'] %}selected="active"{% endif %}>English</option>
-      {% endfor %}
-    </select>
+<div class="col-sm-6" style="margin-bottom:15px;margin-top:15px">
+  <label for="Subreddits">Subreddits</label>
+  <select size="5" class="form-control" name="subreddits" id="subreddits" multiple="multiple">
+        {% for redditsubreddit in redditsubreddits %}
+          <option id="opt" value="{{redditsubreddit}}">{{redditsubreddit}}</option>
+        {% endfor %}
+      </select>
 
 </div>

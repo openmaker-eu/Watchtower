@@ -13,21 +13,23 @@ import operator
 from praw.models import MoreComments
 import praw
 
+def sourceSelection(topicList):
+    return {'pages': sourceSelectionFromFacebook(topicList),
+    'subreddits': sourceSelectionFromReddit(topicList)}
+
 def sourceSelectionFromFacebook(topicList):
     my_token = Connection.Instance().redditFacebookDB['tokens'].find_one()["facebook"]["token"]
     graph = facebook.GraphAPI(access_token=my_token, version="2.7")
-    allGroupsAndPages = []
+    pages = []
     for topic in topicList:
-        groups, pages = [], []
         s = graph.get_object("search?q="+topic+"&type=page&limit=3")
         for search in s["data"]:
             pages.append({"page_id":search["id"],"page_name":search["name"]})
         s = graph.get_object("search?q="+topic+"&type=group&limit=3")
         for search in s["data"]:
             if search["privacy"] == "OPEN":
-                groups.append({"group_id":search["id"],"group_name":search["name"]})
-        allGroupsAndPages.append({"topic":topic, "groups":groups, "pages":pages})
-    return allGroupsAndPages
+                pages.append({"page_id":search["id"],"page_name":search["name"]})
+    return [i for n, i in enumerate(pages) if i not in pages[n + 1:]]
 
 def sourceSelectionFromReddit(topicList):
     keys = Connection.Instance().redditFacebookDB['tokens'].find_one()["reddit"]
@@ -38,7 +40,8 @@ def sourceSelectionFromReddit(topicList):
     allSubreddits = []
     for topic in topicList:
         subreddits = reddit.subreddits.search_by_name(topic)
-        allSubreddits.append({"topic":topic, "subreddits":subreddits})
+        subreddits = set([sub.display_name for sub in subreddits])
+        allSubreddits = list(set(allSubreddits + list(subreddits)))
     return allSubreddits
 
 def getThemes():
@@ -218,7 +221,8 @@ def banDomain(alertid, domain):
 def addAlert(alert, mainT, userid):
     alert['alertid'] = getNextAlertId()
     now = strftime("%Y-%m-%d", gmtime())
-    Connection.Instance().cur.execute("INSERT INTO alerts (alertid, userid, alertname, keywords, languages, creationtime, keywordlimit, isrunning, description, domains, bookmarks) values (%s, %s, %s, %s, %s, %s, %s, %s, %s);", [alert['alertid'], userid, alert['name'], alert['keywords'], alert['lang'], now, alert['keywordlimit'], True, alert['description'], alert['domains'], []])
+    Connection.Instance().cur.execute("INSERT INTO alerts (alertid, userid, alertname, keywords, languages, creationtime, keywordlimit, isrunning, description, domains, bookmarks, pages, subreddits) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);",\
+     [alert['alertid'], userid, alert['name'], alert['keywords'], alert['lang'], now, alert['keywordlimit'], True, alert['description'], alert['domains'], [], alert['pages'], alert['subreddits']])
     Connection.Instance().PostGreSQLConnect.commit()
     alert = getAlertAllOfThemList(alert['alertid'])
     setUserAlertLimit(userid, 'decrement')
@@ -237,7 +241,8 @@ def deleteAlert(alertid, mainT, userid):
 
 # Updates given alert information and kill its thread, then again start its thread.
 def updateAlert(alert, mainT, userid):
-    Connection.Instance().cur.execute("update alerts set userid = %s, keywords = %s , languages = %s, domains = %s, isrunning = %s, description = %s where alertid = %s;", [userid, alert['keywords'], alert['lang'], alert['domains'], True, alert['description'], alert['alertid']])
+    Connection.Instance().cur.execute("update alerts set userid = %s, keywords = %s , languages = %s, domains = %s, isrunning = %s, description = %s, pages = %s, subreddits = %s where alertid = %s;",\
+     [userid, alert['keywords'], alert['lang'], alert['domains'], True, alert['description'], alert['pages'], alert['subreddits'], alert['alertid']])
     Connection.Instance().PostGreSQLConnect.commit()
     alert = getAlertAllOfThemList(alert['alertid'])
     mainT.updateAlert(alert)
