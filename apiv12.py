@@ -41,7 +41,7 @@ def getConversations(topic, timeFilter, paging):
 
 
 def my_handler(x):
-    if isinstance(x, datetime.datetime):
+    if isinstance(x, datetime):
         return x.strftime("%d-%m-%Y")
     elif isinstance(x, bson.objectid.ObjectId):
         return str(x)
