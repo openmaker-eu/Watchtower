@@ -40,7 +40,8 @@
             <tbody>
                 {% for alert in alerts %}
                 <tr>
-                    <td style="text-align:center"><a href="/Feed/{{alert['alertid']}}" style="text-decoration : none; color : #000000;">{{ alert['name'] }}</a></td>
+                  <!-- ekleyebilisin sonra <a href="/Feed/{{alert['alertid']}}" style="text-decoration : none; color : #000000;">{{ alert['name'] }}</a> -->
+                    <td style="text-align:center">{{ alert['name'] }}</td>
                     <td style="text-align:center">{{ ", ".join(alert['keywords']) }}</td>
                     <td style="text-align:center">{{ ", ".join(alert['lang']) }}</td>
                     <td style="text-align:center">{{ ", ".join(alert['domains']) }}</td>
