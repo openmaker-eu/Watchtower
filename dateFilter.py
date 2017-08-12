@@ -5,7 +5,7 @@ def getDateList(alertid, date, forbidden_domain):
     return list(Connection.Instance().newsPoolDB[str(alertid)].aggregate([
         {'$project': {
                 'link_id':1,
-                'published_at': 1,
+                'published_at': { '$dateToString': { 'format': "%d-%m-%Y", 'date': "$published_at" } },
                 'source':1,
                 '_id':0,
                 'im':1,
