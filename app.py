@@ -366,12 +366,14 @@ class CreateEditAlertsHandler(BaseHandler, TemplateRendering):
             alert['lang'] = b','.join(self.request.arguments.get("languages")).decode("utf-8")
         else:
             alert['lang'] = ""
-        if len(self.request.arguments.get("facebookpages")) != 0:
-            alert['pages'] = b','.join(self.request.arguments.get("facebookpages")).decode("utf-8")
+        facebookpages = self.request.arguments.get("facebookpages")
+        if facebookpages != None and len(facebookpages) != 0:
+            alert['pages'] = b','.join(facebookpages).decode("utf-8")
         else:
             alert['pages'] = ""
-        if len(self.request.arguments.get("subreddits")) != 0:
-            alert['subreddits'] = b','.join(self.request.arguments.get("subreddits")).decode("utf-8")
+        subreddits = self.request.arguments.get("subreddits")
+        if subreddits != None and len(subreddits) != 0:
+            alert['subreddits'] = b','.join(subreddits).decode("utf-8")
         else:
             alert['subreddits'] = ""
 
