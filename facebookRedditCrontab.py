@@ -131,11 +131,11 @@ if __name__ == '__main__':
 
     dates = ["day", "week", "month"]
     for v in var:
-        if v[2] != None:
-            for date in dates:
+        for date in dates:
+            date_conversation_dic = {}
+            if v[2] != None and v[2] != "":
                 subreddits = v[2].split(",")
                 mineRedditConversation(v[0], subreddits, date)
-        if v[1] != None:
-            for date in dates:
+            if v[1] != None and v[1] != "":
                 pages = v[1].split(",")
                 startConversations(v[0], pages, date)
