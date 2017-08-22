@@ -26,9 +26,10 @@ def mineFacebookConversations(search_ids, timeFilter="day", pageNumber = "5"):
     timeAgo = datetime.strptime(timeAgo, "%Y-%m-%dT%H:%M:%S")
 
     posts = []
+    print("search: ", search_ids)
     for ids in search_ids:
         p = graph.get_object(ids+"?fields=feed{permalink_url,attachments,message,created_time,comments{comments,message,created_time,from,attachment}}", page=True, retry=5)
-
+        print("facebook pages: ", ids)
         if "feed" in p:
             for post in p["feed"]["data"]:
                 temp = post["created_time"][:-5]
@@ -65,33 +66,21 @@ def mineFacebookConversations(search_ids, timeFilter="day", pageNumber = "5"):
                 else:
                     break
     # Sorting all comments with comment numbers, because I will use them in web page in this order
-    posts = sorted(posts, key=lambda k: k["numberOfComments"], reverse=True)
-    dic = {}
-    dic["time_filter"] = timeFilter
-    dic["posts"] = posts
-    return dic
+    #posts = sorted(posts, key=lambda k: k["numberOfComments"], reverse=True)
+    return posts
 
-def startConversations(topic_id, ids, time_filter):
-    page = mineFacebookConversations(ids,timeFilter=time_filter)
-    oldPosts = Connection.Instance().conversations[str(topic_id)].find_one({"time_filter" : time_filter}, {"posts":1, "_id":0})
-    if oldPosts != None:
-        page["posts"].extend(oldPosts["posts"])
-    page["posts"] = sorted(page["posts"], key=lambda k: k["numberOfComments"], reverse=True)
-
-    Connection.Instance().conversations[str(topic_id)].remove({"time_filter":page["time_filter"]})
-    Connection.Instance().conversations[str(topic_id)].insert_one(page)
-
-def mineRedditConversation(topic_id, subreddits, timeFilter):
+def mineRedditConversation(subreddits, timeFilter):
     keys = Connection.Instance().redditFacebookDB['tokens'].find_one()["reddit"]
     reddit = praw.Reddit(client_id=keys["client_id"],
                          client_secret=keys["client_secret"],
                          user_agent=keys["user_agent"],
                         api_type=keys["api_type"])
-    allPosts = {"posts": []}
+    posts = []
     for subreddit in subreddits:
         s = reddit.subreddit(subreddit)
         for submission in s.top(time_filter=timeFilter,limit=None):
             try:
+                print("reddit: ", submission)
                 if (re.search(r"^https://www.reddit.com",submission.url) or re.search(r"^https://i.redd.it",submission.url)):
                     commentStack, comList = [], []
                     submission.comments.replace_more(limit=0)
@@ -116,14 +105,12 @@ def mineRedditConversation(topic_id, subreddits, timeFilter):
                             temp["comment_author"] = "[deleted]"
                         cList.append(temp)
 
-                    allPosts["time_filter"] = timeFilter
-                    allPosts["posts"].append({"source": "reddit", "created_time":submission.created, "title":submission.title, "post_text":submission.selftext, "comments":cList, "url":submission.url, "numberOfComments":len(cList)})
+                    posts.append({"source": "reddit", "created_time":submission.created, "title":submission.title, "post_text":submission.selftext, "comments":cList, "url":submission.url, "numberOfComments":len(cList)})
             except:
                 print("one submission passed")
                 pass
 
-        Connection.Instance().conversations[str(topic_id)].remove({"time_filter":allPosts["time_filter"]})
-        Connection.Instance().conversations[str(topic_id)].insert_one(allPosts)
+        return posts
 
 if __name__ == '__main__':
     Connection.Instance().cur.execute("Select alertid, pages, subreddits from alerts;")
@@ -132,10 +119,14 @@ if __name__ == '__main__':
     dates = ["day", "week", "month"]
     for v in var:
         for date in dates:
-            date_conversation_dic = {}
+            posts = []
             if v[2] != None and v[2] != "":
                 subreddits = v[2].split(",")
-                mineRedditConversation(v[0], subreddits, date)
+                posts.extend(mineRedditConversation(subreddits, date))
             if v[1] != None and v[1] != "":
                 pages = v[1].split(",")
-                startConversations(v[0], pages, date)
+                posts.extend(mineFacebookConversations(pages, timeFilter=date))
+            if len(posts) != 0:
+                posts = sorted(posts, key=lambda k: k["numberOfComments"], reverse=True)
+                Connection.Instance().conversations[str(v[0])].remove({"time_filter":date})
+                Connection.Instance().conversations[str(v[0])].insert_one({'time_filter': date, 'posts': posts})

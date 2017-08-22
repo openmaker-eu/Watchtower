@@ -11,6 +11,7 @@ import re
 from bson.objectid import ObjectId
 import link_parser
 import subprocess
+from datetime import datetime
 
 def get_info(alertDic):
     keywords = []
@@ -50,6 +51,9 @@ def separates_tweet(alertDic, tweet):
                     keyword = re.compile(keyword.replace(" ", "(.?)"), re.IGNORECASE)
                     if 'extended_tweet' in tweet and 'full_text' in tweet['extended_tweet']:
                         if re.search(keyword, str(tweet['extended_tweet']['full_text'])):
+                            updatedTime = datetime.fromtimestamp(int(tweet['timestamp_ms'])/1e3)
+                            Connection.Instance().cur.execute("update alerts set lasttweetdate = %s where alertid = %s;", [updatedTime, alert['alertid']])
+                            Connection.Instance().PostGreSQLConnect.commit()
                             tweet['_id'] = ObjectId()
                             if tweet['entities']['urls'] != []:
                                 tweet['redis'] = False
@@ -60,6 +64,9 @@ def separates_tweet(alertDic, tweet):
                             break
                     else:
                         if re.search(keyword, str(tweet['text'])):
+                            updatedTime = datetime.fromtimestamp(int(tweet['timestamp_ms'])/1e3)
+                            Connection.Instance().cur.execute("update alerts set lasttweetdate = %s where alertid = %s;", [updatedTime, alert['alertid']])
+                            Connection.Instance().PostGreSQLConnect.commit()
                             tweet['_id'] = ObjectId()
                             if tweet['entities']['urls'] == [] or tweet['entities']['urls'][0]['expanded_url'] == None:
                                 tweet['isprocessed'] = True

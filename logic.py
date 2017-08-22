@@ -147,7 +147,7 @@ def getAlertList(userid):
     Connection.Instance().cur.execute("Select * from alerts where userid = %s;", [userid])
     var = Connection.Instance().cur.fetchall()
     alerts = [{'alertid':i[0], 'name':i[2], 'keywords':i[3].split(","), 'lang': i[5].split(","),\
-               'status': i[6], 'creationTime': i[7], 'publish': i[10], 'domains': i[11].split(",")} for i in var]
+               'status': i[6], 'creationTime': i[7], 'publish': i[10], 'domains': i[11].split(","), 'updatedTime': i[15]} for i in var]
     alerts = sorted(alerts, key=lambda k: k['alertid'])
     for alert in alerts:
         alert['tweetCount'] = Connection.Instance().db[str(alert['alertid'])].find().count()

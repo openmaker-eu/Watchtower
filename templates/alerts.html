@@ -30,6 +30,7 @@
                     <th style="text-align:center">Unwanted Domains</th>
                     <!--<th style="text-align:center">Exclude Keywords</th>-->
                     <th style="text-align:center">Creation Time</th>
+                    <th style="text-align:center">Last Updated Time</th>
                     <th style="text-align:center">#Tweets</th>
                     <th style="text-align:center">Edit</th>
                     <th style="text-align:center">Remove</th>
@@ -47,6 +48,7 @@
                     <td style="text-align:center">{{ ", ".join(alert['domains']) }}</td>
                     <!--<td style="text-align:center">{{ ", ".join(alert['excludedkeywords']) }}</td>-->
                     <td style="text-align:center">{{alert['creationTime']}}</td>
+                    <td style="text-align:center">{{alert['updatedTime']}}</td>
                     <td style="text-align:center">{{alert['tweetCount']}}</td>
                     <td style="text-align:center">
                         <a href="/alertinfo/{{alert['alertid']}}">
