@@ -237,7 +237,7 @@ def getNews(news_ids, keywords, languages, cities, countries, user_location, use
 
     return json.dumps(result, indent=4, default=my_handler)
 
-def getHastags(themename, themeid)):
+def getHastags(themename, themeid):
 
     if themeid == None and themename == None:
         return json.dumps({}, indent=4)
