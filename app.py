@@ -166,6 +166,7 @@ class NewsV12Handler(BaseHandler, TemplateRendering):
         user_language = self.get_argument('mention_language', "").split(",")
         since = self.get_argument('since', "")
         until = self.get_argument('until', "")
+        topics = self.get_argument('topics', "").split(",")
         print(countries)
         try:
             cursor = int(self.get_argument("cursor"))
@@ -174,7 +175,7 @@ class NewsV12Handler(BaseHandler, TemplateRendering):
         except:
             cursor = 0
             pass
-        news = apiv12.getNews(news_ids, keywords, languages, cities, countries, user_location, user_language, cursor, since, until, [""])
+        news = apiv12.getNews(news_ids, keywords, languages, cities, countries, user_location, user_language, cursor, since, until, [""], topics)
         self.set_header('Content-Type', 'application/json')
         self.write(news)
 

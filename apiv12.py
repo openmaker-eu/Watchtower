@@ -136,7 +136,7 @@ def getInfluencers(themename, themeid):
 
     return json.dumps(result, indent=4)
 
-def getNews(news_ids, keywords, languages, cities, countries, user_location, user_language, cursor, since, until, domains):
+def getNews(news_ids, keywords, languages, cities, countries, user_location, user_language, cursor, since, until, domains, topics):
     cursor = int(cursor)
     if news_ids == [""] and keywords == [""] and since == "" and until == "" and\
      languages == [""] and cities == [""] and countries == [""] and user_location == [""]\
@@ -219,11 +219,19 @@ def getNews(news_ids, keywords, languages, cities, countries, user_location, use
 
     print(aggregate_dictionary)
 
+    topics_filter = []
+    if topics != [""]:
+        topics_filter = [int(one_id) for one_id in topics]
+
     news = []
     for alertid in Connection.Instance().newsPoolDB.collection_names():
         if len(news) >= cursor+20:
             break
-        news = news + list(Connection.Instance().newsPoolDB[str(alertid)].aggregate(aggregate_dictionary))
+        if topics_filter == []:
+            news = news + list(Connection.Instance().newsPoolDB[str(alertid)].aggregate(aggregate_dictionary))
+        else:
+            if alertid in topics_filter:
+                news = news + list(Connection.Instance().newsPoolDB[str(alertid)].aggregate(aggregate_dictionary))
 
     next_cursor = cursor + 20
     if len(news) < cursor+20:
