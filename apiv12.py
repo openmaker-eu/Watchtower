@@ -7,6 +7,32 @@ import re, datetime
 from bson import json_util
 import bson.objectid
 from datetime import datetime
+import time
+
+def getEvents(topic_id, filterField, cursor):
+    
+    now = time.time()
+    cursor = int(cursor)
+    ret = None
+    if filterField == 'interested':
+        ret = Connection.Instance().events[str(topic_id)].aggregate([
+            { '$match' : { 'end_time' : { '$gte' : now } } },
+            { '$project' : { '_id' : 0 } },
+            { '$sort' : { 'interested' : -1} },
+            { '$skip' : int(cursor) },
+            { '$limit' : 10 }
+        ])
+    elif filterField == 'date':
+        ret = Connection.Instance().events[str(topic_id)].aggregate([
+            { '$match' : { 'end_time' : { '$gte' : now } } },
+            { '$project' : { '_id' : 0 } },
+            { '$sort' : { 'start_time' : -1} },
+            { '$skip' : int(cursor) },
+            { '$limit' : 10 }
+        ])
+    ret = list(ret)
+    temp = {'events': ret}
+    return temp
 
 def getConversations(topic_id, timeFilter, paging):
     curser = Connection.Instance().conversations[str(topic_id)].find({"time_filter" : timeFilter}, {"posts": { "$slice": [ int(paging), 10 ] }, "_id":0})

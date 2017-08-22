@@ -4,7 +4,7 @@ var topic_id = -1;
 
 $(document).ready(function(){
 	$('a.feedalerts').click(function() {
-			topic_id = $(this).attr("data-id");
+		topic_id = $(this).attr("data-id");
     	getConversations($("#day"), "day");
     	lastPostScrollNumber = 0;
     });

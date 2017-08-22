@@ -56,6 +56,10 @@ class Application(tornado.web.Application):
             (r"/Conversations", ConversationPageHandler, {'mainT':mainT}),
             (r"/Comments/(.*)", ConversationHandler, {'mainT':mainT}),
             (r"/Comments", ConversationHandler, {'mainT':mainT}),
+            (r"/Events/(.*)", EventPageHandler, {'mainT':mainT}),
+            (r"/Events", EventPageHandler, {'mainT':mainT}),
+            (r"/get_events/(.*)", EventHandler, {'mainT':mainT}),
+            (r"/get_events", EventHandler, {'mainT':mainT}),
             (r"/News/(.*)", NewsHandler, {'mainT':mainT}),
             (r"/News", NewsHandler, {'mainT':mainT}),
             (r"/Search", SearchHandler, {'mainT':mainT}),
@@ -84,15 +88,48 @@ class Application(tornado.web.Application):
             (r"/api/v1.2/get_feeds", FeedsV12Handler, {'mainT':mainT}),
             (r"/api/v1.2/get_influencers", InfluencersV12Handler, {'mainT':mainT}),
             (r"/api/v1.2/get_news", NewsV12Handler, {'mainT':mainT}),
-            (r"/api/v1.2/get_conversation", ConversationHandler, {'mainT':mainT}),
+            (r"/api/v1.2/get_events", EventV12Handler, {'mainT':mainT}),
+            (r"/api/v1.2/get_conversation", ConversationV12Handler, {'mainT':mainT}),
             (r"/api/v1.2/get_hashtags", HashtagsV12Handler, {'mainT':mainT}),
             (r"/(.*)", tornado.web.StaticFileHandler, {'path': settings['static_path']}),
         ]
         super(Application, self).__init__(handlers, **settings)
 
+class EventV12Handler(BaseHandler, TemplateRendering):
+    def get(self):
+        topic_id = self.get_argument('themeid',None)
+        if topic_id is None:
+            self.write({})
+        filter = self.get_argument('filter','date')
+        cursor = self.get_argument('cursor','0')
+        document = apiv12.getEvents(topic_id, filter, cursor)
+        self.write(json.dumps(document,indent=4))
+
+class EventPageHandler(BaseHandler, TemplateRendering):
+    def get(self):
+        
+        userid = tornado.escape.xhtml_escape(self.current_user)
+        template = 'afterlogintemplate.html'
+        variables = {
+            'title' : "Events",
+            'alerts': logic.getAlertList(userid),
+            'type' : "events"
+        }
+        content = self.render_template(template, variables)
+        self.write(content)
+
+class EventHandler(BaseHandler, TemplateRendering):
+    def get(self):
+        
+        topic_id = self.get_argument('topic_id')
+        filter = self.get_argument('filter')
+        cursor = self.get_argument('cursor')
+        document = apiv12.getEvents(topic_id, filter, cursor)
+        self.write(self.render_template("single-event.html", {"document":document}))
+
+
 class ConversationPageHandler(BaseHandler, TemplateRendering):
     def get(self):
-        self.mainT.checkThread()
         userid = tornado.escape.xhtml_escape(self.current_user)
         template = 'afterlogintemplate.html'
         variables = {
@@ -102,7 +139,7 @@ class ConversationPageHandler(BaseHandler, TemplateRendering):
         }
         content = self.render_template(template, variables)
         self.write(content)
-
+        
 class ConversationHandler(BaseHandler, TemplateRendering):
     def get(self):
         topic_id = self.get_argument("topic_id")
@@ -112,6 +149,17 @@ class ConversationHandler(BaseHandler, TemplateRendering):
         if docs == None:
             docs = []
         self.write(self.render_template("submission.html", {"docs":docs}))
+
+class ConversationV12Handler(BaseHandler, TemplateRendering):
+    def get(self):
+        topic_id = self.get_argument("themeid",None)
+        if topic_id is None:
+            self.write({})
+        timeFilter = self.get_argument("date","day")
+        paging = self.get_argument("cursor","0")
+        docs = apiv12.getConversations(int(topic_id),timeFilter,paging)
+        self.set_header('Content-Type', 'application/json')
+        self.write(json.dumps(docs,indent=4))
 
 class ThemesV12Handler(BaseHandler, TemplateRendering):
     def get(self):
