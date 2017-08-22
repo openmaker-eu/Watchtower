@@ -264,6 +264,6 @@ def getHastags(themename, themeid, date):
         if str(temp_themeid) != str(themeid):
             return json.dumps({}, indent=4)
 
-    hashtags = Connection.Instance().hashtags[str(themeid)].find({'name': date})
+    hashtags = Connection.Instance().hashtags[str(themeid)].find({'name': date}, {'_id': 0})
 
     return json.dumps({'hashtags': list(hashtags)}, indent=4)
