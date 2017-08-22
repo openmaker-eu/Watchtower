@@ -13,6 +13,9 @@
           <li>
             themename,
           </li>
+          <li>
+            date(yesterday, week, month)
+          </li>
         </ol>
       </li>
     </ul>
@@ -864,7 +867,7 @@
       </span>}</span>
     </span>}
   ]
-</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div><div id="hashtags-collection" class="resource"><h3 class="resource-heading">Hashtags Collection <a href="#hashtags-collection" class="permalink">&nbsp;&para;</a></h3><div id="hashtags-collection-get" class="action get"><h4 class="action-heading"><div class="name">List All Hashtags of given theme name or theme id</div><a href="#hashtags-collection-get" class="method get">GET</a><code class="uri">/get_hashtags?themeid={themeid}&themename={themename}</code></h4><h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&nbsp;<span class="uri"><span class="hostname">http://138.68.92.181:8484/api/v1.2</span>/get_hashtags?themeid=38</span></div><div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div><div id="hashtags-collection" class="resource"><h3 class="resource-heading">Hashtags Collection <a href="#hashtags-collection" class="permalink">&nbsp;&para;</a></h3><div id="hashtags-collection-get" class="action get"><h4 class="action-heading"><div class="name">List All Hashtags of given theme name or theme id</div><a href="#hashtags-collection-get" class="method get">GET</a><code class="uri">/get_hashtags?themeid={themeid}&themename={themename}&date={date}</code></h4><h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&nbsp;<span class="uri"><span class="hostname">http://138.68.92.181:8484/api/v1.2</span>/get_hashtags?themeid=38</span></div><div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
   "<span class="hljs-attribute">hashtags</span>": <span class="hljs-value">[
     {
       "<span class="hljs-attribute">count</span>": <span class="hljs-value"><span class="hljs-number">13768</span></span>,
