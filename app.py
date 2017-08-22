@@ -85,6 +85,7 @@ class Application(tornado.web.Application):
             (r"/api/v1.2/get_influencers", InfluencersV12Handler, {'mainT':mainT}),
             (r"/api/v1.2/get_news", NewsV12Handler, {'mainT':mainT}),
             (r"/api/v1.2/get_conversation", ConversationHandler, {'mainT':mainT}),
+            (r"/api/v1.2/get_hashtags", HashtagsV12Handler, {'mainT':mainT}),
             (r"/(.*)", tornado.web.StaticFileHandler, {'path': settings['static_path']}),
         ]
         super(Application, self).__init__(handlers, **settings)
@@ -142,6 +143,14 @@ class InfluencersV12Handler(BaseHandler, TemplateRendering):
         influencers = apiv12.getInfluencers(themename, themeid)
         self.set_header('Content-Type', 'application/json')
         self.write(influencers)
+
+class HashtagsV12Handler(BaseHandler, TemplateRendering):
+    def get(self):
+        themename = self.get_argument("themename", None)
+        themeid = self.get_argument("themeid", None)
+        hashtags = apiv12.getHastags(themename, themeid)
+        self.set_header('Content-Type', 'application/json')
+        self.write(hashtags)
 
 class NewsV12Handler(BaseHandler, TemplateRendering):
     def get(self):

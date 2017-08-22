@@ -7,6 +7,7 @@ import re
 import requests
 import urllib
 from datetime import datetime, timedelta
+import time
 import operator
 
 def mineFacebookConversations(search_ids, timeFilter="day", pageNumber = "5"):
@@ -112,12 +113,85 @@ def mineRedditConversation(subreddits, timeFilter):
 
         return posts
 
+def sourceSelection(topicList):
+    my_token = Connection.Instance().redditFacebookDB['tokens'].find_one()["facebook"]["token"]
+    graph = facebook.GraphAPI(access_token=my_token, version="2.7")
+
+    allSearches = []
+    for topic in topicList:
+        events = []
+        s = graph.get_object('search?q='+topic+'&type=event&limit=100')
+        for search in s['data']:
+            events.append({'event_id':search['id'],'event_name':search['name']})
+        temp = {
+            'events' : events
+        }
+        allSearches.append(temp)
+    return allSearches
+
+def mineEvents(topic_id,search_id_list):
+    my_token = Connection.Instance().redditFacebookDB['tokens'].find_one()["facebook"]["token"]
+    graph = facebook.GraphAPI(access_token=my_token, version="2.7")
+
+    for ids in search_id_list:
+        print(ids)
+        # event = graph.get_object(id+'?fields=attending_count,cover,description,end_time,id,interested_count,is_canceled,maybe_count,name,noreply_count,owner,place,start_time,timezone,type,updated_time,declined_count,admins,picture,photos,interested,maybe', page=True, retry=5)
+        event = graph.get_object(ids+'?fields=attending_count,updated_time,cover,end_time,id,interested_count,name,place,start_time', page=True, retry=5)
+        if 'end_time' in event:
+            event['end_time'] = time.mktime(datetime.strptime(event['end_time'][:10], "%Y-%m-%d").timetuple())
+        else:
+            event['end_time'] = time.mktime(datetime.strptime(event['start_time'][:10], "%Y-%m-%d").timetuple())
+        try:
+            if 'location' in event['place']:
+                event['place'] = event['place']['location']['city'] + ", " + event['place']['location']['country']
+            else:
+                event['place'] = event['place']['name']
+        except:
+            event['place'] = ''
+        event['link'] = 'https://www.facebook.com/events/' + event['id']
+        event['start_time'] = event['start_time'][:10]
+        event['interested'] = event.pop('interested_count')
+        event['coming'] = event.pop('attending_count')
+        if 'cover' in event:
+            event['cover'] = event['cover']['source']
+
+        ret = Connection.Instance().events[str(topic_id)].aggregate([
+            { '$match' : { 'id' : ids } },
+            { '$limit' : 1 }
+            ])
+
+        if ret.alive:
+            newEventUpdateTime = datetime.strptime(event['updated_time'][:-5], "%Y-%m-%dT%H:%M:%S")
+            oldEventUpdateTime = datetime.strptime(event['updated_time'][:-5], "%Y-%m-%dT%H:%M:%S")
+            if newEventUpdateTime != oldEventUpdateTime:
+                print(newEventUpdateTime)
+                print(oldEventUpdateTime)
+            if newEventUpdateTime > oldEventUpdateTime:
+                Connection.Instance().events[str(topic_id)].remove( { 'id' : ids } )
+                Connection.Instance().events[str(topic_id)].insert_one(event)
+                print('updated')
+            else:
+                print('existing')
+        else:
+            Connection.Instance().events[str(topic_id)].insert_one(event)
+            print('added new')
+
+
+def startEvent(topic_id, topicList):
+    sources = sourceSelection(topicList)
+    for source in sources:
+        ids = []
+        for event in source['events']:
+            ids.append(event['event_id'])
+        mineEvents(topic_id,ids)
+
 if __name__ == '__main__':
-    Connection.Instance().cur.execute("Select alertid, pages, subreddits from alerts;")
+    Connection.Instance().cur.execute("Select alertid, pages, subreddits, keywords from alerts;")
     var = Connection.Instance().cur.fetchall()
 
     dates = ["day", "week", "month"]
     for v in var:
+        startEvent(v[0], v[3].split(","))
         for date in dates:
             posts = []
             if v[2] != None and v[2] != "":

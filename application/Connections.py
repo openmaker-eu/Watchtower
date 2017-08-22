@@ -6,7 +6,6 @@ from application.utils.Singleton import Singleton
 @Singleton
 class Connection:
     MongoDBClient = None
-    db = None # MongoDB
     PostGreSQLConnect = None
     cur = None # PostgreSQL
 
@@ -17,6 +16,7 @@ class Connection:
             self.newsdB = self.MongoDBClient.newsdB
             self.feedDB = self.MongoDBClient.feedDB
             self.conversations = self.MongoDBClient.conversations
+            self.events = self.MongoDBClient.events
             self.redditFacebookDB = self.MongoDBClient.redditFacebookDB
             self.newsPoolDB = self.MongoDBClient.newsPool
             self.filteredNewsPoolDB = self.MongoDBClient.filteredNewsPool

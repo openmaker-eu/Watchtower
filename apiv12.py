@@ -236,3 +236,60 @@ def getNews(news_ids, keywords, languages, cities, countries, user_location, use
     }
 
     return json.dumps(result, indent=4, default=my_handler)
+
+def getHastags(themename, themeid)):
+
+    if themeid == None and themename == None:
+        return json.dumps({}, indent=4)
+
+    elif themeid == None and themename != None:
+        try:
+            themeid = int(logic.getAlertId(themename))
+        except:
+            return json.dumps({}, indent=4)
+
+    elif themeid != None and themename == None:
+        try:
+            themeid = int(themeid)
+            Connection.Instance().cur.execute("select alertname from alerts where alertid = %s;", [themeid])
+            var = Connection.Instance().cur.fetchall()
+            themename = var[0][0]
+        except:
+            return json.dumps({}, indent=4)
+    else:
+        try:
+            temp_themeid = str(logic.getAlertId(themename))
+        except:
+            return json.dumps({}, indent=4)
+        if str(temp_themeid) != str(themeid):
+            return json.dumps({}, indent=4)
+
+    Connection.Instance().cur.execute("Select alertid from alerts;")
+    alertid_list = list(Connection.Instance().cur.fetchall())
+    if topic_id in alertid_list:
+        hashtags = Connection.Instance().db[str(themeid)].aggregate([
+            {
+                '$unwind': '$entities.hashtags'
+            },
+            {
+                '$group': {
+                    '_id': '$entities.hashtags.text',
+                    'count': {
+                        '$sum': 1
+                    }
+                }
+            },
+            {
+                '$project': {
+                    'count':1,
+                    'hashtag': '$_id',
+                    '_id':0
+                }
+            },
+            {
+                '$sort': {'count':-1}
+            },
+            {'$limit':10}
+        ]))
+
+        return json.dumps({'hashtags': list(hashtags)}, indent=4)
