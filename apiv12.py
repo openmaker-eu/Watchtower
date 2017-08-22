@@ -230,7 +230,7 @@ def getNews(news_ids, keywords, languages, cities, countries, user_location, use
         if topics_filter == []:
             news = news + list(Connection.Instance().newsPoolDB[str(alertid)].aggregate(aggregate_dictionary))
         else:
-            if alertid in topics_filter:
+            if int(alertid) in topics_filter:
                 news = news + list(Connection.Instance().newsPoolDB[str(alertid)].aggregate(aggregate_dictionary))
 
     next_cursor = cursor + 20
