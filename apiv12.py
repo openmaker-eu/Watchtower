@@ -290,6 +290,6 @@ def getHastags(themename, themeid):
                 '$sort': {'count':-1}
             },
             {'$limit':10}
-        ]))
+        ])
 
         return json.dumps({'hashtags': list(hashtags)}, indent=4)
