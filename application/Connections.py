@@ -17,6 +17,7 @@ class Connection:
             self.feedDB = self.MongoDBClient.feedDB
             self.conversations = self.MongoDBClient.conversations
             self.events = self.MongoDBClient.events
+            self.hashtags = self.MongoDBClient.hashtags
             self.redditFacebookDB = self.MongoDBClient.redditFacebookDB
             self.newsPoolDB = self.MongoDBClient.newsPool
             self.filteredNewsPoolDB = self.MongoDBClient.filteredNewsPool

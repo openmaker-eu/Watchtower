@@ -237,7 +237,7 @@ def getNews(news_ids, keywords, languages, cities, countries, user_location, use
 
     return json.dumps(result, indent=4, default=my_handler)
 
-def getHastags(themename, themeid):
+def getHastags(themename, themeid, date):
 
     if themeid == None and themename == None:
         return json.dumps({}, indent=4)
@@ -264,29 +264,6 @@ def getHastags(themename, themeid):
         if str(temp_themeid) != str(themeid):
             return json.dumps({}, indent=4)
 
-    hashtags = Connection.Instance().db[str(themeid)].aggregate([
-        {
-            '$unwind': '$entities.hashtags'
-        },
-        {
-            '$group': {
-                '_id': '$entities.hashtags.text',
-                'count': {
-                    '$sum': 1
-                }
-            }
-        },
-        {
-            '$project': {
-                'count':1,
-                'hashtag': '$_id',
-                '_id':0
-            }
-        },
-        {
-            '$sort': {'count':-1}
-        },
-        {'$limit':10}
-    ])
+    hashtags = Connection.Instance().hashtags.find({'name': date})
 
     return json.dumps({'hashtags': list(hashtags)}, indent=4)
