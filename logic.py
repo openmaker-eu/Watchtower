@@ -40,6 +40,9 @@ def sourceSelectionFromReddit(topicList):
     allSubreddits = []
     for topic in topicList:
         subreddits = reddit.subreddits.search_by_name(topic)
+        if " " in topic:
+            subreddits.extend(reddit.subreddits.search_by_name(topic.replace(" ", "_")))
+            subreddits.extend(reddit.subreddits.search_by_name(topic.replace(" ", "")))
         subreddits = set([sub.display_name for sub in subreddits])
         allSubreddits = list(set(allSubreddits + list(subreddits)))
     return allSubreddits
