@@ -149,7 +149,7 @@ class HashtagsV12Handler(BaseHandler, TemplateRendering):
         themename = self.get_argument("themename", None)
         themeid = self.get_argument("themeid", None)
         date = self.get_argument("date", "yesterday")
-        hashtags = apiv12.getHastags(themename, themeid)
+        hashtags = apiv12.getHastags(themename, themeid, date)
         self.set_header('Content-Type', 'application/json')
         self.write(hashtags)
 
