@@ -103,11 +103,12 @@ class EventV12Handler(BaseHandler, TemplateRendering):
         filter = self.get_argument('filter','date')
         cursor = self.get_argument('cursor','0')
         document = apiv12.getEvents(topic_id, filter, cursor)
+        self.set_header('Content-Type', 'application/json')
         self.write(json.dumps(document,indent=4))
 
 class EventPageHandler(BaseHandler, TemplateRendering):
     def get(self):
-        
+
         userid = tornado.escape.xhtml_escape(self.current_user)
         template = 'afterlogintemplate.html'
         variables = {
@@ -120,7 +121,7 @@ class EventPageHandler(BaseHandler, TemplateRendering):
 
 class EventHandler(BaseHandler, TemplateRendering):
     def get(self):
-        
+
         topic_id = self.get_argument('topic_id')
         filter = self.get_argument('filter')
         cursor = self.get_argument('cursor')
@@ -139,7 +140,7 @@ class ConversationPageHandler(BaseHandler, TemplateRendering):
         }
         content = self.render_template(template, variables)
         self.write(content)
-        
+
 class ConversationHandler(BaseHandler, TemplateRendering):
     def get(self):
         topic_id = self.get_argument("topic_id")
