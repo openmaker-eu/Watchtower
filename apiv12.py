@@ -228,7 +228,7 @@ def getNews(news_ids, keywords, languages, cities, countries, user_location, use
     return json.dumps(result, indent=4, default=my_handler)
 
 def getHastags(topic_id, date):
-    if themeid == None:
+    if topic_id == None:
         return json.dumps({}, indent=4)
 
     hashtags = list(Connection.Instance().hashtags[str(topic_id)].find({'name': date}, {'_id': 0, 'modified_date': 0}))[0][date]
