@@ -89,7 +89,7 @@ class Application(tornado.web.Application):
             (r"/api/v1.2/get_audiences", AudiencesV12Handler, {'mainT':mainT}),
             (r"/api/v1.2/search_news", NewsV12Handler, {'mainT':mainT}),
             (r"/api/v1.2/get_events", EventV12Handler, {'mainT':mainT}),
-            (r"/api/v1.2/get_conversation", ConversationV12Handler, {'mainT':mainT}),
+            (r"/api/v1.2/get_conversations", ConversationV12Handler, {'mainT':mainT}),
             (r"/api/v1.2/get_hashtags", HashtagsV12Handler, {'mainT':mainT}),
             (r"/(.*)", tornado.web.StaticFileHandler, {'path': settings['static_path']}),
         ]
