@@ -223,24 +223,26 @@ def getCommentsOfSubmission(submission):
     commentStack, comList = [], []
     submission.comments.replace_more(limit=0)
     temp = reversed(submission.comments)
+    dayAgo = int(round(time() * 1000)) - 86400000
     for x in temp:
         commentStack.append(x)
     while commentStack:
         comment = commentStack.pop()
-        try:
-            if comment.replies:
-                temp = reversed(comment.replies)
-                for x in temp:
-                    commentStack.append(x)
-            s = {
-                'submission_id': comment._submission.id,
-                'comment_id': comment.id,
-                'user': comment.author.name,
-                'timestamp_ms': int(comment.created)
-            }
-            comList.append(s)
-        except:
-            pass
+        if int(comment.created) >= dayAgo:
+            try:
+                if comment.replies:
+                    temp = reversed(comment.replies)
+                    for x in temp:
+                        commentStack.append(x)
+                s = {
+                    'submission_id': comment._submission.id,
+                    'comment_id': comment.id,
+                    'user': comment.author.name,
+                    'timestamp_ms': int(comment.created)
+                }
+                comList.append(s)
+            except:
+                pass
     return comList
 
 
