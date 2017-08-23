@@ -3,11 +3,10 @@ from application.Connections import Connection
 import logic
 import json
 import dateFilter, crontab3
-import re, datetime
 from bson import json_util
 import bson.objectid
 from datetime import datetime
-import time
+import time, re
 
 def getEvents(topic_id, filterField, cursor):
 
@@ -178,14 +177,14 @@ def getNews(news_ids, keywords, languages, cities, countries, user_location, use
 
     if since != "":
         try:
-            since_in_dictionary = datetime.datetime.strptime(since, "%d-%m-%Y")
+            since_in_dictionary = datetime.strptime(since, "%d-%m-%Y")
             date_dictionary['$gte'] =  since_in_dictionary
         except ValueError:
             return json.dumps({'error': "please, enter a valid since day. DAY-MONTH-YEAR"}, indent=4)
 
     if until != "":
         try:
-            until_in_dictionary = datetime.datetime.strptime(until, "%d-%m-%Y")
+            until_in_dictionary = datetime.strptime(until, "%d-%m-%Y")
             date_dictionary['$lte'] =  until_in_dictionary
         except ValueError:
             return json.dumps({'error': "please, enter a valid since day. DAY-MONTH-YEAR"}, indent=4)
