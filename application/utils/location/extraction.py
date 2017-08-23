@@ -1,5 +1,4 @@
 import nltk
-from .utils import remove_non_ascii
 
 
 class Extractor(object):

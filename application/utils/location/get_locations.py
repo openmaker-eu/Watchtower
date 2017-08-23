@@ -1,6 +1,7 @@
 from .extraction import Extractor
 from .places import PlaceContext
 
+
 def get_place_context(text=None):
     e = Extractor(text=text)
     e.find_entities()

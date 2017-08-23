@@ -1,14 +1,17 @@
-from track import StreamCreator
 import sys
+
+from track import StreamCreator
+
 reload(sys)
 sys.setdefaultencoding('utf8')
+
 
 class AddTrack():
     def __init__(self):
         self.threadDic = {}
 
-    def setup(self,alertList):
-        for alert in alertList :
+    def setup(self, alertList):
+        for alert in alertList:
             if str(alert['alertid']) not in self.threadDic:
                 self.threadDic[str(alert['alertid'])] = StreamCreator(alert)
                 self.threadDic[str(alert['alertid'])].start()
@@ -29,7 +32,7 @@ class AddTrack():
 
     def killThread(self, alert):
         self.threadDic[str(alert['alertid'])].terminate()
-        del self.threadDic[str(alert['alertid'])] #sonradan ekledik
+        del self.threadDic[str(alert['alertid'])]  # sonradan ekledik
 
     def __getitem__(self):
         return (self.threadDic)

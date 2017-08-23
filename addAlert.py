@@ -1,13 +1,14 @@
 from track import StreamCreator
 
+
 class AddAlert():
     def __init__(self):
         self.alertDic = {}
         self.onlyThread = None
 
-    def setup(self,alertList):
+    def setup(self, alertList):
         if len(alertList) != 0:
-            for alert in alertList :
+            for alert in alertList:
                 if str(alert['alertid']) not in self.alertDic:
                     self.alertDic[str(alert['alertid'])] = alert
             self.onlyThread = StreamCreator(self.alertDic)

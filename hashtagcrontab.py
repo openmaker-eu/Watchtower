@@ -1,5 +1,7 @@
-from application.Connections import Connection
 from time import gmtime, strftime, time
+
+from application.Connections import Connection
+
 
 def getDateHashtags(alertid, date):
     return list(Connection.Instance().db[str(alertid)].aggregate([
@@ -21,16 +23,17 @@ def getDateHashtags(alertid, date):
         },
         {
             '$project': {
-                'count':1,
+                'count': 1,
                 'hashtag': '$_id',
-                '_id':0
+                '_id': 0
             }
         },
         {
-            '$sort': {'count':-1}
+            '$sort': {'count': -1}
         },
-        {'$limit':20}
+        {'$limit': 20}
     ]))
+
 
 def calculate_dates():
     l = []
@@ -40,6 +43,7 @@ def calculate_dates():
     l.append(('week', current_milli_time - 14 * one_day))
     l.append(('month', current_milli_time - 30 * one_day))
     return l
+
 
 def calc(alertid):
     dates = calculate_dates()
@@ -52,6 +56,7 @@ def calc(alertid):
         if result[date] != []:
             Connection.Instance().hashtags[str(alertid)].remove({'name': result['name']})
             Connection.Instance().hashtags[str(alertid)].insert_one(result)
+
 
 if __name__ == '__main__':
     Connection.Instance().cur.execute("Select alertid from alerts;")

@@ -1,5 +1,4 @@
 class Singleton:
-
     def __init__(self, decorated):
         self._decorated = decorated
 

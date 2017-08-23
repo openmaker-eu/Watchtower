@@ -1,16 +1,20 @@
-import tornado.web
-import tornado.options
-import tornado.ioloop
-from tornado.escape import json_encode
-import logic, api, newapi, apiv12
-from jinja2 import Environment, FileSystemLoader, TemplateNotFound
-from threading import Thread
-import os
-import string
-import random
 import json
+import os
+import random
+import string
+from threading import Thread
 
-chars = ''.join([string.ascii_letters, string.digits, string.punctuation]).replace('\'', '').replace('"', '').replace('\\', '')
+import tornado.ioloop
+import tornado.options
+import tornado.web
+from jinja2 import Environment, FileSystemLoader, TemplateNotFound
+
+import apiv12
+import logic
+import newapi
+
+chars = ''.join([string.ascii_letters, string.digits, string.punctuation]).replace('\'', '').replace('"', '').replace(
+    '\\', '')
 secret_key = ''.join([random.SystemRandom().choice(chars) for i in range(100)])
 secret_key = 'PEO+{+RlTK[3~}TS-F%[9J/sIp>W7!r*]YV75GZV)e;Q9lAdNE{m@oWX.+u-&z*-p>~Xa!Z8j~{z,BVv.e0GChY{(1.KVForO#rQ'
 
@@ -18,13 +22,14 @@ settings = dict(
     template_path=os.path.join(os.path.dirname(__file__), "templates"),
     static_path=os.path.join(os.path.dirname(__file__), "static"),
     xsrf_cookies=False,
-    cookie_secret= secret_key,
-    login_url= "/login",
+    cookie_secret=secret_key,
+    login_url="/login",
 )
 
+
 class TemplateRendering:
-    def render_template(self, template_name, variables = {}):
-        env = Environment(loader = FileSystemLoader(settings['template_path']))
+    def render_template(self, template_name, variables={}):
+        env = Environment(loader=FileSystemLoader(settings['template_path']))
         try:
             template = env.get_template(template_name)
         except TemplateNotFound:
@@ -33,6 +38,7 @@ class TemplateRendering:
         content = template.render(variables)
         return content
 
+
 class BaseHandler(tornado.web.RequestHandler):
     def initialize(self, mainT):
         self.mainT = mainT
@@ -40,93 +46,95 @@ class BaseHandler(tornado.web.RequestHandler):
     def get_current_user(self):
         return self.get_secure_cookie("userid")
 
+
 class Application(tornado.web.Application):
     def __init__(self, mainT):
         handlers = [
-            (r"/", MainHandler, {'mainT':mainT}),
+            (r"/", MainHandler, {'mainT': mainT}),
             (r"/logout", LogoutHandler, {'mainT': mainT}),
-            (r"/login", LoginHandler, {'mainT':mainT}),
-            (r"/Alerts", AlertsHandler, {'mainT':mainT}),
-            #(r"/message", MessageHandler, {'mainT':mainT}),
-            (r"/alertinfo", CreateEditAlertsHandler, {'mainT':mainT}),
-            (r"/alertinfo/([0-9]*)", CreateEditAlertsHandler, {'mainT':mainT}),
-            (r"/Feed/(.*)", FeedHandler, {'mainT':mainT}),
-            (r"/Feed", FeedHandler, {'mainT':mainT}),
-            (r"/Conversations/(.*)", ConversationPageHandler, {'mainT':mainT}),
-            (r"/Conversations", ConversationPageHandler, {'mainT':mainT}),
-            (r"/Comments/(.*)", ConversationHandler, {'mainT':mainT}),
-            (r"/Comments", ConversationHandler, {'mainT':mainT}),
-            (r"/Events/(.*)", EventPageHandler, {'mainT':mainT}),
-            (r"/Events", EventPageHandler, {'mainT':mainT}),
-            (r"/get_events/(.*)", EventHandler, {'mainT':mainT}),
-            (r"/get_events", EventHandler, {'mainT':mainT}),
-            (r"/News/(.*)", NewsHandler, {'mainT':mainT}),
-            (r"/News", NewsHandler, {'mainT':mainT}),
-            (r"/Search", SearchHandler, {'mainT':mainT}),
-            (r"/get_news", SearchNewsHandler, {'mainT':mainT}),
-            (r"/get_news/(.*)", SearchNewsHandler, {'mainT':mainT}),
-            (r"/Audience", AudienceHandler, {'mainT':mainT}),
-            (r"/preview", PreviewHandler, {'mainT':mainT}),
-            (r"/sentiment", SentimentHandler, {'mainT':mainT}),
-            (r"/bookmark", BookmarkHandler, {'mainT':mainT}),
-            (r"/domain", DomainHandler, {'mainT':mainT}),
-            (r"/newTweets", NewTweetsHandler, {'mainT':mainT}),
-            (r"/newTweets/(.*)", NewTweetsHandler, {'mainT':mainT}),
-            (r"/api", DocumentationHandler, {'mainT':mainT}),
-            (r"/api/v1\.1", Documentationv11Handler, {'mainT':mainT}),
-            (r"/api/v1\.2", Documentationv12Handler, {'mainT':mainT}),
-            (r"/api/get_themes", ThemesHandler, {'mainT':mainT}),
-            (r"/api/get_influencers/(.*)/(.*)", InfluencersHandler, {'mainT':mainT}),
-            (r"/api/get_feeds/(.*)/(.*)", FeedsHandler, {'mainT':mainT}),
-            (r"/api/get_influencers/(.*)", InfluencersHandler, {'mainT':mainT}),
-            (r"/api/get_feeds/(.*)", FeedsHandler, {'mainT':mainT}),
-            (r"/getPages", PagesHandler, {'mainT':mainT}),
-            (r"/api/v1.1/get_themes", ThemesV11Handler, {'mainT':mainT}),
-            (r"/api/v1.1/get_feeds", FeedsV11Handler, {'mainT':mainT}),
-            (r"/api/v1.1/get_influencers", InfluencersV11Handler, {'mainT':mainT}),
-            (r"/api/v1.2/get_topics", TopicsV12Handler, {'mainT':mainT}),
-            (r"/api/v1.2/get_news", NewsFeedsV12Handler, {'mainT':mainT}),
-            (r"/api/v1.2/get_audiences", AudiencesV12Handler, {'mainT':mainT}),
-            (r"/api/v1.2/search_news", NewsV12Handler, {'mainT':mainT}),
-            (r"/api/v1.2/get_events", EventV12Handler, {'mainT':mainT}),
-            (r"/api/v1.2/get_conversations", ConversationV12Handler, {'mainT':mainT}),
-            (r"/api/v1.2/get_hashtags", HashtagsV12Handler, {'mainT':mainT}),
+            (r"/login", LoginHandler, {'mainT': mainT}),
+            (r"/Alerts", AlertsHandler, {'mainT': mainT}),
+            # (r"/message", MessageHandler, {'mainT':mainT}),
+            (r"/alertinfo", CreateEditAlertsHandler, {'mainT': mainT}),
+            (r"/alertinfo/([0-9]*)", CreateEditAlertsHandler, {'mainT': mainT}),
+            (r"/Feed/(.*)", FeedHandler, {'mainT': mainT}),
+            (r"/Feed", FeedHandler, {'mainT': mainT}),
+            (r"/Conversations/(.*)", ConversationPageHandler, {'mainT': mainT}),
+            (r"/Conversations", ConversationPageHandler, {'mainT': mainT}),
+            (r"/Comments/(.*)", ConversationHandler, {'mainT': mainT}),
+            (r"/Comments", ConversationHandler, {'mainT': mainT}),
+            (r"/Events/(.*)", EventPageHandler, {'mainT': mainT}),
+            (r"/Events", EventPageHandler, {'mainT': mainT}),
+            (r"/get_events/(.*)", EventHandler, {'mainT': mainT}),
+            (r"/get_events", EventHandler, {'mainT': mainT}),
+            (r"/News/(.*)", NewsHandler, {'mainT': mainT}),
+            (r"/News", NewsHandler, {'mainT': mainT}),
+            (r"/Search", SearchHandler, {'mainT': mainT}),
+            (r"/get_news", SearchNewsHandler, {'mainT': mainT}),
+            (r"/get_news/(.*)", SearchNewsHandler, {'mainT': mainT}),
+            (r"/Audience", AudienceHandler, {'mainT': mainT}),
+            (r"/preview", PreviewHandler, {'mainT': mainT}),
+            (r"/sentiment", SentimentHandler, {'mainT': mainT}),
+            (r"/bookmark", BookmarkHandler, {'mainT': mainT}),
+            (r"/domain", DomainHandler, {'mainT': mainT}),
+            (r"/newTweets", NewTweetsHandler, {'mainT': mainT}),
+            (r"/newTweets/(.*)", NewTweetsHandler, {'mainT': mainT}),
+            (r"/api", DocumentationHandler, {'mainT': mainT}),
+            (r"/api/v1\.1", Documentationv11Handler, {'mainT': mainT}),
+            (r"/api/v1\.2", Documentationv12Handler, {'mainT': mainT}),
+            (r"/api/get_themes", ThemesHandler, {'mainT': mainT}),
+            (r"/api/get_influencers/(.*)/(.*)", InfluencersHandler, {'mainT': mainT}),
+            (r"/api/get_feeds/(.*)/(.*)", FeedsHandler, {'mainT': mainT}),
+            (r"/api/get_influencers/(.*)", InfluencersHandler, {'mainT': mainT}),
+            (r"/api/get_feeds/(.*)", FeedsHandler, {'mainT': mainT}),
+            (r"/getPages", PagesHandler, {'mainT': mainT}),
+            (r"/api/v1.1/get_themes", ThemesV11Handler, {'mainT': mainT}),
+            (r"/api/v1.1/get_feeds", FeedsV11Handler, {'mainT': mainT}),
+            (r"/api/v1.1/get_influencers", InfluencersV11Handler, {'mainT': mainT}),
+            (r"/api/v1.2/get_topics", TopicsV12Handler, {'mainT': mainT}),
+            (r"/api/v1.2/get_news", NewsFeedsV12Handler, {'mainT': mainT}),
+            (r"/api/v1.2/get_audiences", AudiencesV12Handler, {'mainT': mainT}),
+            (r"/api/v1.2/search_news", NewsV12Handler, {'mainT': mainT}),
+            (r"/api/v1.2/get_events", EventV12Handler, {'mainT': mainT}),
+            (r"/api/v1.2/get_conversations", ConversationV12Handler, {'mainT': mainT}),
+            (r"/api/v1.2/get_hashtags", HashtagsV12Handler, {'mainT': mainT}),
             (r"/(.*)", tornado.web.StaticFileHandler, {'path': settings['static_path']}),
         ]
         super(Application, self).__init__(handlers, **settings)
 
+
 class EventV12Handler(BaseHandler, TemplateRendering):
     def get(self):
-        topic_id = self.get_argument('topic_id',None)
+        topic_id = self.get_argument('topic_id', None)
         if topic_id is None:
             self.write({})
-        date = self.get_argument('date','date')
-        cursor = self.get_argument('cursor','0')
+        date = self.get_argument('date', 'date')
+        cursor = self.get_argument('cursor', '0')
         document = apiv12.getEvents(topic_id, date, cursor)
         self.set_header('Content-Type', 'application/json')
-        self.write(json.dumps(document,indent=4))
+        self.write(json.dumps(document, indent=4))
+
 
 class EventPageHandler(BaseHandler, TemplateRendering):
     def get(self):
-
         userid = tornado.escape.xhtml_escape(self.current_user)
         template = 'afterlogintemplate.html'
         variables = {
-            'title' : "Events",
+            'title': "Events",
             'alerts': logic.getAlertList(userid),
-            'type' : "events"
+            'type': "events"
         }
         content = self.render_template(template, variables)
         self.write(content)
 
+
 class EventHandler(BaseHandler, TemplateRendering):
     def get(self):
-
         topic_id = self.get_argument('topic_id')
         filter = self.get_argument('filter')
         cursor = self.get_argument('cursor')
         document = apiv12.getEvents(topic_id, filter, cursor)
-        self.write(self.render_template("single-event.html", {"document":document}))
+        self.write(self.render_template("single-event.html", {"document": document}))
 
 
 class ConversationPageHandler(BaseHandler, TemplateRendering):
@@ -134,39 +142,43 @@ class ConversationPageHandler(BaseHandler, TemplateRendering):
         userid = tornado.escape.xhtml_escape(self.current_user)
         template = 'afterlogintemplate.html'
         variables = {
-            'title' : "Conversations",
+            'title': "Conversations",
             'alerts': logic.getAlertList(userid),
-            'type' : "conversation"
+            'type': "conversation"
         }
         content = self.render_template(template, variables)
         self.write(content)
+
 
 class ConversationHandler(BaseHandler, TemplateRendering):
     def get(self):
         topic_id = self.get_argument("topic_id")
         timeFilter = self.get_argument("timeFilter")
         paging = self.get_argument("paging")
-        docs = apiv12.getConversations(topic_id,timeFilter,paging)
+        docs = apiv12.getConversations(topic_id, timeFilter, paging)
         if docs == None:
             docs = []
-        self.write(self.render_template("submission.html", {"docs":docs}))
+        self.write(self.render_template("submission.html", {"docs": docs}))
+
 
 class ConversationV12Handler(BaseHandler, TemplateRendering):
     def get(self):
-        topic_id = self.get_argument("topic_id",None)
+        topic_id = self.get_argument("topic_id", None)
         if topic_id is None:
             self.write({})
-        timeFilter = self.get_argument("date","day")
-        paging = self.get_argument("cursor","0")
-        docs = apiv12.getConversations(int(topic_id),timeFilter,paging)
+        timeFilter = self.get_argument("date", "day")
+        paging = self.get_argument("cursor", "0")
+        docs = apiv12.getConversations(int(topic_id), timeFilter, paging)
         self.set_header('Content-Type', 'application/json')
-        self.write(json.dumps({'conversations':docs},indent=4))
+        self.write(json.dumps({'conversations': docs}, indent=4))
+
 
 class TopicsV12Handler(BaseHandler, TemplateRendering):
     def get(self):
         topics = apiv12.getTopics()
         self.set_header('Content-Type', 'application/json')
         self.write(topics)
+
 
 class NewsFeedsV12Handler(BaseHandler, TemplateRendering):
     def get(self):
@@ -184,12 +196,14 @@ class NewsFeedsV12Handler(BaseHandler, TemplateRendering):
         self.set_header('Content-Type', 'application/json')
         self.write(news)
 
+
 class AudiencesV12Handler(BaseHandler, TemplateRendering):
     def get(self):
         topic_id = self.get_argument("topic_id", None)
         audiences = apiv12.getAudiences(topic_id)
         self.set_header('Content-Type', 'application/json')
         self.write(audiences)
+
 
 class HashtagsV12Handler(BaseHandler, TemplateRendering):
     def get(self):
@@ -198,6 +212,7 @@ class HashtagsV12Handler(BaseHandler, TemplateRendering):
         hashtags = apiv12.getHastags(topic_id, date)
         self.set_header('Content-Type', 'application/json')
         self.write(hashtags)
+
 
 class NewsV12Handler(BaseHandler, TemplateRendering):
     def get(self):
@@ -218,24 +233,28 @@ class NewsV12Handler(BaseHandler, TemplateRendering):
         except:
             cursor = 0
             pass
-        news = apiv12.getNews(news_ids, keywords, languages, cities, countries, user_location, user_language, cursor, since, until, [""], topics)
+        news = apiv12.getNews(news_ids, keywords, languages, cities, countries, user_location, user_language, cursor,
+                              since, until, [""], topics)
         self.set_header('Content-Type', 'application/json')
         self.write(news)
+
 
 class Documentationv12Handler(BaseHandler, TemplateRendering):
     def get(self):
         template = 'apiv12.html'
         variables = {
-            'title' : "Watchtower Api v1.2"
+            'title': "Watchtower Api v1.2"
         }
         content = self.render_template(template, variables)
         self.write(content)
+
 
 class ThemesV11Handler(BaseHandler, TemplateRendering):
     def get(self):
         themes = newapi.getThemes(4)
         self.set_header('Content-Type', 'application/json')
         self.write(themes)
+
 
 class FeedsV11Handler(BaseHandler, TemplateRendering):
     def get(self):
@@ -249,9 +268,10 @@ class FeedsV11Handler(BaseHandler, TemplateRendering):
             cursor = 0
             pass
         date = str(self.get_argument("date", "month"))
-        feeds = newapi.getFeeds(themename, themeid , 4, date, cursor)
+        feeds = newapi.getFeeds(themename, themeid, 4, date, cursor)
         self.set_header('Content-Type', 'application/json')
         self.write(feeds)
+
 
 class InfluencersV11Handler(BaseHandler, TemplateRendering):
     def get(self):
@@ -261,14 +281,16 @@ class InfluencersV11Handler(BaseHandler, TemplateRendering):
         self.set_header('Content-Type', 'application/json')
         self.write(influencers)
 
+
 class Documentationv11Handler(BaseHandler, TemplateRendering):
     def get(self):
         template = 'apiv11.html'
         variables = {
-            'title' : "Watchtower Api"
+            'title': "Watchtower Api"
         }
         content = self.render_template(template, variables)
         self.write(content)
+
 
 class ThemesHandler(BaseHandler, TemplateRendering):
     def get(self):
@@ -276,11 +298,13 @@ class ThemesHandler(BaseHandler, TemplateRendering):
         self.set_header('Content-Type', 'application/json')
         self.write(themes)
 
+
 class InfluencersHandler(BaseHandler, TemplateRendering):
     def get(self, themename, cursor=None):
         influencers = logic.getInfluencers(themename, cursor)
         self.set_header('Content-Type', 'application/json')
         self.write(influencers)
+
 
 class FeedsHandler(BaseHandler, TemplateRendering):
     def get(self, themename, cursor=None):
@@ -288,29 +312,32 @@ class FeedsHandler(BaseHandler, TemplateRendering):
         self.set_header('Content-Type', 'application/json')
         self.write(feeds)
 
+
 class DocumentationHandler(BaseHandler, TemplateRendering):
     def get(self):
         template = 'api.html'
         variables = {
-            'title' : "Watchtower Api"
+            'title': "Watchtower Api"
         }
         content = self.render_template(template, variables)
         self.write(content)
+
 
 class MainHandler(BaseHandler, TemplateRendering):
     def get(self):
         template = 'index.html'
         variables = {
-            'title' : "Watchtower"
+            'title': "Watchtower"
         }
         content = self.render_template(template, variables)
         self.write(content)
+
 
 class LoginHandler(BaseHandler, TemplateRendering):
     def get(self):
         template = 'login.html'
         variables = {
-            'title' : "Login Page"
+            'title': "Login Page"
         }
         content = self.render_template(template, variables)
         self.write(content)
@@ -323,10 +350,12 @@ class LoginHandler(BaseHandler, TemplateRendering):
         else:
             self.write(json.dumps(login_info))
 
+
 class LogoutHandler(BaseHandler, TemplateRendering):
     def get(self):
         self.clear_all_cookies()
         self.redirect("/")
+
 
 class AlertsHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
@@ -335,10 +364,10 @@ class AlertsHandler(BaseHandler, TemplateRendering):
         userid = tornado.escape.xhtml_escape(self.current_user)
         template = 'afterlogintemplate.html'
         variables = {
-            'title' : "Alerts",
-            'alerts' : logic.getAlertList(userid),
-            'type' : "alertlist",
-            'alertlimit' : logic.getAlertLimit(userid),
+            'title': "Alerts",
+            'alerts': logic.getAlertList(userid),
+            'type': "alertlist",
+            'alertlimit': logic.getAlertLimit(userid),
             'threadstatus': logic.getThreadStatus(self.mainT),
             'threadconnection': logic.getThreadConnection(self.mainT)
         }
@@ -346,12 +375,12 @@ class AlertsHandler(BaseHandler, TemplateRendering):
         self.write(content)
 
     @tornado.web.authenticated
-    def post(self, alertid = None):
+    def post(self, alertid=None):
         alertid = self.get_argument("alertid")
         posttype = self.get_argument("posttype")
         userid = tornado.escape.xhtml_escape(self.current_user)
         if posttype == u'remove':
-            info = logic.deleteAlert(alertid, self.mainT,userid)
+            info = logic.deleteAlert(alertid, self.mainT, userid)
         elif posttype == u'stop':
             info = logic.stopAlert(alertid, self.mainT)
         elif posttype == u'start':
@@ -362,13 +391,14 @@ class AlertsHandler(BaseHandler, TemplateRendering):
             info = logic.unpublishAlert(alertid)
         template = "alerts.html"
         variables = {
-            'title' : "Alerts",
-            'alerts' : logic.getAlertList(userid),
-            'type' : "alertlist",
-            'alertlimit' : logic.getAlertLimit(userid)
+            'title': "Alerts",
+            'alerts': logic.getAlertList(userid),
+            'type': "alertlist",
+            'alertlimit': logic.getAlertLimit(userid)
         }
         content = self.render_template(template, variables)
         self.write(content)
+
 
 class MessageHandler(BaseHandler, TemplateRendering):
     def post(self):
@@ -377,9 +407,10 @@ class MessageHandler(BaseHandler, TemplateRendering):
         result = info['message'] + ";" + info['type']
         self.write(result)
 
+
 class CreateEditAlertsHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
-    def get(self, alertid = None):
+    def get(self, alertid=None):
         userid = tornado.escape.xhtml_escape(self.current_user)
         template = 'afterlogintemplate.html'
         variables = {}
@@ -403,7 +434,7 @@ class CreateEditAlertsHandler(BaseHandler, TemplateRendering):
         self.write(content)
 
     @tornado.web.authenticated
-    def post(self, alertid = None):
+    def post(self, alertid=None):
         userid = tornado.escape.xhtml_escape(self.current_user)
         alert = {}
         alert['keywords'] = ",".join(self.get_argument("keywords").split(","))
@@ -415,7 +446,7 @@ class CreateEditAlertsHandler(BaseHandler, TemplateRendering):
         alert['description'] = self.get_argument("description")
         keywordlimit = 10 - len(self.get_argument("keywords").split(","))
         alert['keywordlimit'] = keywordlimit
-        #alert['excludedkeywords'] = ",".join(self.get_argument("excludedkeywords").split(","))
+        # alert['excludedkeywords'] = ",".join(self.get_argument("excludedkeywords").split(","))
         if len(self.request.arguments.get("languages")) != 0:
             alert['lang'] = b','.join(self.request.arguments.get("languages")).decode("utf-8")
         else:
@@ -441,12 +472,13 @@ class CreateEditAlertsHandler(BaseHandler, TemplateRendering):
             logic.addAlert(alert, self.mainT, userid)
         self.redirect("/Alerts")
 
+
 class PreviewHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
     def post(self):
         template = 'tweetsTemplate.html'
         keywords = self.get_argument("keywords")
-        #exculdedkeywords = self.get_argument("excludedkeywords")
+        # exculdedkeywords = self.get_argument("excludedkeywords")
         languages = self.get_argument("languages")
         variables = {
             'tweets': logic.searchTweets(keywords, languages)
@@ -455,6 +487,7 @@ class PreviewHandler(BaseHandler, TemplateRendering):
             self.write("<p style='color: red; font-size: 15px'><b>Ops! There is no tweet now.</b></p>")
         content = self.render_template(template, variables)
         self.write(content)
+
 
 class BookmarkHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
@@ -467,6 +500,7 @@ class BookmarkHandler(BaseHandler, TemplateRendering):
         else:
             content = logic.removeBookmark(alertid, link_id)
         self.write(content)
+
 
 class SentimentHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
@@ -482,6 +516,7 @@ class SentimentHandler(BaseHandler, TemplateRendering):
             content = logic.sentimentNotr(alertid, link_id)
         self.write(content)
 
+
 class DomainHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
     def post(self):
@@ -490,9 +525,10 @@ class DomainHandler(BaseHandler, TemplateRendering):
         logic.banDomain(alertid, domain)
         self.write({})
 
+
 class FeedHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
-    def get(self, argument = None):
+    def get(self, argument=None):
         userid = tornado.escape.xhtml_escape(self.current_user)
         template = 'afterlogintemplate.html'
         if argument is not None:
@@ -547,9 +583,10 @@ class FeedHandler(BaseHandler, TemplateRendering):
         content = self.render_template(template, variables)
         self.write(content)
 
+
 class NewTweetsHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
-    def post(self, get = None):
+    def post(self, get=None):
         if get is not None:
             template = 'tweetsTemplate.html'
             alertid = self.get_argument('alertid')
@@ -564,9 +601,10 @@ class NewTweetsHandler(BaseHandler, TemplateRendering):
             content = str(logic.checkTweets(alertid, newestId))
         self.write(content)
 
+
 class NewsHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
-    def get(self, argument = None):
+    def get(self, argument=None):
         variables = {}
         userid = tornado.escape.xhtml_escape(self.current_user)
         template = 'afterlogintemplate.html'
@@ -574,7 +612,7 @@ class NewsHandler(BaseHandler, TemplateRendering):
             try:
                 alertid = int(argument)
                 try:
-                    date =  self.get_argument('date')
+                    date = self.get_argument('date')
                 except:
                     date = 'yesterday'
                     pass
@@ -617,7 +655,7 @@ class NewsHandler(BaseHandler, TemplateRendering):
             alertid = self.get_argument('alertid')
             next_cursor = self.get_argument('next_cursor')
             try:
-                date =  self.get_argument('date')
+                date = self.get_argument('date')
             except:
                 date = 'yesterday'
                 pass
@@ -634,7 +672,7 @@ class NewsHandler(BaseHandler, TemplateRendering):
             template = 'alertNews.html'
             alertid = self.get_argument('alertid')
             try:
-                date =  self.get_argument('date')
+                date = self.get_argument('date')
             except:
                 date = 'yesterday'
                 pass
@@ -651,6 +689,7 @@ class NewsHandler(BaseHandler, TemplateRendering):
         content = self.render_template(template, variables)
         self.write(content)
 
+
 class SearchHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
     def get(self):
@@ -664,6 +703,7 @@ class SearchHandler(BaseHandler, TemplateRendering):
 
         content = self.render_template(template, variables)
         self.write(content)
+
 
 class SearchNewsHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
@@ -692,7 +732,8 @@ class SearchNewsHandler(BaseHandler, TemplateRendering):
         else:
             template = "alertNews.html"
 
-        news = apiv12.getNews([""], keywords, languages, cities, countries, user_location, user_language, cursor, since, until, domains)
+        news = apiv12.getNews([""], keywords, languages, cities, countries, user_location, user_language, cursor, since,
+                              until, domains)
         news = json.loads(news)
         if news['news'] == []:
             self.write("<p style='color: red; font-size: 15px'><b>Ops! There is no news now.</b></p>")
@@ -703,6 +744,7 @@ class SearchNewsHandler(BaseHandler, TemplateRendering):
 
         content = self.render_template(template, variables)
         self.write(content)
+
 
 class AudienceHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
@@ -759,6 +801,7 @@ class AudienceHandler(BaseHandler, TemplateRendering):
         content = self.render_template(template, variables)
         self.write(content)
 
+
 class PagesHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
     def get(self):
@@ -780,17 +823,20 @@ class PagesHandler(BaseHandler, TemplateRendering):
         content = self.render_template(template, variables)
         self.write(content)
 
+
 def main(mainT):
     tornado.options.parse_command_line()
     app = Application(mainT)
     app.listen(8484)
     tornado.ioloop.IOLoop.current().start()
 
+
 def webserverInit(mainT):
-    thr = Thread(target= main, args= [mainT] )
+    thr = Thread(target=main, args=[mainT])
     thr.daemon = True
     thr.start()
     thr.join()
+
 
 if __name__ == "__main__":
     main()

@@ -1,40 +1,44 @@
-import pymongo
-from application.Connections import Connection
-import logic
 import json
-import dateFilter, crontab3
-from bson import json_util
-import bson.objectid
+import re
+import time
 from datetime import datetime
-import time, re
+
+import bson.objectid
+import pymongo
+
+import crontab3
+import dateFilter
+from application.Connections import Connection
+
 
 def getEvents(topic_id, filterField, cursor):
-
     now = time.time()
     cursor = int(cursor)
     ret = None
     if filterField == 'interested':
         ret = Connection.Instance().events[str(topic_id)].aggregate([
-            { '$match' : { 'end_time' : { '$gte' : now } } },
-            { '$project' : { '_id' : 0 } },
-            { '$sort' : { 'interested' : -1} },
-            { '$skip' : int(cursor) },
-            { '$limit' : 10 }
+            {'$match': {'end_time': {'$gte': now}}},
+            {'$project': {'_id': 0}},
+            {'$sort': {'interested': -1}},
+            {'$skip': int(cursor)},
+            {'$limit': 10}
         ])
     elif filterField == 'date':
         ret = Connection.Instance().events[str(topic_id)].aggregate([
-            { '$match' : { 'end_time' : { '$gte' : now } } },
-            { '$project' : { '_id' : 0 } },
-            { '$sort' : { 'start_time' : -1} },
-            { '$skip' : int(cursor) },
-            { '$limit' : 10 }
+            {'$match': {'end_time': {'$gte': now}}},
+            {'$project': {'_id': 0}},
+            {'$sort': {'start_time': -1}},
+            {'$skip': int(cursor)},
+            {'$limit': 10}
         ])
     ret = list(ret)
     temp = {'events': ret}
     return temp
 
+
 def getConversations(topic_id, timeFilter, paging):
-    curser = Connection.Instance().conversations[str(topic_id)].find({"time_filter" : timeFilter}, {"posts": { "$slice": [ int(paging), 10 ] }, "_id":0})
+    curser = Connection.Instance().conversations[str(topic_id)].find({"time_filter": timeFilter},
+                                                                     {"posts": {"$slice": [int(paging), 10]}, "_id": 0})
     for document in curser:
         docs = []
         for submission in document["posts"]:
@@ -44,11 +48,13 @@ def getConversations(topic_id, timeFilter, paging):
             for comment in submission["comments"]:
                 comment["relative_indent"] = 0
                 if submission['source'] == 'reddit':
-                    comment["created_time"] = datetime.fromtimestamp(int(comment["created_time"])).strftime("%Y-%m-%d %H:%M:%S")
+                    comment["created_time"] = datetime.fromtimestamp(int(comment["created_time"])).strftime(
+                        "%Y-%m-%d %H:%M:%S")
                 else:
-                    comment["created_time"] = comment["created_time"][:10]+" "+comment["created_time"][11:18]
+                    comment["created_time"] = comment["created_time"][:10] + " " + comment["created_time"][11:18]
                 comments.append(comment)
-            temp = {"title":submission["title"],"source":submission["source"],"comments":comments,"url":submission["url"],"commentNumber":submission["numberOfComments"]}
+            temp = {"title": submission["title"], "source": submission["source"], "comments": comments,
+                    "url": submission["url"], "commentNumber": submission["numberOfComments"]}
             if "post_text" in submission:
                 temp["post_text"] = submission["post_text"]
             else:
@@ -70,36 +76,38 @@ def my_handler(x):
     else:
         raise TypeError(x)
 
+
 def getTopics():
     Connection.Instance().cur.execute("select alertid, alertname, description from alerts where ispublish = %s", [True])
     var = Connection.Instance().cur.fetchall()
-    topics = [{'topic_id':i[0], 'topic_name':i[1], 'description': i[2]} for i in var]
+    topics = [{'topic_id': i[0], 'topic_name': i[1], 'description': i[2]} for i in var]
     result = {}
     result['topics'] = topics
     return json.dumps(result, indent=4)
+
 
 def getNewsFeeds(date, cursor, forbidden_domain, topics):
     if topics == [""]:
         return json.dumps({}, indent=4)
 
-    dates=['yesterday', 'week', 'month']
+    dates = ['yesterday', 'week', 'month']
     result = {}
     if date not in dates:
         result['Error'] = 'invalid date'
         return json.dumps(result, indent=4)
 
-    #feeds = list(Connection.Instance().filteredNewsPoolDB[themeid].find({'name': date}, {date: 1}))
-    #feeds = list(feeds[0][date][cursor:cursor+20])
+    # feeds = list(Connection.Instance().filteredNewsPoolDB[themeid].find({'name': date}, {date: 1}))
+    # feeds = list(feeds[0][date][cursor:cursor+20])
 
-    date=crontab3.determine_date(date)
+    date = crontab3.determine_date(date)
 
     news = []
     for topic_id in topics:
-        if len(news) >= cursor+20:
+        if len(news) >= cursor + 20:
             break
         news = news + dateFilter.getDateList(topic_id, int(date), forbidden_domain)
 
-    news = news[cursor:cursor+20]
+    news = news[cursor:cursor + 20]
 
     cursor = int(cursor) + 20
     if cursor >= 60:
@@ -110,19 +118,25 @@ def getNewsFeeds(date, cursor, forbidden_domain, topics):
 
     return json.dumps(result, indent=4)
 
+
 def getAudiences(topic_id):
     if topic_id == None:
         return json.dumps({}, indent=4)
 
-    audiences = list(Connection.Instance().infDB[str(topic_id)].find({}, {'_id':0, 'screen_name': 1, 'location':1, 'name':1, 'profile_image_url':1, 'lang':1, 'description':1, 'time_zone':1}).sort([('rank', pymongo.ASCENDING)]))
+    audiences = list(Connection.Instance().infDB[str(topic_id)].find({}, {'_id': 0, 'screen_name': 1, 'location': 1,
+                                                                          'name': 1, 'profile_image_url': 1, 'lang': 1,
+                                                                          'description': 1, 'time_zone': 1}).sort(
+        [('rank', pymongo.ASCENDING)]))
 
-    return json.dumps({'audiences' : audiences}, indent=4)
+    return json.dumps({'audiences': audiences}, indent=4)
 
-def getNews(news_ids, keywords, languages, cities, countries, user_location, user_language, cursor, since, until, domains, topics):
+
+def getNews(news_ids, keywords, languages, cities, countries, user_location, user_language, cursor, since, until,
+            domains, topics):
     cursor = int(cursor)
-    if news_ids == [""] and keywords == [""] and since == "" and until == "" and\
-     languages == [""] and cities == [""] and countries == [""] and user_location == [""]\
-     and user_language == [""] and domains == [""]:
+    if news_ids == [""] and keywords == [""] and since == "" and until == "" and \
+                    languages == [""] and cities == [""] and countries == [""] and user_location == [""] \
+            and user_language == [""] and domains == [""]:
         return json.dumps({'news': [], 'next_cursor': 0, 'next_cursor_str': "0"}, indent=4)
 
     aggregate_dictionary = []
@@ -145,7 +159,8 @@ def getNews(news_ids, keywords, languages, cities, countries, user_location, use
 
     if keywords != [""]:
         keywords_in_dictionary = [re.compile(key, re.IGNORECASE) for key in keywords]
-        find_dictionary['$or'] = [{'title': {'$in': keywords_in_dictionary}}, {'description': {'$in': keywords_in_dictionary}}]
+        find_dictionary['$or'] = [{'title': {'$in': keywords_in_dictionary}},
+                                  {'description': {'$in': keywords_in_dictionary}}]
 
     if domains != [""]:
         domains_in_dictionary = [re.compile(key, re.IGNORECASE) for key in domains]
@@ -178,14 +193,14 @@ def getNews(news_ids, keywords, languages, cities, countries, user_location, use
     if since != "":
         try:
             since_in_dictionary = datetime.strptime(since, "%d-%m-%Y")
-            date_dictionary['$gte'] =  since_in_dictionary
+            date_dictionary['$gte'] = since_in_dictionary
         except ValueError:
             return json.dumps({'error': "please, enter a valid since day. DAY-MONTH-YEAR"}, indent=4)
 
     if until != "":
         try:
             until_in_dictionary = datetime.strptime(until, "%d-%m-%Y")
-            date_dictionary['$lte'] =  until_in_dictionary
+            date_dictionary['$lte'] = until_in_dictionary
         except ValueError:
             return json.dumps({'error': "please, enter a valid since day. DAY-MONTH-YEAR"}, indent=4)
 
@@ -194,10 +209,10 @@ def getNews(news_ids, keywords, languages, cities, countries, user_location, use
 
     aggregate_dictionary.append({'$match': find_dictionary})
     if user_language == [""] and user_location == [""]:
-        aggregate_dictionary.append({'$project': {'mentions':0}})
-    aggregate_dictionary.append({'$project': {'_id': 0, 'bookmark':0, 'bookmark_date':0, 'location': 0}})
+        aggregate_dictionary.append({'$project': {'mentions': 0}})
+    aggregate_dictionary.append({'$project': {'_id': 0, 'bookmark': 0, 'bookmark_date': 0, 'location': 0}})
 
-    aggregate_dictionary.append({'$sort': {'link_id' : -1}})
+    aggregate_dictionary.append({'$sort': {'link_id': -1}})
 
     print(aggregate_dictionary)
 
@@ -207,7 +222,7 @@ def getNews(news_ids, keywords, languages, cities, countries, user_location, use
 
     news = []
     for alertid in Connection.Instance().newsPoolDB.collection_names():
-        if len(news) >= cursor+20:
+        if len(news) >= cursor + 20:
             break
         if topics_filter == []:
             news = news + list(Connection.Instance().newsPoolDB[str(alertid)].aggregate(aggregate_dictionary))
@@ -216,21 +231,23 @@ def getNews(news_ids, keywords, languages, cities, countries, user_location, use
                 news = news + list(Connection.Instance().newsPoolDB[str(alertid)].aggregate(aggregate_dictionary))
 
     next_cursor = cursor + 20
-    if len(news) < cursor+20:
+    if len(news) < cursor + 20:
         next_cursor = 0
 
     result = {
         'next_cursor': next_cursor,
         'next_cursor_str': str(next_cursor),
-        'news': news[cursor:cursor+20]
+        'news': news[cursor:cursor + 20]
     }
 
     return json.dumps(result, indent=4, default=my_handler)
+
 
 def getHastags(topic_id, date):
     if topic_id == None:
         return json.dumps({}, indent=4)
 
-    hashtags = list(Connection.Instance().hashtags[str(topic_id)].find({'name': date}, {'_id': 0, 'modified_date': 0}))[0][date]
+    hashtags = \
+    list(Connection.Instance().hashtags[str(topic_id)].find({'name': date}, {'_id': 0, 'modified_date': 0}))[0][date]
 
     return json.dumps({'hashtags': hashtags}, indent=4)

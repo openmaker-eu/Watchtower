@@ -1,17 +1,22 @@
 {% for audience in audiences %}
-<div class="row margin-bottom-25">
-    <div class="col-md-12">
-      <img src="{{audience['profile_image_url']}}" onerror="this.src='/images/image-not-found.png'" class="img-responsive feed_img img-circle">
-      <p></p>
-      <a href="http://twitter.com/{{audience['screen_name']}}" target="_blank" style="color: #000000;text-decoration: none;">
-      <h5><small>@{{audience['screen_name']}}</small></br>{{audience['name']}}</h5>
-    </a>
-      <p>Followers Count: {{audience['followers_count']}} </p>
-      <p>
-      </p><p>{{audience['description']}} </p>
+    <div class="row margin-bottom-25">
+        <div class="col-md-12">
+            <img src="{{ audience['profile_image_url'] }}" onerror="this.src='/images/image-not-found.png'"
+                 class="img-responsive feed_img img-circle">
+            <p></p>
+            <a href="http://twitter.com/{{ audience['screen_name'] }}" target="_blank"
+               style="color: #000000;text-decoration: none;">
+                <h5>
+                    <small>@{{ audience['screen_name'] }}</small>
+                    </br>{{ audience['name'] }}</h5>
+            </a>
+            <p>Followers Count: {{ audience['followers_count'] }} </p>
+            <p>
+            </p>
+            <p>{{ audience['description'] }} </p>
+        </div>
+        <div class="col-md-12 margin-top-10">
+            <hr>
+        </div>
     </div>
-    <div class="col-md-12 margin-top-10">
-        <hr>
-    </div>
-</div>
 {% endfor %}

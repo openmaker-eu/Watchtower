@@ -1,109 +1,1119 @@
-<!DOCTYPE html><html><head><meta charset="utf-8"><title>Watchtower API v1.2</title><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css"><style>@import url('https://fonts.googleapis.com/css?family=Roboto:400,700|Inconsolata|Raleway:200');.hljs-comment,.hljs-title{color:#8e908c}.hljs-variable,.hljs-attribute,.hljs-tag,.hljs-regexp,.ruby .hljs-constant,.xml .hljs-tag .hljs-title,.xml .hljs-pi,.xml .hljs-doctype,.html .hljs-doctype,.css .hljs-id,.css .hljs-class,.css .hljs-pseudo{color:#c82829}.hljs-number,.hljs-preprocessor,.hljs-pragma,.hljs-built_in,.hljs-literal,.hljs-params,.hljs-constant{color:#f5871f}.ruby .hljs-class .hljs-title,.css .hljs-rules .hljs-attribute{color:#eab700}.hljs-string,.hljs-value,.hljs-inheritance,.hljs-header,.ruby .hljs-symbol,.xml .hljs-cdata{color:#718c00}.css .hljs-hexcolor{color:#3e999f}.hljs-function,.python .hljs-decorator,.python .hljs-title,.ruby .hljs-function .hljs-title,.ruby .hljs-title .hljs-keyword,.perl .hljs-sub,.javascript .hljs-title,.coffeescript .hljs-title{color:#4271ae}.hljs-keyword,.javascript .hljs-function{color:#8959a8}.hljs{display:block;background:white;color:#4d4d4c;padding:.5em}.coffeescript .javascript,.javascript .xml,.tex .hljs-formula,.xml .javascript,.xml .vbscript,.xml .css,.xml .hljs-cdata{opacity:.5}.right .hljs-comment{color:#969896}.right .css .hljs-class,.right .css .hljs-id,.right .css .hljs-pseudo,.right .hljs-attribute,.right .hljs-regexp,.right .hljs-tag,.right .hljs-variable,.right .html .hljs-doctype,.right .ruby .hljs-constant,.right .xml .hljs-doctype,.right .xml .hljs-pi,.right .xml .hljs-tag .hljs-title{color:#c66}.right .hljs-built_in,.right .hljs-constant,.right .hljs-literal,.right .hljs-number,.right .hljs-params,.right .hljs-pragma,.right .hljs-preprocessor{color:#de935f}.right .css .hljs-rule .hljs-attribute,.right .ruby .hljs-class .hljs-title{color:#f0c674}.right .hljs-header,.right .hljs-inheritance,.right .hljs-name,.right .hljs-string,.right .hljs-value,.right .ruby .hljs-symbol,.right .xml .hljs-cdata{color:#b5bd68}.right .css .hljs-hexcolor,.right .hljs-title{color:#8abeb7}.right .coffeescript .hljs-title,.right .hljs-function,.right .javascript .hljs-title,.right .perl .hljs-sub,.right .python .hljs-decorator,.right .python .hljs-title,.right .ruby .hljs-function .hljs-title,.right .ruby .hljs-title .hljs-keyword{color:#81a2be}.right .hljs-keyword,.right .javascript .hljs-function{color:#b294bb}.right .hljs{display:block;overflow-x:auto;background:#1d1f21;color:#c5c8c6;padding:.5em;-webkit-text-size-adjust:none}.right .coffeescript .javascript,.right .javascript .xml,.right .tex .hljs-formula,.right .xml .css,.right .xml .hljs-cdata,.right .xml .javascript,.right .xml .vbscript{opacity:.5}body{color:black;background:white;font:400 14px / 1.42 'Roboto',Helvetica,sans-serif}header{border-bottom:1px solid #f2f2f2;margin-bottom:12px}h1,h2,h3,h4,h5{color:black;margin:12px 0}h1 .permalink,h2 .permalink,h3 .permalink,h4 .permalink,h5 .permalink{margin-left:0;opacity:0;transition:opacity .25s ease}h1:hover .permalink,h2:hover .permalink,h3:hover .permalink,h4:hover .permalink,h5:hover .permalink{opacity:1}.triple h1 .permalink,.triple h2 .permalink,.triple h3 .permalink,.triple h4 .permalink,.triple h5 .permalink{opacity:.15}.triple h1:hover .permalink,.triple h2:hover .permalink,.triple h3:hover .permalink,.triple h4:hover .permalink,.triple h5:hover .permalink{opacity:.15}h1{font:200 36px 'Raleway',Helvetica,sans-serif;font-size:36px}h2{font:200 36px 'Raleway',Helvetica,sans-serif;font-size:30px}h3{font-size:100%;text-transform:uppercase}h5{font-size:100%;font-weight:normal}p{margin:0 0 10px}p.choices{line-height:1.6}a{color:#428bca;text-decoration:none}li p{margin:0}hr.split{border:0;height:1px;width:100%;padding-left:6px;margin:12px auto;background-image:linear-gradient(to right, rgba(0,0,0,0) 20%, rgba(0,0,0,0.2) 51.4%, rgba(255,255,255,0.2) 51.4%, rgba(255,255,255,0) 80%)}dl dt{float:left;width:130px;clear:left;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:700}dl dd{margin-left:150px}blockquote{color:rgba(0,0,0,0.5);font-size:15.5px;padding:10px 20px;margin:12px 0;border-left:5px solid #e8e8e8}blockquote p:last-child{margin-bottom:0}pre{background-color:#f5f5f5;padding:12px;border:1px solid #cfcfcf;border-radius:6px;overflow:auto}pre code{color:black;background-color:transparent;padding:0;border:none}code{color:#444;background-color:#f5f5f5;font:'Inconsolata',monospace;padding:1px 4px;border:1px solid #cfcfcf;border-radius:3px}ul,ol{padding-left:2em}table{border-collapse:collapse;border-spacing:0;margin-bottom:12px}table tr:nth-child(2n){background-color:#fafafa}table th,table td{padding:6px 12px;border:1px solid #e6e6e6}.text-muted{opacity:.5}.note,.warning{padding:.3em 1em;margin:1em 0;border-radius:2px;font-size:90%}.note h1,.warning h1,.note h2,.warning h2,.note h3,.warning h3,.note h4,.warning h4,.note h5,.warning h5,.note h6,.warning h6{font-family:200 36px 'Raleway',Helvetica,sans-serif;font-size:135%;font-weight:500}.note p,.warning p{margin:.5em 0}.note{color:black;background-color:#f0f6fb;border-left:4px solid #428bca}.note h1,.note h2,.note h3,.note h4,.note h5,.note h6{color:#428bca}.warning{color:black;background-color:#fbf1f0;border-left:4px solid #c9302c}.warning h1,.warning h2,.warning h3,.warning h4,.warning h5,.warning h6{color:#c9302c}header{margin-top:24px}nav{position:fixed;top:24px;bottom:0;overflow-y:auto}nav .resource-group{padding:0}nav .resource-group .heading{position:relative}nav .resource-group .heading .chevron{position:absolute;top:12px;right:12px;opacity:.5}nav .resource-group .heading a{display:block;color:black;opacity:.7;border-left:2px solid transparent;margin:0}nav .resource-group .heading a:hover{text-decoration:none;background-color:bad-color;border-left:2px solid black}nav ul{list-style-type:none;padding-left:0}nav ul a{display:block;font-size:13px;color:rgba(0,0,0,0.7);padding:8px 12px;border-top:1px solid #d9d9d9;border-left:2px solid transparent;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}nav ul a:hover{text-decoration:none;background-color:bad-color;border-left:2px solid black}nav ul>li{margin:0}nav ul>li:first-child{margin-top:-12px}nav ul>li:last-child{margin-bottom:-12px}nav ul ul a{padding-left:24px}nav ul ul li{margin:0}nav ul ul li:first-child{margin-top:0}nav ul ul li:last-child{margin-bottom:0}nav>div>div>ul>li:first-child>a{border-top:none}.preload *{transition:none !important}.pull-left{float:left}.pull-right{float:right}.badge{display:inline-block;float:right;min-width:10px;min-height:14px;padding:3px 7px;font-size:12px;color:#000;background-color:#f2f2f2;border-radius:10px;margin:-2px 0}.badge.get{color:#70bbe1;background-color:#d9edf7}.badge.head{color:#70bbe1;background-color:#d9edf7}.badge.options{color:#70bbe1;background-color:#d9edf7}.badge.put{color:#f0db70;background-color:#fcf8e3}.badge.patch{color:#f0db70;background-color:#fcf8e3}.badge.post{color:#93cd7c;background-color:#dff0d8}.badge.delete{color:#ce8383;background-color:#f2dede}.collapse-button{float:right}.collapse-button .close{display:none;color:#428bca;cursor:pointer}.collapse-button .open{color:#428bca;cursor:pointer}.collapse-button.show .close{display:inline}.collapse-button.show .open{display:none}.collapse-content{max-height:0;overflow:hidden;transition:max-height .3s ease-in-out}nav{width:220px}.container{max-width:940px;margin-left:auto;margin-right:auto}.container .row .content{margin-left:244px;width:696px}.container .row:after{content:'';display:block;clear:both}.container-fluid nav{width:22%}.container-fluid .row .content{margin-left:24%}.container-fluid.triple nav{width:16.5%;padding-right:1px}.container-fluid.triple .row .content{position:relative;margin-left:16.5%;padding-left:24px}.middle:before,.middle:after{content:'';display:table}.middle:after{clear:both}.middle{box-sizing:border-box;width:51.5%;padding-right:12px}.right{box-sizing:border-box;float:right;width:48.5%;padding-left:12px}.right a{color:#428bca}.right h1,.right h2,.right h3,.right h4,.right h5,.right p,.right div{color:white}.right pre{background-color:#1d1f21;border:1px solid #1d1f21}.right pre code{color:#c5c8c6}.right .description{margin-top:12px}.triple .resource-heading{font-size:125%}.definition{margin-top:12px;margin-bottom:12px}.definition .method{font-weight:bold}.definition .method.get{color:#2e8ab8}.definition .method.head{color:#2e8ab8}.definition .method.options{color:#2e8ab8}.definition .method.post{color:#56b82e}.definition .method.put{color:#b8a22e}.definition .method.patch{color:#b8a22e}.definition .method.delete{color:#b82e2e}.definition .uri{word-break:break-all;word-wrap:break-word}.definition .hostname{opacity:.5}.example-names{background-color:#eee;padding:12px;border-radius:6px}.example-names .tab-button{cursor:pointer;color:black;border:1px solid #ddd;padding:6px;margin-left:12px}.example-names .tab-button.active{background-color:#d5d5d5}.right .example-names{background-color:#444}.right .example-names .tab-button{color:white;border:1px solid #666;border-radius:6px}.right .example-names .tab-button.active{background-color:#5e5e5e}#nav-background{position:fixed;left:0;top:0;bottom:0;width:16.5%;padding-right:14.4px;background-color:#fbfbfb;border-right:1px solid #f0f0f0;z-index:-1}#right-panel-background{position:absolute;right:-12px;top:-12px;bottom:-12px;width:48.6%;background-color:#333;z-index:-1}@media (max-width:1200px){nav{width:198px}.container{max-width:840px}.container .row .content{margin-left:224px;width:606px}}@media (max-width:992px){nav{width:169.4px}.container{max-width:720px}.container .row .content{margin-left:194px;width:526px}}@media (max-width:768px){nav{display:none}.container{width:95%;max-width:none}.container .row .content,.container-fluid .row .content,.container-fluid.triple .row .content{margin-left:auto;margin-right:auto;width:95%}#nav-background{display:none}#right-panel-background{width:48.6%}}.back-to-top{position:fixed;z-index:1;bottom:0;right:24px;padding:4px 8px;color:rgba(0,0,0,0.5);background-color:#f2f2f2;text-decoration:none !important;border-top:1px solid #d9d9d9;border-left:1px solid #d9d9d9;border-right:1px solid #d9d9d9;border-top-left-radius:3px;border-top-right-radius:3px}.resource-group{padding:12px;margin-bottom:12px;background-color:white;border:1px solid #d9d9d9;border-radius:6px}.resource-group h2.group-heading,.resource-group .heading a{padding:12px;margin:-12px -12px 12px -12px;background-color:#f2f2f2;border-bottom:1px solid #d9d9d9;border-top-left-radius:6px;border-top-right-radius:6px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden}.triple .content .resource-group{padding:0;border:none}.triple .content .resource-group h2.group-heading,.triple .content .resource-group .heading a{margin:0 0 12px 0;border:1px solid #d9d9d9}nav .resource-group .heading a{padding:12px;margin-bottom:0}nav .resource-group .collapse-content{padding:0}.action{margin-bottom:12px;padding:12px 12px 0 12px;overflow:hidden;border:1px solid transparent;border-radius:6px}.action h4.action-heading{padding:6px 12px;margin:-12px -12px 12px -12px;border-bottom:1px solid transparent;border-top-left-radius:6px;border-top-right-radius:6px;overflow:hidden}.action h4.action-heading .name{float:right;font-weight:normal;padding:6px 0}.action h4.action-heading .method{padding:6px 12px;margin-right:12px;border-radius:3px;display:inline-block}.action h4.action-heading .method.get{color:#fff;background-color:#337ab7}.action h4.action-heading .method.head{color:#fff;background-color:#337ab7}.action h4.action-heading .method.options{color:#fff;background-color:#337ab7}.action h4.action-heading .method.put{color:#fff;background-color:#ed9c28}.action h4.action-heading .method.patch{color:#fff;background-color:#ed9c28}.action h4.action-heading .method.post{color:#fff;background-color:#5cb85c}.action h4.action-heading .method.delete{color:#fff;background-color:#d9534f}.action h4.action-heading code{color:#444;background-color:#f5f5f5;border-color:#cfcfcf;font-weight:normal;word-break:break-all;display:inline-block;margin-top:2px}.action dl.inner{padding-bottom:2px}.action .title{border-bottom:1px solid white;margin:0 -12px -1px -12px;padding:12px}.action.get{border-color:#bce8f1}.action.get h4.action-heading{color:#337ab7;background:#d9edf7;border-bottom-color:#bce8f1}.action.head{border-color:#bce8f1}.action.head h4.action-heading{color:#337ab7;background:#d9edf7;border-bottom-color:#bce8f1}.action.options{border-color:#bce8f1}.action.options h4.action-heading{color:#337ab7;background:#d9edf7;border-bottom-color:#bce8f1}.action.post{border-color:#d6e9c6}.action.post h4.action-heading{color:#5cb85c;background:#dff0d8;border-bottom-color:#d6e9c6}.action.put{border-color:#faebcc}.action.put h4.action-heading{color:#ed9c28;background:#fcf8e3;border-bottom-color:#faebcc}.action.patch{border-color:#faebcc}.action.patch h4.action-heading{color:#ed9c28;background:#fcf8e3;border-bottom-color:#faebcc}.action.delete{border-color:#ebccd1}.action.delete h4.action-heading{color:#d9534f;background:#f2dede;border-bottom-color:#ebccd1}</style></head><body class="preload"><a href="#top" class="text-muted back-to-top"><i class="fa fa-toggle-up"></i>&nbsp;Back to top</a><div class="container"><div class="row"><nav><div class="resource-group"><div class="heading"><div class="chevron"><i class="open fa fa-angle-down"></i></div><a href="#">Resource Group</a></div><div class="collapse-content"><ul><li><a href="#topics-collection-get"><span class="badge get"><i class="fa fa-arrow-down"></i></span>List All Topics</a></li><li><a href="#audiences-collection-get"><span class="badge get"><i class="fa fa-arrow-down"></i></span>List All Audiences of given topic</a></li><li><a href="#news-collection-get"><span class="badge get"><i class="fa fa-arrow-down"></i></span>List All News of given topic</a></li><li><a href="#news-collection-get-1"><span class="badge get"><i class="fa fa-arrow-down"></i></span>List All News of given filter</a></li><li><a href="#hashtags-collection-get"><span class="badge get"><i class="fa fa-arrow-down"></i></span>List All Hashtags of given topic</a></li><li><a href="#event-collection-get"><span class="badge get"><i class="fa fa-arrow-down"></i></span>List All Events of given topic</a></li><li><a href="#conversation-collection-get"><span class="badge get"><i class="fa fa-arrow-down"></i></span>List All Conversation of given topic</a></li></ul></div></div><p style="text-align: center; word-wrap: break-word;"><a href="http://138.68.92.181:8484/api/v1.2">http://138.68.92.181:8484/api/v1.2</a></p></nav><div class="content"><header><h1 id="top">Watchtower API v1.2</h1></header><p>Watchtower is a simple API allowing consumers to view the given topic’s audiences, events, conversations and news.</p>
-  <h3>Change Log:</h3>
-  <ul>
-    <li>
-      <h4>23.08.2017</h4>
-      <ul>
-        <li>
-          get_events end point is added.
-          <ol>
-            <li>
-              topic_id (int),
-            </li>
-            <li>
-              date(date, interested),
-            </li>
-            <li>
-              cursor (int)
-            </li>
-          </ol>
-        </li>
-        <li>
-          get_conversations end point is added.
-          <ol>
-            <li>
-              topic_id (int),
-            </li>
-            <li>
-              date(day, week, month),
-            </li>
-            <li>
-              cursor (int)
-            </li>
-          </ol>
-        </li>
-      </ul>
-      <h4>22.08.2017</h4>
-      <ul>
-        <li>
-          get_hashtag end point is added.
-          <ol>
-            <li>
-              topic_id (int),
-            </li>
-            <li>
-              date(yesterday, week, month)
-            </li>
-          </ol>
-        </li>
-        <li>
-          search_news end point is updated.
-          <ol>
-            <li>
-              topic_ids (int, seperated with comma)
-            </li>
-          </ol>
-        </li>
-      </ul>
-      <h4>05.08.2017</h4>
-      <ul>
-        <li>
-          search_news end point parameters are increased.
-          <ol>
-            <li>
-              since(DAY-MONTH-YEAR),
-            </li>
-            <li>
-              until(DAY-MONTH-YEAR),
-            </li>
-            <li>
-              language(seperated with comma, language code),
-            </li>
-            <li>
-              mention_location(seperated with comma),
-            </li>
-            <li>
-              mention_language(seperated with comma, language code)
-            </li>
-          </ol>
-        </li>
-      </ul>
-    </li>
-  </ul>
-<section id="" class="resource-group"><h2 class="group-heading">Resource Group <a href="#" class="permalink">&para;</a></h2><div id="topics-collection" class="resource"><h3 class="resource-heading">Topics Collection <a href="#topics-collection" class="permalink">&nbsp;&para;</a></h3><div id="topics-collection-get" class="action get"><h4 class="action-heading"><div class="name">List All Topics</div><a href="#topics-collection-get" class="method get">GET</a><code class="uri">/get_topics</code></h4><h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&nbsp;<span class="uri"><span class="hostname">http://138.68.92.181:8484/api/v1.2</span>/get_topics</span></div><div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Watchtower API v1.2</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+    <style>@import url('https://fonts.googleapis.com/css?family=Roboto:400,700|Inconsolata|Raleway:200');
+
+    .hljs-comment, .hljs-title {
+        color: #8e908c
+    }
+
+    .hljs-variable, .hljs-attribute, .hljs-tag, .hljs-regexp, .ruby .hljs-constant, .xml .hljs-tag .hljs-title, .xml .hljs-pi, .xml .hljs-doctype, .html .hljs-doctype, .css .hljs-id, .css .hljs-class, .css .hljs-pseudo {
+        color: #c82829
+    }
+
+    .hljs-number, .hljs-preprocessor, .hljs-pragma, .hljs-built_in, .hljs-literal, .hljs-params, .hljs-constant {
+        color: #f5871f
+    }
+
+    .ruby .hljs-class .hljs-title, .css .hljs-rules .hljs-attribute {
+        color: #eab700
+    }
+
+    .hljs-string, .hljs-value, .hljs-inheritance, .hljs-header, .ruby .hljs-symbol, .xml .hljs-cdata {
+        color: #718c00
+    }
+
+    .css .hljs-hexcolor {
+        color: #3e999f
+    }
+
+    .hljs-function, .python .hljs-decorator, .python .hljs-title, .ruby .hljs-function .hljs-title, .ruby .hljs-title .hljs-keyword, .perl .hljs-sub, .javascript .hljs-title, .coffeescript .hljs-title {
+        color: #4271ae
+    }
+
+    .hljs-keyword, .javascript .hljs-function {
+        color: #8959a8
+    }
+
+    .hljs {
+        display: block;
+        background: white;
+        color: #4d4d4c;
+        padding: .5em
+    }
+
+    .coffeescript .javascript, .javascript .xml, .tex .hljs-formula, .xml .javascript, .xml .vbscript, .xml .css, .xml .hljs-cdata {
+        opacity: .5
+    }
+
+    .right .hljs-comment {
+        color: #969896
+    }
+
+    .right .css .hljs-class, .right .css .hljs-id, .right .css .hljs-pseudo, .right .hljs-attribute, .right .hljs-regexp, .right .hljs-tag, .right .hljs-variable, .right .html .hljs-doctype, .right .ruby .hljs-constant, .right .xml .hljs-doctype, .right .xml .hljs-pi, .right .xml .hljs-tag .hljs-title {
+        color: #c66
+    }
+
+    .right .hljs-built_in, .right .hljs-constant, .right .hljs-literal, .right .hljs-number, .right .hljs-params, .right .hljs-pragma, .right .hljs-preprocessor {
+        color: #de935f
+    }
+
+    .right .css .hljs-rule .hljs-attribute, .right .ruby .hljs-class .hljs-title {
+        color: #f0c674
+    }
+
+    .right .hljs-header, .right .hljs-inheritance, .right .hljs-name, .right .hljs-string, .right .hljs-value, .right .ruby .hljs-symbol, .right .xml .hljs-cdata {
+        color: #b5bd68
+    }
+
+    .right .css .hljs-hexcolor, .right .hljs-title {
+        color: #8abeb7
+    }
+
+    .right .coffeescript .hljs-title, .right .hljs-function, .right .javascript .hljs-title, .right .perl .hljs-sub, .right .python .hljs-decorator, .right .python .hljs-title, .right .ruby .hljs-function .hljs-title, .right .ruby .hljs-title .hljs-keyword {
+        color: #81a2be
+    }
+
+    .right .hljs-keyword, .right .javascript .hljs-function {
+        color: #b294bb
+    }
+
+    .right .hljs {
+        display: block;
+        overflow-x: auto;
+        background: #1d1f21;
+        color: #c5c8c6;
+        padding: .5em;
+        -webkit-text-size-adjust: none
+    }
+
+    .right .coffeescript .javascript, .right .javascript .xml, .right .tex .hljs-formula, .right .xml .css, .right .xml .hljs-cdata, .right .xml .javascript, .right .xml .vbscript {
+        opacity: .5
+    }
+
+    body {
+        color: black;
+        background: white;
+        font: 400 14px / 1.42 'Roboto', Helvetica, sans-serif
+    }
+
+    header {
+        border-bottom: 1px solid #f2f2f2;
+        margin-bottom: 12px
+    }
+
+    h1, h2, h3, h4, h5 {
+        color: black;
+        margin: 12px 0
+    }
+
+    h1 .permalink, h2 .permalink, h3 .permalink, h4 .permalink, h5 .permalink {
+        margin-left: 0;
+        opacity: 0;
+        transition: opacity .25s ease
+    }
+
+    h1:hover .permalink, h2:hover .permalink, h3:hover .permalink, h4:hover .permalink, h5:hover .permalink {
+        opacity: 1
+    }
+
+    .triple h1 .permalink, .triple h2 .permalink, .triple h3 .permalink, .triple h4 .permalink, .triple h5 .permalink {
+        opacity: .15
+    }
+
+    .triple h1:hover .permalink, .triple h2:hover .permalink, .triple h3:hover .permalink, .triple h4:hover .permalink, .triple h5:hover .permalink {
+        opacity: .15
+    }
+
+    h1 {
+        font: 200 36px 'Raleway', Helvetica, sans-serif;
+        font-size: 36px
+    }
+
+    h2 {
+        font: 200 36px 'Raleway', Helvetica, sans-serif;
+        font-size: 30px
+    }
+
+    h3 {
+        font-size: 100%;
+        text-transform: uppercase
+    }
+
+    h5 {
+        font-size: 100%;
+        font-weight: normal
+    }
+
+    p {
+        margin: 0 0 10px
+    }
+
+    p.choices {
+        line-height: 1.6
+    }
+
+    a {
+        color: #428bca;
+        text-decoration: none
+    }
+
+    li p {
+        margin: 0
+    }
+
+    hr.split {
+        border: 0;
+        height: 1px;
+        width: 100%;
+        padding-left: 6px;
+        margin: 12px auto;
+        background-image: linear-gradient(to right, rgba(0, 0, 0, 0) 20%, rgba(0, 0, 0, 0.2) 51.4%, rgba(255, 255, 255, 0.2) 51.4%, rgba(255, 255, 255, 0) 80%)
+    }
+
+    dl dt {
+        float: left;
+        width: 130px;
+        clear: left;
+        text-align: right;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-weight: 700
+    }
+
+    dl dd {
+        margin-left: 150px
+    }
+
+    blockquote {
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 15.5px;
+        padding: 10px 20px;
+        margin: 12px 0;
+        border-left: 5px solid #e8e8e8
+    }
+
+    blockquote p:last-child {
+        margin-bottom: 0
+    }
+
+    pre {
+        background-color: #f5f5f5;
+        padding: 12px;
+        border: 1px solid #cfcfcf;
+        border-radius: 6px;
+        overflow: auto
+    }
+
+    pre code {
+        color: black;
+        background-color: transparent;
+        padding: 0;
+        border: none
+    }
+
+    code {
+        color: #444;
+        background-color: #f5f5f5;
+        font: 'Inconsolata', monospace;
+        padding: 1px 4px;
+        border: 1px solid #cfcfcf;
+        border-radius: 3px
+    }
+
+    ul, ol {
+        padding-left: 2em
+    }
+
+    table {
+        border-collapse: collapse;
+        border-spacing: 0;
+        margin-bottom: 12px
+    }
+
+    table tr:nth-child(2n) {
+        background-color: #fafafa
+    }
+
+    table th, table td {
+        padding: 6px 12px;
+        border: 1px solid #e6e6e6
+    }
+
+    .text-muted {
+        opacity: .5
+    }
+
+    .note, .warning {
+        padding: .3em 1em;
+        margin: 1em 0;
+        border-radius: 2px;
+        font-size: 90%
+    }
+
+    .note h1, .warning h1, .note h2, .warning h2, .note h3, .warning h3, .note h4, .warning h4, .note h5, .warning h5, .note h6, .warning h6 {
+        font-family: 200 36px 'Raleway', Helvetica, sans-serif;
+        font-size: 135%;
+        font-weight: 500
+    }
+
+    .note p, .warning p {
+        margin: .5em 0
+    }
+
+    .note {
+        color: black;
+        background-color: #f0f6fb;
+        border-left: 4px solid #428bca
+    }
+
+    .note h1, .note h2, .note h3, .note h4, .note h5, .note h6 {
+        color: #428bca
+    }
+
+    .warning {
+        color: black;
+        background-color: #fbf1f0;
+        border-left: 4px solid #c9302c
+    }
+
+    .warning h1, .warning h2, .warning h3, .warning h4, .warning h5, .warning h6 {
+        color: #c9302c
+    }
+
+    header {
+        margin-top: 24px
+    }
+
+    nav {
+        position: fixed;
+        top: 24px;
+        bottom: 0;
+        overflow-y: auto
+    }
+
+    nav .resource-group {
+        padding: 0
+    }
+
+    nav .resource-group .heading {
+        position: relative
+    }
+
+    nav .resource-group .heading .chevron {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        opacity: .5
+    }
+
+    nav .resource-group .heading a {
+        display: block;
+        color: black;
+        opacity: .7;
+        border-left: 2px solid transparent;
+        margin: 0
+    }
+
+    nav .resource-group .heading a:hover {
+        text-decoration: none;
+        background-color: bad-color;
+        border-left: 2px solid black
+    }
+
+    nav ul {
+        list-style-type: none;
+        padding-left: 0
+    }
+
+    nav ul a {
+        display: block;
+        font-size: 13px;
+        color: rgba(0, 0, 0, 0.7);
+        padding: 8px 12px;
+        border-top: 1px solid #d9d9d9;
+        border-left: 2px solid transparent;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap
+    }
+
+    nav ul a:hover {
+        text-decoration: none;
+        background-color: bad-color;
+        border-left: 2px solid black
+    }
+
+    nav ul > li {
+        margin: 0
+    }
+
+    nav ul > li:first-child {
+        margin-top: -12px
+    }
+
+    nav ul > li:last-child {
+        margin-bottom: -12px
+    }
+
+    nav ul ul a {
+        padding-left: 24px
+    }
+
+    nav ul ul li {
+        margin: 0
+    }
+
+    nav ul ul li:first-child {
+        margin-top: 0
+    }
+
+    nav ul ul li:last-child {
+        margin-bottom: 0
+    }
+
+    nav > div > div > ul > li:first-child > a {
+        border-top: none
+    }
+
+    .preload * {
+        transition: none !important
+    }
+
+    .pull-left {
+        float: left
+    }
+
+    .pull-right {
+        float: right
+    }
+
+    .badge {
+        display: inline-block;
+        float: right;
+        min-width: 10px;
+        min-height: 14px;
+        padding: 3px 7px;
+        font-size: 12px;
+        color: #000;
+        background-color: #f2f2f2;
+        border-radius: 10px;
+        margin: -2px 0
+    }
+
+    .badge.get {
+        color: #70bbe1;
+        background-color: #d9edf7
+    }
+
+    .badge.head {
+        color: #70bbe1;
+        background-color: #d9edf7
+    }
+
+    .badge.options {
+        color: #70bbe1;
+        background-color: #d9edf7
+    }
+
+    .badge.put {
+        color: #f0db70;
+        background-color: #fcf8e3
+    }
+
+    .badge.patch {
+        color: #f0db70;
+        background-color: #fcf8e3
+    }
+
+    .badge.post {
+        color: #93cd7c;
+        background-color: #dff0d8
+    }
+
+    .badge.delete {
+        color: #ce8383;
+        background-color: #f2dede
+    }
+
+    .collapse-button {
+        float: right
+    }
+
+    .collapse-button .close {
+        display: none;
+        color: #428bca;
+        cursor: pointer
+    }
+
+    .collapse-button .open {
+        color: #428bca;
+        cursor: pointer
+    }
+
+    .collapse-button.show .close {
+        display: inline
+    }
+
+    .collapse-button.show .open {
+        display: none
+    }
+
+    .collapse-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height .3s ease-in-out
+    }
+
+    nav {
+        width: 220px
+    }
+
+    .container {
+        max-width: 940px;
+        margin-left: auto;
+        margin-right: auto
+    }
+
+    .container .row .content {
+        margin-left: 244px;
+        width: 696px
+    }
+
+    .container .row:after {
+        content: '';
+        display: block;
+        clear: both
+    }
+
+    .container-fluid nav {
+        width: 22%
+    }
+
+    .container-fluid .row .content {
+        margin-left: 24%
+    }
+
+    .container-fluid.triple nav {
+        width: 16.5%;
+        padding-right: 1px
+    }
+
+    .container-fluid.triple .row .content {
+        position: relative;
+        margin-left: 16.5%;
+        padding-left: 24px
+    }
+
+    .middle:before, .middle:after {
+        content: '';
+        display: table
+    }
+
+    .middle:after {
+        clear: both
+    }
+
+    .middle {
+        box-sizing: border-box;
+        width: 51.5%;
+        padding-right: 12px
+    }
+
+    .right {
+        box-sizing: border-box;
+        float: right;
+        width: 48.5%;
+        padding-left: 12px
+    }
+
+    .right a {
+        color: #428bca
+    }
+
+    .right h1, .right h2, .right h3, .right h4, .right h5, .right p, .right div {
+        color: white
+    }
+
+    .right pre {
+        background-color: #1d1f21;
+        border: 1px solid #1d1f21
+    }
+
+    .right pre code {
+        color: #c5c8c6
+    }
+
+    .right .description {
+        margin-top: 12px
+    }
+
+    .triple .resource-heading {
+        font-size: 125%
+    }
+
+    .definition {
+        margin-top: 12px;
+        margin-bottom: 12px
+    }
+
+    .definition .method {
+        font-weight: bold
+    }
+
+    .definition .method.get {
+        color: #2e8ab8
+    }
+
+    .definition .method.head {
+        color: #2e8ab8
+    }
+
+    .definition .method.options {
+        color: #2e8ab8
+    }
+
+    .definition .method.post {
+        color: #56b82e
+    }
+
+    .definition .method.put {
+        color: #b8a22e
+    }
+
+    .definition .method.patch {
+        color: #b8a22e
+    }
+
+    .definition .method.delete {
+        color: #b82e2e
+    }
+
+    .definition .uri {
+        word-break: break-all;
+        word-wrap: break-word
+    }
+
+    .definition .hostname {
+        opacity: .5
+    }
+
+    .example-names {
+        background-color: #eee;
+        padding: 12px;
+        border-radius: 6px
+    }
+
+    .example-names .tab-button {
+        cursor: pointer;
+        color: black;
+        border: 1px solid #ddd;
+        padding: 6px;
+        margin-left: 12px
+    }
+
+    .example-names .tab-button.active {
+        background-color: #d5d5d5
+    }
+
+    .right .example-names {
+        background-color: #444
+    }
+
+    .right .example-names .tab-button {
+        color: white;
+        border: 1px solid #666;
+        border-radius: 6px
+    }
+
+    .right .example-names .tab-button.active {
+        background-color: #5e5e5e
+    }
+
+    #nav-background {
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 16.5%;
+        padding-right: 14.4px;
+        background-color: #fbfbfb;
+        border-right: 1px solid #f0f0f0;
+        z-index: -1
+    }
+
+    #right-panel-background {
+        position: absolute;
+        right: -12px;
+        top: -12px;
+        bottom: -12px;
+        width: 48.6%;
+        background-color: #333;
+        z-index: -1
+    }
+
+    @media (max-width: 1200px) {
+        nav {
+            width: 198px
+        }
+
+        .container {
+            max-width: 840px
+        }
+
+        .container .row .content {
+            margin-left: 224px;
+            width: 606px
+        }
+    }
+
+    @media (max-width: 992px) {
+        nav {
+            width: 169.4px
+        }
+
+        .container {
+            max-width: 720px
+        }
+
+        .container .row .content {
+            margin-left: 194px;
+            width: 526px
+        }
+    }
+
+    @media (max-width: 768px) {
+        nav {
+            display: none
+        }
+
+        .container {
+            width: 95%;
+            max-width: none
+        }
+
+        .container .row .content, .container-fluid .row .content, .container-fluid.triple .row .content {
+            margin-left: auto;
+            margin-right: auto;
+            width: 95%
+        }
+
+        #nav-background {
+            display: none
+        }
+
+        #right-panel-background {
+            width: 48.6%
+        }
+    }
+
+    .back-to-top {
+        position: fixed;
+        z-index: 1;
+        bottom: 0;
+        right: 24px;
+        padding: 4px 8px;
+        color: rgba(0, 0, 0, 0.5);
+        background-color: #f2f2f2;
+        text-decoration: none !important;
+        border-top: 1px solid #d9d9d9;
+        border-left: 1px solid #d9d9d9;
+        border-right: 1px solid #d9d9d9;
+        border-top-left-radius: 3px;
+        border-top-right-radius: 3px
+    }
+
+    .resource-group {
+        padding: 12px;
+        margin-bottom: 12px;
+        background-color: white;
+        border: 1px solid #d9d9d9;
+        border-radius: 6px
+    }
+
+    .resource-group h2.group-heading, .resource-group .heading a {
+        padding: 12px;
+        margin: -12px -12px 12px -12px;
+        background-color: #f2f2f2;
+        border-bottom: 1px solid #d9d9d9;
+        border-top-left-radius: 6px;
+        border-top-right-radius: 6px;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden
+    }
+
+    .triple .content .resource-group {
+        padding: 0;
+        border: none
+    }
+
+    .triple .content .resource-group h2.group-heading, .triple .content .resource-group .heading a {
+        margin: 0 0 12px 0;
+        border: 1px solid #d9d9d9
+    }
+
+    nav .resource-group .heading a {
+        padding: 12px;
+        margin-bottom: 0
+    }
+
+    nav .resource-group .collapse-content {
+        padding: 0
+    }
+
+    .action {
+        margin-bottom: 12px;
+        padding: 12px 12px 0 12px;
+        overflow: hidden;
+        border: 1px solid transparent;
+        border-radius: 6px
+    }
+
+    .action h4.action-heading {
+        padding: 6px 12px;
+        margin: -12px -12px 12px -12px;
+        border-bottom: 1px solid transparent;
+        border-top-left-radius: 6px;
+        border-top-right-radius: 6px;
+        overflow: hidden
+    }
+
+    .action h4.action-heading .name {
+        float: right;
+        font-weight: normal;
+        padding: 6px 0
+    }
+
+    .action h4.action-heading .method {
+        padding: 6px 12px;
+        margin-right: 12px;
+        border-radius: 3px;
+        display: inline-block
+    }
+
+    .action h4.action-heading .method.get {
+        color: #fff;
+        background-color: #337ab7
+    }
+
+    .action h4.action-heading .method.head {
+        color: #fff;
+        background-color: #337ab7
+    }
+
+    .action h4.action-heading .method.options {
+        color: #fff;
+        background-color: #337ab7
+    }
+
+    .action h4.action-heading .method.put {
+        color: #fff;
+        background-color: #ed9c28
+    }
+
+    .action h4.action-heading .method.patch {
+        color: #fff;
+        background-color: #ed9c28
+    }
+
+    .action h4.action-heading .method.post {
+        color: #fff;
+        background-color: #5cb85c
+    }
+
+    .action h4.action-heading .method.delete {
+        color: #fff;
+        background-color: #d9534f
+    }
+
+    .action h4.action-heading code {
+        color: #444;
+        background-color: #f5f5f5;
+        border-color: #cfcfcf;
+        font-weight: normal;
+        word-break: break-all;
+        display: inline-block;
+        margin-top: 2px
+    }
+
+    .action dl.inner {
+        padding-bottom: 2px
+    }
+
+    .action .title {
+        border-bottom: 1px solid white;
+        margin: 0 -12px -1px -12px;
+        padding: 12px
+    }
+
+    .action.get {
+        border-color: #bce8f1
+    }
+
+    .action.get h4.action-heading {
+        color: #337ab7;
+        background: #d9edf7;
+        border-bottom-color: #bce8f1
+    }
+
+    .action.head {
+        border-color: #bce8f1
+    }
+
+    .action.head h4.action-heading {
+        color: #337ab7;
+        background: #d9edf7;
+        border-bottom-color: #bce8f1
+    }
+
+    .action.options {
+        border-color: #bce8f1
+    }
+
+    .action.options h4.action-heading {
+        color: #337ab7;
+        background: #d9edf7;
+        border-bottom-color: #bce8f1
+    }
+
+    .action.post {
+        border-color: #d6e9c6
+    }
+
+    .action.post h4.action-heading {
+        color: #5cb85c;
+        background: #dff0d8;
+        border-bottom-color: #d6e9c6
+    }
+
+    .action.put {
+        border-color: #faebcc
+    }
+
+    .action.put h4.action-heading {
+        color: #ed9c28;
+        background: #fcf8e3;
+        border-bottom-color: #faebcc
+    }
+
+    .action.patch {
+        border-color: #faebcc
+    }
+
+    .action.patch h4.action-heading {
+        color: #ed9c28;
+        background: #fcf8e3;
+        border-bottom-color: #faebcc
+    }
+
+    .action.delete {
+        border-color: #ebccd1
+    }
+
+    .action.delete h4.action-heading {
+        color: #d9534f;
+        background: #f2dede;
+        border-bottom-color: #ebccd1
+    }</style>
+</head>
+<body class="preload"><a href="#top" class="text-muted back-to-top"><i class="fa fa-toggle-up"></i>&nbsp;Back to top</a>
+<div class="container">
+    <div class="row">
+        <nav>
+            <div class="resource-group">
+                <div class="heading">
+                    <div class="chevron"><i class="open fa fa-angle-down"></i></div>
+                    <a href="#">Resource Group</a></div>
+                <div class="collapse-content">
+                    <ul>
+                        <li><a href="#topics-collection-get"><span class="badge get"><i
+                                class="fa fa-arrow-down"></i></span>List All Topics</a></li>
+                        <li><a href="#audiences-collection-get"><span class="badge get"><i class="fa fa-arrow-down"></i></span>List
+                            All Audiences of given topic</a></li>
+                        <li><a href="#news-collection-get"><span class="badge get"><i
+                                class="fa fa-arrow-down"></i></span>List All News of given topic</a></li>
+                        <li><a href="#news-collection-get-1"><span class="badge get"><i
+                                class="fa fa-arrow-down"></i></span>List All News of given filter</a></li>
+                        <li><a href="#hashtags-collection-get"><span class="badge get"><i class="fa fa-arrow-down"></i></span>List
+                            All Hashtags of given topic</a></li>
+                        <li><a href="#event-collection-get"><span class="badge get"><i
+                                class="fa fa-arrow-down"></i></span>List All Events of given topic</a></li>
+                        <li><a href="#conversation-collection-get"><span class="badge get"><i
+                                class="fa fa-arrow-down"></i></span>List All Conversation of given topic</a></li>
+                    </ul>
+                </div>
+            </div>
+            <p style="text-align: center; word-wrap: break-word;"><a href="http://138.68.92.181:8484/api/v1.2">http://138.68.92.181:8484/api/v1.2</a>
+            </p></nav>
+        <div class="content">
+            <header><h1 id="top">Watchtower API v1.2</h1></header>
+            <p>Watchtower is a simple API allowing consumers to view the given topic’s audiences, events, conversations
+                and news.</p>
+            <h3>Change Log:</h3>
+            <ul>
+                <li>
+                    <h4>23.08.2017</h4>
+                    <ul>
+                        <li>
+                            get_events end point is added.
+                            <ol>
+                                <li>
+                                    topic_id (int),
+                                </li>
+                                <li>
+                                    date(date, interested),
+                                </li>
+                                <li>
+                                    cursor (int)
+                                </li>
+                            </ol>
+                        </li>
+                        <li>
+                            get_conversations end point is added.
+                            <ol>
+                                <li>
+                                    topic_id (int),
+                                </li>
+                                <li>
+                                    date(day, week, month),
+                                </li>
+                                <li>
+                                    cursor (int)
+                                </li>
+                            </ol>
+                        </li>
+                    </ul>
+                    <h4>22.08.2017</h4>
+                    <ul>
+                        <li>
+                            get_hashtag end point is added.
+                            <ol>
+                                <li>
+                                    topic_id (int),
+                                </li>
+                                <li>
+                                    date(yesterday, week, month)
+                                </li>
+                            </ol>
+                        </li>
+                        <li>
+                            search_news end point is updated.
+                            <ol>
+                                <li>
+                                    topic_ids (int, seperated with comma)
+                                </li>
+                            </ol>
+                        </li>
+                    </ul>
+                    <h4>05.08.2017</h4>
+                    <ul>
+                        <li>
+                            search_news end point parameters are increased.
+                            <ol>
+                                <li>
+                                    since(DAY-MONTH-YEAR),
+                                </li>
+                                <li>
+                                    until(DAY-MONTH-YEAR),
+                                </li>
+                                <li>
+                                    language(seperated with comma, language code),
+                                </li>
+                                <li>
+                                    mention_location(seperated with comma),
+                                </li>
+                                <li>
+                                    mention_language(seperated with comma, language code)
+                                </li>
+                            </ol>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+            <section id="" class="resource-group"><h2 class="group-heading">Resource Group <a href="#"
+                                                                                              class="permalink">&para;</a>
+            </h2>
+                <div id="topics-collection" class="resource"><h3 class="resource-heading">Topics Collection <a
+                        href="#topics-collection" class="permalink">&nbsp;&para;</a></h3>
+                    <div id="topics-collection-get" class="action get">
+                        <h4 class="action-heading">
+                            <div class="name">List All Topics</div>
+                            <a href="#topics-collection-get" class="method get">GET</a><code
+                                class="uri">/get_topics</code></h4>
+                        <h4>Example URI</h4>
+                        <div class="definition"><span class="method get">GET</span>&nbsp;<span class="uri"><span
+                                class="hostname">http://138.68.92.181:8484/api/v1.2</span>/get_topics</span></div>
+                        <div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong>
+                            <div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span>
+                            </div>
+                        </div>
+                        <div class="collapse-content">
+                            <div class="inner"><h5>Headers</h5>
+                                <pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre>
+                                <div style="height: 1px;"></div>
+                                <h5>Body</h5>
+                                <pre><code>{
   "<span class="hljs-attribute">topics</span>": <span class="hljs-value">[
     {
-      "<span class="hljs-attribute">topic_id</span>": <span class="hljs-value"><span class="hljs-number">32</span></span>,
+      "<span class="hljs-attribute">topic_id</span>": <span class="hljs-value"><span
+                                                class="hljs-number">32</span></span>,
       "<span class="hljs-attribute">topic_name</span>": <span class="hljs-value"><span class="hljs-string">"raspberry pi"</span></span>,
       "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Raspberry Pi"</span>
     </span>},
     {
-      "<span class="hljs-attribute">topic_id</span>": <span class="hljs-value"><span class="hljs-number">33</span></span>,
-      "<span class="hljs-attribute">topic_name</span>": <span class="hljs-value"><span class="hljs-string">"3d printer"</span></span>,
+      "<span class="hljs-attribute">topic_id</span>": <span class="hljs-value"><span
+                                                class="hljs-number">33</span></span>,
+      "<span class="hljs-attribute">topic_name</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"3d printer"</span></span>,
       "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Please, fill this area!"</span>
     </span>},
     {
-      "<span class="hljs-attribute">topic_id</span>": <span class="hljs-value"><span class="hljs-number">31</span></span>,
-      "<span class="hljs-attribute">topic_name</span>": <span class="hljs-value"><span class="hljs-string">"arduino"</span></span>,
+      "<span class="hljs-attribute">topic_id</span>": <span class="hljs-value"><span
+                                                class="hljs-number">31</span></span>,
+      "<span class="hljs-attribute">topic_name</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"arduino"</span></span>,
       "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Please, fill this area!"</span>
     </span>}
   ]
-</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div><div id="audiences-collection" class="resource"><h3 class="resource-heading">Audiences Collection <a href="#audiences-collection" class="permalink">&nbsp;&para;</a></h3><div id="audiences-collection-get" class="action get"><h4 class="action-heading"><div class="name">List All Audiences of given topic</div><a href="#audiences-collection-get" class="method get">GET</a><code class="uri">/get_audiences?topic_id={topic_id}</code></h4><h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&nbsp;<span class="uri"><span class="hostname">http://138.68.92.181:8484/api/v1.2</span>/get_audiences?topic_id=18</span></div><div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+</span>}</code></pre>
+                                <div style="height: 1px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="audiences-collection" class="resource"><h3 class="resource-heading">Audiences Collection <a
+                        href="#audiences-collection" class="permalink">&nbsp;&para;</a></h3>
+                    <div id="audiences-collection-get" class="action get">
+                        <h4 class="action-heading">
+                            <div class="name">List All Audiences of given topic</div>
+                            <a href="#audiences-collection-get" class="method get">GET</a><code class="uri">/get_audiences?topic_id={topic_id}</code>
+                        </h4>
+                        <h4>Example URI</h4>
+                        <div class="definition"><span class="method get">GET</span>&nbsp;<span class="uri"><span
+                                class="hostname">http://138.68.92.181:8484/api/v1.2</span>/get_audiences?topic_id=18</span>
+                        </div>
+                        <div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong>
+                            <div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span>
+                            </div>
+                        </div>
+                        <div class="collapse-content">
+                            <div class="inner"><h5>Headers</h5>
+                                <pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre>
+                                <div style="height: 1px;"></div>
+                                <h5>Body</h5>
+                                <pre><code>{
   "<span class="hljs-attribute">audiences</span>": <span class="hljs-value">[
     {
       "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Ben Hamner"</span></span>,
-      "<span class="hljs-attribute">screen_name</span>": <span class="hljs-value"><span class="hljs-string">"benhamner"</span></span>,
-      "<span class="hljs-attribute">location</span>": <span class="hljs-value"><span class="hljs-string">"SF"</span></span>,
+      "<span class="hljs-attribute">screen_name</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"benhamner"</span></span>,
+      "<span class="hljs-attribute">location</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"SF"</span></span>,
       "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Co-founder &amp; CTO @kaggle. FOR artists, builders, creators, inventors. FOR open data, open science, open markets, open governments."</span></span>,
       "<span class="hljs-attribute">time_zone</span>": <span class="hljs-value"><span class="hljs-string">"Pacific Time (US &amp; Canada)"</span></span>,
       "<span class="hljs-attribute">lang</span>": <span class="hljs-value"><span class="hljs-string">"en"</span></span>,
@@ -112,7 +1122,8 @@
     {
       "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Data Science Central"</span></span>,
       "<span class="hljs-attribute">screen_name</span>": <span class="hljs-value"><span class="hljs-string">"analyticbridge"</span></span>,
-      "<span class="hljs-attribute">location</span>": <span class="hljs-value"><span class="hljs-string">"Seattle, WA"</span></span>,
+      "<span class="hljs-attribute">location</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"Seattle, WA"</span></span>,
       "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Co-founded by Vincent Granville and part of the DSC community, our  focus is on data science, ML, AI, deep learning, dataviz, Hadoop, IoT, and BI."</span></span>,
       "<span class="hljs-attribute">time_zone</span>": <span class="hljs-value"><span class="hljs-string">"Pacific Time (US &amp; Canada)"</span></span>,
       "<span class="hljs-attribute">lang</span>": <span class="hljs-value"><span class="hljs-string">"en"</span></span>,
@@ -128,36 +1139,45 @@
       "<span class="hljs-attribute">profile_image_url</span>": <span class="hljs-value"><span class="hljs-string">"http://pbs.twimg.com/profile_images/823989084699836416/HLeb5i56_normal.jpg"</span>
     </span>},
     {
-      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Data Science Fact"</span></span>,
+      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"Data Science Fact"</span></span>,
       "<span class="hljs-attribute">screen_name</span>": <span class="hljs-value"><span class="hljs-string">"DataSciFact"</span></span>,
-      "<span class="hljs-attribute">location</span>": <span class="hljs-value"><span class="hljs-string">"Houston"</span></span>,
+      "<span class="hljs-attribute">location</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"Houston"</span></span>,
       "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Daily data science tweets from @JohnDCook."</span></span>,
       "<span class="hljs-attribute">time_zone</span>": <span class="hljs-value"><span class="hljs-string">"Pacific Time (US &amp; Canada)"</span></span>,
       "<span class="hljs-attribute">lang</span>": <span class="hljs-value"><span class="hljs-string">"en"</span></span>,
       "<span class="hljs-attribute">profile_image_url</span>": <span class="hljs-value"><span class="hljs-string">"http://pbs.twimg.com/profile_images/871521787300855809/sMpYCCGn_normal.jpg"</span>
     </span>},
     {
-      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Stuart Lynn"</span></span>,
+      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"Stuart Lynn"</span></span>,
       "<span class="hljs-attribute">screen_name</span>": <span class="hljs-value"><span class="hljs-string">"Stuart_Lynn"</span></span>,
       "<span class="hljs-attribute">location</span>": <span class="hljs-value"><span class="hljs-string">"Brooklyn,New York, USA"</span></span>,
       "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Ex Astrophysicist, head of research and data at Carto, interested in data vizulisation, public participation in science, data for social good and making stuff!"</span></span>,
-      "<span class="hljs-attribute">time_zone</span>": <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+      "<span class="hljs-attribute">time_zone</span>": <span class="hljs-value"><span
+                                                class="hljs-literal">null</span></span>,
       "<span class="hljs-attribute">lang</span>": <span class="hljs-value"><span class="hljs-string">"en"</span></span>,
       "<span class="hljs-attribute">profile_image_url</span>": <span class="hljs-value"><span class="hljs-string">"http://pbs.twimg.com/profile_images/2392941891/anq5bkkx8rtdhn8p2i9m_normal.png"</span>
     </span>},
     {
-      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Alexandr Kalinin"</span></span>,
+      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"Alexandr Kalinin"</span></span>,
       "<span class="hljs-attribute">screen_name</span>": <span class="hljs-value"><span class="hljs-string">"alxndrkalinin"</span></span>,
-      "<span class="hljs-attribute">location</span>": <span class="hljs-value"><span class="hljs-string">"Ann Arbor, MI"</span></span>,
+      "<span class="hljs-attribute">location</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"Ann Arbor, MI"</span></span>,
       "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"PhD candidate in Bioinformatics@UMich: Biomedical Data Science, 3D Image Processing, Machine/Deep Learning"</span></span>,
       "<span class="hljs-attribute">time_zone</span>": <span class="hljs-value"><span class="hljs-string">"Eastern Time (US &amp; Canada)"</span></span>,
       "<span class="hljs-attribute">lang</span>": <span class="hljs-value"><span class="hljs-string">"en"</span></span>,
       "<span class="hljs-attribute">profile_image_url</span>": <span class="hljs-value"><span class="hljs-string">"http://pbs.twimg.com/profile_images/1137802608/article_image-image-article_normal.jpg"</span>
     </span>},
     {
-      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Open Data Science"</span></span>,
-      "<span class="hljs-attribute">screen_name</span>": <span class="hljs-value"><span class="hljs-string">"odsc"</span></span>,
-      "<span class="hljs-attribute">location</span>": <span class="hljs-value"><span class="hljs-string">"Boston, MA"</span></span>,
+      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"Open Data Science"</span></span>,
+      "<span class="hljs-attribute">screen_name</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"odsc"</span></span>,
+      "<span class="hljs-attribute">location</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"Boston, MA"</span></span>,
       "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Bringing together the global data science community to help foster the exchange of innovative ideas and encourage the growth of open source software."</span></span>,
       "<span class="hljs-attribute">time_zone</span>": <span class="hljs-value"><span class="hljs-string">"Pacific Time (US &amp; Canada)"</span></span>,
       "<span class="hljs-attribute">lang</span>": <span class="hljs-value"><span class="hljs-string">"en"</span></span>,
@@ -173,9 +1193,12 @@
       "<span class="hljs-attribute">profile_image_url</span>": <span class="hljs-value"><span class="hljs-string">"http://pbs.twimg.com/profile_images/437332968768425984/hy1HDtPo_normal.jpeg"</span>
     </span>},
     {
-      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"NASA Data Science"</span></span>,
-      "<span class="hljs-attribute">screen_name</span>": <span class="hljs-value"><span class="hljs-string">"NASAdata"</span></span>,
-      "<span class="hljs-attribute">location</span>": <span class="hljs-value"><span class="hljs-string">""</span></span>,
+      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"NASA Data Science"</span></span>,
+      "<span class="hljs-attribute">screen_name</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"NASAdata"</span></span>,
+      "<span class="hljs-attribute">location</span>": <span class="hljs-value"><span
+                                                class="hljs-string">""</span></span>,
       "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Data and information driving better decision making on Earth and in space."</span></span>,
       "<span class="hljs-attribute">time_zone</span>": <span class="hljs-value"><span class="hljs-string">"Eastern Time (US &amp; Canada)"</span></span>,
       "<span class="hljs-attribute">lang</span>": <span class="hljs-value"><span class="hljs-string">"en"</span></span>,
@@ -184,16 +1207,20 @@
     {
       "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Insight Data Science"</span></span>,
       "<span class="hljs-attribute">screen_name</span>": <span class="hljs-value"><span class="hljs-string">"InsightDataSci"</span></span>,
-      "<span class="hljs-attribute">location</span>": <span class="hljs-value"><span class="hljs-string">"Palo Alto, CA"</span></span>,
+      "<span class="hljs-attribute">location</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"Palo Alto, CA"</span></span>,
       "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Insight Data Science Fellows Program"</span></span>,
       "<span class="hljs-attribute">time_zone</span>": <span class="hljs-value"><span class="hljs-string">"Pacific Time (US &amp; Canada)"</span></span>,
       "<span class="hljs-attribute">lang</span>": <span class="hljs-value"><span class="hljs-string">"en"</span></span>,
       "<span class="hljs-attribute">profile_image_url</span>": <span class="hljs-value"><span class="hljs-string">"http://pbs.twimg.com/profile_images/378800000221536589/db6ebf8e038f49a28110c84632ca3ed1_normal.png"</span>
     </span>},
     {
-      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"NYC Data Science"</span></span>,
-      "<span class="hljs-attribute">screen_name</span>": <span class="hljs-value"><span class="hljs-string">"NYCDataSci"</span></span>,
-      "<span class="hljs-attribute">location</span>": <span class="hljs-value"><span class="hljs-string">"New York, NY"</span></span>,
+      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"NYC Data Science"</span></span>,
+      "<span class="hljs-attribute">screen_name</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"NYCDataSci"</span></span>,
+      "<span class="hljs-attribute">location</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"New York, NY"</span></span>,
       "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Apply for our 12-Week Data Science Bootcamp https://t.co/O5RxpxammM"</span></span>,
       "<span class="hljs-attribute">time_zone</span>": <span class="hljs-value"><span class="hljs-string">"Eastern Time (US &amp; Canada)"</span></span>,
       "<span class="hljs-attribute">lang</span>": <span class="hljs-value"><span class="hljs-string">"en"</span></span>,
@@ -201,17 +1228,21 @@
     </span>},
     {
       "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Data Science London"</span></span>,
-      "<span class="hljs-attribute">screen_name</span>": <span class="hljs-value"><span class="hljs-string">"ds_ldn"</span></span>,
+      "<span class="hljs-attribute">screen_name</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"ds_ldn"</span></span>,
       "<span class="hljs-attribute">location</span>": <span class="hljs-value"><span class="hljs-string">"London"</span></span>,
       "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Largest #DataScience Community in Europe #AI #MachineLearning Data Geekery. Subscribe to Data Machina weekly newsletter https://t.co/mnUjbhzCTh"</span></span>,
-      "<span class="hljs-attribute">time_zone</span>": <span class="hljs-value"><span class="hljs-string">"London"</span></span>,
+      "<span class="hljs-attribute">time_zone</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"London"</span></span>,
       "<span class="hljs-attribute">lang</span>": <span class="hljs-value"><span class="hljs-string">"en"</span></span>,
       "<span class="hljs-attribute">profile_image_url</span>": <span class="hljs-value"><span class="hljs-string">"http://pbs.twimg.com/profile_images/1787151199/dsldn_normal.jpg"</span>
     </span>},
     {
-      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"NYU Data Science"</span></span>,
+      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"NYU Data Science"</span></span>,
       "<span class="hljs-attribute">screen_name</span>": <span class="hljs-value"><span class="hljs-string">"NYUDataScience"</span></span>,
-      "<span class="hljs-attribute">location</span>": <span class="hljs-value"><span class="hljs-string">"New York, NY"</span></span>,
+      "<span class="hljs-attribute">location</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"New York, NY"</span></span>,
       "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Official profile of the Center for Data Science at NYU, home of the Master's and Ph.D. in Data Science, and part of the Moore-Sloan Data Science Environment"</span></span>,
       "<span class="hljs-attribute">time_zone</span>": <span class="hljs-value"><span class="hljs-string">"Central Time (US &amp; Canada)"</span></span>,
       "<span class="hljs-attribute">lang</span>": <span class="hljs-value"><span class="hljs-string">"en"</span></span>,
@@ -219,15 +1250,18 @@
     </span>},
     {
       "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Lillian Pierson, PE"</span></span>,
-      "<span class="hljs-attribute">screen_name</span>": <span class="hljs-value"><span class="hljs-string">"BigDataGal"</span></span>,
-      "<span class="hljs-attribute">location</span>": <span class="hljs-value"><span class="hljs-string">"Houston, TX"</span></span>,
+      "<span class="hljs-attribute">screen_name</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"BigDataGal"</span></span>,
+      "<span class="hljs-attribute">location</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"Houston, TX"</span></span>,
       "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"I train working pros to do data science 💻\nCareer Coach for aspiring data pros 👩🏼‍💻\nData Scientist @_data_mania"</span></span>,
       "<span class="hljs-attribute">time_zone</span>": <span class="hljs-value"><span class="hljs-string">"Pacific Time (US &amp; Canada)"</span></span>,
       "<span class="hljs-attribute">lang</span>": <span class="hljs-value"><span class="hljs-string">"en"</span></span>,
       "<span class="hljs-attribute">profile_image_url</span>": <span class="hljs-value"><span class="hljs-string">"http://pbs.twimg.com/profile_images/850317917895892992/9WZGcEB5_normal.jpg"</span>
     </span>},
     {
-      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"SV Data Science"</span></span>,
+      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"SV Data Science"</span></span>,
       "<span class="hljs-attribute">screen_name</span>": <span class="hljs-value"><span class="hljs-string">"SVDataScience"</span></span>,
       "<span class="hljs-attribute">location</span>": <span class="hljs-value"><span class="hljs-string">"Silicon Valley, CA"</span></span>,
       "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Silicon Valley Data Science is a consulting firm of data science &amp; engineering teams who specialize in data-driven product development &amp; business transformation"</span></span>,
@@ -236,7 +1270,8 @@
       "<span class="hljs-attribute">profile_image_url</span>": <span class="hljs-value"><span class="hljs-string">"http://pbs.twimg.com/profile_images/378800000355636522/0b6093eaad3d7c1223eb69ee8ca304c8_normal.png"</span>
     </span>},
     {
-      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Pivotal Data"</span></span>,
+      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"Pivotal Data"</span></span>,
       "<span class="hljs-attribute">screen_name</span>": <span class="hljs-value"><span class="hljs-string">"PivotalData"</span></span>,
       "<span class="hljs-attribute">location</span>": <span class="hljs-value"><span class="hljs-string">"San Francisco, California"</span></span>,
       "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"From cloud data services to data science &amp; machine learning, Pivotal Data helps enterprises develop software &amp; apps that use data to drive innovation."</span></span>,
@@ -245,17 +1280,20 @@
       "<span class="hljs-attribute">profile_image_url</span>": <span class="hljs-value"><span class="hljs-string">"http://pbs.twimg.com/profile_images/861668207291060226/sruEEUXv_normal.jpg"</span>
     </span>},
     {
-      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Data Science Lab"</span></span>,
+      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"Data Science Lab"</span></span>,
       "<span class="hljs-attribute">screen_name</span>": <span class="hljs-value"><span class="hljs-string">"thedatascilab"</span></span>,
       "<span class="hljs-attribute">location</span>": <span class="hljs-value"><span class="hljs-string">"University of Warwick, UK"</span></span>,
       "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"The Data Science Lab is based in Behavioural Science at @WarwickBSchool. It is directed by @suzymoat and @t_preis."</span></span>,
-      "<span class="hljs-attribute">time_zone</span>": <span class="hljs-value"><span class="hljs-string">"London"</span></span>,
+      "<span class="hljs-attribute">time_zone</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"London"</span></span>,
       "<span class="hljs-attribute">lang</span>": <span class="hljs-value"><span class="hljs-string">"en"</span></span>,
       "<span class="hljs-attribute">profile_image_url</span>": <span class="hljs-value"><span class="hljs-string">"http://pbs.twimg.com/profile_images/566159606871638017/9M1cQHct_normal.jpeg"</span>
     </span>},
     {
       "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Kirk Borne"</span></span>,
-      "<span class="hljs-attribute">screen_name</span>": <span class="hljs-value"><span class="hljs-string">"KirkDBorne"</span></span>,
+      "<span class="hljs-attribute">screen_name</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"KirkDBorne"</span></span>,
       "<span class="hljs-attribute">location</span>": <span class="hljs-value"><span class="hljs-string">"Booz Allen Hamilton"</span></span>,
       "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"The Principal Data Scientist at @BoozAllen, PhD Astrophysicist.\nTop Data Science and Big Data Influencer. Ex-Professor https://t.co/f4gsbNc00C 📊📈🔭"</span></span>,
       "<span class="hljs-attribute">time_zone</span>": <span class="hljs-value"><span class="hljs-string">"Eastern Time (US &amp; Canada)"</span></span>,
@@ -263,7 +1301,8 @@
       "<span class="hljs-attribute">profile_image_url</span>": <span class="hljs-value"><span class="hljs-string">"http://pbs.twimg.com/profile_images/869301637269139458/3wIcLiQC_normal.jpg"</span>
     </span>},
     {
-      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"DataScience.com"</span></span>,
+      "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"DataScience.com"</span></span>,
       "<span class="hljs-attribute">screen_name</span>": <span class="hljs-value"><span class="hljs-string">"DataScienceInc"</span></span>,
       "<span class="hljs-attribute">location</span>": <span class="hljs-value"><span class="hljs-string">"Los Angeles, CA"</span></span>,
       "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Our data science platform combines the tools, libraries, and languages data scientists love, with the infrastructure and workflows their organizations need."</span></span>,
@@ -276,12 +1315,39 @@
       "<span class="hljs-attribute">screen_name</span>": <span class="hljs-value"><span class="hljs-string">"DataScienceHEP"</span></span>,
       "<span class="hljs-attribute">location</span>": <span class="hljs-value"><span class="hljs-string">"CERN(15), Simons(16), FNAL(17)"</span></span>,
       "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Data Science in High Energy Physics"</span></span>,
-      "<span class="hljs-attribute">time_zone</span>": <span class="hljs-value"><span class="hljs-string">"Brussels"</span></span>,
+      "<span class="hljs-attribute">time_zone</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"Brussels"</span></span>,
       "<span class="hljs-attribute">lang</span>": <span class="hljs-value"><span class="hljs-string">"en"</span></span>,
       "<span class="hljs-attribute">profile_image_url</span>": <span class="hljs-value"><span class="hljs-string">"http://pbs.twimg.com/profile_images/662668132176289793/obZbfbH5_normal.jpg"</span>
     </span>}
   ]
-</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div><div id="news-collection" class="resource"><h3 class="resource-heading">News Collection <a href="#news-collection" class="permalink">&nbsp;&para;</a></h3><div id="news-collection-get" class="action get"><h4 class="action-heading"><div class="name">List All News of given topic</div><a href="#news-collection-get" class="method get">GET</a><code class="uri">/get_news?topic_ids={topic_id,topic_id...}</code></h4><h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&nbsp;<span class="uri"><span class="hostname">http://138.68.92.181:8484/api/v1.2</span>/get_news?topic_ids=18,20</span></div><div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+</span>}</code></pre>
+                                <div style="height: 1px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="news-collection" class="resource"><h3 class="resource-heading">News Collection <a
+                        href="#news-collection" class="permalink">&nbsp;&para;</a></h3>
+                    <div id="news-collection-get" class="action get">
+                        <h4 class="action-heading">
+                            <div class="name">List All News of given topic</div>
+                            <a href="#news-collection-get" class="method get">GET</a><code class="uri">/get_news?topic_ids={topic_id,topic_id...}</code>
+                        </h4>
+                        <h4>Example URI</h4>
+                        <div class="definition"><span class="method get">GET</span>&nbsp;<span class="uri"><span
+                                class="hostname">http://138.68.92.181:8484/api/v1.2</span>/get_news?topic_ids=18,20</span>
+                        </div>
+                        <div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong>
+                            <div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span>
+                            </div>
+                        </div>
+                        <div class="collapse-content">
+                            <div class="inner"><h5>Headers</h5>
+                                <pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre>
+                                <div style="height: 1px;"></div>
+                                <h5>Body</h5>
+                                <pre><code>{
   "<span class="hljs-attribute">next_cursor</span>": <span class="hljs-value"><span class="hljs-number">20</span></span>,
   "<span class="hljs-attribute">next_cursor_str</span>": <span class="hljs-value"><span class="hljs-string">"20"</span></span>,
   "<span class="hljs-attribute">news</span>": <span class="hljs-value">[
@@ -306,12 +1372,14 @@
         <span class="hljs-string">"3d"</span>
       ]</span>,
       "<span class="hljs-attribute">source</span>": <span class="hljs-value"><span class="hljs-string">"https://3dprintingindustry.com/"</span></span>,
-      "<span class="hljs-attribute">link_id</span>": <span class="hljs-value"><span class="hljs-number">24687</span></span>,
+      "<span class="hljs-attribute">link_id</span>": <span class="hljs-value"><span
+                                                class="hljs-number">24687</span></span>,
       "<span class="hljs-attribute">domain</span>": <span class="hljs-value"><span class="hljs-string">"3dprintingindustry"</span></span>,
       "<span class="hljs-attribute">popularity</span>": <span class="hljs-value"><span class="hljs-number">40</span>
     </span>},
     {
-      "<span class="hljs-attribute">link_id</span>": <span class="hljs-value"><span class="hljs-number">6419</span></span>,
+      "<span class="hljs-attribute">link_id</span>": <span class="hljs-value"><span
+                                                class="hljs-number">6419</span></span>,
       "<span class="hljs-attribute">source</span>": <span class="hljs-value"><span class="hljs-string">"https://www.bittopper.com/"</span></span>,
       "<span class="hljs-attribute">im</span>": <span class="hljs-value"><span class="hljs-string">"https://www.bittopper.com/c/37/78/65/bittopper_377865d196e4db525f33035b9c57b59b-sunwing-3d-stereoscopic-drawing-doodling-printing-pen-arts.jpg"</span></span>,
       "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"https://www.bittopper.com/item/sunwing-3d-stereoscopic-drawing-doodling-printing-pen-arts/"</span></span>,
@@ -336,7 +1404,8 @@
         <span class="hljs-string">"instantly"</span>
       ]</span>,
       "<span class="hljs-attribute">title</span>": <span class="hljs-value"><span class="hljs-string">"Sunwing 3d-printing-pen &amp; 3D-printer-pen,Best Birthday DIY Toy for Kids with LED Display (Blue) by QuadPro What is SUNWING 3D pen ? SUNWING 3D printing pen is a tool for the creative minds of our gene"</span></span>,
-      "<span class="hljs-attribute">domain</span>": <span class="hljs-value"><span class="hljs-string">"bittopper"</span></span>,
+      "<span class="hljs-attribute">domain</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"bittopper"</span></span>,
       "<span class="hljs-attribute">popularity</span>": <span class="hljs-value"><span class="hljs-number">22</span>
     </span>},
     {
@@ -361,12 +1430,14 @@
         <span class="hljs-string">"ship"</span>
       ]</span>,
       "<span class="hljs-attribute">source</span>": <span class="hljs-value"><span class="hljs-string">"https://3dprint.com/"</span></span>,
-      "<span class="hljs-attribute">link_id</span>": <span class="hljs-value"><span class="hljs-number">15368</span></span>,
+      "<span class="hljs-attribute">link_id</span>": <span class="hljs-value"><span
+                                                class="hljs-number">15368</span></span>,
       "<span class="hljs-attribute">domain</span>": <span class="hljs-value"><span class="hljs-string">"3dprint"</span></span>,
       "<span class="hljs-attribute">popularity</span>": <span class="hljs-value"><span class="hljs-number">11</span>
     </span>},
     {
-      "<span class="hljs-attribute">link_id</span>": <span class="hljs-value"><span class="hljs-number">6586</span></span>,
+      "<span class="hljs-attribute">link_id</span>": <span class="hljs-value"><span
+                                                class="hljs-number">6586</span></span>,
       "<span class="hljs-attribute">source</span>": <span class="hljs-value"><span class="hljs-string">"https://3dprint.com/"</span></span>,
       "<span class="hljs-attribute">im</span>": <span class="hljs-value"><span class="hljs-string">"https://3dprint.com/wp-content/uploads/2015/12/3dp_300x125-300x125.jpg"</span></span>,
       "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"https://3dprint.com/"</span></span>,
@@ -415,12 +1486,15 @@
         <span class="hljs-string">"motor"</span>
       ]</span>,
       "<span class="hljs-attribute">source</span>": <span class="hljs-value"><span class="hljs-string">"https://www.livescience.com/"</span></span>,
-      "<span class="hljs-attribute">link_id</span>": <span class="hljs-value"><span class="hljs-number">16159</span></span>,
-      "<span class="hljs-attribute">domain</span>": <span class="hljs-value"><span class="hljs-string">"livescience"</span></span>,
+      "<span class="hljs-attribute">link_id</span>": <span class="hljs-value"><span
+                                                class="hljs-number">16159</span></span>,
+      "<span class="hljs-attribute">domain</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"livescience"</span></span>,
       "<span class="hljs-attribute">popularity</span>": <span class="hljs-value"><span class="hljs-number">8</span>
     </span>},
     {
-      "<span class="hljs-attribute">link_id</span>": <span class="hljs-value"><span class="hljs-number">6937</span></span>,
+      "<span class="hljs-attribute">link_id</span>": <span class="hljs-value"><span
+                                                class="hljs-number">6937</span></span>,
       "<span class="hljs-attribute">source</span>": <span class="hljs-value"><span class="hljs-string">"http://www.digitalto3d.com/"</span></span>,
       "<span class="hljs-attribute">im</span>": <span class="hljs-value"><span class="hljs-string">"http://www.digitalto3d.com/wp-content/uploads/2015/12/3d-printer-comparisons.jpg"</span></span>,
       "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"http://www.digitalto3d.com/3d-printer-comparison-and-a-description-of-its-features/?utm_source=ReviveOldPost&amp;utm_medium=social&amp;utm_campaign=ReviveOldPost"</span></span>,
@@ -441,12 +1515,14 @@
         <span class="hljs-string">"features"</span>
       ]</span>,
       "<span class="hljs-attribute">title</span>": <span class="hljs-value"><span class="hljs-string">"3D Printer Comparison and a Description of its Features"</span></span>,
-      "<span class="hljs-attribute">domain</span>": <span class="hljs-value"><span class="hljs-string">"digitalto3d"</span></span>,
+      "<span class="hljs-attribute">domain</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"digitalto3d"</span></span>,
       "<span class="hljs-attribute">popularity</span>": <span class="hljs-value"><span class="hljs-number">7</span>
     </span>},
     {
       "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"https://3dprinterchat.com/"</span></span>,
-      "<span class="hljs-attribute">link_id</span>": <span class="hljs-value"><span class="hljs-number">14112</span></span>,
+      "<span class="hljs-attribute">link_id</span>": <span class="hljs-value"><span
+                                                class="hljs-number">14112</span></span>,
       "<span class="hljs-attribute">source</span>": <span class="hljs-value"><span class="hljs-string">"https://3dprinterchat.com/"</span></span>,
       "<span class="hljs-attribute">title</span>": <span class="hljs-value"><span class="hljs-string">"3D Printer Chat – 3D Printing News, Articles, Reviews and How To´s"</span></span>,
       "<span class="hljs-attribute">keywords</span>": <span class="hljs-value">[
@@ -470,7 +1546,8 @@
       ]</span>,
       "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Being an entrepreneur is far from being an easy labor.\nThere are many, many difficulties to face before bringing your idea to the market.\nBut that's actually the beginning of a harder stage: Successfully growing your business.\nFortunately, there are"</span></span>,
       "<span class="hljs-attribute">im</span>": <span class="hljs-value"><span class="hljs-string">"https://3dprinterchat.com/wp-content/uploads/2016/01/logo-9.png"</span></span>,
-      "<span class="hljs-attribute">domain</span>": <span class="hljs-value"><span class="hljs-string">"3dprinterchat"</span></span>,
+      "<span class="hljs-attribute">domain</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"3dprinterchat"</span></span>,
       "<span class="hljs-attribute">popularity</span>": <span class="hljs-value"><span class="hljs-number">6</span>
     </span>},
     {
@@ -495,7 +1572,8 @@
         <span class="hljs-string">"ship"</span>
       ]</span>,
       "<span class="hljs-attribute">source</span>": <span class="hljs-value"><span class="hljs-string">"https://www.3dprint.com/"</span></span>,
-      "<span class="hljs-attribute">link_id</span>": <span class="hljs-value"><span class="hljs-number">17091</span></span>,
+      "<span class="hljs-attribute">link_id</span>": <span class="hljs-value"><span
+                                                class="hljs-number">17091</span></span>,
       "<span class="hljs-attribute">domain</span>": <span class="hljs-value"><span class="hljs-string">"3dprint"</span></span>,
       "<span class="hljs-attribute">popularity</span>": <span class="hljs-value"><span class="hljs-number">6</span>
     </span>},
@@ -524,13 +1602,16 @@
         <span class="hljs-string">"contour"</span>
       ]</span>,
       "<span class="hljs-attribute">source</span>": <span class="hljs-value"><span class="hljs-string">"https://www.i4u.com/"</span></span>,
-      "<span class="hljs-attribute">link_id</span>": <span class="hljs-value"><span class="hljs-number">17692</span></span>,
-      "<span class="hljs-attribute">domain</span>": <span class="hljs-value"><span class="hljs-string">"i4u"</span></span>,
+      "<span class="hljs-attribute">link_id</span>": <span class="hljs-value"><span
+                                                class="hljs-number">17692</span></span>,
+      "<span class="hljs-attribute">domain</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"i4u"</span></span>,
       "<span class="hljs-attribute">popularity</span>": <span class="hljs-value"><span class="hljs-number">5</span>
     </span>},
     {
       "<span class="hljs-attribute">title</span>": <span class="hljs-value"><span class="hljs-string">"Win an Anet A8 3D Printer!"</span></span>,
-      "<span class="hljs-attribute">link_id</span>": <span class="hljs-value"><span class="hljs-number">18142</span></span>,
+      "<span class="hljs-attribute">link_id</span>": <span class="hljs-value"><span
+                                                class="hljs-number">18142</span></span>,
       "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"https://contest.io/c/4fcnppcy"</span></span>,
       "<span class="hljs-attribute">source</span>": <span class="hljs-value"><span class="hljs-string">"https://contest.io/"</span></span>,
       "<span class="hljs-attribute">keywords</span>": <span class="hljs-value">[
@@ -552,7 +1633,8 @@
       "<span class="hljs-attribute">popularity</span>": <span class="hljs-value"><span class="hljs-number">5</span>
     </span>},
     {
-      "<span class="hljs-attribute">link_id</span>": <span class="hljs-value"><span class="hljs-number">6482</span></span>,
+      "<span class="hljs-attribute">link_id</span>": <span class="hljs-value"><span
+                                                class="hljs-number">6482</span></span>,
       "<span class="hljs-attribute">source</span>": <span class="hljs-value"><span class="hljs-string">"https://www.amazon.co.uk/"</span></span>,
       "<span class="hljs-attribute">im</span>": <span class="hljs-value"><span class="hljs-string">"https://images-eu.ssl-images-amazon.com/images/I/51+Dq1QEKZL._AC_US160_.jpg"</span></span>,
       "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"https://www.amazon.co.uk/s/?_encoding=UTF8&amp;camp=3194&amp;creative=21334&amp;linkCode=shr&amp;tag=jonsinfocom-21&amp;st=as:off&amp;rh=i:aps,k:3d+printer,p_89:Riverside&amp;keywords=3d+printer&amp;qid=1454855873"</span></span>,
@@ -573,11 +1655,13 @@
         <span class="hljs-string">"moreprime"</span>
       ]</span>,
       "<span class="hljs-attribute">title</span>": <span class="hljs-value"><span class="hljs-string">"Amazon.co.uk: 3d printer"</span></span>,
-      "<span class="hljs-attribute">domain</span>": <span class="hljs-value"><span class="hljs-string">"amazon"</span></span>,
+      "<span class="hljs-attribute">domain</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"amazon"</span></span>,
       "<span class="hljs-attribute">popularity</span>": <span class="hljs-value"><span class="hljs-number">5</span>
     </span>},
     {
-      "<span class="hljs-attribute">link_id</span>": <span class="hljs-value"><span class="hljs-number">6693</span></span>,
+      "<span class="hljs-attribute">link_id</span>": <span class="hljs-value"><span
+                                                class="hljs-number">6693</span></span>,
       "<span class="hljs-attribute">source</span>": <span class="hljs-value"><span class="hljs-string">"http://mashable.com/"</span></span>,
       "<span class="hljs-attribute">im</span>": <span class="hljs-value"><span class="hljs-string">"http://i.amz.mshcdn.com/9ZiOQVehhRGvQoQmAtJOTZKO9V4=/1200x630/2017%2F03%2F03%2Fac%2F5ff546e4771040a9a93f8f7dba319eb2.b2a9d.jpg"</span></span>,
       "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"http://mashable.com/2017/03/03/lowcost-house-3d-printed-in-a-day-/"</span></span>,
@@ -629,7 +1713,8 @@
         <span class="hljs-string">"metal"</span>
       ]</span>,
       "<span class="hljs-attribute">source</span>": <span class="hljs-value"><span class="hljs-string">"http://dennismedler3dprintingreviews.com/"</span></span>,
-      "<span class="hljs-attribute">link_id</span>": <span class="hljs-value"><span class="hljs-number">21887</span></span>,
+      "<span class="hljs-attribute">link_id</span>": <span class="hljs-value"><span
+                                                class="hljs-number">21887</span></span>,
       "<span class="hljs-attribute">domain</span>": <span class="hljs-value"><span class="hljs-string">"dennismedler3dprintingreviews"</span></span>,
       "<span class="hljs-attribute">popularity</span>": <span class="hljs-value"><span class="hljs-number">4</span>
     </span>},
@@ -659,8 +1744,10 @@
         <span class="hljs-string">"theres"</span>
       ]</span>,
       "<span class="hljs-attribute">source</span>": <span class="hljs-value"><span class="hljs-string">"http://www.middletownpress.com/"</span></span>,
-      "<span class="hljs-attribute">link_id</span>": <span class="hljs-value"><span class="hljs-number">22235</span></span>,
-      "<span class="hljs-attribute">domain</span>": <span class="hljs-value"><span class="hljs-string">"middletownpress"</span></span>,
+      "<span class="hljs-attribute">link_id</span>": <span class="hljs-value"><span
+                                                class="hljs-number">22235</span></span>,
+      "<span class="hljs-attribute">domain</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"middletownpress"</span></span>,
       "<span class="hljs-attribute">popularity</span>": <span class="hljs-value"><span class="hljs-number">4</span>
     </span>},
     {
@@ -686,7 +1773,8 @@
         <span class="hljs-string">"3d"</span>
       ]</span>,
       "<span class="hljs-attribute">source</span>": <span class="hljs-value"><span class="hljs-string">"https://3dprint.com/"</span></span>,
-      "<span class="hljs-attribute">link_id</span>": <span class="hljs-value"><span class="hljs-number">22615</span></span>,
+      "<span class="hljs-attribute">link_id</span>": <span class="hljs-value"><span
+                                                class="hljs-number">22615</span></span>,
       "<span class="hljs-attribute">domain</span>": <span class="hljs-value"><span class="hljs-string">"3dprint"</span></span>,
       "<span class="hljs-attribute">popularity</span>": <span class="hljs-value"><span class="hljs-number">4</span>
     </span>},
@@ -715,7 +1803,8 @@
         <span class="hljs-string">"video"</span>
       ]</span>,
       "<span class="hljs-attribute">source</span>": <span class="hljs-value"><span class="hljs-string">"https://www.youtube.com/"</span></span>,
-      "<span class="hljs-attribute">link_id</span>": <span class="hljs-value"><span class="hljs-number">19948</span></span>,
+      "<span class="hljs-attribute">link_id</span>": <span class="hljs-value"><span
+                                                class="hljs-number">19948</span></span>,
       "<span class="hljs-attribute">domain</span>": <span class="hljs-value"><span class="hljs-string">"youtube"</span></span>,
       "<span class="hljs-attribute">popularity</span>": <span class="hljs-value"><span class="hljs-number">4</span>
     </span>},
@@ -743,8 +1832,10 @@
         <span class="hljs-string">"motor"</span>
       ]</span>,
       "<span class="hljs-attribute">source</span>": <span class="hljs-value"><span class="hljs-string">"https://www.space.com/"</span></span>,
-      "<span class="hljs-attribute">link_id</span>": <span class="hljs-value"><span class="hljs-number">17178</span></span>,
-      "<span class="hljs-attribute">domain</span>": <span class="hljs-value"><span class="hljs-string">"space"</span></span>,
+      "<span class="hljs-attribute">link_id</span>": <span class="hljs-value"><span
+                                                class="hljs-number">17178</span></span>,
+      "<span class="hljs-attribute">domain</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"space"</span></span>,
       "<span class="hljs-attribute">popularity</span>": <span class="hljs-value"><span class="hljs-number">4</span>
     </span>},
     {
@@ -775,7 +1866,8 @@
         <span class="hljs-string">"tool"</span>
       ]</span>,
       "<span class="hljs-attribute">source</span>": <span class="hljs-value"><span class="hljs-string">"http://dennismedler3dprintingreviews.com/"</span></span>,
-      "<span class="hljs-attribute">link_id</span>": <span class="hljs-value"><span class="hljs-number">20011</span></span>,
+      "<span class="hljs-attribute">link_id</span>": <span class="hljs-value"><span
+                                                class="hljs-number">20011</span></span>,
       "<span class="hljs-attribute">domain</span>": <span class="hljs-value"><span class="hljs-string">"dennismedler3dprintingreviews"</span></span>,
       "<span class="hljs-attribute">popularity</span>": <span class="hljs-value"><span class="hljs-number">3</span>
     </span>},
@@ -800,8 +1892,10 @@
         <span class="hljs-string">"mechanical"</span>
       ]</span>,
       "<span class="hljs-attribute">source</span>": <span class="hljs-value"><span class="hljs-string">"http://news.bio-based.eu/"</span></span>,
-      "<span class="hljs-attribute">link_id</span>": <span class="hljs-value"><span class="hljs-number">22745</span></span>,
-      "<span class="hljs-attribute">domain</span>": <span class="hljs-value"><span class="hljs-string">"bio-based"</span></span>,
+      "<span class="hljs-attribute">link_id</span>": <span class="hljs-value"><span
+                                                class="hljs-number">22745</span></span>,
+      "<span class="hljs-attribute">domain</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"bio-based"</span></span>,
       "<span class="hljs-attribute">popularity</span>": <span class="hljs-value"><span class="hljs-number">3</span>
     </span>},
     {
@@ -821,24 +1915,54 @@
         <span class="hljs-string">"printer"</span>,
         <span class="hljs-string">"printing"</span>
       ]</span>,
-      "<span class="hljs-attribute">link_id</span>": <span class="hljs-value"><span class="hljs-number">13545</span></span>,
+      "<span class="hljs-attribute">link_id</span>": <span class="hljs-value"><span
+                                                class="hljs-number">13545</span></span>,
       "<span class="hljs-attribute">source</span>": <span class="hljs-value"><span class="hljs-string">"http://www.teachercast.net/"</span></span>,
       "<span class="hljs-attribute">im</span>": <span class="hljs-value"><span class="hljs-string">"http://www.teachercast.net/wp-content/uploads/2017/05/Schools-Using-3D-Printers.png"</span></span>,
       "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"http://www.teachercast.net/2017/05/03/3d-printers-for-school/"</span></span>,
       "<span class="hljs-attribute">title</span>": <span class="hljs-value"><span class="hljs-string">"Why Your School Should Invest in a 3D Printer by @Sarah_Darren"</span></span>,
-      "<span class="hljs-attribute">domain</span>": <span class="hljs-value"><span class="hljs-string">"teachercast"</span></span>,
+      "<span class="hljs-attribute">domain</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"teachercast"</span></span>,
       "<span class="hljs-attribute">popularity</span>": <span class="hljs-value"><span class="hljs-number">3</span>
     </span>}
   ]
-</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div><div id="news-collection-1" class="resource"><h3 class="resource-heading">News Collection <a href="#news-collection-1" class="permalink">&nbsp;&para;</a></h3><div id="news-collection-get-1" class="action get"><h4 class="action-heading"><div class="name">List All News of given filter</div><a href="#news-collection-get-1" class="method get">GET</a><code class="uri">/search_news?topic_ids={topic_id,topic_id...}&news_ids={news_ids}&keywords={keywords}&cursor={cursor}&language={language}&since={since}&until={until}&mention_language={mention_language}&mention_location={mention_location}</code></h4><h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&nbsp;<span class="uri"><span class="hostname">http://138.68.92.181:8484/api/v1.2</span>/search_news?news_ids=129971,12312&keywords=tech,school&language=en&since=01-01-2017&until=01-08-2017&mention_language=en&mention_location=chicago</span></div><div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+</span>}</code></pre>
+                                <div style="height: 1px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="news-collection-1" class="resource"><h3 class="resource-heading">News Collection <a
+                        href="#news-collection-1" class="permalink">&nbsp;&para;</a></h3>
+                    <div id="news-collection-get-1" class="action get">
+                        <h4 class="action-heading">
+                            <div class="name">List All News of given filter</div>
+                            <a href="#news-collection-get-1" class="method get">GET</a><code class="uri">/search_news?topic_ids={topic_id,topic_id...}&news_ids={news_ids}&keywords={keywords}&cursor={cursor}&language={language}&since={since}&until={until}&mention_language={mention_language}&mention_location={mention_location}</code>
+                        </h4>
+                        <h4>Example URI</h4>
+                        <div class="definition"><span class="method get">GET</span>&nbsp;<span class="uri"><span
+                                class="hostname">http://138.68.92.181:8484/api/v1.2</span>/search_news?news_ids=129971,12312&keywords=tech,school&language=en&since=01-01-2017&until=01-08-2017&mention_language=en&mention_location=chicago</span>
+                        </div>
+                        <div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong>
+                            <div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span>
+                            </div>
+                        </div>
+                        <div class="collapse-content">
+                            <div class="inner"><h5>Headers</h5>
+                                <pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre>
+                                <div style="height: 1px;"></div>
+                                <h5>Body</h5>
+                                <pre><code>{
   "<span class="hljs-attribute">next_cursor</span>": <span class="hljs-value"><span class="hljs-number">0</span></span>,
-  "<span class="hljs-attribute">next_cursor_str</span>": <span class="hljs-value"><span class="hljs-string">"0"</span></span>,
+  "<span class="hljs-attribute">next_cursor_str</span>": <span class="hljs-value"><span
+                                            class="hljs-string">"0"</span></span>,
   "<span class="hljs-attribute">news</span>": <span class="hljs-value">[
     {
       "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"http://www.seattletimes.com/opinion/editorials/join-tech-workers-in-helping-homeless-youth/?platform=hootsuite"</span></span>,
       "<span class="hljs-attribute">im</span>": <span class="hljs-value"><span class="hljs-string">"http://www.seattletimes.com/wp-content/themes/st_refresh/img/st-meta-facebook.png"</span></span>,
       "<span class="hljs-attribute">title</span>": <span class="hljs-value"><span class="hljs-string">"Join tech workers in helping homeless youth"</span></span>,
-      "<span class="hljs-attribute">domain</span>": <span class="hljs-value"><span class="hljs-string">"seattletimes"</span></span>,
+      "<span class="hljs-attribute">domain</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"seattletimes"</span></span>,
       "<span class="hljs-attribute">description</span>": <span class="hljs-value"><span class="hljs-string">"Join your neighbors and co-workers in contributing to a school-supply drive this summer.\nTHERE’S a certain symmetry in the idea of a group of Seattle tech workers using their free time to give back to the community by focusing on the issue of homelessness.\nThe group is focused on education and advocacy but also wants to create opportunities for tech workers to make a difference.\nOne recent giving-back opportunity involved the Seattle/King County Coalition on Homelessness’ annual effort to provide homeless kids with backpacks full of school supplies.\n“The notion that there are thousands of homeless youth going to school is mind blowing,” Retford said."</span></span>,
       "<span class="hljs-attribute">keywords</span>": <span class="hljs-value">[
         <span class="hljs-string">"schoolsupply"</span>,
@@ -858,7 +1982,8 @@
       ]</span>,
       "<span class="hljs-attribute">source</span>": <span class="hljs-value"><span class="hljs-string">"www.seattletimes.com"</span></span>,
       "<span class="hljs-attribute">published_at</span>": <span class="hljs-value"><span class="hljs-string">"12:01:00 23-07-2017"</span></span>,
-      "<span class="hljs-attribute">language</span>": <span class="hljs-value"><span class="hljs-string">"en"</span></span>,
+      "<span class="hljs-attribute">language</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"en"</span></span>,
       "<span class="hljs-attribute">author</span>": <span class="hljs-value">[
         <span class="hljs-string">"Seattle Times Editorial Board"</span>,
         <span class="hljs-string">"The Seattle Times"</span>,
@@ -871,30 +1996,65 @@
         <span class="hljs-string">"William K. Blethen"</span>,
         <span class="hljs-string">"Emeritus"</span>
       ]</span>,
-      "<span class="hljs-attribute">link_id</span>": <span class="hljs-value"><span class="hljs-number">129971</span></span>,
+      "<span class="hljs-attribute">link_id</span>": <span class="hljs-value"><span
+                                                class="hljs-number">129971</span></span>,
       "<span class="hljs-attribute">mentions</span>": <span class="hljs-value">{
-        "<span class="hljs-attribute">user_id</span>": <span class="hljs-value"><span class="hljs-string">"17491146"</span></span>,
+        "<span class="hljs-attribute">user_id</span>": <span class="hljs-value"><span
+                                                    class="hljs-string">"17491146"</span></span>,
         "<span class="hljs-attribute">tweet_id</span>": <span class="hljs-value"><span class="hljs-string">"889894345549197312"</span></span>,
         "<span class="hljs-attribute">timestamp_ms</span>": <span class="hljs-value"><span class="hljs-number">1501002320073</span></span>,
-        "<span class="hljs-attribute">language</span>": <span class="hljs-value"><span class="hljs-string">"en"</span></span>,
+        "<span class="hljs-attribute">language</span>": <span class="hljs-value"><span
+                                                    class="hljs-string">"en"</span></span>,
         "<span class="hljs-attribute">location</span>": <span class="hljs-value"><span class="hljs-string">"3141B N. Lincoln Ave., Chicago, IL"</span>
       </span>}</span>,
       "<span class="hljs-attribute">forbidden</span>": <span class="hljs-value"><span class="hljs-literal">false</span>
     </span>}
   ]
-</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div><div id="hashtags-collection" class="resource"><h3 class="resource-heading">Hashtags Collection <a href="#hashtags-collection" class="permalink">&nbsp;&para;</a></h3><div id="hashtags-collection-get" class="action get"><h4 class="action-heading"><div class="name">List All Hashtags of given topic</div><a href="#hashtags-collection-get" class="method get">GET</a><code class="uri">/get_hashtags?topic_id={topic_id}&date={date}</code></h4><h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&nbsp;<span class="uri"><span class="hostname">http://138.68.92.181:8484/api/v1.2</span>/get_hashtags?topic_id=38</span></div><div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+</span>}</code></pre>
+                                <div style="height: 1px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="hashtags-collection" class="resource"><h3 class="resource-heading">Hashtags Collection <a
+                        href="#hashtags-collection" class="permalink">&nbsp;&para;</a></h3>
+                    <div id="hashtags-collection-get" class="action get">
+                        <h4 class="action-heading">
+                            <div class="name">List All Hashtags of given topic</div>
+                            <a href="#hashtags-collection-get" class="method get">GET</a><code class="uri">/get_hashtags?topic_id={topic_id}&date={date}</code>
+                        </h4>
+                        <h4>Example URI</h4>
+                        <div class="definition"><span class="method get">GET</span>&nbsp;<span class="uri"><span
+                                class="hostname">http://138.68.92.181:8484/api/v1.2</span>/get_hashtags?topic_id=38</span>
+                        </div>
+                        <div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong>
+                            <div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span>
+                            </div>
+                        </div>
+                        <div class="collapse-content">
+                            <div class="inner"><h5>Headers</h5>
+                                <pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre>
+                                <div style="height: 1px;"></div>
+                                <h5>Body</h5>
+                                <pre><code>{
   "<span class="hljs-attribute">hashtags</span>": <span class="hljs-value">[
     {
-      "<span class="hljs-attribute">count</span>": <span class="hljs-value"><span class="hljs-number">13768</span></span>,
-      "<span class="hljs-attribute">hashtag</span>": <span class="hljs-value"><span class="hljs-string">"3DPrinting"</span>
+      "<span class="hljs-attribute">count</span>": <span class="hljs-value"><span
+                                                class="hljs-number">13768</span></span>,
+      "<span class="hljs-attribute">hashtag</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"3DPrinting"</span>
     </span>},
     {
-      "<span class="hljs-attribute">count</span>": <span class="hljs-value"><span class="hljs-number">11825</span></span>,
-      "<span class="hljs-attribute">hashtag</span>": <span class="hljs-value"><span class="hljs-string">"3dprinting"</span>
+      "<span class="hljs-attribute">count</span>": <span class="hljs-value"><span
+                                                class="hljs-number">11825</span></span>,
+      "<span class="hljs-attribute">hashtag</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"3dprinting"</span>
     </span>},
     {
-      "<span class="hljs-attribute">count</span>": <span class="hljs-value"><span class="hljs-number">11013</span></span>,
-      "<span class="hljs-attribute">hashtag</span>": <span class="hljs-value"><span class="hljs-string">"3Dprinting"</span>
+      "<span class="hljs-attribute">count</span>": <span class="hljs-value"><span
+                                                class="hljs-number">11013</span></span>,
+      "<span class="hljs-attribute">hashtag</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"3Dprinting"</span>
     </span>},
     {
       "<span class="hljs-attribute">count</span>": <span class="hljs-value"><span class="hljs-number">6990</span></span>,
@@ -906,7 +2066,8 @@
     </span>},
     {
       "<span class="hljs-attribute">count</span>": <span class="hljs-value"><span class="hljs-number">5176</span></span>,
-      "<span class="hljs-attribute">hashtag</span>": <span class="hljs-value"><span class="hljs-string">"giveaway"</span>
+      "<span class="hljs-attribute">hashtag</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"giveaway"</span>
     </span>},
     {
       "<span class="hljs-attribute">count</span>": <span class="hljs-value"><span class="hljs-number">3928</span></span>,
@@ -922,211 +2083,361 @@
     </span>},
     {
       "<span class="hljs-attribute">count</span>": <span class="hljs-value"><span class="hljs-number">2846</span></span>,
-      "<span class="hljs-attribute">hashtag</span>": <span class="hljs-value"><span class="hljs-string">"3dprinter"</span>
+      "<span class="hljs-attribute">hashtag</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"3dprinter"</span>
     </span>}
   ]
-</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div><div id="event-collection" class="resource"><h3 class="resource-heading">Event Collection <a href="#event-collection" class="permalink">&nbsp;&para;</a></h3><div id="event-collection-get" class="action get"><h4 class="action-heading"><div class="name">List All Events of given topic</div><a href="#event-collection-get" class="method get">GET</a><code class="uri">/get_events?topic_id={topic_id}&date={date}&cursor={cursor}</code></h4><h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&nbsp;<span class="uri"><span class="hostname">http://138.68.92.181:8484/api/v1.2</span>/get_events?topic_id=18&date=date&cursor=0</span></div><div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+</span>}</code></pre>
+                                <div style="height: 1px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="event-collection" class="resource"><h3 class="resource-heading">Event Collection <a
+                        href="#event-collection" class="permalink">&nbsp;&para;</a></h3>
+                    <div id="event-collection-get" class="action get">
+                        <h4 class="action-heading">
+                            <div class="name">List All Events of given topic</div>
+                            <a href="#event-collection-get" class="method get">GET</a><code class="uri">/get_events?topic_id={topic_id}&date={date}&cursor={cursor}</code>
+                        </h4>
+                        <h4>Example URI</h4>
+                        <div class="definition"><span class="method get">GET</span>&nbsp;<span class="uri"><span
+                                class="hostname">http://138.68.92.181:8484/api/v1.2</span>/get_events?topic_id=18&date=date&cursor=0</span>
+                        </div>
+                        <div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong>
+                            <div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span>
+                            </div>
+                        </div>
+                        <div class="collapse-content">
+                            <div class="inner"><h5>Headers</h5>
+                                <pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre>
+                                <div style="height: 1px;"></div>
+                                <h5>Body</h5>
+                                <pre><code>{
   "<span class="hljs-attribute">events</span>": <span class="hljs-value">[
     {
       "<span class="hljs-attribute">updated_time</span>": <span class="hljs-value"><span class="hljs-string">"2017-08-13T03:39:43+0000"</span></span>,
       "<span class="hljs-attribute">cover</span>": <span class="hljs-value"><span class="hljs-string">"https://scontent.xx.fbcdn.net/v/t1.0-9/s720x720/13718684_10153611195677051_8947384868007011043_n.jpg?oh=4599e179539983ebb0dcd3a41102c6b3&amp;oe=5A27CB19"</span></span>,
-      "<span class="hljs-attribute">end_time</span>": <span class="hljs-value"><span class="hljs-number">1508533200</span></span>,
-      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"295297364148781"</span></span>,
+      "<span class="hljs-attribute">end_time</span>": <span class="hljs-value"><span
+                                                class="hljs-number">1508533200</span></span>,
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"295297364148781"</span></span>,
       "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Aegis-IBM Big Data &amp; Data Science Meetup in Jaipur"</span></span>,
-      "<span class="hljs-attribute">place</span>": <span class="hljs-value"><span class="hljs-string">"Jaipur, India"</span></span>,
-      "<span class="hljs-attribute">start_time</span>": <span class="hljs-value"><span class="hljs-string">"2017-10-21"</span></span>,
+      "<span class="hljs-attribute">place</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"Jaipur, India"</span></span>,
+      "<span class="hljs-attribute">start_time</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"2017-10-21"</span></span>,
       "<span class="hljs-attribute">link</span>": <span class="hljs-value"><span class="hljs-string">"https://www.facebook.com/events/295297364148781"</span></span>,
-      "<span class="hljs-attribute">interested</span>": <span class="hljs-value"><span class="hljs-number">2565</span></span>,
+      "<span class="hljs-attribute">interested</span>": <span class="hljs-value"><span
+                                                class="hljs-number">2565</span></span>,
       "<span class="hljs-attribute">coming</span>": <span class="hljs-value"><span class="hljs-number">514</span>
     </span>},
     {
       "<span class="hljs-attribute">updated_time</span>": <span class="hljs-value"><span class="hljs-string">"2017-08-10T20:56:32+0000"</span></span>,
       "<span class="hljs-attribute">cover</span>": <span class="hljs-value"><span class="hljs-string">"https://scontent.xx.fbcdn.net/v/t31.0-0/p480x480/18449585_628047117389400_6208310549031090635_o.jpg?oh=3ba2fb6709d2fa3a4c4c4011e5f64276&amp;oe=5A24097C"</span></span>,
-      "<span class="hljs-attribute">end_time</span>": <span class="hljs-value"><span class="hljs-number">1507237200</span></span>,
-      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"250534705351469"</span></span>,
+      "<span class="hljs-attribute">end_time</span>": <span class="hljs-value"><span
+                                                class="hljs-number">1507237200</span></span>,
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"250534705351469"</span></span>,
       "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"5-Day Data Science Bootcamp in Washington DC"</span></span>,
       "<span class="hljs-attribute">place</span>": <span class="hljs-value"><span class="hljs-string">"Bethesda, United States"</span></span>,
-      "<span class="hljs-attribute">start_time</span>": <span class="hljs-value"><span class="hljs-string">"2017-10-02"</span></span>,
+      "<span class="hljs-attribute">start_time</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"2017-10-02"</span></span>,
       "<span class="hljs-attribute">link</span>": <span class="hljs-value"><span class="hljs-string">"https://www.facebook.com/events/250534705351469"</span></span>,
-      "<span class="hljs-attribute">interested</span>": <span class="hljs-value"><span class="hljs-number">75</span></span>,
+      "<span class="hljs-attribute">interested</span>": <span class="hljs-value"><span
+                                                class="hljs-number">75</span></span>,
       "<span class="hljs-attribute">coming</span>": <span class="hljs-value"><span class="hljs-number">13</span>
     </span>},
     {
       "<span class="hljs-attribute">updated_time</span>": <span class="hljs-value"><span class="hljs-string">"2017-08-12T11:08:27+0000"</span></span>,
       "<span class="hljs-attribute">cover</span>": <span class="hljs-value"><span class="hljs-string">"https://scontent.xx.fbcdn.net/v/t31.0-8/s720x720/17240392_1369578119731969_7888332856448459093_o.jpg?oh=fdcce291bc21f91e5bb153d4f6dc419b&amp;oe=5A29A0F5"</span></span>,
-      "<span class="hljs-attribute">end_time</span>": <span class="hljs-value"><span class="hljs-number">1506114000</span></span>,
-      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"1873958579558849"</span></span>,
+      "<span class="hljs-attribute">end_time</span>": <span class="hljs-value"><span
+                                                class="hljs-number">1506114000</span></span>,
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"1873958579558849"</span></span>,
       "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Cypher 2017, Analytics &amp; Data Science India Summit"</span></span>,
-      "<span class="hljs-attribute">place</span>": <span class="hljs-value"><span class="hljs-string">"Bangalore, India"</span></span>,
-      "<span class="hljs-attribute">start_time</span>": <span class="hljs-value"><span class="hljs-string">"2017-09-21"</span></span>,
+      "<span class="hljs-attribute">place</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"Bangalore, India"</span></span>,
+      "<span class="hljs-attribute">start_time</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"2017-09-21"</span></span>,
       "<span class="hljs-attribute">link</span>": <span class="hljs-value"><span class="hljs-string">"https://www.facebook.com/events/1873958579558849"</span></span>,
-      "<span class="hljs-attribute">interested</span>": <span class="hljs-value"><span class="hljs-number">262</span></span>,
+      "<span class="hljs-attribute">interested</span>": <span class="hljs-value"><span
+                                                class="hljs-number">262</span></span>,
       "<span class="hljs-attribute">coming</span>": <span class="hljs-value"><span class="hljs-number">42</span>
     </span>},
     {
       "<span class="hljs-attribute">updated_time</span>": <span class="hljs-value"><span class="hljs-string">"2017-08-12T13:33:20+0000"</span></span>,
       "<span class="hljs-attribute">cover</span>": <span class="hljs-value"><span class="hljs-string">"https://scontent.xx.fbcdn.net/v/t31.0-0/p480x480/20229685_657005331160245_3373497185276937264_o.jpg?oh=10e19848ed6194312e3aab63479df068&amp;oe=5A22A808"</span></span>,
-      "<span class="hljs-attribute">end_time</span>": <span class="hljs-value"><span class="hljs-number">1506027600</span></span>,
-      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"304847746643660"</span></span>,
+      "<span class="hljs-attribute">end_time</span>": <span class="hljs-value"><span
+                                                class="hljs-number">1506027600</span></span>,
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"304847746643660"</span></span>,
       "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Data Science Bootcamp in Seattle"</span></span>,
       "<span class="hljs-attribute">place</span>": <span class="hljs-value"><span class="hljs-string">"Redmond, United States"</span></span>,
-      "<span class="hljs-attribute">start_time</span>": <span class="hljs-value"><span class="hljs-string">"2017-09-18"</span></span>,
+      "<span class="hljs-attribute">start_time</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"2017-09-18"</span></span>,
       "<span class="hljs-attribute">link</span>": <span class="hljs-value"><span class="hljs-string">"https://www.facebook.com/events/304847746643660"</span></span>,
-      "<span class="hljs-attribute">interested</span>": <span class="hljs-value"><span class="hljs-number">77</span></span>,
+      "<span class="hljs-attribute">interested</span>": <span class="hljs-value"><span
+                                                class="hljs-number">77</span></span>,
       "<span class="hljs-attribute">coming</span>": <span class="hljs-value"><span class="hljs-number">8</span>
     </span>},
     {
       "<span class="hljs-attribute">updated_time</span>": <span class="hljs-value"><span class="hljs-string">"2017-08-11T00:23:19+0000"</span></span>,
       "<span class="hljs-attribute">cover</span>": <span class="hljs-value"><span class="hljs-string">"https://scontent.xx.fbcdn.net/v/t31.0-8/s720x720/20229517_10154593683722051_7184157984845777674_o.jpg?oh=616cbddad2f14b6a4b546d20ffb44a90&amp;oe=5A31BA34"</span></span>,
-      "<span class="hljs-attribute">end_time</span>": <span class="hljs-value"><span class="hljs-number">1505595600</span></span>,
-      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"331449910642787"</span></span>,
+      "<span class="hljs-attribute">end_time</span>": <span class="hljs-value"><span
+                                                class="hljs-number">1505595600</span></span>,
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"331449910642787"</span></span>,
       "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Aegis IBM Big Data and Data Science Meetup, Ahmedabad"</span></span>,
-      "<span class="hljs-attribute">place</span>": <span class="hljs-value"><span class="hljs-string">"Ahmedabad, India"</span></span>,
-      "<span class="hljs-attribute">start_time</span>": <span class="hljs-value"><span class="hljs-string">"2017-09-17"</span></span>,
+      "<span class="hljs-attribute">place</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"Ahmedabad, India"</span></span>,
+      "<span class="hljs-attribute">start_time</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"2017-09-17"</span></span>,
       "<span class="hljs-attribute">link</span>": <span class="hljs-value"><span class="hljs-string">"https://www.facebook.com/events/331449910642787"</span></span>,
-      "<span class="hljs-attribute">interested</span>": <span class="hljs-value"><span class="hljs-number">245</span></span>,
+      "<span class="hljs-attribute">interested</span>": <span class="hljs-value"><span
+                                                class="hljs-number">245</span></span>,
       "<span class="hljs-attribute">coming</span>": <span class="hljs-value"><span class="hljs-number">42</span>
     </span>},
     {
       "<span class="hljs-attribute">updated_time</span>": <span class="hljs-value"><span class="hljs-string">"2017-08-16T11:16:19+0000"</span></span>,
       "<span class="hljs-attribute">cover</span>": <span class="hljs-value"><span class="hljs-string">"https://scontent.xx.fbcdn.net/v/t31.0-8/s720x720/19577095_1394186904028012_6430138526883229507_o.jpg?oh=24f8824e3cacfa6afdd124e22d97b2f5&amp;oe=5A2AF551"</span></span>,
-      "<span class="hljs-attribute">end_time</span>": <span class="hljs-value"><span class="hljs-number">1505336400</span></span>,
-      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"891767460964367"</span></span>,
+      "<span class="hljs-attribute">end_time</span>": <span class="hljs-value"><span
+                                                class="hljs-number">1505336400</span></span>,
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"891767460964367"</span></span>,
       "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Data Science Week 2017"</span></span>,
-      "<span class="hljs-attribute">place</span>": <span class="hljs-value"><span class="hljs-string">"Moscow, Russia"</span></span>,
-      "<span class="hljs-attribute">start_time</span>": <span class="hljs-value"><span class="hljs-string">"2017-09-12"</span></span>,
+      "<span class="hljs-attribute">place</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"Moscow, Russia"</span></span>,
+      "<span class="hljs-attribute">start_time</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"2017-09-12"</span></span>,
       "<span class="hljs-attribute">link</span>": <span class="hljs-value"><span class="hljs-string">"https://www.facebook.com/events/891767460964367"</span></span>,
-      "<span class="hljs-attribute">interested</span>": <span class="hljs-value"><span class="hljs-number">590</span></span>,
+      "<span class="hljs-attribute">interested</span>": <span class="hljs-value"><span
+                                                class="hljs-number">590</span></span>,
       "<span class="hljs-attribute">coming</span>": <span class="hljs-value"><span class="hljs-number">140</span>
     </span>},
     {
       "<span class="hljs-attribute">updated_time</span>": <span class="hljs-value"><span class="hljs-string">"2017-08-20T13:52:34+0000"</span></span>,
       "<span class="hljs-attribute">cover</span>": <span class="hljs-value"><span class="hljs-string">"https://scontent.xx.fbcdn.net/v/t31.0-8/s720x720/20615829_750590631788119_3014114781414361029_o.jpg?oh=4b8b57ffb20f50b1379ee0b4158422bc&amp;oe=5A2F59F4"</span></span>,
-      "<span class="hljs-attribute">end_time</span>": <span class="hljs-value"><span class="hljs-number">1504990800</span></span>,
-      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"727202760800644"</span></span>,
+      "<span class="hljs-attribute">end_time</span>": <span class="hljs-value"><span
+                                                class="hljs-number">1504990800</span></span>,
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"727202760800644"</span></span>,
       "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Курс \"Introduction to Data Science, Analytics and AI\""</span></span>,
-      "<span class="hljs-attribute">place</span>": <span class="hljs-value"><span class="hljs-string">"Kyiv, Ukraine"</span></span>,
-      "<span class="hljs-attribute">start_time</span>": <span class="hljs-value"><span class="hljs-string">"2017-09-09"</span></span>,
+      "<span class="hljs-attribute">place</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"Kyiv, Ukraine"</span></span>,
+      "<span class="hljs-attribute">start_time</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"2017-09-09"</span></span>,
       "<span class="hljs-attribute">link</span>": <span class="hljs-value"><span class="hljs-string">"https://www.facebook.com/events/727202760800644"</span></span>,
-      "<span class="hljs-attribute">interested</span>": <span class="hljs-value"><span class="hljs-number">1052</span></span>,
+      "<span class="hljs-attribute">interested</span>": <span class="hljs-value"><span
+                                                class="hljs-number">1052</span></span>,
       "<span class="hljs-attribute">coming</span>": <span class="hljs-value"><span class="hljs-number">187</span>
     </span>},
     {
       "<span class="hljs-attribute">updated_time</span>": <span class="hljs-value"><span class="hljs-string">"2017-08-21T19:41:32+0000"</span></span>,
       "<span class="hljs-attribute">cover</span>": <span class="hljs-value"><span class="hljs-string">"https://scontent.xx.fbcdn.net/v/t1.0-9/20953993_10159237684040261_3201860903833490052_n.jpg?oh=261b2c35fbc036cf150775975406bf12&amp;oe=5A1C2061"</span></span>,
-      "<span class="hljs-attribute">end_time</span>": <span class="hljs-value"><span class="hljs-number">1504731600</span></span>,
-      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"125921241367691"</span></span>,
+      "<span class="hljs-attribute">end_time</span>": <span class="hljs-value"><span
+                                                class="hljs-number">1504731600</span></span>,
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"125921241367691"</span></span>,
       "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Canada's Data Science and Data Engineering Industry Landscape "</span></span>,
-      "<span class="hljs-attribute">place</span>": <span class="hljs-value"><span class="hljs-string">"Toronto, Canada"</span></span>,
-      "<span class="hljs-attribute">start_time</span>": <span class="hljs-value"><span class="hljs-string">"2017-09-07"</span></span>,
+      "<span class="hljs-attribute">place</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"Toronto, Canada"</span></span>,
+      "<span class="hljs-attribute">start_time</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"2017-09-07"</span></span>,
       "<span class="hljs-attribute">link</span>": <span class="hljs-value"><span class="hljs-string">"https://www.facebook.com/events/125921241367691"</span></span>,
-      "<span class="hljs-attribute">interested</span>": <span class="hljs-value"><span class="hljs-number">0</span></span>,
+      "<span class="hljs-attribute">interested</span>": <span class="hljs-value"><span
+                                                class="hljs-number">0</span></span>,
       "<span class="hljs-attribute">coming</span>": <span class="hljs-value"><span class="hljs-number">0</span>
     </span>},
     {
       "<span class="hljs-attribute">updated_time</span>": <span class="hljs-value"><span class="hljs-string">"2017-08-11T00:40:01+0000"</span></span>,
       "<span class="hljs-attribute">cover</span>": <span class="hljs-value"><span class="hljs-string">"https://scontent.xx.fbcdn.net/v/t31.0-8/s720x720/20645112_1554186514601897_3123602631321685340_o.jpg?oh=891fde13f9302e4b5c2f89c492ddad1d&amp;oe=5A2BB2FA"</span></span>,
-      "<span class="hljs-attribute">end_time</span>": <span class="hljs-value"><span class="hljs-number">1504645200</span></span>,
-      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"279760199173806"</span></span>,
+      "<span class="hljs-attribute">end_time</span>": <span class="hljs-value"><span
+                                                class="hljs-number">1504645200</span></span>,
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"279760199173806"</span></span>,
       "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Неделя открытых технологий: Data Science митап"</span></span>,
-      "<span class="hljs-attribute">place</span>": <span class="hljs-value"><span class="hljs-string">"Odessa, Ukraine"</span></span>,
-      "<span class="hljs-attribute">start_time</span>": <span class="hljs-value"><span class="hljs-string">"2017-09-06"</span></span>,
+      "<span class="hljs-attribute">place</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"Odessa, Ukraine"</span></span>,
+      "<span class="hljs-attribute">start_time</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"2017-09-06"</span></span>,
       "<span class="hljs-attribute">link</span>": <span class="hljs-value"><span class="hljs-string">"https://www.facebook.com/events/279760199173806"</span></span>,
-      "<span class="hljs-attribute">interested</span>": <span class="hljs-value"><span class="hljs-number">111</span></span>,
+      "<span class="hljs-attribute">interested</span>": <span class="hljs-value"><span
+                                                class="hljs-number">111</span></span>,
       "<span class="hljs-attribute">coming</span>": <span class="hljs-value"><span class="hljs-number">24</span>
     </span>},
     {
       "<span class="hljs-attribute">updated_time</span>": <span class="hljs-value"><span class="hljs-string">"2017-08-18T05:51:33+0000"</span></span>,
       "<span class="hljs-attribute">cover</span>": <span class="hljs-value"><span class="hljs-string">"https://scontent.xx.fbcdn.net/v/t1.0-9/s720x720/13532820_10153578327712051_2149254848759659712_n.jpg?oh=f50d5ca5bb9571476a2f6be74dc64973&amp;oe=5A264B32"</span></span>,
-      "<span class="hljs-attribute">end_time</span>": <span class="hljs-value"><span class="hljs-number">1504386000</span></span>,
-      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"1161699240541901"</span></span>,
+      "<span class="hljs-attribute">end_time</span>": <span class="hljs-value"><span
+                                                class="hljs-number">1504386000</span></span>,
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"1161699240541901"</span></span>,
       "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Aegis IBM Big Data and Data Science Meetup, Kolkata"</span></span>,
-      "<span class="hljs-attribute">start_time</span>": <span class="hljs-value"><span class="hljs-string">"2017-09-03"</span></span>,
+      "<span class="hljs-attribute">start_time</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"2017-09-03"</span></span>,
       "<span class="hljs-attribute">place</span>": <span class="hljs-value"><span class="hljs-string">""</span></span>,
       "<span class="hljs-attribute">link</span>": <span class="hljs-value"><span class="hljs-string">"https://www.facebook.com/events/1161699240541901"</span></span>,
-      "<span class="hljs-attribute">interested</span>": <span class="hljs-value"><span class="hljs-number">373</span></span>,
+      "<span class="hljs-attribute">interested</span>": <span class="hljs-value"><span
+                                                class="hljs-number">373</span></span>,
       "<span class="hljs-attribute">coming</span>": <span class="hljs-value"><span class="hljs-number">78</span>
     </span>}
   ]
-</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div><div id="conversation-collection" class="resource"><h3 class="resource-heading">Conversation Collection <a href="#conversation-collection" class="permalink">&nbsp;&para;</a></h3><div id="conversation-collection-get" class="action get"><h4 class="action-heading"><div class="name">List All Conversation of given topic</div><a href="#conversation-collection-get" class="method get">GET</a><code class="uri">/get_conversations?topic_id={topic_id}&date={date}&cursor={cursor}</code></h4><h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&nbsp;<span class="uri"><span class="hostname">http://138.68.92.181:8484/api/v1.2</span>/get_conversations?topic_id=18&date=day&cursor=0</span></div><div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+</span>}</code></pre>
+                                <div style="height: 1px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="conversation-collection" class="resource"><h3 class="resource-heading">Conversation Collection
+                    <a href="#conversation-collection" class="permalink">&nbsp;&para;</a></h3>
+                    <div id="conversation-collection-get" class="action get">
+                        <h4 class="action-heading">
+                            <div class="name">List All Conversation of given topic</div>
+                            <a href="#conversation-collection-get" class="method get">GET</a><code class="uri">/get_conversations?topic_id={topic_id}&date={date}&cursor={cursor}</code>
+                        </h4>
+                        <h4>Example URI</h4>
+                        <div class="definition"><span class="method get">GET</span>&nbsp;<span class="uri"><span
+                                class="hostname">http://138.68.92.181:8484/api/v1.2</span>/get_conversations?topic_id=18&date=day&cursor=0</span>
+                        </div>
+                        <div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong>
+                            <div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span>
+                            </div>
+                        </div>
+                        <div class="collapse-content">
+                            <div class="inner"><h5>Headers</h5>
+                                <pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre>
+                                <div style="height: 1px;"></div>
+                                <h5>Body</h5>
+                                <pre><code>{
   "<span class="hljs-attribute">conversation</span>": <span class="hljs-value">[
     {
       "<span class="hljs-attribute">title</span>": <span class="hljs-value"><span class="hljs-string">"Guide to buying iota for Dutch users"</span></span>,
-      "<span class="hljs-attribute">source</span>": <span class="hljs-value"><span class="hljs-string">"reddit"</span></span>,
+      "<span class="hljs-attribute">source</span>": <span class="hljs-value"><span
+                                                class="hljs-string">"reddit"</span></span>,
       "<span class="hljs-attribute">comments</span>": <span class="hljs-value">[
         {
-          "<span class="hljs-attribute">parent</span>": <span class="hljs-value"><span class="hljs-string">"6v76iw"</span></span>,
+          "<span class="hljs-attribute">parent</span>": <span class="hljs-value"><span
+                                                    class="hljs-string">"6v76iw"</span></span>,
           "<span class="hljs-attribute">comment_text</span>": <span class="hljs-value"><span class="hljs-string">"In plaats van BTC kan je beter Ethereum aanschaffen. Minder fees!"</span></span>,
           "<span class="hljs-attribute">created_time</span>": <span class="hljs-value"><span class="hljs-string">"2017-08-22 11:28:45"</span></span>,
-          "<span class="hljs-attribute">comment_id</span>": <span class="hljs-value"><span class="hljs-string">"dly4k10"</span></span>,
-          "<span class="hljs-attribute">indent_number</span>": <span class="hljs-value"><span class="hljs-number">0</span></span>,
-          "<span class="hljs-attribute">is_leaf</span>": <span class="hljs-value"><span class="hljs-string">"false"</span></span>,
-          "<span class="hljs-attribute">is_root</span>": <span class="hljs-value"><span class="hljs-string">"true"</span></span>,
+          "<span class="hljs-attribute">comment_id</span>": <span class="hljs-value"><span
+                                                    class="hljs-string">"dly4k10"</span></span>,
+          "<span class="hljs-attribute">indent_number</span>": <span class="hljs-value"><span
+                                                    class="hljs-number">0</span></span>,
+          "<span class="hljs-attribute">is_leaf</span>": <span class="hljs-value"><span
+                                                    class="hljs-string">"false"</span></span>,
+          "<span class="hljs-attribute">is_root</span>": <span class="hljs-value"><span
+                                                    class="hljs-string">"true"</span></span>,
           "<span class="hljs-attribute">comment_author</span>": <span class="hljs-value"><span class="hljs-string">"Glavobolja"</span></span>,
-          "<span class="hljs-attribute">relative_indent</span>": <span class="hljs-value">-<span class="hljs-number">1</span>
+          "<span class="hljs-attribute">relative_indent</span>": <span class="hljs-value">-<span
+                                                    class="hljs-number">1</span>
         </span>},
         {
-          "<span class="hljs-attribute">parent</span>": <span class="hljs-value"><span class="hljs-string">"dly4k10"</span></span>,
+          "<span class="hljs-attribute">parent</span>": <span class="hljs-value"><span
+                                                    class="hljs-string">"dly4k10"</span></span>,
           "<span class="hljs-attribute">comment_text</span>": <span class="hljs-value"><span class="hljs-string">"Inderdaad, ik had die fout ook gemaakt..."</span></span>,
           "<span class="hljs-attribute">created_time</span>": <span class="hljs-value"><span class="hljs-string">"2017-08-22 18:51:53"</span></span>,
-          "<span class="hljs-attribute">comment_id</span>": <span class="hljs-value"><span class="hljs-string">"dlyk7oa"</span></span>,
-          "<span class="hljs-attribute">indent_number</span>": <span class="hljs-value"><span class="hljs-number">1</span></span>,
-          "<span class="hljs-attribute">is_leaf</span>": <span class="hljs-value"><span class="hljs-string">"true"</span></span>,
-          "<span class="hljs-attribute">is_root</span>": <span class="hljs-value"><span class="hljs-string">"false"</span></span>,
+          "<span class="hljs-attribute">comment_id</span>": <span class="hljs-value"><span
+                                                    class="hljs-string">"dlyk7oa"</span></span>,
+          "<span class="hljs-attribute">indent_number</span>": <span class="hljs-value"><span
+                                                    class="hljs-number">1</span></span>,
+          "<span class="hljs-attribute">is_leaf</span>": <span class="hljs-value"><span
+                                                    class="hljs-string">"true"</span></span>,
+          "<span class="hljs-attribute">is_root</span>": <span class="hljs-value"><span
+                                                    class="hljs-string">"false"</span></span>,
           "<span class="hljs-attribute">comment_author</span>": <span class="hljs-value"><span class="hljs-string">"SamGranger"</span></span>,
-          "<span class="hljs-attribute">relative_indent</span>": <span class="hljs-value"><span class="hljs-number">1</span>
+          "<span class="hljs-attribute">relative_indent</span>": <span class="hljs-value"><span
+                                                    class="hljs-number">1</span>
         </span>},
         {
-          "<span class="hljs-attribute">parent</span>": <span class="hljs-value"><span class="hljs-string">"dly4k10"</span></span>,
+          "<span class="hljs-attribute">parent</span>": <span class="hljs-value"><span
+                                                    class="hljs-string">"dly4k10"</span></span>,
           "<span class="hljs-attribute">comment_text</span>": <span class="hljs-value"><span class="hljs-string">"Ik zal die optie toevoegen en toelichten, als ik vanavond weer thuis ben"</span></span>,
           "<span class="hljs-attribute">created_time</span>": <span class="hljs-value"><span class="hljs-string">"2017-08-22 23:05:13"</span></span>,
-          "<span class="hljs-attribute">comment_id</span>": <span class="hljs-value"><span class="hljs-string">"dlypxky"</span></span>,
-          "<span class="hljs-attribute">indent_number</span>": <span class="hljs-value"><span class="hljs-number">1</span></span>,
-          "<span class="hljs-attribute">is_leaf</span>": <span class="hljs-value"><span class="hljs-string">"true"</span></span>,
-          "<span class="hljs-attribute">is_root</span>": <span class="hljs-value"><span class="hljs-string">"false"</span></span>,
+          "<span class="hljs-attribute">comment_id</span>": <span class="hljs-value"><span
+                                                    class="hljs-string">"dlypxky"</span></span>,
+          "<span class="hljs-attribute">indent_number</span>": <span class="hljs-value"><span
+                                                    class="hljs-number">1</span></span>,
+          "<span class="hljs-attribute">is_leaf</span>": <span class="hljs-value"><span
+                                                    class="hljs-string">"true"</span></span>,
+          "<span class="hljs-attribute">is_root</span>": <span class="hljs-value"><span
+                                                    class="hljs-string">"false"</span></span>,
           "<span class="hljs-attribute">comment_author</span>": <span class="hljs-value"><span class="hljs-string">"Lazy-Physicist"</span></span>,
-          "<span class="hljs-attribute">relative_indent</span>": <span class="hljs-value"><span class="hljs-number">0</span>
+          "<span class="hljs-attribute">relative_indent</span>": <span class="hljs-value"><span
+                                                    class="hljs-number">0</span>
         </span>},
         {
-          "<span class="hljs-attribute">parent</span>": <span class="hljs-value"><span class="hljs-string">"6v76iw"</span></span>,
+          "<span class="hljs-attribute">parent</span>": <span class="hljs-value"><span
+                                                    class="hljs-string">"6v76iw"</span></span>,
           "<span class="hljs-attribute">comment_text</span>": <span class="hljs-value"><span class="hljs-string">"Duidelijk verhaal. Misschien is het een mooie aanvulling om na de aanschaf op bitfenix uit te leggen hoe je je iota van de exchange af krijgt. De huidige wallet is ook niet vreselijk voor zichzelf sprekend."</span></span>,
           "<span class="hljs-attribute">created_time</span>": <span class="hljs-value"><span class="hljs-string">"2017-08-22 14:47:57"</span></span>,
-          "<span class="hljs-attribute">comment_id</span>": <span class="hljs-value"><span class="hljs-string">"dlydfd4"</span></span>,
-          "<span class="hljs-attribute">indent_number</span>": <span class="hljs-value"><span class="hljs-number">0</span></span>,
-          "<span class="hljs-attribute">is_leaf</span>": <span class="hljs-value"><span class="hljs-string">"false"</span></span>,
-          "<span class="hljs-attribute">is_root</span>": <span class="hljs-value"><span class="hljs-string">"true"</span></span>,
+          "<span class="hljs-attribute">comment_id</span>": <span class="hljs-value"><span
+                                                    class="hljs-string">"dlydfd4"</span></span>,
+          "<span class="hljs-attribute">indent_number</span>": <span class="hljs-value"><span
+                                                    class="hljs-number">0</span></span>,
+          "<span class="hljs-attribute">is_leaf</span>": <span class="hljs-value"><span
+                                                    class="hljs-string">"false"</span></span>,
+          "<span class="hljs-attribute">is_root</span>": <span class="hljs-value"><span
+                                                    class="hljs-string">"true"</span></span>,
           "<span class="hljs-attribute">comment_author</span>": <span class="hljs-value"><span class="hljs-string">"Bazeratti"</span></span>,
-          "<span class="hljs-attribute">relative_indent</span>": <span class="hljs-value">-<span class="hljs-number">1</span>
+          "<span class="hljs-attribute">relative_indent</span>": <span class="hljs-value">-<span
+                                                    class="hljs-number">1</span>
         </span>},
         {
-          "<span class="hljs-attribute">parent</span>": <span class="hljs-value"><span class="hljs-string">"dlydfd4"</span></span>,
+          "<span class="hljs-attribute">parent</span>": <span class="hljs-value"><span
+                                                    class="hljs-string">"dlydfd4"</span></span>,
           "<span class="hljs-attribute">comment_text</span>": <span class="hljs-value"><span class="hljs-string">"Ik kwam hier zelf achter toen ik het artikel van NEM schreef. Ik vraag me alleen af of het verstandig is om een nieuwe gebruiker de risico van eigen verantwoordelijk te geven ( zo snel ) in het process.\n"</span></span>,
           "<span class="hljs-attribute">created_time</span>": <span class="hljs-value"><span class="hljs-string">"2017-08-22 23:06:21"</span></span>,
-          "<span class="hljs-attribute">comment_id</span>": <span class="hljs-value"><span class="hljs-string">"dlypyv6"</span></span>,
-          "<span class="hljs-attribute">indent_number</span>": <span class="hljs-value"><span class="hljs-number">1</span></span>,
-          "<span class="hljs-attribute">is_leaf</span>": <span class="hljs-value"><span class="hljs-string">"true"</span></span>,
-          "<span class="hljs-attribute">is_root</span>": <span class="hljs-value"><span class="hljs-string">"false"</span></span>,
+          "<span class="hljs-attribute">comment_id</span>": <span class="hljs-value"><span
+                                                    class="hljs-string">"dlypyv6"</span></span>,
+          "<span class="hljs-attribute">indent_number</span>": <span class="hljs-value"><span
+                                                    class="hljs-number">1</span></span>,
+          "<span class="hljs-attribute">is_leaf</span>": <span class="hljs-value"><span
+                                                    class="hljs-string">"true"</span></span>,
+          "<span class="hljs-attribute">is_root</span>": <span class="hljs-value"><span
+                                                    class="hljs-string">"false"</span></span>,
           "<span class="hljs-attribute">comment_author</span>": <span class="hljs-value"><span class="hljs-string">"Lazy-Physicist"</span></span>,
-          "<span class="hljs-attribute">relative_indent</span>": <span class="hljs-value"><span class="hljs-number">1</span>
+          "<span class="hljs-attribute">relative_indent</span>": <span class="hljs-value"><span
+                                                    class="hljs-number">1</span>
         </span>},
         {
-          "<span class="hljs-attribute">parent</span>": <span class="hljs-value"><span class="hljs-string">"6v76iw"</span></span>,
+          "<span class="hljs-attribute">parent</span>": <span class="hljs-value"><span
+                                                    class="hljs-string">"6v76iw"</span></span>,
           "<span class="hljs-attribute">comment_text</span>": <span class="hljs-value"><span class="hljs-string">"Duidelijke en overzichtelijke site. Zal hem naar wat mensen doorsturen die zich beginnen met het verdiepen in de cryptowereld."</span></span>,
           "<span class="hljs-attribute">created_time</span>": <span class="hljs-value"><span class="hljs-string">"2017-08-23 00:43:09"</span></span>,
-          "<span class="hljs-attribute">comment_id</span>": <span class="hljs-value"><span class="hljs-string">"dlytuaa"</span></span>,
-          "<span class="hljs-attribute">indent_number</span>": <span class="hljs-value"><span class="hljs-number">0</span></span>,
-          "<span class="hljs-attribute">is_leaf</span>": <span class="hljs-value"><span class="hljs-string">"true"</span></span>,
-          "<span class="hljs-attribute">is_root</span>": <span class="hljs-value"><span class="hljs-string">"true"</span></span>,
+          "<span class="hljs-attribute">comment_id</span>": <span class="hljs-value"><span
+                                                    class="hljs-string">"dlytuaa"</span></span>,
+          "<span class="hljs-attribute">indent_number</span>": <span class="hljs-value"><span
+                                                    class="hljs-number">0</span></span>,
+          "<span class="hljs-attribute">is_leaf</span>": <span class="hljs-value"><span
+                                                    class="hljs-string">"true"</span></span>,
+          "<span class="hljs-attribute">is_root</span>": <span class="hljs-value"><span
+                                                    class="hljs-string">"true"</span></span>,
           "<span class="hljs-attribute">comment_author</span>": <span class="hljs-value"><span class="hljs-string">"JesseSebastian"</span></span>,
-          "<span class="hljs-attribute">relative_indent</span>": <span class="hljs-value">-<span class="hljs-number">1</span>
+          "<span class="hljs-attribute">relative_indent</span>": <span class="hljs-value">-<span
+                                                    class="hljs-number">1</span>
         </span>}
       ]</span>,
       "<span class="hljs-attribute">url</span>": <span class="hljs-value"><span class="hljs-string">"https://www.reddit.com/r/Iota/comments/6v76iw/guide_to_buying_iota_for_dutch_users/"</span></span>,
-      "<span class="hljs-attribute">commentNumber</span>": <span class="hljs-value"><span class="hljs-number">6</span></span>,
+      "<span class="hljs-attribute">commentNumber</span>": <span class="hljs-value"><span
+                                                class="hljs-number">6</span></span>,
       "<span class="hljs-attribute">post_text</span>": <span class="hljs-value"><span class="hljs-string">"I recently started a Dutch website aimed at helping new users get around in the cryptocurrency world. \n\nI recently wrote a short guide to help Dutch users get their own IOTA. I also added a video on it to help them go through the steps. And information on what exactly makes IOTA so special.\n\nI figured posting it here might help out my fellow Netherlanders get information on the coin.\n\nhttps://blockk.nl/iota/\n*for the dutch*\nLaat me weten wat je van het artikel/video vind. Feedback wordt altijd gewaardeerd. "</span>
     </span>}
   ]
-</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div></section></div></div></div><p style="text-align: center;" class="text-muted">Generated by&nbsp;<a href="https://github.com/danielgtaylor/aglio" class="aglio">aglio</a>&nbsp;on 23 Aug 2017</p><script>/* eslint-env browser */
+</span>}</code></pre>
+                                <div style="height: 1px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+<p style="text-align: center;" class="text-muted">Generated by&nbsp;<a href="https://github.com/danielgtaylor/aglio"
+                                                                       class="aglio">aglio</a>&nbsp;on 23 Aug 2017</p>
+<script>/* eslint-env browser */
 /* eslint quotes: [2, "single"] */
 'use strict';
 
@@ -1141,31 +2452,31 @@ function endsWith(str, suffix) {
   Get a list of direct child elements by class name.
 */
 function childrenByClass(element, name) {
-  var filtered = [];
+    var filtered = [];
 
-  for (var i = 0; i < element.children.length; i++) {
-    var child = element.children[i];
-    var classNames = child.className.split(' ');
-    if (classNames.indexOf(name) !== -1) {
-      filtered.push(child);
+    for (var i = 0; i < element.children.length; i++) {
+        var child = element.children[i];
+        var classNames = child.className.split(' ');
+        if (classNames.indexOf(name) !== -1) {
+            filtered.push(child);
+        }
     }
-  }
 
-  return filtered;
+    return filtered;
 }
 
 /*
   Get an array [width, height] of the window.
 */
 function getWindowDimensions() {
-  var w = window,
-      d = document,
-      e = d.documentElement,
-      g = d.body,
-      x = w.innerWidth || e.clientWidth || g.clientWidth,
-      y = w.innerHeight || e.clientHeight || g.clientHeight;
+    var w = window,
+        d = document,
+        e = d.documentElement,
+        g = d.body,
+        x = w.innerWidth || e.clientWidth || g.clientWidth,
+        y = w.innerHeight || e.clientHeight || g.clientHeight;
 
-  return [x, y];
+    return [x, y];
 }
 
 /*
@@ -1177,8 +2488,8 @@ function toggleCollapseButton(event) {
     var inner = content.children[0];
 
     if (button.className.indexOf('collapse-button') === -1) {
-      // Clicked without hitting the right element?
-      return;
+        // Clicked without hitting the right element?
+        return;
     }
 
     if (content.style.maxHeight && content.style.maxHeight !== '0px') {
@@ -1228,20 +2539,20 @@ function toggleCollapseNav(event, force) {
     var inner = content.children[0];
 
     if (heading.className.indexOf('heading') === -1) {
-      // Clicked without hitting the right element?
-      return;
+        // Clicked without hitting the right element?
+        return;
     }
 
     if (content.style.maxHeight && content.style.maxHeight !== '0px') {
-      // Currently showing, so let's hide it, but only if this nav item
-      // is already selected. This prevents newly selected items from
-      // collapsing in an annoying fashion.
-      if (force || window.location.hash && endsWith(event.target.href, window.location.hash)) {
-        content.style.maxHeight = '0px';
-      }
+        // Currently showing, so let's hide it, but only if this nav item
+        // is already selected. This prevents newly selected items from
+        // collapsing in an annoying fashion.
+        if (force || window.location.hash && endsWith(event.target.href, window.location.hash)) {
+            content.style.maxHeight = '0px';
+        }
     } else {
-      // Currently hidden, so let's show it
-      content.style.maxHeight = inner.offsetHeight + 12 + 'px';
+        // Currently hidden, so let's show it
+        content.style.maxHeight = inner.offsetHeight + 12 + 'px';
     }
 }
 
@@ -1266,39 +2577,40 @@ function refresh(body) {
   collapses them.
 */
 function autoCollapse() {
-  var windowHeight = getWindowDimensions()[1];
-  var itemsHeight = 64; /* Account for some padding */
-  var itemsArray = Array.prototype.slice.call(
-    document.querySelectorAll('nav .resource-group .heading'));
+    var windowHeight = getWindowDimensions()[1];
+    var itemsHeight = 64;
+    /* Account for some padding */
+    var itemsArray = Array.prototype.slice.call(
+        document.querySelectorAll('nav .resource-group .heading'));
 
-  // Get the total height of the navigation items
-  itemsArray.forEach(function (item) {
-    itemsHeight += item.parentNode.offsetHeight;
-  });
+    // Get the total height of the navigation items
+    itemsArray.forEach(function (item) {
+        itemsHeight += item.parentNode.offsetHeight;
+    });
 
-  // Should we auto-collapse any nav items? Try to find the smallest item
-  // that can be collapsed to show all items on the screen. If not possible,
-  // then collapse the largest item and do it again. First, sort the items
-  // by height from smallest to largest.
-  var sortedItems = itemsArray.sort(function (a, b) {
-    return a.parentNode.offsetHeight - b.parentNode.offsetHeight;
-  });
+    // Should we auto-collapse any nav items? Try to find the smallest item
+    // that can be collapsed to show all items on the screen. If not possible,
+    // then collapse the largest item and do it again. First, sort the items
+    // by height from smallest to largest.
+    var sortedItems = itemsArray.sort(function (a, b) {
+        return a.parentNode.offsetHeight - b.parentNode.offsetHeight;
+    });
 
-  while (sortedItems.length && itemsHeight > windowHeight) {
-    for (var i = 0; i < sortedItems.length; i++) {
-      // Will collapsing this item help?
-      var itemHeight = sortedItems[i].nextSibling.offsetHeight;
-      if ((itemsHeight - itemHeight <= windowHeight) || i === sortedItems.length - 1) {
-        // It will, so let's collapse it, remove its content height from
-        // our total and then remove it from our list of candidates
-        // that can be collapsed.
-        itemsHeight -= itemHeight;
-        toggleCollapseNav({target: sortedItems[i].children[0]}, true);
-        sortedItems.splice(i, 1);
-        break;
-      }
+    while (sortedItems.length && itemsHeight > windowHeight) {
+        for (var i = 0; i < sortedItems.length; i++) {
+            // Will collapsing this item help?
+            var itemHeight = sortedItems[i].nextSibling.offsetHeight;
+            if ((itemsHeight - itemHeight <= windowHeight) || i === sortedItems.length - 1) {
+                // It will, so let's collapse it, remove its content height from
+                // our total and then remove it from our list of candidates
+                // that can be collapsed.
+                itemsHeight -= itemHeight;
+                toggleCollapseNav({target: sortedItems[i].children[0]}, true);
+                sortedItems.splice(i, 1);
+                break;
+            }
+        }
     }
-  }
 }
 
 /*
@@ -1349,4 +2661,6 @@ window.onload = function () {
     // Remove the `preload` class to enable animations
     document.querySelector('body').className = '';
 };
-</script></body></html>
+</script>
+</body>
+</html>

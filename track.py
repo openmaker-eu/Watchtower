@@ -1,17 +1,16 @@
-
-#Import the necessary methods from tweepy library
-from tweepy.streaming import StreamListener
-from tweepy import OAuthHandler
-from tweepy import Stream
-import time
-import threading
-from application.Connections import Connection
+# Import the necessary methods from tweepy library
 import json
 import re
-from bson.objectid import ObjectId
-import link_parser
-import subprocess
+import threading
 from datetime import datetime
+
+from bson.objectid import ObjectId
+from tweepy import OAuthHandler
+from tweepy import Stream
+from tweepy.streaming import StreamListener
+
+from application.Connections import Connection
+
 
 def get_info(alertDic):
     keywords = []
@@ -27,20 +26,22 @@ def get_info(alertDic):
     keywords = list(set(keywords))
     keywords = [str(keyword) for keyword in keywords]
     result = {
-        'alerts' : sorted(alerts),
-        'keywords' : keywords,
-        'lang' : lang
+        'alerts': sorted(alerts),
+        'keywords': keywords,
+        'lang': lang
     }
     return result
 
+
 def get_next_tweets_sequence():
     cursor = Connection.Instance().db["counters"].find_and_modify(
-            query= { '_id': "tweetDBId" },
-            update= { '$inc': { 'seq': 1 } },
-            new= True,
-            upsert= True
+        query={'_id': "tweetDBId"},
+        update={'$inc': {'seq': 1}},
+        new=True,
+        upsert=True
     )
     return cursor['seq']
+
 
 def separates_tweet(alertDic, tweet):
     try:
@@ -51,8 +52,10 @@ def separates_tweet(alertDic, tweet):
                     keyword = re.compile(keyword.replace(" ", "(.?)"), re.IGNORECASE)
                     if 'extended_tweet' in tweet and 'full_text' in tweet['extended_tweet']:
                         if re.search(keyword, str(tweet['extended_tweet']['full_text'])):
-                            updatedTime = datetime.fromtimestamp(int(tweet['timestamp_ms'])/1e3)
-                            Connection.Instance().cur.execute("update alerts set lasttweetdate = %s where alertid = %s;", [updatedTime, alert['alertid']])
+                            updatedTime = datetime.fromtimestamp(int(tweet['timestamp_ms']) / 1e3)
+                            Connection.Instance().cur.execute(
+                                "update alerts set lasttweetdate = %s where alertid = %s;",
+                                [updatedTime, alert['alertid']])
                             Connection.Instance().PostGreSQLConnect.commit()
                             tweet['_id'] = ObjectId()
                             if tweet['entities']['urls'] != []:
@@ -64,8 +67,10 @@ def separates_tweet(alertDic, tweet):
                             break
                     else:
                         if re.search(keyword, str(tweet['text'])):
-                            updatedTime = datetime.fromtimestamp(int(tweet['timestamp_ms'])/1e3)
-                            Connection.Instance().cur.execute("update alerts set lasttweetdate = %s where alertid = %s;", [updatedTime, alert['alertid']])
+                            updatedTime = datetime.fromtimestamp(int(tweet['timestamp_ms']) / 1e3)
+                            Connection.Instance().cur.execute(
+                                "update alerts set lasttweetdate = %s where alertid = %s;",
+                                [updatedTime, alert['alertid']])
                             Connection.Instance().PostGreSQLConnect.commit()
                             tweet['_id'] = ObjectId()
                             if tweet['entities']['urls'] == [] or tweet['entities']['urls'][0]['expanded_url'] == None:
@@ -77,7 +82,7 @@ def separates_tweet(alertDic, tweet):
                             break
     except Exception as e:
         f = open('../log.txt', 'a+')
-        s = '\n\n tweet lang: ' +  tweet['lang']
+        s = '\n\n tweet lang: ' + tweet['lang']
         f.write(s)
         f.write('\n')
         f.write(str(e))
@@ -85,16 +90,17 @@ def separates_tweet(alertDic, tweet):
         f.close()
         pass
 
+
 # Accessing Twitter API
-consumer_key = "utTM4qfuhmzeLUxRkBb1xb12P" # API key
-consumer_secret = "XteCQjAZCVAu7Tk5ftgcjv0jJlII2o7b8BqZc3sfEdwn1R6Ic7" # API secret
+consumer_key = "utTM4qfuhmzeLUxRkBb1xb12P"  # API key
+consumer_secret = "XteCQjAZCVAu7Tk5ftgcjv0jJlII2o7b8BqZc3sfEdwn1R6Ic7"  # API secret
 access_token = "821415961467228161-iB85g0Lm8c4jLqIqxWcryWjE8nm6CPq"
 access_secret = "BrNaqN0BP2K3rYzIurlaTIaJeOk4MBP6mzBtR73ay5ulU"
 
-#This is a basic listener that just prints received tweets to stdout.
-class StdOutListener(StreamListener):
 
-    def __init__(self,alertDic):
+# This is a basic listener that just prints received tweets to stdout.
+class StdOutListener(StreamListener):
+    def __init__(self, alertDic):
         self.alertDic = alertDic
         self.terminate = False
         self.connection = True
@@ -134,15 +140,16 @@ class StdOutListener(StreamListener):
         self.terminate = True
 
     def on_timeout(self):
-        return True # To continue listening
+        return True  # To continue listening
+
 
 class StreamCreator():
-    def __init__(self,alertDic):
-        #This handles Twitter authetification and the connection to Twitter Streaming API
+    def __init__(self, alertDic):
+        # This handles Twitter authetification and the connection to Twitter Streaming API
         self.l = StdOutListener(alertDic)
 
         """ TODO merge keywords langs and alerts in one method """
-        self.info = get_info(alertDic= alertDic)
+        self.info = get_info(alertDic=alertDic)
         self.keywords = self.info['keywords']
         self.lang = self.info['lang']
         self.alerts = self.info['alerts']
@@ -152,7 +159,9 @@ class StreamCreator():
         self.auth = OAuthHandler(consumer_key, consumer_secret)
         self.auth.set_access_token(access_token, access_secret)
         self.stream = Stream(self.auth, self.l)
-        self.t = threading.Thread(target = self.stream.filter, kwargs = {'track':self.keywords, 'languages':self.lang, 'stall_warnings':True} )
+        self.t = threading.Thread(target=self.stream.filter,
+                                  kwargs={'track': self.keywords, 'languages': self.lang, 'stall_warnings': True})
+
     def start(self):
         try:
             self.t.deamon = True
@@ -164,12 +173,15 @@ class StreamCreator():
             f.write(str(e))
             f.write('\n\n')
             f.close()
+
     def terminate(self):
         self.l.running = False
         self.l.stop()
         self.l.terminate = True
+
     def checkAlive(self):
         return self.t.isAlive()
+
     def checkConnection(self):
         if self.l is not None:
             return self.l.connection

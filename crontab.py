@@ -1,19 +1,20 @@
-import pymongo
-from application.Connections import Connection
-#from application.TimeOut import timeout
-from requests import head
-import summary
-from goose import Goose
 from resource import RLIMIT_DATA, getrlimit, setrlimit
-from time import gmtime, strftime, time
-from urlparse import urlparse
-from tldextract import extract
-from Queue import Queue
 from threading import Thread
+from time import gmtime, strftime, time
+
 import timeout_decorator
+from Queue import Queue
+# from application.TimeOut import timeout
+from requests import head
+from tldextract import extract
+from urlparse import urlparse
+
+from application.Connections import Connection
+
 
 class Worker(Thread):
     """ Thread executing tasks from a given tasks queue """
+
     def __init__(self, tasks):
         Thread.__init__(self)
         self.tasks = tasks
@@ -35,6 +36,7 @@ class Worker(Thread):
 
 class ThreadPool:
     """ Pool of threads consuming tasks from a queue """
+
     def __init__(self, num_threads):
         self.tasks = Queue(num_threads)
         for _ in range(num_threads):
@@ -53,11 +55,13 @@ class ThreadPool:
         """ Wait for completion of all the tasks in the queue """
         self.tasks.join()
 
+
 rsrc = RLIMIT_DATA
 soft, hard = getrlimit(rsrc)
-setrlimit(rsrc, (3*512000000, hard)) #limit to one 512mb
+setrlimit(rsrc, (3 * 512000000, hard))  # limit to one 512mb
 
 unwanted_links = ['ebay', 'gearbest', 'abizy']
+
 
 def determine_date(date):
     current_milli_time = int(round(time() * 1000))
@@ -70,8 +74,10 @@ def determine_date(date):
         return str(current_milli_time - 30 * one_day)
     return '0'
 
+
 def unshorten_url(url):
     return head(url, allow_redirects=True).url
+
 
 @timeout_decorator.timeout(30, use_signals=False)
 def linkParser(link):
@@ -83,36 +89,39 @@ def linkParser(link):
         if domain not in unwanted_links:
             source = '{uri.scheme}://{uri.netloc}/'.format(uri=parsed_uri)
 
-            #g = Goose({'browser_user_agent': 'Mozilla', 'parser_class':'lxml'})
-            #article = g.extract(url=link)
-            #image = str(article.top_image.src)
-            #description = str(article.meta_description)
-            #title = article.title.upper()
+            # g = Goose({'browser_user_agent': 'Mozilla', 'parser_class':'lxml'})
+            # article = g.extract(url=link)
+            # image = str(article.top_image.src)
+            # description = str(article.meta_description)
+            # title = article.title.upper()
 
-            #s = summary.Summary(link)
-            #s.extract()
-            #image = str(s.image).encode('utf-8')
-            #title = str(s.title.encode('utf-8'))
-            #description = str(s.description.encode('utf-8'))
+            # s = summary.Summary(link)
+            # s.extract()
+            # image = str(s.image).encode('utf-8')
+            # title = str(s.title.encode('utf-8'))
+            # description = str(s.description.encode('utf-8'))
 
             if image != "None" and description != "None":
-                dic = {'url': link, 'im':image, 'title': title, 'description': description, 'popularity': int(count), 'source': source}
-                if not next((item for item in result if item["title"] == dic['title'] and item["im"] == dic['im']\
-                 and item["description"] == dic['description']), False):
+                dic = {'url': link, 'im': image, 'title': title, 'description': description, 'popularity': int(count),
+                       'source': source}
+                if not next((item for item in result if item["title"] == dic['title'] and item["im"] == dic['im'] \
+                        and item["description"] == dic['description']), False):
                     return dic
                 return {}
     except Exception as e:
         return {}
         pass
 
+
 def calculateLinks(alertid, date):
     stringDate = date
     date = determine_date(date)
-    links = Connection.Instance().db[str(alertid)].aggregate([{'$match': {'timestamp_ms': {'$gte': date} }},\
-                                                         {'$unwind': "$entities.urls" },\
-                                                         {'$group' : {'_id' :"$entities.urls.expanded_url" , 'total':{'$sum': 1}}},\
-                                                         {'$sort': {'total': -1}},\
-                                                         {'$limit': 500}])
+    links = Connection.Instance().db[str(alertid)].aggregate([{'$match': {'timestamp_ms': {'$gte': date}}}, \
+                                                              {'$unwind': "$entities.urls"}, \
+                                                              {'$group': {'_id': "$entities.urls.expanded_url",
+                                                                          'total': {'$sum': 1}}}, \
+                                                              {'$sort': {'total': -1}}, \
+                                                              {'$limit': 500}])
 
     links = list(links)
     result = []
@@ -129,12 +138,14 @@ def calculateLinks(alertid, date):
 
     if result != []:
         Connection.Instance().newsdB[str(alertid)].remove({'name': stringDate})
-        Connection.Instance().newsdB[str(alertid)].insert_one({'name': stringDate, stringDate:result, 'date': strftime("%a, %d %b %Y %H:%M:%S", gmtime())})
+        Connection.Instance().newsdB[str(alertid)].insert_one(
+            {'name': stringDate, stringDate: result, 'date': strftime("%a, %d %b %Y %H:%M:%S", gmtime())})
 
 
 def createParameters(alertid_list):
     dates = ['yesterday', 'week', 'month']
-    return [[alertid[0],date] for alertid in alertid_list for date in dates]
+    return [[alertid[0], date] for alertid in alertid_list for date in dates]
+
 
 def main():
     Connection.Instance().cur.execute("Select alertid from alerts;")
@@ -144,6 +155,7 @@ def main():
     pool = ThreadPool(3)
     pool.map(calculateLinks, parameters)
     pool.wait_completion()
+
 
 """
     while alertid_list != []:

@@ -1,15 +1,17 @@
-import pymongo
-from application.Connections import Connection
-import logic
 import json
+
+import logic
+from application.Connections import Connection
+
 
 def getThemes(userid):
     Connection.Instance().cur.execute("select alertid, alertname, description from alerts where ispublish = %s", [True])
     var = Connection.Instance().cur.fetchall()
-    themes = [{'alertid':i[0], 'name':i[1], 'description': i[2]} for i in var]
+    themes = [{'alertid': i[0], 'name': i[1], 'description': i[2]} for i in var]
     result = {}
     result['themes'] = themes
     return json.dumps(result, indent=4)
+
 
 def getFeeds(themename, themeid, userid, date, cursor):
     try:
@@ -21,14 +23,14 @@ def getFeeds(themename, themeid, userid, date, cursor):
         var = Connection.Instance().cur.fetchall()
         themename = var[0][0]
     if themeid != "None" or themename != "None":
-        dates=['all', 'yesterday', 'week', 'month']
+        dates = ['all', 'yesterday', 'week', 'month']
         result = {}
         if date not in dates:
             result['Error'] = 'invalid date'
             return json.dumps(result, indent=4)
         themeid = str(logic.getAlertIdwithUserId(themename, int(userid)))
         feeds = list(Connection.Instance().newsdB[themeid].find({'name': date}, {date: 1}))
-        feeds = list(feeds[0][date][cursor:cursor+20])
+        feeds = list(feeds[0][date][cursor:cursor + 20])
         cursor = int(cursor) + 20
         if cursor >= 60:
             cursor = 0
@@ -38,6 +40,7 @@ def getFeeds(themename, themeid, userid, date, cursor):
     else:
         result['feeds'] = "theme not found"
     return json.dumps(result, indent=4)
+
 
 def getInfluencers(themename, themeid):
     try:
@@ -53,11 +56,12 @@ def getInfluencers(themename, themeid):
         if themename == "arduino":
             themename = "Arduino"
         elif themename == "raspberry pi":
-            themename =  "RaspberryPi"
+            themename = "RaspberryPi"
         elif themename == "3d printer":
             themename = "Printer"
 
-        influencers = list(Connection.Instance().infDB[str(themename)].find({"type": "filteredUser"}, {"_id":0, "type": 0}))
+        influencers = list(
+            Connection.Instance().infDB[str(themename)].find({"type": "filteredUser"}, {"_id": 0, "type": 0}))
         result['influencers'] = influencers
     else:
         result['influencers'] = "theme not found"

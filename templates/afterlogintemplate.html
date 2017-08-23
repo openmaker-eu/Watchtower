@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <meta name="author" content="">
-    <title>{{title}}</title>
+    <title>{{ title }}</title>
 
     <!-- Bootstrap core CSS -->
     <link href="/css/bootstrap.css" rel="stylesheet">
@@ -19,14 +19,15 @@
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
     <!-- for alert template -->
-    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,300,600,700">
+    <link rel="stylesheet"
+          href="http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,300,600,700">
     <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic,700italic">
     <!-- for alertForm -->
     <link rel="stylesheet" href="/css/bootstrap-theme.min.css">
     <link rel="stylesheet" href="/css/bootstrap-tagsinput.css">
     <style type="text/css">
         .form-alert form .input-error {
-        	border-color: #de615e;
+            border-color: #de615e;
         }
 
         .bootstrap-tagsinput {
@@ -47,165 +48,168 @@
     </style>
 
     {% if type == "conversation" %}
-    <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon">
+        <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon">
 
-    <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css">
-    <link rel="stylesheet" type="text/css" href="static/css/conversation.css"/>
-    <script type="text/javascript" src="static/js/jquery-3.2.1.min.js"></script>
-    <script type="text/javascript" src="static/js/conversation.js"></script>
+        <link rel="stylesheet" type="text/css"
+              href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css">
+        <link rel="stylesheet" type="text/css" href="static/css/conversation.css"/>
+        <script type="text/javascript" src="static/js/jquery-3.2.1.min.js"></script>
+        <script type="text/javascript" src="static/js/conversation.js"></script>
     {% endif %}
 
     {% if type == "events" %}
-    <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon">
+        <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon">
 
-    <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css">
-    <link rel="stylesheet" type="text/css" href="static/css/event.css"/>
-    <script type="text/javascript" src="static/js/jquery-3.2.1.min.js"></script>
-    <script type="text/javascript" src="static/js/event.js"></script>
+        <link rel="stylesheet" type="text/css"
+              href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css">
+        <link rel="stylesheet" type="text/css" href="static/css/event.css"/>
+        <script type="text/javascript" src="static/js/jquery-3.2.1.min.js"></script>
+        <script type="text/javascript" src="static/js/event.js"></script>
     {% endif %}
 
 </head>
 
 <body>
-    <nav class="navbar navbar-inverse navbar-fixed-top">
-        <div class="container">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-                        <span class="sr-only">Toggle navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-                <a href="/Alerts" class="navbar-brand">Watchtower<br></a>
-            </div>
-            <div id="navbar" class="collapse navbar-collapse">
-                <ul class="nav navbar-nav">
-                    <li {% if type=="alertlist" or type=="editAlert" or type=="createAlert" %} class="active" {% endif %}>
-                        <a href="/Alerts">Topics</a>
-                    </li>
-                    <li {% if type=="news" %} class="active" {% endif %}>
-                        <a href="/News">News</a>
-                    </li>
-                    <li {% if type=="conversation" %} class="active" {% endif %}>
-                        <a href="/Conversations">Conversations</a>
-                    </li>
-                    <li {% if type=="influencer" %} class="active" {% endif %}>
-                        <a href="/Audience">Audience</a>
-                    </li>
-                    <li {% if type=="events" %} class="active" {% endif %}>
-                        <a href="/Events">Events</a>
-                    </li>
-                    <li>
-                        <a href="/logout">Logout</a>
-                    </li>
-                </ul>
-            </div>
-            <!--/.nav-collapse -->
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                    aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="/Alerts" class="navbar-brand">Watchtower<br></a>
         </div>
-    </nav>
-
-    {% if type == "alertlist" %}
-    <div class="container" style="padding:10px" id="alertspage">
-      {% include 'alerts.html' %}
+        <div id="navbar" class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li {% if type=="alertlist" or type=="editAlert" or type=="createAlert" %} class="active" {% endif %}>
+                    <a href="/Alerts">Topics</a>
+                </li>
+                <li {% if type=="news" %} class="active" {% endif %}>
+                    <a href="/News">News</a>
+                </li>
+                <li {% if type=="conversation" %} class="active" {% endif %}>
+                    <a href="/Conversations">Conversations</a>
+                </li>
+                <li {% if type=="influencer" %} class="active" {% endif %}>
+                    <a href="/Audience">Audience</a>
+                </li>
+                <li {% if type=="events" %} class="active" {% endif %}>
+                    <a href="/Events">Events</a>
+                </li>
+                <li>
+                    <a href="/logout">Logout</a>
+                </li>
+            </ul>
+        </div>
+        <!--/.nav-collapse -->
     </div>
-    {% endif %}
-    {% if type == "editAlert" %}
-      {% include 'alertForm.html' %}
-    {% endif %}
-    {% if type == "createAlert" %}
-      {% include 'alertForm.html' %}
-    {% endif %}
-    {% if type == "conversation" %}
-      {% include 'conversation.html'%}
-    {% endif %}
-    {% if type == "news" %}
-      {% include 'news.html'%}
-    {% endif %}
-    {% if type == "audience" %}
-      {% include 'audience.html'%}
-    {% endif %}
-    {% if type == "search" %}
-      {% include 'search.html'%}
-    {% endif %}
-    {% if type == "events" %}
-      {% include 'event.html'%}
-    {% endif %}
-    <!-- /.container -->
-    <!-- Bootstrap core JavaScript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <script src="/js/jquery.min.js"></script>
-    <script src="/js/bootstrap.min.js"></script>
-    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <script src="/js/ie10-viewport-bug-workaround.js"></script>
+</nav>
 
-    <script src="/js/jquery.babypaunch.spinner.min.js"></script>
-    <!-- for alerts -->
-    {% if type == "alertlist" %}
-      <script src="/js/bootstrap-notify.min.js"></script>
-      <script src="/js/bootstrap-notify.js"></script>
-      <!--
-      <script>
-      $(document).ready(function() {
-        var path = window.location.pathname;
-        var pathList = path.split("/");
-        if(pathList.length === 3){
-          notification(pathList[2]);
-        }
+{% if type == "alertlist" %}
+    <div class="container" style="padding:10px" id="alertspage">
+        {% include 'alerts.html' %}
+    </div>
+{% endif %}
+{% if type == "editAlert" %}
+    {% include 'alertForm.html' %}
+{% endif %}
+{% if type == "createAlert" %}
+    {% include 'alertForm.html' %}
+{% endif %}
+{% if type == "conversation" %}
+    {% include 'conversation.html' %}
+{% endif %}
+{% if type == "news" %}
+    {% include 'news.html' %}
+{% endif %}
+{% if type == "audience" %}
+    {% include 'audience.html' %}
+{% endif %}
+{% if type == "search" %}
+    {% include 'search.html' %}
+{% endif %}
+{% if type == "events" %}
+    {% include 'event.html' %}
+{% endif %}
+<!-- /.container -->
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="/js/jquery.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+<script src="/js/ie10-viewport-bug-workaround.js"></script>
 
-      });
-      </script>
-      <script>
-      function notification(alertid) {
-        setTimeout('', 10000);
-        console.log(alertid);
-        $.ajax({
-            url: "/message",
-            method: 'POST',
-            data: {
-              'alertid' : alertid,
-            }
-        }).success(function(response) {
-            var results = response.split(";");
-            var message = results[0];
-            var messagetype = results[1];
-            if(message != ""){
-              $.notify({
-                message: message
-              },
-              {
-                type: messagetype
-              })
-            }
-            console.log("message:" + message);
-        });
+<script src="/js/jquery.babypaunch.spinner.min.js"></script>
+<!-- for alerts -->
+{% if type == "alertlist" %}
+    <script src="/js/bootstrap-notify.min.js"></script>
+    <script src="/js/bootstrap-notify.js"></script>
+    <!--
+    <script>
+    $(document).ready(function() {
+      var path = window.location.pathname;
+      var pathList = path.split("/");
+      if(pathList.length === 3){
+        notification(pathList[2]);
       }
-      </script>
-    -->
-      <script>
-        function alertbuttonclick(aid, ptype) {
-              //var aid = $(this).attr("alertid");
-              //var ptype = $(this).attr("posttype");
-              console.log(ptype);
-              $.ajax({
-                  url: "/Alerts",
-                  method: 'POST',
-                  data: {
-                    'alertid' : aid,
-                    'posttype' : ptype
-                  }
-              }).success(function(html) {
-                  $('#alerts').remove();
-                  $("#alertspage").append(html);
-                  //console.log("notification :" + aid);
-                  //notification(aid);
-              });
-        }
-      </script>
 
-    {% endif %}
-    <!-- for edit form -->
-    {% if type == "editAlert" or type == "createAlert" %}
+    });
+    </script>
+    <script>
+    function notification(alertid) {
+      setTimeout('', 10000);
+      console.log(alertid);
+      $.ajax({
+          url: "/message",
+          method: 'POST',
+          data: {
+            'alertid' : alertid,
+          }
+      }).success(function(response) {
+          var results = response.split(";");
+          var message = results[0];
+          var messagetype = results[1];
+          if(message != ""){
+            $.notify({
+              message: message
+            },
+            {
+              type: messagetype
+            })
+          }
+          console.log("message:" + message);
+      });
+    }
+    </script>
+  -->
+    <script>
+        function alertbuttonclick(aid, ptype) {
+            //var aid = $(this).attr("alertid");
+            //var ptype = $(this).attr("posttype");
+            console.log(ptype);
+            $.ajax({
+                url: "/Alerts",
+                method: 'POST',
+                data: {
+                    'alertid': aid,
+                    'posttype': ptype
+                }
+            }).success(function (html) {
+                $('#alerts').remove();
+                $("#alertspage").append(html);
+                //console.log("notification :" + aid);
+                //notification(aid);
+            });
+        }
+    </script>
+
+{% endif %}
+<!-- for edit form -->
+{% if type == "editAlert" or type == "createAlert" %}
     <script src="/js/typeahead.bundle.min.js"></script>
     <script src="/js/angular.min.js"></script>
     <script src="/js/rainbow.min.js"></script>
@@ -214,193 +218,103 @@
     <script src="/js/generic.js"></script>
     <script src="/js/jquery.babypaunch.spinner.min.js"></script>
     <script>
-    var main = function(){
-      $(".keyword > .bootstrap-tagsinput").on('DOMSubtreeModified', function() {
-          var keywordCount = $(".keyword > .bootstrap-tagsinput > .tag").length;
-          var limitLeft = 10 - keywordCount;
-          if(limitLeft <= 0){
-            $('.counter').css('color', 'red');
-            $(".keyword > .bootstrap-tagsinput > input").prop('disabled', true);
-            $('.counter').text("Your keyword limit is full. In order to add a new keyword, please remove old ones.");
-          }else{
-            $('.counter').css('color', 'black');
-            $('.counter').text("Keyword Limit: " + limitLeft);
-            $(".keyword > .bootstrap-tagsinput > input").prop('disabled', false);
-          }
-      });
-    };
-    $(document).ready(main);
-    </script>
-
-    <script>
-        $(document).ready(function() {
-            $('#findpages').click(function(e) {
-                $('.alert-form').find('input[name="keywords"]').each(function(){
-                  if( $(this).val() == "" || $(this).val() == null) {
-                    e.preventDefault();
-                    $(".keyword > .bootstrap-tagsinput").addClass("input-error");
-                  }
-                  else {
-                    $(this).removeClass('input-error');
-                  }
-                });
-              if($('.input-error').length == 0){
-                $("#spin").spinner();
-                $('#pages').empty();
-                $("#spin").show();
-                var keys = $("#keywords").val();
-                $.ajax({
-                    url: '/getPages',
-                    method: 'GET',
-                    data: {
-                        'keywords': keys,
-                    },
-                    timeout: 10000,
-                    error: function () {
-                         $('#pages').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");
-                         $("#spin").hide();
-                    }
-                }).success(function(html) {
-                    $('#pages').append(html);
-                    $("#spin").hide();
-                });
-              }
-              });
+        var main = function () {
+            $(".keyword > .bootstrap-tagsinput").on('DOMSubtreeModified', function () {
+                var keywordCount = $(".keyword > .bootstrap-tagsinput > .tag").length;
+                var limitLeft = 10 - keywordCount;
+                if (limitLeft <= 0) {
+                    $('.counter').css('color', 'red');
+                    $(".keyword > .bootstrap-tagsinput > input").prop('disabled', true);
+                    $('.counter').text("Your keyword limit is full. In order to add a new keyword, please remove old ones.");
+                } else {
+                    $('.counter').css('color', 'black');
+                    $('.counter').text("Keyword Limit: " + limitLeft);
+                    $(".keyword > .bootstrap-tagsinput > input").prop('disabled', false);
+                }
             });
+        };
+        $(document).ready(main);
     </script>
 
     <script>
-        $(document).ready(function() {
-            $('#previewbutton').click(function(e) {
-                $('.alert-form').find('input[name="alertname"], input[name="description"], input[name="keywords"], select[name="languages"]').each(function(){
-                  if( $(this).val() == "" || $(this).val() == null) {
-                    e.preventDefault();
-                    if($(this).attr("name") == "keywords"){
-                      $(".keyword > .bootstrap-tagsinput").addClass("input-error");
+        $(document).ready(function () {
+            $('#findpages').click(function (e) {
+                $('.alert-form').find('input[name="keywords"]').each(function () {
+                    if ($(this).val() == "" || $(this).val() == null) {
+                        e.preventDefault();
+                        $(".keyword > .bootstrap-tagsinput").addClass("input-error");
                     }
-                    else{
-                      $(this).addClass('input-error');
+                    else {
+                        $(this).removeClass('input-error');
                     }
-                  }
-                  else {
-                    $(this).removeClass('input-error');
-                  }
                 });
-              if($('.input-error').length == 0){
-                $("#spin").spinner();
-                $('#preview').empty();
-                $("#spin").show();
-                var keys = $("#keywords").val();
-                var exkeys = $("#excludedkeywords").val();
-                var langs = $("#languages").val().join();
-                $.ajax({
-                    url: '/preview',
-                    method: 'POST',
-                    data: {
-                        'keywords': keys,
-                        'languages': langs,
-                        'excludedkeywords': exkeys
-                    },
-                    timeout: 10000,
-                    error: function () {
-                         $('#preview').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");
-                         $("#spin").hide();
-                    }
-                }).success(function(html) {
-                    $('#preview').append(html);
-                    var interval = setInterval(function() { // this code is executed every 500 milliseconds:
-                        console.log("I'm waiting");
-                        if($('blockquote').length === 0) {
-                            clearInterval(interval);
-                            $('.twitter-tweet-error').remove()
-                            $('#spin').hide();
-                        }
-
-                    }, 500);
-                });
-              }
-              });
-            });
-    </script>
-
-    <script>
-
-    jQuery(document).ready(function() {
-        $('.alert-form  input[name="alertname"], .alert-form  input[name="description"], .alert-form  select[name="languages"]').on('focus', function() {
-          $(this).removeClass('input-error');
-        });
-        $(".keyword > .bootstrap-tagsinput").on('DOMSubtreeModified', function() {
-          $(this).removeClass('input-error');
-        });
-
-        $('.alert-form').on('submit', function(e) {
-
-          $(this).find('input[name="alertname"], input[name="description"], input[name="keywords"], select[name="languages"]').each(function(){
-            if( $(this).val() == "" || $(this).val() == null) {
-              e.preventDefault();
-              if($(this).attr("name") == "keywords"){
-                $(".bootstrap-tagsinput").addClass("input-error")
-              }
-              else{
-                $(this).addClass('input-error');
-              }
-            }
-            else {
-              $(this).removeClass('input-error');
-            }
-          });
-
-        });
-
-    });
-
-    </script>
-    {% endif %}
-    <!-- for feed -->
-    {% if type == "feed" %}
-    <script>
-    $(document).ready(function() {
-      if($('#feedDiv').length != 0){
-      $("#spin").spinner();
-      $('#spin').show();
-      var interval = setInterval(function() { // this code is executed every 500 milliseconds:
-          if($('blockquote').length === $('.twitter-tweet-error').length ) {
-              clearInterval(interval);
-              $('.twitter-tweet-error').remove()
-              $('#spin').hide();
-          }
-
-      }, 500);
-    }
-    });
-    </script>
-    <script>
-        $(".dropdown-menu").on('click', 'li a', function() {
-            var selText = $(this).children("h4").html();
-            $(this).parent('li').siblings().removeClass('active');
-            $(this).parents('.btn-group').find('.selection').html(selText);
-            $(this).parents('li').addClass("active");
-        });
-    </script>
-    <script>
-        $(document).ready(function() {
-            $(window).scroll(function() {
-                if ($(window).scrollTop() + $(window).height() == $(document).height()){
-                  if($('#feedDiv').length != 0){
+                if ($('.input-error').length == 0) {
+                    $("#spin").spinner();
+                    $('#pages').empty();
                     $("#spin").show();
-                    var tid = $("ol > div").last().attr("tweetid");
-                    var aid = $("ol").attr("alertid");
+                    var keys = $("#keywords").val();
                     $.ajax({
-                        url: '/Feed/scroll',
+                        url: '/getPages',
+                        method: 'GET',
+                        data: {
+                            'keywords': keys,
+                        },
+                        timeout: 10000,
+                        error: function () {
+                            $('#pages').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");
+                            $("#spin").hide();
+                        }
+                    }).success(function (html) {
+                        $('#pages').append(html);
+                        $("#spin").hide();
+                    });
+                }
+            });
+        });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            $('#previewbutton').click(function (e) {
+                $('.alert-form').find('input[name="alertname"], input[name="description"], input[name="keywords"], select[name="languages"]').each(function () {
+                    if ($(this).val() == "" || $(this).val() == null) {
+                        e.preventDefault();
+                        if ($(this).attr("name") == "keywords") {
+                            $(".keyword > .bootstrap-tagsinput").addClass("input-error");
+                        }
+                        else {
+                            $(this).addClass('input-error');
+                        }
+                    }
+                    else {
+                        $(this).removeClass('input-error');
+                    }
+                });
+                if ($('.input-error').length == 0) {
+                    $("#spin").spinner();
+                    $('#preview').empty();
+                    $("#spin").show();
+                    var keys = $("#keywords").val();
+                    var exkeys = $("#excludedkeywords").val();
+                    var langs = $("#languages").val().join();
+                    $.ajax({
+                        url: '/preview',
                         method: 'POST',
                         data: {
-                            'lastTweetId': tid,
-                            'alertid': aid
+                            'keywords': keys,
+                            'languages': langs,
+                            'excludedkeywords': exkeys
+                        },
+                        timeout: 10000,
+                        error: function () {
+                            $('#preview').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");
+                            $("#spin").hide();
                         }
-                    }).success(function(html) {
-                        $('#tweets').append(html);
-                        var interval = setInterval(function() { // this code is executed every 500 milliseconds:
-                            if($('blockquote').length === $('.twitter-tweet-error').length ) {
+                    }).success(function (html) {
+                        $('#preview').append(html);
+                        var interval = setInterval(function () { // this code is executed every 500 milliseconds:
+                            console.log("I'm waiting");
+                            if ($('blockquote').length === 0) {
                                 clearInterval(interval);
                                 $('.twitter-tweet-error').remove()
                                 $('#spin').hide();
@@ -408,15 +322,105 @@
 
                         }, 500);
                     });
-                  }
+                }
+            });
+        });
+    </script>
+
+    <script>
+
+        jQuery(document).ready(function () {
+            $('.alert-form  input[name="alertname"], .alert-form  input[name="description"], .alert-form  select[name="languages"]').on('focus', function () {
+                $(this).removeClass('input-error');
+            });
+            $(".keyword > .bootstrap-tagsinput").on('DOMSubtreeModified', function () {
+                $(this).removeClass('input-error');
+            });
+
+            $('.alert-form').on('submit', function (e) {
+
+                $(this).find('input[name="alertname"], input[name="description"], input[name="keywords"], select[name="languages"]').each(function () {
+                    if ($(this).val() == "" || $(this).val() == null) {
+                        e.preventDefault();
+                        if ($(this).attr("name") == "keywords") {
+                            $(".bootstrap-tagsinput").addClass("input-error")
+                        }
+                        else {
+                            $(this).addClass('input-error');
+                        }
+                    }
+                    else {
+                        $(this).removeClass('input-error');
+                    }
+                });
+
+            });
+
+        });
+
+    </script>
+{% endif %}
+<!-- for feed -->
+{% if type == "feed" %}
+    <script>
+        $(document).ready(function () {
+            if ($('#feedDiv').length != 0) {
+                $("#spin").spinner();
+                $('#spin').show();
+                var interval = setInterval(function () { // this code is executed every 500 milliseconds:
+                    if ($('blockquote').length === $('.twitter-tweet-error').length) {
+                        clearInterval(interval);
+                        $('.twitter-tweet-error').remove()
+                        $('#spin').hide();
+                    }
+
+                }, 500);
+            }
+        });
+    </script>
+    <script>
+        $(".dropdown-menu").on('click', 'li a', function () {
+            var selText = $(this).children("h4").html();
+            $(this).parent('li').siblings().removeClass('active');
+            $(this).parents('.btn-group').find('.selection').html(selText);
+            $(this).parents('li').addClass("active");
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            $(window).scroll(function () {
+                if ($(window).scrollTop() + $(window).height() == $(document).height()) {
+                    if ($('#feedDiv').length != 0) {
+                        $("#spin").show();
+                        var tid = $("ol > div").last().attr("tweetid");
+                        var aid = $("ol").attr("alertid");
+                        $.ajax({
+                            url: '/Feed/scroll',
+                            method: 'POST',
+                            data: {
+                                'lastTweetId': tid,
+                                'alertid': aid
+                            }
+                        }).success(function (html) {
+                            $('#tweets').append(html);
+                            var interval = setInterval(function () { // this code is executed every 500 milliseconds:
+                                if ($('blockquote').length === $('.twitter-tweet-error').length) {
+                                    clearInterval(interval);
+                                    $('.twitter-tweet-error').remove()
+                                    $('#spin').hide();
+                                }
+
+                            }, 500);
+                        });
+                    }
                 }
             });
         });
     </script>
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             $("#spin").spinner();
-            $('a.feedalerts').click(function() {
+            $('a.feedalerts').click(function () {
                 $('#feedcontainer').empty();
                 $("#spin").show();
                 var aid = $(this).attr("data-id");
@@ -428,15 +432,15 @@
                     },
                     timeout: 10000,
                     error: function () {
-                         $('#feedcontainer').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");
-                         $("#spin").hide();
+                        $('#feedcontainer').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");
+                        $("#spin").hide();
                     }
-                }).success(function(html) {
+                }).success(function (html) {
                     $('#feedcontainer').empty();
                     $('#feedcontainer').append(html);
-                    var interval = setInterval(function() { // this code is executed every 500 milliseconds:
+                    var interval = setInterval(function () { // this code is executed every 500 milliseconds:
                         console.log("I'm waiting");
-                        if($('blockquote').length === $('.twitter-tweet-error').length ) {
+                        if ($('blockquote').length === $('.twitter-tweet-error').length) {
                             clearInterval(interval);
                             $('.twitter-tweet-error').remove()
                             $('#spin').hide();
@@ -448,29 +452,29 @@
         });
     </script>
     <script>
-        $(document).ready(function() {
-          if($('#feedDiv').length != 0){
-            setInterval(function() {
-                var tid = $("ol > div").first().attr("tweetid") || -1;
-                var aid = $("ol").attr("alertid");
-                $.ajax({
-                    url: '/newTweets',
-                    method: 'POST',
-                    data: {
-                        'alertid': aid,
-                        'tweetid': tid
-                    }
-                }).success(function(response) {
-                    response = parseInt(response);
-                    console.log(response);
-                    if (response > 0) {
-                        $('#newTweetsButton').remove();
-                        var html = "<button type='button' onclick='refreshTweets();' id='newTweetsButton' style='width: 100%' class='btn btn-primary'>" + response + " new tweets</button>";
-                        $('#tweets').prepend(html);
-                    }
-                });
-            }, 10000);
-          }
+        $(document).ready(function () {
+            if ($('#feedDiv').length != 0) {
+                setInterval(function () {
+                    var tid = $("ol > div").first().attr("tweetid") || -1;
+                    var aid = $("ol").attr("alertid");
+                    $.ajax({
+                        url: '/newTweets',
+                        method: 'POST',
+                        data: {
+                            'alertid': aid,
+                            'tweetid': tid
+                        }
+                    }).success(function (response) {
+                        response = parseInt(response);
+                        console.log(response);
+                        if (response > 0) {
+                            $('#newTweetsButton').remove();
+                            var html = "<button type='button' onclick='refreshTweets();' id='newTweetsButton' style='width: 100%' class='btn btn-primary'>" + response + " new tweets</button>";
+                            $('#tweets').prepend(html);
+                        }
+                    });
+                }, 10000);
+            }
         });
     </script>
     <script>
@@ -485,13 +489,13 @@
                     'alertid': aid,
                     'tweetid': tid
                 }
-            }).success(function(html) {
+            }).success(function (html) {
                 $('#newTweetsButton').remove();
                 $('p').remove();
                 $('#tweets').prepend(html);
-                var interval = setInterval(function() { // this code is executed every 500 milliseconds:
+                var interval = setInterval(function () { // this code is executed every 500 milliseconds:
                     console.log("I'm waiting");
-                    if($('blockquote').length === $('.twitter-tweet-error').length ) {
+                    if ($('blockquote').length === $('.twitter-tweet-error').length) {
                         clearInterval(interval);
                         $('.twitter-tweet-error').remove()
                         $('#spin').hide();
@@ -501,11 +505,11 @@
             });
         }
     </script>
-    {% endif %}
+{% endif %}
 
-    {% if type == "news" %}
+{% if type == "news" %}
     <script>
-        $(".dropdown-menu").on('click', 'li a', function() {
+        $(".dropdown-menu").on('click', 'li a', function () {
             var selText = $(this).children("h4").html();
             $(this).parent('li').siblings().removeClass('active');
             $(this).parents('.btn-group').find('.selection').html(selText);
@@ -513,50 +517,50 @@
         });
     </script>
     <script>
-        $(document).ready(function() {
-            $(window).scroll(function() {
-                if ($(window).scrollTop() + $(window).height() == $(document).height()){
-                  if($('#newsDiv').length != 0){
-                    $("#spin").show();
-                    var ncursor = $("ol > div").last().attr("cursor");
-                    var aid = $("ol").attr("alertid");
-                    var date = $('#newscontainer').attr("date");
-                    $.ajax({
-                        url: '/News/scroll',
-                        method: 'POST',
-                        data: {
-                            'next_cursor': ncursor,
-                            'alertid': aid,
-                            'date': date
-                        }
-                    }).success(function(html) {
-                        $('#news').append(html);
-                        $("#spin").hide();
-                    });
-                  }
+        $(document).ready(function () {
+            $(window).scroll(function () {
+                if ($(window).scrollTop() + $(window).height() == $(document).height()) {
+                    if ($('#newsDiv').length != 0) {
+                        $("#spin").show();
+                        var ncursor = $("ol > div").last().attr("cursor");
+                        var aid = $("ol").attr("alertid");
+                        var date = $('#newscontainer').attr("date");
+                        $.ajax({
+                            url: '/News/scroll',
+                            method: 'POST',
+                            data: {
+                                'next_cursor': ncursor,
+                                'alertid': aid,
+                                'date': date
+                            }
+                        }).success(function (html) {
+                            $('#news').append(html);
+                            $("#spin").hide();
+                        });
+                    }
                 }
             });
         });
     </script>
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             $("#spin").spinner();
-            $('a.newsalerts').click(function() {
+            $('a.newsalerts').click(function () {
                 $('#newscontainer').empty();
                 $("#spin").show();
                 $("#date_buttons").show();
                 var aid = $(this).attr("data-id");
                 var date = 'yesterday';
                 $('#newscontainer').attr("date", date);
-                var children=$('#date_buttons').children();
-                children.each(function(){
-                  if($(this).attr('date') == date){
-                    $(this).removeClass('btn-default');
-                    $(this).addClass('btn-success');
-                  }else{
-                    $(this).removeClass('btn-success');
-                    $(this).addClass('btn-default');
-                  }
+                var children = $('#date_buttons').children();
+                children.each(function () {
+                    if ($(this).attr('date') == date) {
+                        $(this).removeClass('btn-default');
+                        $(this).addClass('btn-success');
+                    } else {
+                        $(this).removeClass('btn-success');
+                        $(this).addClass('btn-default');
+                    }
                 });
                 $.ajax({
                     url: '/News',
@@ -567,10 +571,10 @@
                     },
                     timeout: 10000,
                     error: function () {
-                         $('#newscontainer').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");
-                         $("#spin").hide();
+                        $('#newscontainer').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");
+                        $("#spin").hide();
                     }
-                }).success(function(html) {
+                }).success(function (html) {
                     $('#newscontainer').empty();
                     $('#newscontainer').append(html);
                     $("#spin").hide();
@@ -579,98 +583,98 @@
         });
     </script>
     <script>
-    function getDate(date) {
-      var aid = $("ol").attr("alertid");
-      $("#spin").show();
-      console.log(date);
-      $('#newscontainer').attr("date", date);
-      var children=$('#date_buttons').children();
-      children.each(function(){
-        if($(this).attr('date') == date){
-          $(this).removeClass('btn-default');
-          $(this).addClass('btn-success');
-        }else{
-          $(this).removeClass('btn-success');
-          $(this).addClass('btn-default');
+        function getDate(date) {
+            var aid = $("ol").attr("alertid");
+            $("#spin").show();
+            console.log(date);
+            $('#newscontainer').attr("date", date);
+            var children = $('#date_buttons').children();
+            children.each(function () {
+                if ($(this).attr('date') == date) {
+                    $(this).removeClass('btn-default');
+                    $(this).addClass('btn-success');
+                } else {
+                    $(this).removeClass('btn-success');
+                    $(this).addClass('btn-default');
+                }
+            });
+            $.ajax({
+                url: '/News',
+                method: 'POST',
+                data: {
+                    'alertid': aid,
+                    'date': date
+                },
+                timeout: 10000,
+                error: function () {
+                    $('#newscontainer').empty();
+                    $('#newscontainer').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");
+                    $("#spin").hide();
+                }
+            }).success(function (html) {
+                $('#newscontainer').empty();
+                $('#newscontainer').append(html);
+                $("#spin").hide();
+            });
         }
-      });
-      $.ajax({
-          url: '/News',
-          method: 'POST',
-          data: {
-              'alertid': aid,
-              'date': date
-          },
-          timeout: 10000,
-          error: function () {
-               $('#newscontainer').empty();
-               $('#newscontainer').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");
-               $("#spin").hide();
-          }
-      }).success(function(html) {
-          $('#newscontainer').empty();
-          $('#newscontainer').append(html);
-          $("#spin").hide();
-      });
-    }
     </script>
     <script>
-    function dummy(posttype, link_id) {
-      $("#spin").show();
-      var aid = $("ol").attr("alertid");
-      $.ajax({
-          url: '/bookmark',
-          method: 'POST',
-          data: {
-              'alertid': aid,
-              'posttype': posttype,
-              'link_id': link_id
-          },
-      }).success(function(html) {
-          $('#'.concat(link_id)).empty();
-          $('#'.concat(link_id)).append(html);
-          $("#spin").hide();
-      });
-    }
+        function dummy(posttype, link_id) {
+            $("#spin").show();
+            var aid = $("ol").attr("alertid");
+            $.ajax({
+                url: '/bookmark',
+                method: 'POST',
+                data: {
+                    'alertid': aid,
+                    'posttype': posttype,
+                    'link_id': link_id
+                },
+            }).success(function (html) {
+                $('#'.concat(link_id)).empty();
+                $('#'.concat(link_id)).append(html);
+                $("#spin").hide();
+            });
+        }
     </script>
     <script>
-    function sentiment(posttype, link_id) {
-      $("#spin").show();
-      var aid = $("ol").attr("alertid");
-      $.ajax({
-          url: '/sentiment',
-          method: 'POST',
-          data: {
-              'alertid': aid,
-              'posttype': posttype,
-              'link_id': link_id
-          },
-      }).success(function(html) {
-          $('#sentiment_'.concat(link_id)).empty();
-          $('#sentiment_'.concat(link_id)).append(html);
-          $("#spin").hide();
-      });
-    }
+        function sentiment(posttype, link_id) {
+            $("#spin").show();
+            var aid = $("ol").attr("alertid");
+            $.ajax({
+                url: '/sentiment',
+                method: 'POST',
+                data: {
+                    'alertid': aid,
+                    'posttype': posttype,
+                    'link_id': link_id
+                },
+            }).success(function (html) {
+                $('#sentiment_'.concat(link_id)).empty();
+                $('#sentiment_'.concat(link_id)).append(html);
+                $("#spin").hide();
+            });
+        }
     </script>
     <script>
-    function ban_domain(domain) {
-      $("#spin").show();
-      var aid = $("ol").attr("alertid");
-      $.ajax({
-          url: '/domain',
-          method: 'POST',
-          data: {
-              'alertid': aid,
-              'domain': domain
-          },
-      }).success(function(html) {
-        $("[domain='".concat(domain).concat("']")).remove();
-        $("#spin").hide();
-      });
-    }
+        function ban_domain(domain) {
+            $("#spin").show();
+            var aid = $("ol").attr("alertid");
+            $.ajax({
+                url: '/domain',
+                method: 'POST',
+                data: {
+                    'alertid': aid,
+                    'domain': domain
+                },
+            }).success(function (html) {
+                $("[domain='".concat(domain).concat("']")).remove();
+                $("#spin").hide();
+            });
+        }
     </script>
-    {% endif %}
-    {% if type == "search" %}
+{% endif %}
+{% if type == "search" %}
     <script src="/js/typeahead.bundle.min.js"></script>
     <script src="/js/angular.min.js"></script>
     <script src="/js/rainbow.min.js"></script>
@@ -679,8 +683,8 @@
     <script src="/js/generic.js"></script>
     <script src="/js/jquery.babypaunch.spinner.min.js"></script>
     <script>
-        $(document).ready(function() {
-            $('#searchButton').click(function(e) {
+        $(document).ready(function () {
+            $('#searchButton').click(function (e) {
                 $("#spin").spinner();
                 $('#newscontainer').empty();
                 $("#spin").show();
@@ -689,23 +693,23 @@
                 var cities = $("#cities").val();
                 var countries = $("#countries").val();
                 var langs;
-                if($("#languages").val() === null) {
-                  langs = "";
+                if ($("#languages").val() === null) {
+                    langs = "";
                 } else {
-                  langs = $("#languages").val().join();
+                    langs = $("#languages").val().join();
                 }
                 var mention_location = $("#mention_location").val();
                 var mention_language;
-                if($("#mention_language").val() === null) {
-                  mention_language = "";
+                if ($("#mention_language").val() === null) {
+                    mention_language = "";
                 } else {
-                  mention_language = $("#mention_language").val().join();
+                    mention_language = $("#mention_language").val().join();
                 }
                 var ncursor;
                 if ($("ol > div").last().attr("cursor") === undefined) {
-                  ncursor = 0;
+                    ncursor = 0;
                 } else {
-                  ncursor = $("ol > div").last().attr("cursor");
+                    ncursor = $("ol > div").last().attr("cursor");
                 }
 
 
@@ -724,81 +728,81 @@
                     },
                     timeout: 10000,
                     error: function () {
-                         $('#newscontainer').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");
-                         $("#spin").hide();
+                        $('#newscontainer').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");
+                        $("#spin").hide();
                     }
-                }).success(function(html) {
+                }).success(function (html) {
                     $('#newscontainer').append(html);
                     $("#spin").hide();
                 });
-              });
             });
+        });
     </script>
 
     <script>
-        $(document).ready(function() {
-            $(window).scroll(function() {
-                if ($(window).scrollTop() + $(window).height() == $(document).height()){
+        $(document).ready(function () {
+            $(window).scroll(function () {
+                if ($(window).scrollTop() + $(window).height() == $(document).height()) {
                     $("#spin").show();
                     var keys = $("#keywords").val();
                     var domains = $("#domains").val();
                     var cities = $("#cities").val();
                     var countries = $("#countries").val();
                     var langs;
-                    if($("#languages").val() === null) {
-                      langs = "";
+                    if ($("#languages").val() === null) {
+                        langs = "";
                     } else {
-                      langs = $("#languages").val().join();
+                        langs = $("#languages").val().join();
                     }
                     var mention_location = $("#mention_location").val();
                     var mention_language;
-                    if($("#mention_language").val() === null) {
-                      mention_language = "";
+                    if ($("#mention_language").val() === null) {
+                        mention_language = "";
                     } else {
-                      mention_language = $("#mention_language").val().join();
+                        mention_language = $("#mention_language").val().join();
                     }
                     var ncursor;
                     if ($("ol > div").last().attr("cursor") === undefined) {
-                      ncursor = -1;
+                        ncursor = -1;
                     } else {
-                      ncursor = $("ol > div").last().attr("cursor");
+                        ncursor = $("ol > div").last().attr("cursor");
                     }
 
                     if (ncursor != 0) {
-                      $.ajax({
-                          url: '/get_news/scroll',
-                          method: 'GET',
-                          data: {
-                              'keywords': keys,
-                              'domains': domains,
-                              'languages': langs,
-                              'cities': cities,
-                              'countries': countries,
-                              'mention_language': mention_language,
-                              'mention_location': mention_location,
-                              'cursor': ncursor
-                          },
-                          timeout: 10000,
-                          error: function () {
-                               $('#newscontainer').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");
-                               $("#spin").hide();
-                          }
-                      }).success(function(html) {
-                          $('#news').append(html);
-                          $("#spin").hide();
-                      });
+                        $.ajax({
+                            url: '/get_news/scroll',
+                            method: 'GET',
+                            data: {
+                                'keywords': keys,
+                                'domains': domains,
+                                'languages': langs,
+                                'cities': cities,
+                                'countries': countries,
+                                'mention_language': mention_language,
+                                'mention_location': mention_location,
+                                'cursor': ncursor
+                            },
+                            timeout: 10000,
+                            error: function () {
+                                $('#newscontainer').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");
+                                $("#spin").hide();
+                            }
+                        }).success(function (html) {
+                            $('#news').append(html);
+                            $("#spin").hide();
+                        });
                     } else {
-                      $("#spin").hide();
+                        $("#spin").hide();
                     }
                 }
             });
         });
     </script>
-    {% endif %}
+{% endif %}
 
-    {% if type == "audience" %}
+{% if type == "audience" %}
     <script>
-        $(".dropdown-menu").on('click', 'li a', function() {
+        $(".dropdown-menu").on('click', 'li a', function () {
             var selText = $(this).children("h4").html();
             $(this).parent('li').siblings().removeClass('active');
             $(this).parents('.btn-group').find('.selection').html(selText);
@@ -806,9 +810,9 @@
         });
     </script>
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             $("#spin").spinner();
-            $('a.audiencealerts').click(function() {
+            $('a.audiencealerts').click(function () {
                 $('#audiencecontainer').empty();
                 $("#spin").show();
                 var aid = $(this).attr("data-id");
@@ -820,10 +824,10 @@
                     },
                     timeout: 10000,
                     error: function () {
-                         $('#audiencecontainer').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");
-                         $("#spin").hide();
+                        $('#audiencecontainer').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");
+                        $("#spin").hide();
                     }
-                }).success(function(html) {
+                }).success(function (html) {
                     $('#audiencecontainer').empty();
                     $('#audiencecontainer').append(html);
                     $("#spin").hide();
@@ -831,7 +835,7 @@
             });
         });
     </script>
-    {% endif %}
+{% endif %}
 </body>
 
 </html>

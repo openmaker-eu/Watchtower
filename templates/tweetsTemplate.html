@@ -1,8 +1,8 @@
 {% for tweet in tweets %}
-<div style="text-align:center" tweetid="{{tweet['tweetDBId']}}">
-    <blockquote class="twitter-tweet tw-align-center" data-cards="hidden" lang="en">
-      <a href="http://twitter.com/{{tweet['user']['screen_name']}}/statuses/{{tweet['id']}}"></a>
-    </blockquote>
-</div>
+    <div style="text-align:center" tweetid="{{ tweet['tweetDBId'] }}">
+        <blockquote class="twitter-tweet tw-align-center" data-cards="hidden" lang="en">
+            <a href="http://twitter.com/{{ tweet['user']['screen_name'] }}/statuses/{{ tweet['id'] }}"></a>
+        </blockquote>
+    </div>
 {% endfor %}
 <script type="text/javascript" async defer src="/js/widgets.js"></script>

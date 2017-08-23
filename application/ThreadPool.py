@@ -1,8 +1,10 @@
-from threading import Thread
 from queue import Queue
+from threading import Thread
+
 
 class Worker(Thread):
     """ Thread executing tasks from a given tasks queue """
+
     def __init__(self, tasks):
         Thread.__init__(self)
         self.tasks = tasks
@@ -24,6 +26,7 @@ class Worker(Thread):
 
 class ThreadPool:
     """ Pool of threads consuming tasks from a queue """
+
     def __init__(self, num_threads, more_than_one_parameter):
         self.tasks = Queue(num_threads)
         self.more_than_one_parameter = more_than_one_parameter

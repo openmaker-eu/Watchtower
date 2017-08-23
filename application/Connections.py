@@ -1,13 +1,16 @@
 from __future__ import print_function
-import pymongo
+
 import psycopg2
+import pymongo
+
 from application.utils.Singleton import Singleton
+
 
 @Singleton
 class Connection:
     MongoDBClient = None
     PostGreSQLConnect = None
-    cur = None # PostgreSQL
+    cur = None  # PostgreSQL
 
     def __init__(self):
         try:
@@ -22,7 +25,8 @@ class Connection:
             self.newsPoolDB = self.MongoDBClient.newsPool
             self.filteredNewsPoolDB = self.MongoDBClient.filteredNewsPool
             self.infDB = self.MongoDBClient.influenceRanks
-            self.PostGreSQLConnect = psycopg2.connect("dbname='openmakerdb' user='openmakerpsql' host='138.68.92.181' password='smio1EUp'")
+            self.PostGreSQLConnect = psycopg2.connect(
+                "dbname='openmakerdb' user='openmakerpsql' host='138.68.92.181' password='smio1EUp'")
             self.cur = self.PostGreSQLConnect.cursor()
             print("new connection")
         except Exception as e:

@@ -1,36 +1,37 @@
-import re
-import search
-import pymongo
-from application.Connections import Connection
-from time import gmtime, strftime, strptime
-import time
 import json
+import time
+
 import logic
+from application.Connections import Connection
+
 
 def getThemes(userid):
     Connection.Instance().cur.execute("select alertid, alertname from alerts where userid = %s", [userid])
     var = Connection.Instance().cur.fetchall()
-    themes = [{'alertid':i[0], 'name':i[1]} for i in var]
+    themes = [{'alertid': i[0], 'name': i[1]} for i in var]
     result = {}
     result['themes'] = themes
     return json.dumps(result, indent=4)
 
+
 def getFeeds(themename, date, cursor):
-    dates=['all', 'yesterday', 'week', 'month']
+    dates = ['all', 'yesterday', 'week', 'month']
     result = {}
     if date not in dates:
         result['Error'] = 'invalid date'
         return json.dumps(result, indent=4)
     date = determine_date(date)
     themeid = str(logic.getAlertId(themename))
-    length = len(list(Connection.Instance().db[themeid].aggregate([{'$match': {'timestamp_ms': {'$gte': date} }},\
-                                                                    {'$unwind': "$entities.urls" },\
-                                                                    {'$group' : {'_id' :"$entities.urls.expanded_url" , 'total':{'$sum': 1}}}])))
-    feeds = Connection.Instance().db[themeid].aggregate([{'$match': {'timestamp_ms': {'$gte': date} }},\
-                                                         {'$unwind': "$entities.urls" },\
-                                                         {'$group' : {'_id' :"$entities.urls.expanded_url" , 'total':{'$sum': 1}}},\
-                                                         {'$sort': {'total': -1}},\
-                                                         {'$skip': cursor},\
+    length = len(list(Connection.Instance().db[themeid].aggregate([{'$match': {'timestamp_ms': {'$gte': date}}}, \
+                                                                   {'$unwind': "$entities.urls"}, \
+                                                                   {'$group': {'_id': "$entities.urls.expanded_url",
+                                                                               'total': {'$sum': 1}}}])))
+    feeds = Connection.Instance().db[themeid].aggregate([{'$match': {'timestamp_ms': {'$gte': date}}}, \
+                                                         {'$unwind': "$entities.urls"}, \
+                                                         {'$group': {'_id': "$entities.urls.expanded_url",
+                                                                     'total': {'$sum': 1}}}, \
+                                                         {'$sort': {'total': -1}}, \
+                                                         {'$skip': cursor}, \
                                                          {'$limit': 20}])
     feeds = list(feeds)
     last_feeds = []
@@ -41,27 +42,30 @@ def getFeeds(themename, date, cursor):
         if cursor >= length:
             cursor = length
         result['next_cursor'] = cursor
-    last_feeds = [i['_id']  for i in feeds if i['_id'] != None]
+    last_feeds = [i['_id'] for i in feeds if i['_id'] != None]
     result['cursor_length'] = length
     result['feeds'] = last_feeds
     return json.dumps(result, indent=4)
 
+
 def getFeedsGoose(themename, date, cursor):
-    dates=['all', 'yesterday', 'week', 'month']
+    dates = ['all', 'yesterday', 'week', 'month']
     result = {}
     if date not in dates:
         result['Error'] = 'invalid date'
         return json.dumps(result, indent=4)
     date = determine_date(date)
     themeid = str(logic.getAlertId(themename))
-    length = len(list(Connection.Instance().db[themeid].aggregate([{'$match': {'timestamp_ms': {'$gte': date} }},\
-                                                                    {'$unwind': "$entities.urls" },\
-                                                                    {'$group' : {'_id' :"$entities.urls.expanded_url" , 'total':{'$sum': 1}}}])))
-    feeds = Connection.Instance().db[themeid].aggregate([{'$match': {'timestamp_ms': {'$gte': date} }},\
-                                                         {'$unwind': "$entities.urls" },\
-                                                         {'$group' : {'_id' :"$entities.urls.expanded_url" , 'total':{'$sum': 1}}},\
-                                                         {'$sort': {'total': -1}},\
-                                                         {'$skip': cursor},\
+    length = len(list(Connection.Instance().db[themeid].aggregate([{'$match': {'timestamp_ms': {'$gte': date}}}, \
+                                                                   {'$unwind': "$entities.urls"}, \
+                                                                   {'$group': {'_id': "$entities.urls.expanded_url",
+                                                                               'total': {'$sum': 1}}}])))
+    feeds = Connection.Instance().db[themeid].aggregate([{'$match': {'timestamp_ms': {'$gte': date}}}, \
+                                                         {'$unwind': "$entities.urls"}, \
+                                                         {'$group': {'_id': "$entities.urls.expanded_url",
+                                                                     'total': {'$sum': 1}}}, \
+                                                         {'$sort': {'total': -1}}, \
+                                                         {'$skip': cursor}, \
                                                          {'$limit': 20}])
     feeds = list(feeds)
     last_feeds = []
@@ -77,29 +81,33 @@ def getFeedsGoose(themename, date, cursor):
             try:
                 g = Goose()
                 article = g.extract(url=link['_id'])
-                last_feeds.append({'url': link['_id'], 'im':article.top_image.src, 'title': article.title.upper(), 'description': article.meta_description})
+                last_feeds.append({'url': link['_id'], 'im': article.top_image.src, 'title': article.title.upper(),
+                                   'description': article.meta_description})
             except Exception as e:
                 pass
     result['cursor_length'] = length
     result['feeds'] = last_feeds
     return json.dumps(result, indent=4)
 
+
 def getFeedsSummary(themename, date, cursor):
-    dates=['all', 'yesterday', 'week', 'month']
+    dates = ['all', 'yesterday', 'week', 'month']
     result = {}
     if date not in dates:
         result['Error'] = 'invalid date'
         return json.dumps(result, indent=4)
     date = determine_date(date)
     themeid = str(logic.getAlertId(themename))
-    length = len(list(Connection.Instance().db[themeid].aggregate([{'$match': {'timestamp_ms': {'$gte': date} }},\
-                                                                    {'$unwind': "$entities.urls" },\
-                                                                    {'$group' : {'_id' :"$entities.urls.expanded_url" , 'total':{'$sum': 1}}}])))
-    feeds = Connection.Instance().db[themeid].aggregate([{'$match': {'timestamp_ms': {'$gte': date} }},\
-                                                         {'$unwind': "$entities.urls" },\
-                                                         {'$group' : {'_id' :"$entities.urls.expanded_url" , 'total':{'$sum': 1}}},\
-                                                         {'$sort': {'total': -1}},\
-                                                         {'$skip': cursor},\
+    length = len(list(Connection.Instance().db[themeid].aggregate([{'$match': {'timestamp_ms': {'$gte': date}}}, \
+                                                                   {'$unwind': "$entities.urls"}, \
+                                                                   {'$group': {'_id': "$entities.urls.expanded_url",
+                                                                               'total': {'$sum': 1}}}])))
+    feeds = Connection.Instance().db[themeid].aggregate([{'$match': {'timestamp_ms': {'$gte': date}}}, \
+                                                         {'$unwind': "$entities.urls"}, \
+                                                         {'$group': {'_id': "$entities.urls.expanded_url",
+                                                                     'total': {'$sum': 1}}}, \
+                                                         {'$sort': {'total': -1}}, \
+                                                         {'$skip': cursor}, \
                                                          {'$limit': 20}])
     feeds = list(feeds)
     last_feeds = []
@@ -115,12 +123,14 @@ def getFeedsSummary(themename, date, cursor):
             try:
                 s = summary.Summary(link['_id'])
                 s.extract()
-                last_feeds.append({'url': link['_id'], 'im':str(s.image), 'title': str(s.title), 'description': str(s.description)})
+                last_feeds.append(
+                    {'url': link['_id'], 'im': str(s.image), 'title': str(s.title), 'description': str(s.description)})
             except Exception as e:
                 pass
     result['cursor_length'] = length
     result['feeds'] = last_feeds
     return json.dumps(result, indent=4)
+
 
 def determine_date(date):
     current_milli_time = int(round(time.time() * 1000))
