@@ -258,7 +258,7 @@ def searchSubredditNews(topic_id, subredditNames):
             'topic_id' : topic_id,
             'mentions' : mentions
         }
-        #link_parser.calculateLinks(s)    
+        link_parser.calculateLinks(s)    
 
 if __name__ == '__main__':
     Connection.Instance().cur.execute("Select alertid, pages, subreddits, keywords from alerts;")
