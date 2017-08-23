@@ -84,10 +84,10 @@ class Application(tornado.web.Application):
             (r"/api/v1.1/get_themes", ThemesV11Handler, {'mainT':mainT}),
             (r"/api/v1.1/get_feeds", FeedsV11Handler, {'mainT':mainT}),
             (r"/api/v1.1/get_influencers", InfluencersV11Handler, {'mainT':mainT}),
-            (r"/api/v1.2/get_themes", ThemesV12Handler, {'mainT':mainT}),
-            (r"/api/v1.2/get_feeds", FeedsV12Handler, {'mainT':mainT}),
-            (r"/api/v1.2/get_influencers", InfluencersV12Handler, {'mainT':mainT}),
-            (r"/api/v1.2/get_news", NewsV12Handler, {'mainT':mainT}),
+            (r"/api/v1.2/get_topics", TopicsV12Handler, {'mainT':mainT}),
+            (r"/api/v1.2/get_news", NewsFeedsV12Handler, {'mainT':mainT}),
+            (r"/api/v1.2/get_audiences", AudiencesV12Handler, {'mainT':mainT}),
+            (r"/api/v1.2/search_news", NewsV12Handler, {'mainT':mainT}),
             (r"/api/v1.2/get_events", EventV12Handler, {'mainT':mainT}),
             (r"/api/v1.2/get_conversation", ConversationV12Handler, {'mainT':mainT}),
             (r"/api/v1.2/get_hashtags", HashtagsV12Handler, {'mainT':mainT}),
@@ -97,12 +97,12 @@ class Application(tornado.web.Application):
 
 class EventV12Handler(BaseHandler, TemplateRendering):
     def get(self):
-        topic_id = self.get_argument('themeid',None)
+        topic_id = self.get_argument('topic_id',None)
         if topic_id is None:
             self.write({})
-        filter = self.get_argument('filter','date')
+        date = self.get_argument('date','date')
         cursor = self.get_argument('cursor','0')
-        document = apiv12.getEvents(topic_id, filter, cursor)
+        document = apiv12.getEvents(topic_id, date, cursor)
         self.set_header('Content-Type', 'application/json')
         self.write(json.dumps(document,indent=4))
 
@@ -153,26 +153,25 @@ class ConversationHandler(BaseHandler, TemplateRendering):
 
 class ConversationV12Handler(BaseHandler, TemplateRendering):
     def get(self):
-        topic_id = self.get_argument("themeid",None)
+        topic_id = self.get_argument("topic_id",None)
         if topic_id is None:
             self.write({})
         timeFilter = self.get_argument("date","day")
         paging = self.get_argument("cursor","0")
         docs = apiv12.getConversations(int(topic_id),timeFilter,paging)
         self.set_header('Content-Type', 'application/json')
-        self.write(json.dumps(docs,indent=4))
+        self.write(json.dumps({'conversation':docs},indent=4))
 
-class ThemesV12Handler(BaseHandler, TemplateRendering):
+class TopicsV12Handler(BaseHandler, TemplateRendering):
     def get(self):
-        themes = apiv12.getThemes(4)
+        topics = apiv12.getTopics()
         self.set_header('Content-Type', 'application/json')
-        self.write(themes)
+        self.write(topics)
 
-class FeedsV12Handler(BaseHandler, TemplateRendering):
+class NewsFeedsV12Handler(BaseHandler, TemplateRendering):
     def get(self):
-        themename = self.get_argument("themename", None)
-        themeid = self.get_argument("themeid", None)
         forbidden_domain = self.get_argument("forbidden_domains", "").split(",")
+        topics = self.get_argument('topic_ids', "").split(",")
         try:
             cursor = int(self.get_argument("cursor"))
             if cursor == -1:
@@ -181,31 +180,27 @@ class FeedsV12Handler(BaseHandler, TemplateRendering):
             cursor = 0
             pass
         date = str(self.get_argument("date", "month"))
-        feeds = apiv12.getFeeds(themename, themeid, date, cursor, forbidden_domain)
+        feeds = apiv12.getNewsFeeds(topic_id, date, cursor, forbidden_domain, topics)
         self.set_header('Content-Type', 'application/json')
         self.write(feeds)
 
-class InfluencersV12Handler(BaseHandler, TemplateRendering):
+class AudiencesV12Handler(BaseHandler, TemplateRendering):
     def get(self):
-        themename = self.get_argument("themename", None)
-        themeid = self.get_argument("themeid", None)
-        influencers = apiv12.getInfluencers(themename, themeid)
+        topic_id = self.get_argument("topic_id", None)
+        audiences = apiv12.getAudiences(topic_id)
         self.set_header('Content-Type', 'application/json')
-        self.write(influencers)
+        self.write(audiences)
 
 class HashtagsV12Handler(BaseHandler, TemplateRendering):
     def get(self):
-        themename = self.get_argument("themename", None)
-        themeid = self.get_argument("themeid", None)
+        themeid = self.get_argument("topic_id", None)
         date = self.get_argument("date", "yesterday")
-        hashtags = apiv12.getHastags(themename, themeid, date)
+        hashtags = apiv12.getHastags(topic_id, date)
         self.set_header('Content-Type', 'application/json')
         self.write(hashtags)
 
 class NewsV12Handler(BaseHandler, TemplateRendering):
     def get(self):
-        """themename = self.get_argument("themename", None)
-        themeid = self.get_argument("themeid", None)"""
         news_ids = self.get_argument('news_ids', "").split(",")
         keywords = self.get_argument('keywords', "").split(",")
         languages = self.get_argument('languages', "").split(",")
@@ -215,8 +210,7 @@ class NewsV12Handler(BaseHandler, TemplateRendering):
         user_language = self.get_argument('mention_language', "").split(",")
         since = self.get_argument('since', "")
         until = self.get_argument('until', "")
-        topics = self.get_argument('topics', "").split(",")
-        print(countries)
+        topics = self.get_argument('topic_ids', "").split(",")
         try:
             cursor = int(self.get_argument("cursor"))
             if cursor == -1:

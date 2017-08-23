@@ -10,7 +10,7 @@ from datetime import datetime
 import time
 
 def getEvents(topic_id, filterField, cursor):
-    
+
     now = time.time()
     cursor = int(cursor)
     ret = None
@@ -49,7 +49,7 @@ def getConversations(topic_id, timeFilter, paging):
                 else:
                     comment["created_time"] = comment["created_time"][:10]+" "+comment["created_time"][11:18]
                 comments.append(comment)
-            temp = {"paging":paging,"title":submission["title"],"source":submission["source"],"comments":comments,"url":submission["url"],"commentNumber":submission["numberOfComments"]}
+            temp = {"title":submission["title"],"source":submission["source"],"comments":comments,"url":submission["url"],"commentNumber":submission["numberOfComments"]}
             if "post_text" in submission:
                 temp["post_text"] = submission["post_text"]
             else:
@@ -71,37 +71,17 @@ def my_handler(x):
     else:
         raise TypeError(x)
 
-def getThemes(userid):
+def getTopics():
     Connection.Instance().cur.execute("select alertid, alertname, description from alerts where ispublish = %s", [True])
     var = Connection.Instance().cur.fetchall()
-    themes = [{'themeid':i[0], 'themename':i[1], 'description': i[2]} for i in var]
+    topics = [{'topic_id':i[0], 'topic_name':i[1], 'description': i[2]} for i in var]
     result = {}
-    result['themes'] = themes
+    result['topics'] = topics
     return json.dumps(result, indent=4)
 
-def getFeeds(themename, themeid, date, cursor, forbidden_domain):
-    if themeid == None and themename == None:
-        return json.dumps({'feeds': "theme not found"}, indent=4)
-    elif themeid == None and themename != None:
-        try:
-            themeid = str(logic.getAlertId(themename))
-        except:
-            return json.dumps({'feeds': "theme not found"}, indent=4)
-    elif themeid != None and themename == None:
-        try:
-            themeid = int(themeid)
-            Connection.Instance().cur.execute("select alertname from alerts where alertid = %s;", [themeid])
-            var = Connection.Instance().cur.fetchall()
-            themename = var[0][0]
-        except:
-            return json.dumps({'feeds': "theme not found"}, indent=4)
-    else:
-        try:
-            temp_themeid = str(logic.getAlertId(themename))
-        except:
-            return json.dumps({'feeds': "theme not found"}, indent=4)
-        if str(temp_themeid) != str(themeid):
-            return json.dumps({'feeds': "theme not found"}, indent=4)
+def getNewsFeeds(date, cursor, forbidden_domain, topics):
+    if topics == [""]:
+        return json.dumps({}, indent=4)
 
     dates=['yesterday', 'week', 'month']
     result = {}
@@ -113,54 +93,31 @@ def getFeeds(themename, themeid, date, cursor, forbidden_domain):
     #feeds = list(feeds[0][date][cursor:cursor+20])
 
     date=crontab3.determine_date(date)
-    feeds = dateFilter.getDateList(themeid, int(date), forbidden_domain)
-    feeds = feeds[cursor:cursor+20]
+
+    news = []
+    for topic_id in topics:
+        if len(news) >= cursor+20:
+            break
+        news = news + dateFilter.getDateList(topic_id, int(date), forbidden_domain)
+
+    news = news[cursor:cursor+20]
 
     cursor = int(cursor) + 20
     if cursor >= 60:
         cursor = 0
     result['next_cursor'] = cursor
     result['next_cursor_str'] = str(cursor)
-    result['feeds'] = feeds
+    result['news'] = news
 
     return json.dumps(result, indent=4)
 
-def getInfluencers(themename, themeid):
-    if themeid == None and themename == None:
-        return json.dumps({'influencers': "theme not found"}, indent=4)
-    elif themeid == None and themename != None:
-        try:
-            themeid = str(logic.getAlertId(themename))
-        except:
-            return json.dumps({'influencers': "theme not found"}, indent=4)
-    elif themeid != None and themename == None:
-        try:
-            themeid = int(themeid)
-            Connection.Instance().cur.execute("select alertname from alerts where alertid = %s;", [themeid])
-            var = Connection.Instance().cur.fetchall()
-            themename = var[0][0]
-        except:
-            return json.dumps({'influencers': "theme not found"}, indent=4)
-    else:
-        try:
-            temp_themeid = str(logic.getAlertId(themename))
-        except:
-            return json.dumps({'influencers': "theme not found"}, indent=4)
-        if str(temp_themeid) != str(themeid):
-            return json.dumps({'influencers': "theme not found"}, indent=4)
+def getAudiences(topic_id):
+    if topic_id == None:
+        return json.dumps({}, indent=4)
 
-    result = {}
-    if themename == "arduino":
-        themename = "Arduino"
-    elif themename == "raspberry pi":
-        themename =  "RaspberryPi"
-    elif themename == "3d printer":
-        themename = "Printer"
+    audiences = list(Connection.Instance().infDB[str(topic_id)].find({}, {'_id':0, 'screen_name': 1, 'location':1, 'name':1, 'profile_image_url':1, 'lang':1, 'description':1, 'time_zone':1}).sort([('rank', pymongo.ASCENDING)]))
 
-    influencers = list(Connection.Instance().infDB[str(themename)].find({"type": "filteredUser"}, {"_id":0, "type": 0}))
-    result['influencers'] = influencers
-
-    return json.dumps(result, indent=4)
+    return json.dumps({'audiences' : audiences}, indent=4)
 
 def getNews(news_ids, keywords, languages, cities, countries, user_location, user_language, cursor, since, until, domains, topics):
     cursor = int(cursor)
@@ -239,7 +196,7 @@ def getNews(news_ids, keywords, languages, cities, countries, user_location, use
     aggregate_dictionary.append({'$match': find_dictionary})
     if user_language == [""] and user_location == [""]:
         aggregate_dictionary.append({'$project': {'mentions':0}})
-    aggregate_dictionary.append({'$project': {'_id': 0, 'bookmark':0, 'bookmark_date':0}})
+    aggregate_dictionary.append({'$project': {'_id': 0, 'bookmark':0, 'bookmark_date':0, 'location': 0}})
 
     aggregate_dictionary.append({'$sort': {'link_id' : -1}})
 
@@ -271,33 +228,10 @@ def getNews(news_ids, keywords, languages, cities, countries, user_location, use
 
     return json.dumps(result, indent=4, default=my_handler)
 
-def getHastags(themename, themeid, date):
-
-    if themeid == None and themename == None:
+def getHastags(topic_id, date):
+    if themeid == None:
         return json.dumps({}, indent=4)
 
-    elif themeid == None and themename != None:
-        try:
-            themeid = int(logic.getAlertId(themename))
-        except:
-            return json.dumps({}, indent=4)
-
-    elif themeid != None and themename == None:
-        try:
-            themeid = int(themeid)
-            Connection.Instance().cur.execute("select alertname from alerts where alertid = %s;", [themeid])
-            var = Connection.Instance().cur.fetchall()
-            themename = var[0][0]
-        except:
-            return json.dumps({}, indent=4)
-    else:
-        try:
-            temp_themeid = str(logic.getAlertId(themename))
-        except:
-            return json.dumps({}, indent=4)
-        if str(temp_themeid) != str(themeid):
-            return json.dumps({}, indent=4)
-
-    hashtags = list(Connection.Instance().hashtags[str(themeid)].find({'name': date}, {'_id': 0, 'modified_date': 0}))[0][date]
+    hashtags = list(Connection.Instance().hashtags[str(topic_id)].find({'name': date}, {'_id': 0, 'modified_date': 0}))[0][date]
 
     return json.dumps({'hashtags': hashtags}, indent=4)
