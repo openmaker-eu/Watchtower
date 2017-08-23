@@ -160,7 +160,7 @@ class ConversationV12Handler(BaseHandler, TemplateRendering):
         paging = self.get_argument("cursor","0")
         docs = apiv12.getConversations(int(topic_id),timeFilter,paging)
         self.set_header('Content-Type', 'application/json')
-        self.write(json.dumps({'conversation':docs},indent=4))
+        self.write(json.dumps({'conversations':docs},indent=4))
 
 class TopicsV12Handler(BaseHandler, TemplateRendering):
     def get(self):
