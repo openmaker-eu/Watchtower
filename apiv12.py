@@ -248,6 +248,7 @@ def getHastags(topic_id, date):
         return json.dumps({}, indent=4)
 
     hashtags = \
-    list(Connection.Instance().hashtags[str(topic_id)].find({'name': date}, {'_id': 0, 'modified_date': 0}))[0][date]
+        list(Connection.Instance().hashtags[str(topic_id)].find({'name': date}, {'_id': 0, 'modified_date': 0}))[0][
+            date]
 
     return json.dumps({'hashtags': hashtags}, indent=4)

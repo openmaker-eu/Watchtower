@@ -135,71 +135,89 @@
 <script>
     $(document).ready(function () {
         $('.has-spinner').click(function (e) {
-            $('.login-form input[type="text"], .login-form input[type="password"], .login-form textarea').on('focus', function () {
-                $(this).removeClass('input-error');
-            });
+            login();
+        });
 
-            $('.login-form').on('submit', function (e) {
-
-                $(this).find('input[type="text"], input[type="password"], textarea').each(function () {
-                    if ($(this).val() == "") {
-                        e.preventDefault();
-                        $(this).addClass('input-error');
-                    }
-                    else {
-                        $(this).removeClass('input-error');
-                    }
-                });
-
-            });
-            if ($('.input-error').length == 0) {
-                if ($("#form-password").parent().next(".validation").length != 0) // only add if not added
-                {
-                    $("#form-password").parent().next(".validation").remove();
-                }
-                if ($("#form-username").parent().next(".validation").length != 0) // only add if not added
-                {
-                    $("#form-username").parent().next(".validation").remove();
-                }
-                $(this).toggleClass('active');
-                var username = $("#form-username").val();
-                var password = $("#form-password").val();
-
-                $.ajax({
-                    url: '/login',
-                    method: 'POST',
-                    data: {
-                        'username': username,
-                        'password': password
-                    },
-                    timeout: 10000,
-                    error: function () {
-                        alert("Please, try again later.");
-                    }
-                }).success(function (response) {
-                    $(".has-spinner").toggleClass('active');
-                    if (response.response) {
-                        location.href = response.redirectUrl;
-                    }
-                    var returnedData = JSON.parse(response);
-                    var str = "<div class='validation' style='color:red;margin-top: -10px;margin-bottom:10px;'>".concat(returnedData.message.concat("</div>"));
-                    if (returnedData.error_type == 2) {
-                        if ($("#form-password").parent().next(".validation").length == 0) // only add if not added
-                        {
-                            $("#form-password").parent().after(str);
-
-                        }
-                    } else {
-                        if ($("#form-username").parent().next(".validation").length == 0) // only add if not added
-                        {
-                            $("#form-username").parent().after(str);
-
-                        }
-                    }
-                });
+        $('#form-username').keypress(function (event) {
+            if (event.keyCode == 13 || event.which == 13) {
+                $('#form-password').focus();
+                event.preventDefault();
             }
         });
+
+        $('#form-password').keypress(function (event) {
+            if (event.keyCode == 13 || event.which == 13) {
+                login();
+            }
+        });
+
     });
+
+    function login() {
+        $('.login-form input[type="text"], .login-form input[type="password"], .login-form textarea').on('focus', function () {
+            $(this).removeClass('input-error');
+        });
+
+        $('.login-form').on('submit', function (e) {
+
+            $(this).find('input[type="text"], input[type="password"], textarea').each(function () {
+                if ($(this).val() == "") {
+                    e.preventDefault();
+                    $(this).addClass('input-error');
+                }
+                else {
+                    $(this).removeClass('input-error');
+                }
+            });
+
+        });
+        if ($('.input-error').length == 0) {
+            if ($("#form-password").parent().next(".validation").length != 0) // only add if not added
+            {
+                $("#form-password").parent().next(".validation").remove();
+            }
+            if ($("#form-username").parent().next(".validation").length != 0) // only add if not added
+            {
+                $("#form-username").parent().next(".validation").remove();
+            }
+            $(this).toggleClass('active');
+            var username = $("#form-username").val();
+            var password = $("#form-password").val();
+
+            $.ajax({
+                url: '/login',
+                method: 'POST',
+                data: {
+                    'username': username,
+                    'password': password
+                },
+                timeout: 10000,
+                error: function () {
+                    alert("Please, try again later.");
+                }
+            }).success(function (response) {
+                $(".has-spinner").toggleClass('active');
+                if (response.response) {
+                    location.href = response.redirectUrl;
+                }
+                var returnedData = JSON.parse(response);
+                var str = "<div class='validation' style='color:red;margin-top: -10px;margin-bottom:10px;'>".concat(returnedData.message.concat("</div>"));
+                if (returnedData.error_type == 2) {
+                    if ($("#form-password").parent().next(".validation").length == 0) // only add if not added
+                    {
+                        $("#form-password").parent().after(str);
+
+                    }
+                } else {
+                    if ($("#form-username").parent().next(".validation").length == 0) // only add if not added
+                    {
+                        $("#form-username").parent().after(str);
+
+                    }
+                }
+            });
+        }
+    }
 </script>
 
 

@@ -99,8 +99,13 @@
                 <li {% if type=="events" %} class="active" {% endif %}>
                     <a href="/Events">Events</a>
                 </li>
-                <li>
-                    <a href="/logout">Logout</a>
+                <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">{{ username }}
+                        <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#">My Profile</a></li>
+                        <li><a href="/logout">Logout</a></li>
+                    </ul>
                 </li>
             </ul>
         </div>
@@ -125,7 +130,7 @@
 {% if type == "news" %}
     {% include 'news.html' %}
 {% endif %}
-{% if type == "audience" %}
+{% if type == "audiences" %}
     {% include 'audience.html' %}
 {% endif %}
 {% if type == "search" %}
@@ -801,6 +806,7 @@
 {% endif %}
 
 {% if type == "audience" %}
+{% if type == "audiences" %}
     <script>
         $(".dropdown-menu").on('click', 'li a', function () {
             var selText = $(this).children("h4").html();

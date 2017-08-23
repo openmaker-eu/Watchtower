@@ -5,3 +5,6 @@ timeout_decorator
 tweepy
 praw
 facebook-sdk
+jellyfish
+rq
+pycountry

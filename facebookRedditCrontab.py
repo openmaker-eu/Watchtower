@@ -1,15 +1,13 @@
 import re
 import time
 from datetime import datetime, timedelta
+from time import time
 
 import facebook
 import praw
 
 import link_parser
 from application.Connections import Connection
-
-from time import time
-
 
 
 def mineFacebookConversations(search_ids, timeFilter="day", pageNumber="5"):
@@ -238,45 +236,44 @@ def getCommentsOfSubmission(submission):
                     for x in temp:
                         commentStack.append(x)
                 s = {
-                    'submission_id' : comment._submission.id,
-                    'comment_id' : comment.id,
-                    'user' : comment.author.name,
-                    'timestamp_ms' : int(comment.created) * 1000
+                    'submission_id': comment._submission.id,
+                    'comment_id': comment.id,
+                    'user': comment.author.name,
+                    'timestamp_ms': int(comment.created) * 1000
                 }
                 comList.append(s)
             except:
                 pass
     return comList
 
+
 def searchSubredditNews(topic_id, subredditNames):
     keys = Connection.Instance().redditFacebookDB['tokens'].find_one()["reddit"]
     reddit = praw.Reddit(client_id=keys["client_id"],
                          client_secret=keys["client_secret"],
                          user_agent=keys["user_agent"],
-                        api_type=keys["api_type"])
+                         api_type=keys["api_type"])
 
     submissions = []
     for subredditName in subredditNames:
         for submission in reddit.subreddit(subredditName).top(time_filter='month'):
-            if not (re.search(r"^https://www.reddit.com",submission.url) or 
-                    re.search(r"^https://i.redd.it",submission.url) or
-                    re.search(r"imgur.com",submission.url) or
-                    re.search(r".mp4$",submission.url)):
+            if not (re.search(r"^https://www.reddit.com", submission.url) or
+                        re.search(r"^https://i.redd.it", submission.url) or
+                        re.search(r"imgur.com", submission.url) or
+                        re.search(r".mp4$", submission.url)):
                 submissions.append(submission)
-                
+
     for submission in submissions:
         mentions = getCommentsOfSubmission(submission)
         s = {
-            'channel' : 'reddit',
-            'url': submission.url,        
-            'topic_id' : topic_id,
-            'mentions' : mentions
+            'channel': 'reddit',
+            'url': submission.url,
+            'topic_id': topic_id,
+            'mentions': mentions
         }
-        
+
         if len(mentions) != 0:
             link_parser.calculateLinks(s)
-
-
 
 
 if __name__ == '__main__':

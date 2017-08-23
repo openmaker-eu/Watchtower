@@ -46,6 +46,9 @@ class BaseHandler(tornado.web.RequestHandler):
     def get_current_user(self):
         return self.get_secure_cookie("userid")
 
+    def get_current_username(self):
+        return self.get_secure_cookie("username")
+
 
 class Application(tornado.web.Application):
     def __init__(self, mainT):
@@ -144,7 +147,8 @@ class ConversationPageHandler(BaseHandler, TemplateRendering):
         variables = {
             'title': "Conversations",
             'alerts': logic.getAlertList(userid),
-            'type': "conversation"
+            'type': "conversation",
+            'username': str(tornado.escape.xhtml_escape(self.get_current_username()))
         }
         content = self.render_template(template, variables)
         self.write(content)
@@ -343,9 +347,11 @@ class LoginHandler(BaseHandler, TemplateRendering):
         self.write(content)
 
     def post(self):
-        login_info = logic.login(str(self.get_argument("username")), str(self.get_argument("password")))
+        username = self.get_argument("username")
+        login_info = logic.login(str(username), str(self.get_argument("password")))
         if login_info['response']:
             self.set_secure_cookie("userid", str(login_info['userid']))
+            self.set_secure_cookie("username", str(username))
             self.write({'response': True, 'redirectUrl': self.get_argument('next', '/Alerts')})
         else:
             self.write(json.dumps(login_info))
@@ -369,7 +375,8 @@ class AlertsHandler(BaseHandler, TemplateRendering):
             'type': "alertlist",
             'alertlimit': logic.getAlertLimit(userid),
             'threadstatus': logic.getThreadStatus(self.mainT),
-            'threadconnection': logic.getThreadConnection(self.mainT)
+            'threadconnection': logic.getThreadConnection(self.mainT),
+            'username': str(tornado.escape.xhtml_escape(self.get_current_username()))
         }
         content = self.render_template(template, variables)
         self.write(content)
@@ -394,7 +401,8 @@ class AlertsHandler(BaseHandler, TemplateRendering):
             'title': "Alerts",
             'alerts': logic.getAlertList(userid),
             'type': "alertlist",
-            'alertlimit': logic.getAlertLimit(userid)
+            'alertlimit': logic.getAlertLimit(userid),
+            'username': str(tornado.escape.xhtml_escape(self.get_current_username()))
         }
         content = self.render_template(template, variables)
         self.write(content)
@@ -540,7 +548,8 @@ class FeedHandler(BaseHandler, TemplateRendering):
                     'alertid': alertid,
                     'alertname': logic.getAlertName(alertid),
                     'comesAlert': True,
-                    'type': "feed"
+                    'type': "feed",
+                    'username': str(tornado.escape.xhtml_escape(self.get_current_username()))
                 }
                 if len(variables['tweets']) == 0:
                     self.write("<p style='color: red; font-size: 15px'><b>Ops! There is no tweet now.</b></p>")
@@ -549,7 +558,8 @@ class FeedHandler(BaseHandler, TemplateRendering):
                     'title': "Feed",
                     'alerts': logic.getAlertList(userid),
                     'comesAlert': False,
-                    'type': "feed"
+                    'type': "feed",
+                    'username': str(tornado.escape.xhtml_escape(self.get_current_username()))
                 }
                 pass
         else:
@@ -557,7 +567,8 @@ class FeedHandler(BaseHandler, TemplateRendering):
                 'title': "Feed",
                 'alerts': logic.getAlertList(userid),
                 'comesAlert': False,
-                'type': "feed"
+                'type': "feed",
+                'username': str(tornado.escape.xhtml_escape(self.get_current_username()))
             }
         content = self.render_template(template, variables)
         self.write(content)
@@ -625,7 +636,8 @@ class NewsHandler(BaseHandler, TemplateRendering):
                         'alertid': alertid,
                         'alertname': logic.getAlertName(alertid),
                         'comesAlert': True,
-                        'type': "news"
+                        'type': "news",
+                        'username': str(tornado.escape.xhtml_escape(self.get_current_username()))
                     }
                 except:
                     self.write("<p style='color: red; font-size: 15px'><b>Ops! There is no news now.</b></p>")
@@ -634,7 +646,8 @@ class NewsHandler(BaseHandler, TemplateRendering):
                     'title': "News",
                     'alerts': logic.getAlertList(userid),
                     'comesAlert': False,
-                    'type': "news"
+                    'type': "news",
+                    'username': str(tornado.escape.xhtml_escape(self.get_current_username()))
                 }
                 pass
         else:
@@ -642,7 +655,8 @@ class NewsHandler(BaseHandler, TemplateRendering):
                 'title': "News",
                 'alerts': logic.getAlertList(userid),
                 'comesAlert': False,
-                'type': "news"
+                'type': "news",
+                'username': str(tornado.escape.xhtml_escape(self.get_current_username()))
             }
         content = self.render_template(template, variables)
         self.write(content)
@@ -698,7 +712,8 @@ class SearchHandler(BaseHandler, TemplateRendering):
         template = 'afterlogintemplate.html'
         variables = {
             'title': "Search",
-            'type': "search"
+            'type': "search",
+            'username': str(tornado.escape.xhtml_escape(self.get_current_username()))
         }
 
         content = self.render_template(template, variables)
@@ -762,7 +777,8 @@ class AudienceHandler(BaseHandler, TemplateRendering):
                         'alertname': logic.getAlertName(alertid),
                         'audiences': audiences,
                         'comesAlert': True,
-                        'type': "audiences"
+                        'type': "audiences",
+                        'username': str(tornado.escape.xhtml_escape(self.get_current_username()))
                     }
                 except:
                     self.write("<p style='color: red; font-size: 15px'><b>Ops! There is no news now.</b></p>")
@@ -771,7 +787,8 @@ class AudienceHandler(BaseHandler, TemplateRendering):
                     'title': "Audience",
                     'alerts': logic.getAlertList(userid),
                     'comesAlert': False,
-                    'type': "audience"
+                    'type': "audiences",
+                    'username': str(tornado.escape.xhtml_escape(self.get_current_username()))
                 }
                 pass
         else:
@@ -779,7 +796,8 @@ class AudienceHandler(BaseHandler, TemplateRendering):
                 'title': "Audience",
                 'alerts': logic.getAlertList(userid),
                 'comesAlert': False,
-                'type': "audience"
+                'type': "audiences",
+                'username': str(tornado.escape.xhtml_escape(self.get_current_username()))
             }
         content = self.render_template(template, variables)
         self.write(content)
