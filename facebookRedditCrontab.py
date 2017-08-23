@@ -9,6 +9,7 @@ import urllib
 from datetime import datetime, timedelta
 import time
 import operator
+import link_parser
 
 def mineFacebookConversations(search_ids, timeFilter="day", pageNumber = "5"):
     my_token = Connection.Instance().redditFacebookDB['tokens'].find_one()["facebook"]["token"]
@@ -69,6 +70,28 @@ def mineFacebookConversations(search_ids, timeFilter="day", pageNumber = "5"):
     # Sorting all comments with comment numbers, because I will use them in web page in this order
     #posts = sorted(posts, key=lambda k: k["numberOfComments"], reverse=True)
     return posts
+
+def getComments(submission):
+    commentStack, comList = [], []
+    submission.comments.replace_more(limit=0)
+    temp = reversed(submission.comments)
+    for x in temp:
+        commentStack.append([x,0,"true","true"])
+    while commentStack:
+        comment = commentStack.pop()
+        if comment[0].replies:
+            temp = reversed(comment[0].replies)
+            for x in temp:
+                commentStack.append([x,comment[1]+1,"true","false"])
+            comment[2] = "false"
+        s = {
+            'submission_id' : comment[0]._submission.id,
+            'comment_id' : comment[0].id,
+            'user' : comment[0].author.name,
+            'timestamp_ms' : int(comment[0].created)
+        }
+        comList.append(s)
+    return comList
 
 def mineRedditConversation(subreddits, timeFilter):
     keys = Connection.Instance().redditFacebookDB['tokens'].find_one()["reddit"]
@@ -185,6 +208,58 @@ def startEvent(topic_id, topicList):
             ids.append(event['event_id'])
         mineEvents(topic_id,ids)
 
+def getCommentsOfSubmission(submission):
+    commentStack, comList = [], []
+    submission.comments.replace_more(limit=0)
+    temp = reversed(submission.comments)
+    for x in temp:
+        commentStack.append(x)
+    while commentStack:
+        comment = commentStack.pop()
+        try:
+            if comment.replies:
+                temp = reversed(comment.replies)
+                for x in temp:
+                    commentStack.append(x)
+            s = {
+                'submission_id' : comment._submission.id,
+                'comment_id' : comment.id,
+                'user' : comment.author.name,
+                'timestamp_ms' : int(comment.created)
+            }
+            comList.append(s)
+        except:
+            pass
+    return comList
+
+def searchSubredditNews(topic_id, subredditNames):
+    
+    keys = Connection.Instance().redditFacebookDB['tokens'].find_one()["reddit"]
+    reddit = praw.Reddit(client_id=keys["client_id"],
+                         client_secret=keys["client_secret"],
+                         user_agent=keys["user_agent"],
+                        api_type=keys["api_type"])
+
+    submissions = []
+    for subredditName in subredditNames:
+        for submission in reddit.subreddit(subredditName).top(time_filter='month'):
+            if not (re.search(r"^https://www.reddit.com",submission.url) or 
+                    re.search(r"^https://i.redd.it",submission.url) or
+                    re.search(r"imgur.com",submission.url) or
+                    re.search(r".mp4$",submission.url)):
+                submissions.append(submission)
+   
+
+    for submission in submissions:
+        mentions = getCommentsOfSubmission(submission)
+        s = {
+            'channel' : 'reddit',
+            'url': submission.url,        
+            'topic_id' : topic_id,
+            'mentions' : mentions
+        }
+        #link_parser.calculateLinks(s)    
+
 if __name__ == '__main__':
     Connection.Instance().cur.execute("Select alertid, pages, subreddits, keywords from alerts;")
     var = Connection.Instance().cur.fetchall()
@@ -192,6 +267,7 @@ if __name__ == '__main__':
     dates = ["day", "week", "month"]
     for v in var:
         startEvent(v[0], v[3].split(","))
+        searchSubredditNews(v[0],v[2].split(','))
         for date in dates:
             posts = []
             if v[2] != None and v[2] != "":
