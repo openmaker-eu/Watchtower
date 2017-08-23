@@ -60,9 +60,8 @@ def separates_tweet(alertDic, tweet):
                             tweet['_id'] = ObjectId()
                             if tweet['entities']['urls'] != []:
                                 tweet['redis'] = False
-                                tweet['isprocessed'] = False
                             else:
-                                tweet['isprocessed'] = True
+                                tweet['redis'] = True
                             Connection.Instance().db[str(alert['alertid'])].insert_one(tweet)
                             break
                     else:
@@ -74,10 +73,9 @@ def separates_tweet(alertDic, tweet):
                             Connection.Instance().PostGreSQLConnect.commit()
                             tweet['_id'] = ObjectId()
                             if tweet['entities']['urls'] == [] or tweet['entities']['urls'][0]['expanded_url'] == None:
-                                tweet['isprocessed'] = True
+                                tweet['redis'] = True
                             else:
                                 tweet['redis'] = False
-                                tweet['isprocessed'] = False
                             Connection.Instance().db[str(alert['alertid'])].insert_one(tweet)
                             break
     except Exception as e:
