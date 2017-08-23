@@ -180,9 +180,9 @@ class NewsFeedsV12Handler(BaseHandler, TemplateRendering):
             cursor = 0
             pass
         date = str(self.get_argument("date", "month"))
-        feeds = apiv12.getNewsFeeds(topic_id, date, cursor, forbidden_domain, topics)
+        news = apiv12.getNewsFeeds(topics, date, cursor, forbidden_domain, topics)
         self.set_header('Content-Type', 'application/json')
-        self.write(feeds)
+        self.write(news)
 
 class AudiencesV12Handler(BaseHandler, TemplateRendering):
     def get(self):
