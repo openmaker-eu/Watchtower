@@ -193,7 +193,7 @@ class AudiencesV12Handler(BaseHandler, TemplateRendering):
 
 class HashtagsV12Handler(BaseHandler, TemplateRendering):
     def get(self):
-        themeid = self.get_argument("topic_id", None)
+        topic_id = self.get_argument("topic_id", None)
         date = self.get_argument("date", "yesterday")
         hashtags = apiv12.getHastags(topic_id, date)
         self.set_header('Content-Type', 'application/json')
