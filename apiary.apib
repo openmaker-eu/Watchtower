@@ -5,42 +5,233 @@ HOST: http://138.68.92.181:8484/api/v1.2
 
 Watchtower is a simple API allowing consumers to view the given theme's influencers and feeds.
 
-## Themes Collection [/get_themes]
+## Topics Collection [/get_themes]
 
-### List All Themes [GET]
+### List All Topics [GET]
 
 + Response 200 (application/json)
 
         {
-            "themes": [
+            "topics": [
                 {
-                    "alertid": 32,
-                    "name": "raspberry pi",
+                    "topic_id": 32,
+                    "topic_name": "raspberry pi",
+                    "description": "Raspberry Pi"
+                },
+                {
+                    "topic_id": 33,
+                    "topic_name": "3d printer",
                     "description": "Please, fill this area!"
                 },
                 {
-                    "alertid": 33,
-                    "name": "3d printer",
-                    "description": "Please, fill this area!"
-                },
-                {
-                    "alertid": 31,
-                    "name": "arduino",
+                    "topic_id": 31,
+                    "topic_name": "arduino",
                     "description": "Please, fill this area!"
                 }
             ]
         }
         
-## Feeds Collection [/get_feeds]
+## Audiences Collection [/get_audiences]
 
-### List All feeds of given theme [GET]
+### List All Audiences of given topic [GET]
+
++ Response 200 (application/json)
+
+        {
+            "audiences": [
+                {
+                    "name": "Ben Hamner",
+                    "screen_name": "benhamner",
+                    "location": "SF",
+                    "description": "Co-founder & CTO @kaggle. FOR artists, builders, creators, inventors. FOR open data, open science, open markets, open governments.",
+                    "time_zone": "Pacific Time (US & Canada)",
+                    "lang": "en",
+                    "profile_image_url": "http://pbs.twimg.com/profile_images/1770043191/image1327119418_normal.png"
+                },
+                {
+                    "name": "Data Science Central",
+                    "screen_name": "analyticbridge",
+                    "location": "Seattle, WA",
+                    "description": "Co-founded by Vincent Granville and part of the DSC community, our  focus is on data science, ML, AI, deep learning, dataviz, Hadoop, IoT, and BI.",
+                    "time_zone": "Pacific Time (US & Canada)",
+                    "lang": "en",
+                    "profile_image_url": "http://pbs.twimg.com/profile_images/823984252035309568/pPt7JWhh_normal.jpg"
+                },
+                {
+                    "name": "Data Science Central",
+                    "screen_name": "DataScienceCtrl",
+                    "location": "Los Angeles, CA",
+                    "description": "Co-founded by Vincent Granville and part the DSC Community, our focus is on data science, ML, AI, deep learning, dataviz, Hadoop, IoT, and BI.",
+                    "time_zone": "Pacific Time (US & Canada)",
+                    "lang": "en",
+                    "profile_image_url": "http://pbs.twimg.com/profile_images/823989084699836416/HLeb5i56_normal.jpg"
+                },
+                {
+                    "name": "Data Science Fact",
+                    "screen_name": "DataSciFact",
+                    "location": "Houston",
+                    "description": "Daily data science tweets from @JohnDCook.",
+                    "time_zone": "Pacific Time (US & Canada)",
+                    "lang": "en",
+                    "profile_image_url": "http://pbs.twimg.com/profile_images/871521787300855809/sMpYCCGn_normal.jpg"
+                },
+                {
+                    "name": "Stuart Lynn",
+                    "screen_name": "Stuart_Lynn",
+                    "location": "Brooklyn,New York, USA",
+                    "description": "Ex Astrophysicist, head of research and data at Carto, interested in data vizulisation, public participation in science, data for social good and making stuff!",
+                    "time_zone": null,
+                    "lang": "en",
+                    "profile_image_url": "http://pbs.twimg.com/profile_images/2392941891/anq5bkkx8rtdhn8p2i9m_normal.png"
+                },
+                {
+                    "name": "Alexandr Kalinin",
+                    "screen_name": "alxndrkalinin",
+                    "location": "Ann Arbor, MI",
+                    "description": "PhD candidate in Bioinformatics@UMich: Biomedical Data Science, 3D Image Processing, Machine/Deep Learning",
+                    "time_zone": "Eastern Time (US & Canada)",
+                    "lang": "en",
+                    "profile_image_url": "http://pbs.twimg.com/profile_images/1137802608/article_image-image-article_normal.jpg"
+                },
+                {
+                    "name": "Open Data Science",
+                    "screen_name": "odsc",
+                    "location": "Boston, MA",
+                    "description": "Bringing together the global data science community to help foster the exchange of innovative ideas and encourage the growth of open source software.",
+                    "time_zone": "Pacific Time (US & Canada)",
+                    "lang": "en",
+                    "profile_image_url": "http://pbs.twimg.com/profile_images/623923923441348612/HxO7gaZZ_normal.png"
+                },
+                {
+                    "name": "Data Science Renee",
+                    "screen_name": "BecomingDataSci",
+                    "location": "Harrisonburg, VA",
+                    "description": "Creator/Host of Becoming a Data Scientist Podcast // @DataSciGuide @DataSciLearning @NewDataSciJobs // Personal acct: @paix120 // Data Scientist at @HelioCampus",
+                    "time_zone": "Eastern Time (US & Canada)",
+                    "lang": "en",
+                    "profile_image_url": "http://pbs.twimg.com/profile_images/437332968768425984/hy1HDtPo_normal.jpeg"
+                },
+                {
+                    "name": "NASA Data Science",
+                    "screen_name": "NASAdata",
+                    "location": "",
+                    "description": "Data and information driving better decision making on Earth and in space.",
+                    "time_zone": "Eastern Time (US & Canada)",
+                    "lang": "en",
+                    "profile_image_url": "http://pbs.twimg.com/profile_images/1535004139/meatball_normal.png"
+                },
+                {
+                    "name": "Insight Data Science",
+                    "screen_name": "InsightDataSci",
+                    "location": "Palo Alto, CA",
+                    "description": "Insight Data Science Fellows Program",
+                    "time_zone": "Pacific Time (US & Canada)",
+                    "lang": "en",
+                    "profile_image_url": "http://pbs.twimg.com/profile_images/378800000221536589/db6ebf8e038f49a28110c84632ca3ed1_normal.png"
+                },
+                {
+                    "name": "NYC Data Science",
+                    "screen_name": "NYCDataSci",
+                    "location": "New York, NY",
+                    "description": "Apply for our 12-Week Data Science Bootcamp https://t.co/O5RxpxammM",
+                    "time_zone": "Eastern Time (US & Canada)",
+                    "lang": "en",
+                    "profile_image_url": "http://pbs.twimg.com/profile_images/548550402832998401/PDz9C7S7_normal.png"
+                },
+                {
+                    "name": "Data Science London",
+                    "screen_name": "ds_ldn",
+                    "location": "London",
+                    "description": "Largest #DataScience Community in Europe #AI #MachineLearning Data Geekery. Subscribe to Data Machina weekly newsletter https://t.co/mnUjbhzCTh",
+                    "time_zone": "London",
+                    "lang": "en",
+                    "profile_image_url": "http://pbs.twimg.com/profile_images/1787151199/dsldn_normal.jpg"
+                },
+                {
+                    "name": "NYU Data Science",
+                    "screen_name": "NYUDataScience",
+                    "location": "New York, NY",
+                    "description": "Official profile of the Center for Data Science at NYU, home of the Master's and Ph.D. in Data Science, and part of the Moore-Sloan Data Science Environment",
+                    "time_zone": "Central Time (US & Canada)",
+                    "lang": "en",
+                    "profile_image_url": "http://pbs.twimg.com/profile_images/631178831022419968/QAUCuXNR_normal.jpg"
+                },
+                {
+                    "name": "Lillian Pierson, PE",
+                    "screen_name": "BigDataGal",
+                    "location": "Houston, TX",
+                    "description": "I train working pros to do data science \ud83d\udcbb\nCareer Coach for aspiring data pros \ud83d\udc69\ud83c\udffc\u200d\ud83d\udcbb\nData Scientist @_data_mania",
+                    "time_zone": "Pacific Time (US & Canada)",
+                    "lang": "en",
+                    "profile_image_url": "http://pbs.twimg.com/profile_images/850317917895892992/9WZGcEB5_normal.jpg"
+                },
+                {
+                    "name": "SV Data Science",
+                    "screen_name": "SVDataScience",
+                    "location": "Silicon Valley, CA",
+                    "description": "Silicon Valley Data Science is a consulting firm of data science & engineering teams who specialize in data-driven product development & business transformation",
+                    "time_zone": "Pacific Time (US & Canada)",
+                    "lang": "en",
+                    "profile_image_url": "http://pbs.twimg.com/profile_images/378800000355636522/0b6093eaad3d7c1223eb69ee8ca304c8_normal.png"
+                },
+                {
+                    "name": "Pivotal Data",
+                    "screen_name": "PivotalData",
+                    "location": "San Francisco, California",
+                    "description": "From cloud data services to data science & machine learning, Pivotal Data helps enterprises develop software & apps that use data to drive innovation.",
+                    "time_zone": "Pacific Time (US & Canada)",
+                    "lang": "en",
+                    "profile_image_url": "http://pbs.twimg.com/profile_images/861668207291060226/sruEEUXv_normal.jpg"
+                },
+                {
+                    "name": "Data Science Lab",
+                    "screen_name": "thedatascilab",
+                    "location": "University of Warwick, UK",
+                    "description": "The Data Science Lab is based in Behavioural Science at @WarwickBSchool. It is directed by @suzymoat and @t_preis.",
+                    "time_zone": "London",
+                    "lang": "en",
+                    "profile_image_url": "http://pbs.twimg.com/profile_images/566159606871638017/9M1cQHct_normal.jpeg"
+                },
+                {
+                    "name": "Kirk Borne",
+                    "screen_name": "KirkDBorne",
+                    "location": "Booz Allen Hamilton",
+                    "description": "The Principal Data Scientist at @BoozAllen, PhD Astrophysicist.\nTop Data Science and Big Data Influencer. Ex-Professor https://t.co/f4gsbNc00C \ud83d\udcca\ud83d\udcc8\ud83d\udd2d",
+                    "time_zone": "Eastern Time (US & Canada)",
+                    "lang": "en",
+                    "profile_image_url": "http://pbs.twimg.com/profile_images/869301637269139458/3wIcLiQC_normal.jpg"
+                },
+                {
+                    "name": "DataScience.com",
+                    "screen_name": "DataScienceInc",
+                    "location": "Los Angeles, CA",
+                    "description": "Our data science platform combines the tools, libraries, and languages data scientists love, with the infrastructure and workflows their organizations need.",
+                    "time_zone": "Pacific Time (US & Canada)",
+                    "lang": "en",
+                    "profile_image_url": "http://pbs.twimg.com/profile_images/875502656357244929/3P3vg4by_normal.jpg"
+                },
+                {
+                    "name": "Data Science in HEP",
+                    "screen_name": "DataScienceHEP",
+                    "location": "CERN(15), Simons(16), FNAL(17)",
+                    "description": "Data Science in High Energy Physics",
+                    "time_zone": "Brussels",
+                    "lang": "en",
+                    "profile_image_url": "http://pbs.twimg.com/profile_images/662668132176289793/obZbfbH5_normal.jpg"
+                }
+            ]
+        }
+
+## News Collection [/get_news]
+
+### List All News of given topic [GET]
 
 + Response 200 (application/json)
 
         {
             "next_cursor": 20,
             "next_cursor_str": "20",
-            "feeds": [
+            "news": [
                 {
                     "url": "https://3dprintingindustry.com/news/use-computer-aided-engineering-improve-3d-printer-115641/?utm_source=Twitter",
                     "im": "https://3dprintingindustry.com/wp-content/uploads/2017/06/SIMSCALE_WORK_CLEAN_201511-2613.jpg",
@@ -587,200 +778,8 @@ Watchtower is a simple API allowing consumers to view the given theme's influenc
                 }
             ]
         }
-        
-        
-## Influencers Collection [/get_influencers]
 
-### List All influencers of given theme [GET]
-
-+ Response 200 (application/json)
-
-        {
-            "influencers": [
-                {
-                    "username": "3dprintindustry",
-                    "location_user": "",
-                    "name": "3D Printing Industry",
-                    "img_url": "http://pbs.twimg.com/profile_images/721257833371734016/Kf1P-oEZ_normal.jpg",
-                    "lang_user": "en",
-                    "time_user": "London",
-                    "description_user": "Leading source for #3DPrinting news & information \u2013 industry reports, business directory, jobs board, and more."
-                },
-                {
-                    "username": "3DPrintGirl",
-                    "location_user": "New York",
-                    "name": "3D Printing News",
-                    "img_url": "http://pbs.twimg.com/profile_images/378800000641439947/778de2f93eaf9450956aa3c9547099b6_normal.jpeg",
-                    "lang_user": "en",
-                    "time_user": "Atlantic Time (Canada)",
-                    "description_user": "Your source for The Latest 3D printing News"
-                },
-                {
-                    "username": "3dersorg",
-                    "location_user": "World",
-                    "name": "3D Printing & 3Ders",
-                    "img_url": "http://pbs.twimg.com/profile_images/697123922257518592/twesICYY_normal.jpg",
-                    "lang_user": "en",
-                    "time_user": "Amsterdam",
-                    "description_user": "https://t.co/WEflmhOa76 is your independent source for the latest 3D printing, 3D printer news, trends, insight and analysis."
-                },
-                {
-                    "username": "3dsystems",
-                    "location_user": "Rock Hill, SC",
-                    "name": "3D Systems",
-                    "img_url": "http://pbs.twimg.com/profile_images/775394580929720320/4t72wWwG_normal.jpg",
-                    "lang_user": "en",
-                    "time_user": "Eastern Time (US & Canada)",
-                    "description_user": "Enabling end-to-end digital design and manufacturing solutions to enhance and accelerate your workflow. #MfgInnovation"
-                },
-                {
-                    "username": "shapeways",
-                    "location_user": "New York, NY",
-                    "name": "Shapeways",
-                    "img_url": "http://pbs.twimg.com/profile_images/742424166159286278/KIpBYGPS_normal.jpg",
-                    "lang_user": "en",
-                    "time_user": "Eastern Time (US & Canada)",
-                    "description_user": "A 3D printing marketplace where you can design, make, buy and sell amazing products. Show us your creations #Shap3dbyme"
-                },
-                {
-                    "username": "makerbot",
-                    "location_user": "Brooklyn",
-                    "name": "MakerBot",
-                    "img_url": "http://pbs.twimg.com/profile_images/458718156517679104/9XyyKdC6_normal.jpeg",
-                    "lang_user": "en",
-                    "time_user": "Eastern Time (US & Canada)",
-                    "description_user": "MakerBot's connected 3D printing solutions address the wider needs of professionals and educators, evolving their ideas from inspiration to innovation."
-                },
-                {
-                    "username": "fabbaloo",
-                    "location_user": "Worldwide and Beyond",
-                    "name": "Fabbaloo",
-                    "img_url": "http://pbs.twimg.com/profile_images/432205864133353472/GSlzmJhf_normal.jpeg",
-                    "lang_user": "en",
-                    "time_user": "Mountain Time (US & Canada)",
-                    "description_user": "Fabbaloo provides deeper analysis of developments in current and future 3D Printing and Additive Manufacturing industries https://t.co/T820xhfZQP #3DPrinting"
-                },
-                {
-                    "username": "3DHubs",
-                    "location_user": "Everywhere",
-                    "name": "3D Hubs",
-                    "img_url": "http://pbs.twimg.com/profile_images/459655442361114624/g2R4h-8j_normal.png",
-                    "lang_user": "en",
-                    "time_user": "Amsterdam",
-                    "description_user": "The world\u2019s largest network of 3D printing services: https://t.co/RAdlsFhJz8. \n\nFounded by @briangarret @bram_zwart."
-                },
-                {
-                    "username": "3DPrintBoard",
-                    "location_user": "Florida",
-                    "name": "3D Print .com",
-                    "img_url": "http://pbs.twimg.com/profile_images/676422405431029760/cDZEuj4a_normal.png",
-                    "lang_user": "en",
-                    "time_user": null,
-                    "description_user": "http://t.co/6HneczXiUp covers the latest breaking 3D printing and 3D printer news, before you see it elsewhere!"
-                },
-                {
-                    "username": "ColorFabb",
-                    "location_user": "Venlo, The Netherlands",
-                    "name": "ColorFabb",
-                    "img_url": "http://pbs.twimg.com/profile_images/459313313256439810/pFsvxt7A_normal.png",
-                    "lang_user": "en",
-                    "time_user": "Amsterdam",
-                    "description_user": "ColorFabb. Producer of innovative and functional filaments for 3D Printing."
-                },
-                {
-                    "username": "My3DPrinting",
-                    "location_user": "",
-                    "name": "3D Printing News",
-                    "img_url": "http://pbs.twimg.com/profile_images/492375713849159681/wBgPUcgZ_normal.jpeg",
-                    "lang_user": "en",
-                    "time_user": "Eastern Time (US & Canada)",
-                    "description_user": "All the latest 3D Printing News from around the World."
-                },
-                {
-                    "username": "3dprinting",
-                    "location_user": "Bucharest / Rotterdam",
-                    "name": "3D printing",
-                    "img_url": "http://pbs.twimg.com/profile_images/596050983559569409/1Ro5lXax_normal.jpg",
-                    "lang_user": "en",
-                    "time_user": null,
-                    "description_user": "Dutch part-time daydreamer skating tru the Carpathian Garden.Tweets from @Roemenie .Amazed about the worldchanging 3D Printing.Big fan of @Shapeways | \uf8ff |"
-                },
-                {
-                    "username": "3d_printers",
-                    "location_user": "",
-                    "name": "Stratasys",
-                    "img_url": "http://pbs.twimg.com/profile_images/649446346118709248/RWD5T3KS_normal.jpg",
-                    "lang_user": "en",
-                    "time_user": "UTC",
-                    "description_user": "Interested in 3D printing? Follow us for the latest 3D printing news and join the conversation."
-                },
-                {
-                    "username": "3dprinting3d",
-                    "location_user": "",
-                    "name": "3D Printing",
-                    "img_url": "http://pbs.twimg.com/profile_images/2218578027/twitter-logo_normal.png",
-                    "lang_user": "en",
-                    "time_user": null,
-                    "description_user": "http://t.co/WIZOBci92B industry experts bring you the latest in 3D Printing news, commentary, jobs, videos and entertainment."
-                },
-                {
-                    "username": "3dprintingcom",
-                    "location_user": "",
-                    "name": "3DPrinting.com",
-                    "img_url": "http://pbs.twimg.com/profile_images/700663704887517184/oiO8VCdt_normal.png",
-                    "lang_user": "en",
-                    "time_user": "Amsterdam",
-                    "description_user": "Everything about 3D Printing!"
-                },
-                {
-                    "username": "Ultimaker",
-                    "location_user": "",
-                    "name": "Ultimaker",
-                    "img_url": "http://pbs.twimg.com/profile_images/785883430332534784/09W2LPjg_normal.jpg",
-                    "lang_user": "en",
-                    "time_user": "Amsterdam",
-                    "description_user": "Driven by technology and passionate about innovation, Ultimaker offers a range of high-quality 3D printers, software, materials, and support."
-                },
-                {
-                    "username": "make",
-                    "location_user": "San Francisco, CA - USA",
-                    "name": "Make:",
-                    "img_url": "http://pbs.twimg.com/profile_images/783080298665775108/LESsgngz_normal.jpg",
-                    "lang_user": "en",
-                    "time_user": "Pacific Time (US & Canada)",
-                    "description_user": "DIY projects, How-tos, tech news, electronics, crafts and ideas."
-                },
-                {
-                    "username": "imaterialise",
-                    "location_user": "Leuven, Belgium",
-                    "name": "i.materialise",
-                    "img_url": "http://pbs.twimg.com/profile_images/710503015535538176/dxg6Ob_U_normal.jpg",
-                    "lang_user": "en",
-                    "time_user": "Brussels",
-                    "description_user": "online 3D printing service and community for designers & inventors | World's largest 3D printing facility | Happy to meet you"
-                },
-                {
-                    "username": "3DPrintingFans",
-                    "location_user": "",
-                    "name": "3D Printing Fans",
-                    "img_url": "http://pbs.twimg.com/profile_images/454979770195783681/e8MXCx3I_normal.jpeg",
-                    "lang_user": "en",
-                    "time_user": null,
-                    "description_user": "We cover all the latest, breaking news surrounding 3D printing and 3D scanning"
-                },
-                {
-                    "username": "3DPrintingIt",
-                    "location_user": "",
-                    "name": "3D Printing",
-                    "img_url": "http://pbs.twimg.com/profile_images/454975817374638080/EYF4cGTL_normal.jpeg",
-                    "lang_user": "en",
-                    "time_user": null,
-                    "description_user": "3D Printing News, 3D Scanning News, Building of Electronics, Makers"
-                }
-            ]
-        }
-
-## News Collection [/get_news]
+## News Collection [/search_news]
 
 ### List All News of given filter[GET]
 
@@ -858,7 +857,7 @@ Watchtower is a simple API allowing consumers to view the given theme's influenc
         
 ## Hashtags Collection [/get_hashtags]
 
-### List All Hashtags of given theme name or theme id[GET]
+### List All Hashtags of given topic[GET]
 
 + Response 200 (application/json)
 
@@ -903,6 +902,223 @@ Watchtower is a simple API allowing consumers to view the given theme's influenc
                 {
                     "count": 2846,
                     "hashtag": "3dprinter"
+                }
+            ]
+        }
+        
+## Event Collection [/get_events]
+
+### List All Events of given topic[GET]
+
++ Response 200 (application/json)
+
+        {
+            "events": [
+                {
+                    "updated_time": "2017-08-13T03:39:43+0000",
+                    "cover": "https://scontent.xx.fbcdn.net/v/t1.0-9/s720x720/13718684_10153611195677051_8947384868007011043_n.jpg?oh=4599e179539983ebb0dcd3a41102c6b3&oe=5A27CB19",
+                    "end_time": 1508533200.0,
+                    "id": "295297364148781",
+                    "name": "Aegis-IBM Big Data & Data Science Meetup in Jaipur",
+                    "place": "Jaipur, India",
+                    "start_time": "2017-10-21",
+                    "link": "https://www.facebook.com/events/295297364148781",
+                    "interested": 2565,
+                    "coming": 514
+                },
+                {
+                    "updated_time": "2017-08-10T20:56:32+0000",
+                    "cover": "https://scontent.xx.fbcdn.net/v/t31.0-0/p480x480/18449585_628047117389400_6208310549031090635_o.jpg?oh=3ba2fb6709d2fa3a4c4c4011e5f64276&oe=5A24097C",
+                    "end_time": 1507237200.0,
+                    "id": "250534705351469",
+                    "name": "5-Day Data Science Bootcamp in Washington DC",
+                    "place": "Bethesda, United States",
+                    "start_time": "2017-10-02",
+                    "link": "https://www.facebook.com/events/250534705351469",
+                    "interested": 75,
+                    "coming": 13
+                },
+                {
+                    "updated_time": "2017-08-12T11:08:27+0000",
+                    "cover": "https://scontent.xx.fbcdn.net/v/t31.0-8/s720x720/17240392_1369578119731969_7888332856448459093_o.jpg?oh=fdcce291bc21f91e5bb153d4f6dc419b&oe=5A29A0F5",
+                    "end_time": 1506114000.0,
+                    "id": "1873958579558849",
+                    "name": "Cypher 2017, Analytics & Data Science India Summit",
+                    "place": "Bangalore, India",
+                    "start_time": "2017-09-21",
+                    "link": "https://www.facebook.com/events/1873958579558849",
+                    "interested": 262,
+                    "coming": 42
+                },
+                {
+                    "updated_time": "2017-08-12T13:33:20+0000",
+                    "cover": "https://scontent.xx.fbcdn.net/v/t31.0-0/p480x480/20229685_657005331160245_3373497185276937264_o.jpg?oh=10e19848ed6194312e3aab63479df068&oe=5A22A808",
+                    "end_time": 1506027600.0,
+                    "id": "304847746643660",
+                    "name": "Data Science Bootcamp in Seattle",
+                    "place": "Redmond, United States",
+                    "start_time": "2017-09-18",
+                    "link": "https://www.facebook.com/events/304847746643660",
+                    "interested": 77,
+                    "coming": 8
+                },
+                {
+                    "updated_time": "2017-08-11T00:23:19+0000",
+                    "cover": "https://scontent.xx.fbcdn.net/v/t31.0-8/s720x720/20229517_10154593683722051_7184157984845777674_o.jpg?oh=616cbddad2f14b6a4b546d20ffb44a90&oe=5A31BA34",
+                    "end_time": 1505595600.0,
+                    "id": "331449910642787",
+                    "name": "Aegis IBM Big Data and Data Science Meetup, Ahmedabad",
+                    "place": "Ahmedabad, India",
+                    "start_time": "2017-09-17",
+                    "link": "https://www.facebook.com/events/331449910642787",
+                    "interested": 245,
+                    "coming": 42
+                },
+                {
+                    "updated_time": "2017-08-16T11:16:19+0000",
+                    "cover": "https://scontent.xx.fbcdn.net/v/t31.0-8/s720x720/19577095_1394186904028012_6430138526883229507_o.jpg?oh=24f8824e3cacfa6afdd124e22d97b2f5&oe=5A2AF551",
+                    "end_time": 1505336400.0,
+                    "id": "891767460964367",
+                    "name": "Data Science Week 2017",
+                    "place": "Moscow, Russia",
+                    "start_time": "2017-09-12",
+                    "link": "https://www.facebook.com/events/891767460964367",
+                    "interested": 590,
+                    "coming": 140
+                },
+                {
+                    "updated_time": "2017-08-20T13:52:34+0000",
+                    "cover": "https://scontent.xx.fbcdn.net/v/t31.0-8/s720x720/20615829_750590631788119_3014114781414361029_o.jpg?oh=4b8b57ffb20f50b1379ee0b4158422bc&oe=5A2F59F4",
+                    "end_time": 1504990800.0,
+                    "id": "727202760800644",
+                    "name": "\u041a\u0443\u0440\u0441 \"Introduction to Data Science, Analytics and AI\"",
+                    "place": "Kyiv, Ukraine",
+                    "start_time": "2017-09-09",
+                    "link": "https://www.facebook.com/events/727202760800644",
+                    "interested": 1052,
+                    "coming": 187
+                },
+                {
+                    "updated_time": "2017-08-21T19:41:32+0000",
+                    "cover": "https://scontent.xx.fbcdn.net/v/t1.0-9/20953993_10159237684040261_3201860903833490052_n.jpg?oh=261b2c35fbc036cf150775975406bf12&oe=5A1C2061",
+                    "end_time": 1504731600.0,
+                    "id": "125921241367691",
+                    "name": "Canada's Data Science and Data Engineering Industry Landscape ",
+                    "place": "Toronto, Canada",
+                    "start_time": "2017-09-07",
+                    "link": "https://www.facebook.com/events/125921241367691",
+                    "interested": 0,
+                    "coming": 0
+                },
+                {
+                    "updated_time": "2017-08-11T00:40:01+0000",
+                    "cover": "https://scontent.xx.fbcdn.net/v/t31.0-8/s720x720/20645112_1554186514601897_3123602631321685340_o.jpg?oh=891fde13f9302e4b5c2f89c492ddad1d&oe=5A2BB2FA",
+                    "end_time": 1504645200.0,
+                    "id": "279760199173806",
+                    "name": "\u041d\u0435\u0434\u0435\u043b\u044f \u043e\u0442\u043a\u0440\u044b\u0442\u044b\u0445 \u0442\u0435\u0445\u043d\u043e\u043b\u043e\u0433\u0438\u0439: Data Science \u043c\u0438\u0442\u0430\u043f",
+                    "place": "Odessa, Ukraine",
+                    "start_time": "2017-09-06",
+                    "link": "https://www.facebook.com/events/279760199173806",
+                    "interested": 111,
+                    "coming": 24
+                },
+                {
+                    "updated_time": "2017-08-18T05:51:33+0000",
+                    "cover": "https://scontent.xx.fbcdn.net/v/t1.0-9/s720x720/13532820_10153578327712051_2149254848759659712_n.jpg?oh=f50d5ca5bb9571476a2f6be74dc64973&oe=5A264B32",
+                    "end_time": 1504386000.0,
+                    "id": "1161699240541901",
+                    "name": "Aegis IBM Big Data and Data Science Meetup, Kolkata",
+                    "start_time": "2017-09-03",
+                    "place": "",
+                    "link": "https://www.facebook.com/events/1161699240541901",
+                    "interested": 373,
+                    "coming": 78
+                }
+            ]
+        }
+
+## Conversation Collection [/get_conversations]
+
+### List All Conversation of given topic[GET]
+
++ Response 200 (application/json)
+
+        {
+            "conversation": [
+                {
+                    "title": "Guide to buying iota for Dutch users",
+                    "source": "reddit",
+                    "comments": [
+                        {
+                            "parent": "6v76iw",
+                            "comment_text": "In plaats van BTC kan je beter Ethereum aanschaffen. Minder fees!",
+                            "created_time": "2017-08-22 11:28:45",
+                            "comment_id": "dly4k10",
+                            "indent_number": 0,
+                            "is_leaf": "false",
+                            "is_root": "true",
+                            "comment_author": "Glavobolja",
+                            "relative_indent": -1
+                        },
+                        {
+                            "parent": "dly4k10",
+                            "comment_text": "Inderdaad, ik had die fout ook gemaakt...",
+                            "created_time": "2017-08-22 18:51:53",
+                            "comment_id": "dlyk7oa",
+                            "indent_number": 1,
+                            "is_leaf": "true",
+                            "is_root": "false",
+                            "comment_author": "SamGranger",
+                            "relative_indent": 1
+                        },
+                        {
+                            "parent": "dly4k10",
+                            "comment_text": "Ik zal die optie toevoegen en toelichten, als ik vanavond weer thuis ben",
+                            "created_time": "2017-08-22 23:05:13",
+                            "comment_id": "dlypxky",
+                            "indent_number": 1,
+                            "is_leaf": "true",
+                            "is_root": "false",
+                            "comment_author": "Lazy-Physicist",
+                            "relative_indent": 0
+                        },
+                        {
+                            "parent": "6v76iw",
+                            "comment_text": "Duidelijk verhaal. Misschien is het een mooie aanvulling om na de aanschaf op bitfenix uit te leggen hoe je je iota van de exchange af krijgt. De huidige wallet is ook niet vreselijk voor zichzelf sprekend.",
+                            "created_time": "2017-08-22 14:47:57",
+                            "comment_id": "dlydfd4",
+                            "indent_number": 0,
+                            "is_leaf": "false",
+                            "is_root": "true",
+                            "comment_author": "Bazeratti",
+                            "relative_indent": -1
+                        },
+                        {
+                            "parent": "dlydfd4",
+                            "comment_text": "Ik kwam hier zelf achter toen ik het artikel van NEM schreef. Ik vraag me alleen af of het verstandig is om een nieuwe gebruiker de risico van eigen verantwoordelijk te geven ( zo snel ) in het process.\n",
+                            "created_time": "2017-08-22 23:06:21",
+                            "comment_id": "dlypyv6",
+                            "indent_number": 1,
+                            "is_leaf": "true",
+                            "is_root": "false",
+                            "comment_author": "Lazy-Physicist",
+                            "relative_indent": 1
+                        },
+                        {
+                            "parent": "6v76iw",
+                            "comment_text": "Duidelijke en overzichtelijke site. Zal hem naar wat mensen doorsturen die zich beginnen met het verdiepen in de cryptowereld.",
+                            "created_time": "2017-08-23 00:43:09",
+                            "comment_id": "dlytuaa",
+                            "indent_number": 0,
+                            "is_leaf": "true",
+                            "is_root": "true",
+                            "comment_author": "JesseSebastian",
+                            "relative_indent": -1
+                        }
+                    ],
+                    "url": "https://www.reddit.com/r/Iota/comments/6v76iw/guide_to_buying_iota_for_dutch_users/",
+                    "commentNumber": 6,
+                    "post_text": "I recently started a Dutch website aimed at helping new users get around in the cryptocurrency world. \n\nI recently wrote a short guide to help Dutch users get their own IOTA. I also added a video on it to help them go through the steps. And information on what exactly makes IOTA so special.\n\nI figured posting it here might help out my fellow Netherlanders get information on the coin.\n\nhttps://blockk.nl/iota/\n*for the dutch*\nLaat me weten wat je van het artikel/video vind. Feedback wordt altijd gewaardeerd. "
                 }
             ]
         }
