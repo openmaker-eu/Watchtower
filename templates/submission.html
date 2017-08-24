@@ -18,9 +18,10 @@
 
             <div class="btn-group" style='float:right'>
                 <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
-                    <span class="caret"style="float:right"></span>
+                    <span class="caret" style="float:right"></span>
                 </a>
-                <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu1" style='padding-left:3px;width:auto'>
+                <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu1"
+                    style='padding-left:3px;width:auto'>
                     <li style='display:flex'>
                         <span class="glyphicon glyphicon-ban-circle" style='margin-top:6px'></span>
                         <span>
@@ -30,7 +31,7 @@
                     </li>
                 </ul>
             </div>
-            
+
             <span style="font-size:1.2em;font-weight:bold">
                 {{ post["title"] }}
             </span>
@@ -38,13 +39,13 @@
             <div>
                 <span style='color:#666666;padding-left:0.3em'>
                     {% if post["source"] == "reddit" %}
-                           r/{{ post['subreddit'] }}
+                        r/{{ post['subreddit'] }}
                     {% endif %}    
                 </span>
 
                 <span style='color:#666666;padding-left:1.5em'>
                     {% if post["source"] == "reddit" %}
-                           {{ post['created_time'] }}
+                        {{ post['created_time'] }}
                     {% endif %}    
                 </span>
             </div>
@@ -116,6 +117,6 @@
                         {% endfor %}
                     {% endif %}
             {% endfor %}
-        </div>
+    </div>
     </div>
 {% endfor %}

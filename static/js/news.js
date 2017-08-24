@@ -1,11 +1,11 @@
 $(document).ready(function () {
-  $(".dropdown-menu").on('click', 'li a', function () {
-      var selText = $(this).children("h4").html();
-      $(this).parent('li').siblings().removeClass('active');
-      $(this).parents('.btn-group').find('.selection').html(selText);
-      $(this).parents('li').addClass("active");
-  });
-  
+    $(".dropdown-menu").on('click', 'li a', function () {
+        var selText = $(this).children("h4").html();
+        $(this).parent('li').siblings().removeClass('active');
+        $(this).parents('.btn-group').find('.selection').html(selText);
+        $(this).parents('li').addClass("active");
+    });
+
     $(window).scroll(function () {
         if ($(window).scrollTop() + $(window).height() == $(document).height()) {
             if ($('#newsDiv').length != 0) {

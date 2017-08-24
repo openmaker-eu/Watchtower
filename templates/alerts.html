@@ -1,26 +1,4 @@
 <div id="alerts">
-    <div class="col-sm-8">
-        {% if alertlimit != 0 %}
-            <a href="/alertinfo">Create a new alert</a>
-        {% else %}
-            <p style="color: red; font-size: 15px"><b>You cannot create a new alert because your limit is full. If you
-                want create a new alert, please remove old ones.</b></p>
-        {% endif %}
-    </div>
-
-    <div class="col-sm-2">
-        <p style="text-align:right"><b>Connection Status:
-            {% if threadconnection %}<span class="glyphicon glyphicon-ok"></span>
-            {% else %} <span class="glyphicon glyphicon-remove">
-            {% endif %}</b></p>
-    </div>
-
-    <div class="col-sm-2">
-        <p style="text-align:right"><b>Thread Status:
-            {% if threadstatus %}<span class="glyphicon glyphicon-ok"></span>
-            {% else %} <span class="glyphicon glyphicon-remove">
-            {% endif %}</b></p>
-    </div>
 
     <table class="table">
         <thead>
@@ -89,4 +67,13 @@
         {% endfor %}
         </tbody>
     </table>
+
+    <div align="center">
+        {% if alertlimit != 0 %}
+            <a href="/alertinfo" class="btn btn-primary btn-lg">Create a new topic</a>
+        {% else %}
+            <p style="color: red; font-size: 15px"><b>You cannot create a new topic because your limit is full. If you
+                want create a new topic, please remove old ones.</b></p>
+        {% endif %}
+    </div>
 </div>

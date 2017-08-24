@@ -1,16 +1,13 @@
 import re
 import time
 from datetime import datetime, timedelta
-import time
 
 import facebook
 import praw
+import requests
 
 import link_parser
 from application.Connections import Connection
-
-import requests
-import json
 
 
 def mineFacebookConversations(search_ids, timeFilter="day", pageNumber="5"):
@@ -145,8 +142,8 @@ def mineRedditConversation(subreddits, timeFilter):
                         "comments": cList,
                         "url": submission.url,
                         "numberOfComments": len(cList),
-                        "subreddit" : subreddit
-                        })
+                        "subreddit": subreddit
+                    })
             except:
                 print("one submission passed")
                 pass
@@ -168,10 +165,10 @@ def sourceSelection(topicList):
                     events.append({'event_id': search['id'], 'event_name': search['name']})
                 s = requests.get(s['paging']['next']).json()
             except:
-                break  
+                break
         allSearches.append({
             'events': events
-            })
+        })
     return allSearches
 
 
@@ -182,7 +179,9 @@ def mineEvents(topic_id, search_id_list):
     for ids in search_id_list:
         print(ids)
         # event = graph.get_object(id+'?fields=attending_count,cover,description,end_time,id,interested_count,is_canceled,maybe_count,name,noreply_count,owner,place,start_time,timezone,type,updated_time,declined_count,admins,picture,photos,interested,maybe', page=True, retry=5)
-        event = graph.get_object(ids + '?fields=attending_count,updated_time,cover,end_time,id,interested_count,name,place,start_time', page=True, retry=5)
+        event = graph.get_object(
+            ids + '?fields=attending_count,updated_time,cover,end_time,id,interested_count,name,place,start_time',
+            page=True, retry=5)
         if 'end_time' in event:
             event['end_time'] = time.mktime(datetime.strptime(event['end_time'][:10], "%Y-%m-%d").timetuple())
         else:
@@ -287,23 +286,25 @@ def searchSubredditNews(topic_id, subredditNames):
         if len(mentions) != 0:
             link_parser.calculateLinks(s)
 
+
 # day filter can be 'day', 'week', 'month'; default is 'day'
 def searchFacebookNews(topic_id, search_ids):
-    
     my_token = Connection.Instance().redditFacebookDB['tokens'].find_one()["facebook"]["token"]
     graph = facebook.GraphAPI(access_token=my_token, version="2.7")
 
     dayAgo = (int(round(time())) - 86400000) * 1000
-    
+
     for id in search_ids:
-        p = graph.get_object(str(id)+'?fields=feed{link,created_time,id,comments{from,id,created_time,comments{from,id,created_time}}}', page=True, retry=5)
+        p = graph.get_object(str(
+            id) + '?fields=feed{link,created_time,id,comments{from,id,created_time,comments{from,id,created_time}}}',
+                             page=True, retry=5)
         if 'feed' in p:
             for post in p['feed']['data']:
                 d = post['created_time']
                 created_time = d[:10] + "T" + d[11:19]
                 created_time = datetime.strptime(created_time, "%Y-%m-%dT%H:%M:%S").timestamp() * 1000
                 if dayAgo < created_time:
-                    if ('link' in post) and not (re.search('facebook',post['link'])) :
+                    if ('link' in post) and not (re.search('facebook', post['link'])):
                         listOfMention = []
                         if 'comments' in post:
                             for comment in post['comments']['data']:
@@ -311,42 +312,45 @@ def searchFacebookNews(topic_id, search_ids):
                                     for subComment in comment['comments']['data']:
                                         d = subComment['created_time']
                                         created_comment_time = d[:10] + "T" + d[11:19]
-                                        created_comment_time = datetime.strptime(created_comment_time, "%Y-%m-%dT%H:%M:%S").timestamp() * 1000
+                                        created_comment_time = datetime.strptime(created_comment_time,
+                                                                                 "%Y-%m-%dT%H:%M:%S").timestamp() * 1000
                                         listOfMention.append({
-                                            'submission_id' : post['id'],
-                                            'comment_id' : subComment['id'],
-                                            'user' : subComment['from']['id'],
-                                            'timestamp_ms' : int(created_comment_time)
+                                            'submission_id': post['id'],
+                                            'comment_id': subComment['id'],
+                                            'user': subComment['from']['id'],
+                                            'timestamp_ms': int(created_comment_time)
                                         })
                                 d = comment['created_time']
                                 created_comment_time = d[:10] + "T" + d[11:19]
-                                created_comment_time = datetime.strptime(created_comment_time, "%Y-%m-%dT%H:%M:%S").timestamp() * 1000
+                                created_comment_time = datetime.strptime(created_comment_time,
+                                                                         "%Y-%m-%dT%H:%M:%S").timestamp() * 1000
                                 listOfMention.append({
-                                    'submission_id' : post['id'],
-                                    'comment_id' : comment['id'],
-                                    'user' : comment['from']['id'],
-                                    'timestamp_ms' : int(created_comment_time)
+                                    'submission_id': post['id'],
+                                    'comment_id': comment['id'],
+                                    'user': comment['from']['id'],
+                                    'timestamp_ms': int(created_comment_time)
                                 })
                         if len(listOfMention) != 0:
                             link_parser.calculateLinks({
-                                'channel' : 'facebook',
-                                'url': post['link'],        
-                                'topic_id' : topic_id,
-                                'mentions' : listOfMention
+                                'channel': 'facebook',
+                                'url': post['link'],
+                                'topic_id': topic_id,
+                                'mentions': listOfMention
                             })
                 else:
                     break
 
+
 if __name__ == '__main__':
     Connection.Instance().cur.execute("Select alertid, pages, subreddits, keywords from alerts;")
     var = Connection.Instance().cur.fetchall()
-    
+
     dates = ["day", "week", "month"]
     for v in var:
         if v[0] == 37:
-            #startEvent(v[0], v[3].split(","))
-            #searchSubredditNews(v[0], v[2].split(','))
-            #searchFacebookNews(v[0], v[1])
+            # startEvent(v[0], v[3].split(","))
+            # searchSubredditNews(v[0], v[2].split(','))
+            # searchFacebookNews(v[0], v[1])
             for date in dates:
                 posts = []
                 if v[2] != None and v[2] != "":
@@ -354,7 +358,7 @@ if __name__ == '__main__':
                     posts.extend(mineRedditConversation(subreddits, date))
                 if v[1] != None and v[1] != "":
                     pages = v[1].split(",")
-                    #posts.extend(mineFacebookConversations(pages, timeFilter=date))
+                    # posts.extend(mineFacebookConversations(pages, timeFilter=date))
                 if len(posts) != 0:
                     posts = sorted(posts, key=lambda k: k["numberOfComments"], reverse=True)
                     Connection.Instance().conversations[str(v[0])].remove({"time_filter": date})

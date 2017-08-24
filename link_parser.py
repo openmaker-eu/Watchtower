@@ -118,7 +118,7 @@ def calculateLinks(data):
                     {'short_links': short_link}))) != 0:
                 Connection.Instance().newsPoolDB[str(topic_id)].find_one_and_update(
                     {'short_links': short_link}, {'$push': {'mentions': {'$each': data['mentions']}}})
-                print('short_link : ' , short_link)
+                print('short_link : ', short_link)
 
             dic = linkParser(link)
             if dic is not None:
@@ -174,7 +174,7 @@ def calculateLinks(data):
                             {'short_links': short_link}))) != 0:
                         Connection.Instance().newsPoolDB[str(alertid)].find_one_and_update(
                             {'short_links': short_link}, {'$push': {'mentions': tweet_tuple}})
-                        print('short_link : ' , short_link)
+                        print('short_link : ', short_link)
                         continue
                     dic = linkParser(link)
                     if dic is not None:

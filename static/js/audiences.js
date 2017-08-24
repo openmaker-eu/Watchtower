@@ -1,11 +1,10 @@
-
 $(document).ready(function () {
-  $(".dropdown-menu").on('click', 'li a', function () {
-    var selText = $(this).children("h4").html();
-    $(this).parent('li').siblings().removeClass('active');
-    $(this).parents('.btn-group').find('.selection').html(selText);
-    $(this).parents('li').addClass("active");
-  });
+    $(".dropdown-menu").on('click', 'li a', function () {
+        var selText = $(this).children("h4").html();
+        $(this).parent('li').siblings().removeClass('active');
+        $(this).parents('.btn-group').find('.selection').html(selText);
+        $(this).parents('li').addClass("active");
+    });
     $("#spin").spinner();
     $('a.audiencealerts').click(function () {
         $('#audiencecontainer').empty();

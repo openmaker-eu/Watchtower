@@ -75,7 +75,7 @@
     visibility: hidden;
     width: 40px;
     height: 40px;
-    margin-top: 10px; 
+    margin-top: 10px;
     margin-bottom: 10px;
     -webkit-animation: spin 2s linear infinite;
     animation: spin 2s linear infinite;
