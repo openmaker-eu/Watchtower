@@ -1,7 +1,7 @@
 import re
 import time
 from datetime import datetime, timedelta
-from time import time
+import time
 
 import facebook
 import praw
@@ -137,14 +137,21 @@ def mineRedditConversation(subreddits, timeFilter):
                             temp["comment_author"] = "[deleted]"
                         cList.append(temp)
 
-                    posts.append({"source": "reddit", "created_time": submission.created, "title": submission.title,
-                                  "post_text": submission.selftext, "comments": cList, "url": submission.url,
-                                  "numberOfComments": len(cList)})
+                    posts.append({
+                        "source": "reddit",
+                        "created_time": submission.created,
+                        "title": submission.title,
+                        "post_text": submission.selftext,
+                        "comments": cList,
+                        "url": submission.url,
+                        "numberOfComments": len(cList),
+                        "subreddit" : subreddit
+                        })
             except:
                 print("one submission passed")
                 pass
 
-        return posts
+    return posts
 
 
 def sourceSelection(topicList):
@@ -229,7 +236,7 @@ def getCommentsOfSubmission(submission):
     commentStack, comList = [], []
     submission.comments.replace_more(limit=0)
     temp = reversed(submission.comments)
-    dayAgo = int(round(time())) - 86400000
+    dayAgo = int(round(time.time())) - 86400000
     for x in temp:
         commentStack.append(x)
     while commentStack:
@@ -333,7 +340,7 @@ def searchFacebookNews(topic_id, search_ids):
 if __name__ == '__main__':
     Connection.Instance().cur.execute("Select alertid, pages, subreddits, keywords from alerts;")
     var = Connection.Instance().cur.fetchall()
-
+    
     dates = ["day", "week", "month"]
     for v in var:
         startEvent(v[0], v[3].split(","))

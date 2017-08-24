@@ -7,39 +7,45 @@
 
         <div class="post-box">
 
-				<span>
-					{% if post["source"] == "reddit" %}
+            <div style='display:flex'>
+    			<span>
+    				{% if post["source"] == "reddit" %}
                         <img src="static/images/r-logo.png" alt="logo" style="width:30px;height:30px">
                     {% else %}
                         <img src="static/images/fb-logo.png" alt="logo" style="width:30px;height:30px">
                     {% endif %}
-				</span>
+    			</span>
 
+                <span>    
+                    <div style="font-size:1.2em;font-weight:bold">
+                        {{ post["title"] }}
+                    </div>
+                    <div>
+                        {% if post["source"] == "reddit" %}
+                            {{ post['subreddit'] }}<br><br>
+                        {% endif %}
+                    </div>
+                </span>
 
-            
-            <div class="btn-group" style='float:right'>
-                <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
-                    <span class="caret"style="float:right"></span>
-                </a>
-                <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu1" style='padding-left:3px;width:auto'>
-                    <li style='display:flex'>
-                        <span class="glyphicon glyphicon-ban-circle" style='margin-top:6px'></span>
-                        <span>
-                            <div><strong>Ban Subreddit</strong></div>
-                            <div style='color:gray;font-size:12px'>Stop seeing posts from this subreddit</div>
-                        </span>
-                    </li>
-                </ul>
+                <span class="btn-group" style='margin-left:auto'>
+                    <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
+                        <span class="caret"style="float:right"></span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu1" style='padding-left:3px;width:auto'>
+                        <li style='display:flex'>
+                            <span class="glyphicon glyphicon-ban-circle" style='margin-top:6px'></span>
+                            <span>
+                                <div><strong>Ban Subreddit</strong></div>
+                                <div style='color:gray;font-size:12px'>Stop seeing posts from this subreddit</div>
+                            </span>
+                        </li>
+                    </ul>
+                </span>
             </div>
         
 
             
-            <span style="font-size:1.2em;font-weight:bold">
-					{{ post["title"] }}<br><br>
-			</span>
-
-
-
+            
 
             {% if post["post_text"]|length == 0 %}
                 <div id="post-text">

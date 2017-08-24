@@ -54,7 +54,7 @@ def getConversations(topic_id, timeFilter, paging):
                     comment["created_time"] = comment["created_time"][:10] + " " + comment["created_time"][11:18]
                 comments.append(comment)
             temp = {"title": submission["title"], "source": submission["source"], "comments": comments,
-                    "url": submission["url"], "commentNumber": submission["numberOfComments"]}
+                    "url": submission["url"], "commentNumber": submission["numberOfComments"], 'subreddit':submission['subreddit']}
             if "post_text" in submission:
                 temp["post_text"] = submission["post_text"]
             else:
