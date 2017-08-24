@@ -9,6 +9,9 @@ import praw
 import link_parser
 from application.Connections import Connection
 
+import requests
+import json
+
 
 def mineFacebookConversations(search_ids, timeFilter="day", pageNumber="5"):
     my_token = Connection.Instance().redditFacebookDB['tokens'].find_one()["facebook"]["token"]
@@ -152,12 +155,16 @@ def sourceSelection(topicList):
     for topic in topicList:
         events = []
         s = graph.get_object('search?q=' + topic + '&type=event&limit=100')
-        for search in s['data']:
-            events.append({'event_id': search['id'], 'event_name': search['name']})
-        temp = {
+        while True:
+            try:
+                for search in s['data']:
+                    events.append({'event_id': search['id'], 'event_name': search['name']})
+                s = requests.get(s['paging']['next']).json()
+            except:
+                break  
+        allSearches.append({
             'events': events
-        }
-        allSearches.append(temp)
+            })
     return allSearches
 
 
@@ -168,9 +175,7 @@ def mineEvents(topic_id, search_id_list):
     for ids in search_id_list:
         print(ids)
         # event = graph.get_object(id+'?fields=attending_count,cover,description,end_time,id,interested_count,is_canceled,maybe_count,name,noreply_count,owner,place,start_time,timezone,type,updated_time,declined_count,admins,picture,photos,interested,maybe', page=True, retry=5)
-        event = graph.get_object(
-            ids + '?fields=attending_count,updated_time,cover,end_time,id,interested_count,name,place,start_time',
-            page=True, retry=5)
+        event = graph.get_object(ids + '?fields=attending_count,updated_time,cover,end_time,id,interested_count,name,place,start_time', page=True, retry=5)
         if 'end_time' in event:
             event['end_time'] = time.mktime(datetime.strptime(event['end_time'][:10], "%Y-%m-%d").timetuple())
         else:
