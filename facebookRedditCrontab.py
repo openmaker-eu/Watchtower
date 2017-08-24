@@ -110,7 +110,7 @@ def mineRedditConversation(subreddits, timeFilter):
         s = reddit.subreddit(subreddit)
         for submission in s.top(time_filter=timeFilter, limit=None):
             try:
-                print("reddit: ", submission)
+                print("subreddit: ", submission)
                 if (re.search(r"^https://www.reddit.com", submission.url) or re.search(r"^https://i.redd.it",
                                                                                        submission.url)):
                     commentStack, comList = [], []
@@ -343,18 +343,19 @@ if __name__ == '__main__':
     
     dates = ["day", "week", "month"]
     for v in var:
-        startEvent(v[0], v[3].split(","))
-        searchSubredditNews(v[0], v[2].split(','))
-        searchFacebookNews(v[0], v[1])
-        for date in dates:
-            posts = []
-            if v[2] != None and v[2] != "":
-                subreddits = v[2].split(",")
-                posts.extend(mineRedditConversation(subreddits, date))
-            if v[1] != None and v[1] != "":
-                pages = v[1].split(",")
-                posts.extend(mineFacebookConversations(pages, timeFilter=date))
-            if len(posts) != 0:
-                posts = sorted(posts, key=lambda k: k["numberOfComments"], reverse=True)
-                Connection.Instance().conversations[str(v[0])].remove({"time_filter": date})
-                Connection.Instance().conversations[str(v[0])].insert_one({'time_filter': date, 'posts': posts})
+        if v[0] == 37:
+            #startEvent(v[0], v[3].split(","))
+            #searchSubredditNews(v[0], v[2].split(','))
+            #searchFacebookNews(v[0], v[1])
+            for date in dates:
+                posts = []
+                if v[2] != None and v[2] != "":
+                    subreddits = v[2].split(",")
+                    posts.extend(mineRedditConversation(subreddits, date))
+                if v[1] != None and v[1] != "":
+                    pages = v[1].split(",")
+                    #posts.extend(mineFacebookConversations(pages, timeFilter=date))
+                if len(posts) != 0:
+                    posts = sorted(posts, key=lambda k: k["numberOfComments"], reverse=True)
+                    Connection.Instance().conversations[str(v[0])].remove({"time_filter": date})
+                    Connection.Instance().conversations[str(v[0])].insert_one({'time_filter': date, 'posts': posts})

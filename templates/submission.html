@@ -35,10 +35,18 @@
                 {{ post["title"] }}
             </span>
 
-            <div style='font-size:1em;font-weight:normal'>
-                {% if post["source"] == "reddit" %}
-                       source : {{ post['subreddit'] }}
-                {% endif %}    
+            <div>
+                <span style='color:#666666;padding-left:0.3em'>
+                    {% if post["source"] == "reddit" %}
+                           r/{{ post['subreddit'] }}
+                    {% endif %}    
+                </span>
+
+                <span style='color:#666666;padding-left:1.5em'>
+                    {% if post["source"] == "reddit" %}
+                           {{ post['created_time'] }}
+                    {% endif %}    
+                </span>
             </div>
 
             <br>
