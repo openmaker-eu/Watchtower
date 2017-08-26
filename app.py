@@ -13,6 +13,10 @@ import apiv12
 import logic
 import newapi
 
+import facebookRedditCrontab
+import time
+from datetime import datetime, timedelta
+
 chars = ''.join([string.ascii_letters, string.digits, string.punctuation]).replace('\'', '').replace('"', '').replace(
     '\\', '')
 secret_key = ''.join([random.SystemRandom().choice(chars) for i in range(100)])
@@ -77,6 +81,7 @@ class Application(tornado.web.Application):
             (r"/get_news/(.*)", SearchNewsHandler, {'mainT': mainT}),
             (r"/Audience", AudienceHandler, {'mainT': mainT}),
             (r"/preview", PreviewHandler, {'mainT': mainT}),
+            (r"/previewConversation", PreviewConversationHandler, {'mainT': mainT}),
             (r"/sentiment", SentimentHandler, {'mainT': mainT}),
             (r"/bookmark", BookmarkHandler, {'mainT': mainT}),
             (r"/domain", DomainHandler, {'mainT': mainT}),
@@ -105,6 +110,55 @@ class Application(tornado.web.Application):
         ]
         super(Application, self).__init__(handlers, **settings)
 
+
+class PreviewConversationHandler(BaseHandler, TemplateRendering):
+    @tornado.web.authenticated
+    def post(self):
+        keywords = self.get_argument('keyswords', '0')
+        sources = logic.sourceSelection(keywords)
+
+        redditSources = sources['subreddits']
+        facebookSources = sources['pages']
+        facebookSourceIds = []
+        for source in facebookSources:
+            facebookSourceIds.append(source['page_id'])
+        
+        facebookDocument = facebookRedditCrontab.mineFacebookConversations(facebookSourceIds)
+        redditDocument = facebookRedditCrontab.mineRedditConversation(redditSources)
+        document = facebookDocument + redditDocument
+        
+
+        docs = []
+        for submission in document:
+            if not submission["numberOfComments"]:
+                continue
+            comments = []
+            for comment in submission["comments"]:
+                comment["relative_indent"] = 0
+                if submission['source'] == 'reddit':
+                    comment["created_time"] = datetime.fromtimestamp(int(comment["created_time"])).strftime(
+                        "%Y-%m-%d %H:%M:%S")
+                else:
+                    comment["created_time"] = comment["created_time"][:10] + " " + comment["created_time"][11:18]
+                comments.append(comment)
+
+            submission['created_time'] = datetime.fromtimestamp(submission['created_time']).strftime('%Y-%m-%d')
+            temp = {"title": submission["title"], "source": submission["source"], "comments": comments,
+                    "url": submission["url"], "commentNumber": submission["numberOfComments"],
+                    'subreddit': submission['subreddit'], 'created_time': submission['created_time']}
+            if "post_text" in submission:
+                temp["post_text"] = submission["post_text"]
+            else:
+                temp["post_text"] = ""
+            docs.append(temp)
+        prev = 0
+        for values in docs:
+            for current in values["comments"]:
+                current["relative_indent"] = current["indent_number"] - prev
+                prev = current["indent_number"]
+
+
+        self.write(self.render_template("submission.html", {"docs": docs}))
 
 class EventV12Handler(BaseHandler, TemplateRendering):
     def get(self):

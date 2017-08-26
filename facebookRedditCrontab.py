@@ -96,7 +96,7 @@ def getComments(submission):
     return comList
 
 
-def mineRedditConversation(subreddits, timeFilter):
+def mineRedditConversation(subreddits, timeFilter='day'):
     keys = Connection.Instance().redditFacebookDB['tokens'].find_one()["reddit"]
     reddit = praw.Reddit(client_id=keys["client_id"],
                          client_secret=keys["client_secret"],

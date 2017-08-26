@@ -68,11 +68,12 @@ $(document).ready(function () {
         });
         if ($('.input-error').length == 0) {
             $("#spin").spinner();
-            $('#preview').empty();
+            $('#preview-news').empty();
             $("#spin").show();
             var keys = $("#keywords").val();
             var exkeys = $("#excludedkeywords").val();
             var langs = $("#languages").val().join();
+            // ajax for news
             $.ajax({
                 url: '/preview',
                 method: 'POST',
@@ -83,11 +84,11 @@ $(document).ready(function () {
                 },
                 timeout: 10000,
                 error: function () {
-                    $('#preview').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");
+                    $('#preview-news').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");
                     $("#spin").hide();
                 }
             }).success(function (html) {
-                $('#preview').append(html);
+                $('#preview-news').append(html);
                 var interval = setInterval(function () { // this code is executed every 500 milliseconds:
                     console.log("I'm waiting");
                     if ($('blockquote').length === 0) {
@@ -98,6 +99,58 @@ $(document).ready(function () {
 
                 }, 500);
             });
+            ///* ajax for conversations
+            $.ajax({
+                url: '/previewConversation',
+                method: 'POST',
+                data: {
+                    'keywords': keys,
+                },
+                timeout: 10000,
+                error: function () {
+                    $('#preview-conversations').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");
+                    $("#spin").hide();
+                }
+            }).success(function (html) {
+                $('#preview-conversations').append(html);
+                var interval = setInterval(function () { // this code is executed every 500 milliseconds:
+                    console.log("I'm waiting");
+                    if ($('blockquote').length === 0) {
+                        clearInterval(interval);
+                        $('.twitter-tweet-error').remove()
+                        $('#spin').hide();
+                    }
+
+                }, 500);
+            });
+            //*/
+            /* ajax for events
+            $.ajax({
+                url: '/preview',
+                method: 'POST',
+                data: {
+                    'keywords': keys,
+                    'languages': langs,
+                    'excludedkeywords': exkeys
+                },
+                timeout: 10000,
+                error: function () {
+                    $('#preview-news').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");
+                    $("#spin").hide();
+                }
+            }).success(function (html) {
+                $('#preview-news').append(html);
+                var interval = setInterval(function () { // this code is executed every 500 milliseconds:
+                    console.log("I'm waiting");
+                    if ($('blockquote').length === 0) {
+                        clearInterval(interval);
+                        $('.twitter-tweet-error').remove()
+                        $('#spin').hide();
+                    }
+
+                }, 500);
+            });
+            */
         }
     });
 });
