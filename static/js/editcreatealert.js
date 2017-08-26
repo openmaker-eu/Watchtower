@@ -90,7 +90,7 @@ $(document).ready(function () {
             }).success(function (html) {
                 $('#preview-news').append(html);
                 var interval = setInterval(function () { // this code is executed every 500 milliseconds:
-                    console.log("I'm waiting");
+                    //console.log("I'm waiting");
                     if ($('blockquote').length === 0) {
                         clearInterval(interval);
                         $('.twitter-tweet-error').remove()
@@ -99,7 +99,7 @@ $(document).ready(function () {
 
                 }, 500);
             });
-            ///* ajax for conversations
+            // ajax for conversations
             $.ajax({
                 url: '/previewConversation',
                 method: 'POST',
@@ -122,35 +122,8 @@ $(document).ready(function () {
                     }
 
                 }, 500);
+                updateReadMores()
             });
-            //*/
-            /* ajax for events
-            $.ajax({
-                url: '/preview',
-                method: 'POST',
-                data: {
-                    'keywords': keys,
-                    'languages': langs,
-                    'excludedkeywords': exkeys
-                },
-                timeout: 10000,
-                error: function () {
-                    $('#preview-news').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");
-                    $("#spin").hide();
-                }
-            }).success(function (html) {
-                $('#preview-news').append(html);
-                var interval = setInterval(function () { // this code is executed every 500 milliseconds:
-                    console.log("I'm waiting");
-                    if ($('blockquote').length === 0) {
-                        clearInterval(interval);
-                        $('.twitter-tweet-error').remove()
-                        $('#spin').hide();
-                    }
-
-                }, 500);
-            });
-            */
         }
     });
 });

@@ -1,3 +1,11 @@
+.all-comments-opened {
+    display: inherit;
+}
+
+.all-comments-closed {
+    display: none;
+}
+
 #all-comments {
     margin-right: 20%;
     margin-left: 20%;

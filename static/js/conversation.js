@@ -12,7 +12,13 @@ $(document).ready(function () {
         if (($(window).scrollTop() + $(window).height() == $(document).height()) && (isReadyForLoading)) {
             isReadyForLoading = false;
             console.log("bottom");
-            loadNewConversations();
+            try {
+                loadNewConversations();    
+            }
+            catch(err) {
+                console.log('conversation preview');
+            }
+            
         }
     });
 });
@@ -67,6 +73,7 @@ function getConversations(clickedButton, date) {
 }
 
 function updateReadMores() {
+
     var allButtons = document.querySelectorAll("[id^=read-more-post-button]");
     for (var i in allButtons) {
         if (allButtons[i].previousElementSibling != null) {
@@ -80,6 +87,9 @@ function updateReadMores() {
     for (var i in allButtons) {
         if (allButtons[i].previousElementSibling != null) {
             if (!(allButtons[i].previousElementSibling.offsetHeight < allButtons[i].previousElementSibling.scrollHeight)) {
+                
+                console.log(allButtons[i].previousElementSibling.scrollHeight);
+                console.log(allButtons[i].previousElementSibling.offsetHeight);
                 allButtons[i].remove();
             }
         }
