@@ -6,6 +6,14 @@
     display: none;
 }
 
+.comment-opened {
+    display: inherit;
+}
+
+.comment-closed {
+    display: none;   
+}
+
 #all-comments {
     margin-right: 20%;
     margin-left: 20%;

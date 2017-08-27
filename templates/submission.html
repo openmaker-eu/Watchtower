@@ -76,7 +76,7 @@
 				view {{ post["commentNumber"] }} comments
 			</span>
 
-        <div class="comments all-comments-closed">
+        <div class="comments all-comments-opened">
             {% for item in post["comments"] %}
                 {% if not loop.first %}
                     {% if item["relative_indent"] == 0 %}
@@ -96,7 +96,7 @@
                     <p style="display:inline;font-size:11px">{{ item["created_time"] }}</p>
                 </div>
 
-                <div class="comment-box">
+                <div class="comment-box comment-opened">
 
                     <div class="{{ item["indent_number"] }}">
 

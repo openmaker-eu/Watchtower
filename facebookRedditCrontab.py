@@ -70,7 +70,36 @@ def mineFacebookConversations(search_ids, timeFilter="day", pageNumber="5"):
                     break
     # Sorting all comments with comment numbers, because I will use them in web page in this order
     # posts = sorted(posts, key=lambda k: k["numberOfComments"], reverse=True)
-    return posts
+    docs = []
+    for submission in posts:
+        if not submission["numberOfComments"]:
+            continue
+        comments = []
+        for comment in submission["comments"]:
+            comment["relative_indent"] = 0
+            if submission['source'] == 'reddit':
+                comment["created_time"] = datetime.fromtimestamp(int(comment["created_time"])).strftime(
+                    "%Y-%m-%d %H:%M:%S")
+            else:
+                comment["created_time"] = comment["created_time"][:10] + " " + comment["created_time"][11:18]
+            comments.append(comment)
+
+        submission['created_time'] = datetime.fromtimestamp(submission['created_time']).strftime('%Y-%m-%d')
+        temp = {"title": submission["title"], "source": submission["source"], "comments": comments,
+                "url": submission["url"], "commentNumber": submission["numberOfComments"],
+                'subreddit': submission['subreddit'], 'created_time': submission['created_time']}
+        if "post_text" in submission:
+            temp["post_text"] = submission["post_text"]
+        else:
+            temp["post_text"] = ""
+        docs.append(temp)
+    prev = 0
+    for values in docs:
+        for current in values["comments"]:
+            current["relative_indent"] = current["indent_number"] - prev
+            prev = current["indent_number"]
+
+    return docs
 
 
 def getComments(submission):
@@ -148,7 +177,36 @@ def mineRedditConversation(subreddits, timeFilter='day'):
                 print("one submission passed")
                 pass
 
-    return posts
+    docs = []
+    for submission in posts:
+        if not submission["numberOfComments"]:
+            continue
+        comments = []
+        for comment in submission["comments"]:
+            comment["relative_indent"] = 0
+            if submission['source'] == 'reddit':
+                comment["created_time"] = datetime.fromtimestamp(int(comment["created_time"])).strftime(
+                    "%Y-%m-%d %H:%M:%S")
+            else:
+                comment["created_time"] = comment["created_time"][:10] + " " + comment["created_time"][11:18]
+            comments.append(comment)
+
+        submission['created_time'] = datetime.fromtimestamp(submission['created_time']).strftime('%Y-%m-%d')
+        temp = {"title": submission["title"], "source": submission["source"], "comments": comments,
+                "url": submission["url"], "commentNumber": submission["numberOfComments"],
+                'subreddit': submission['subreddit'], 'created_time': submission['created_time']}
+        if "post_text" in submission:
+            temp["post_text"] = submission["post_text"]
+        else:
+            temp["post_text"] = ""
+        docs.append(temp)
+    prev = 0
+    for values in docs:
+        for current in values["comments"]:
+            current["relative_indent"] = current["indent_number"] - prev
+            prev = current["indent_number"]
+
+    return docs
 
 
 def sourceSelection(topicList):

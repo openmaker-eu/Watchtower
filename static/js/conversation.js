@@ -11,12 +11,10 @@ $(document).ready(function () {
     $(window).scroll(function () {
         if (($(window).scrollTop() + $(window).height() == $(document).height()) && (isReadyForLoading)) {
             isReadyForLoading = false;
-            console.log("bottom");
             try {
                 loadNewConversations();    
             }
-            catch(err) {
-                console.log('conversation preview');
+            catch(err) { // conversation preview
             }
             
         }
@@ -36,7 +34,7 @@ function loadNewConversations() {
             $(".loader").css("visibility", "hidden");
             lastPostScrollNumber += 10;
             $("#all-comments").append(response);
-            console.log(lastPostScrollNumber);
+            
             updateReadMores();
         },
         error: function (response) {
@@ -57,7 +55,7 @@ function getConversations(clickedButton, date) {
         url: "/Comments",
         data: {topic_id: topic_id, timeFilter: date, paging: lastPostScrollNumber},
         success: function (response) {
-            console.log(response);
+            
             console.log("success");
             lastPostScrollNumber += 10;
             $("#all-comments").empty();
@@ -73,7 +71,7 @@ function getConversations(clickedButton, date) {
 }
 
 function updateReadMores() {
-
+    console.log($(".all-comments-opened"));
     var allButtons = document.querySelectorAll("[id^=read-more-post-button]");
     for (var i in allButtons) {
         if (allButtons[i].previousElementSibling != null) {
@@ -87,45 +85,39 @@ function updateReadMores() {
     for (var i in allButtons) {
         if (allButtons[i].previousElementSibling != null) {
             if (!(allButtons[i].previousElementSibling.offsetHeight < allButtons[i].previousElementSibling.scrollHeight)) {
-                
-                console.log(allButtons[i].previousElementSibling.scrollHeight);
-                console.log(allButtons[i].previousElementSibling.offsetHeight);
+                //console.log(allButtons[i].previousElementSibling.scrollHeight);
+                //console.log(allButtons[i].previousElementSibling.offsetHeight);
                 allButtons[i].remove();
             }
         }
     }
-    $(".all-comments-closed").css("display", "none");
+    $(".all-comments-opened").removeClass("all-comments-opened").addClass("all-comments-closed");
 }
 
 function openInnerComment(param) {
-    console.log(param.parentElement.nextElementSibling);
+    
     if (param.textContent == "-") {
-        $(param.parentElement.nextElementSibling).css("display", "none");
+        $(param.parentElement.nextElementSibling).removeClass("comment-opened").addClass("comment-closed");
         param.textContent = "+";
     } else {
-        $(param.parentElement.nextElementSibling).css("display", "inherit");
+        $(param.parentElement.nextElementSibling).removeClass("comment-closed").addClass("comment-opened");
         param.textContent = "-";
     }
 }
 
 function openComment(param) {
-    console.log("lol")
-    console.log(param.parentElement.parentElement.childNodes);
+    
     if (param.textContent == "-") {
-        $(param.parentElement.parentElement.childNodes[7]).css("display", "none");
-        $(param.parentElement.parentElement.childNodes[7]).removeClass("all-comments-opened");
-        $(param.parentElement.parentElement.childNodes[7]).addClass("all-comments-closed");
+        $(param.parentElement.parentElement.childNodes[7]).removeClass("all-comments-opened").addClass("all-comments-closed");
         param.textContent = "+";
     } else {
-        $(param.parentElement.parentElement.childNodes[7]).css("display", "inherit");
-        $(param.parentElement.parentElement.childNodes[7]).removeClass("all-comments-closed");
-        $(param.parentElement.parentElement.childNodes[7]).addClass("all-comments-opened");
+        $(param.parentElement.parentElement.childNodes[7]).removeClass("all-comments-closed").addClass("all-comments-opened");
         param.textContent = "-";
     }
 }
 
 function readMore(param) {
-    console.log(param.parentElement.childNodes);
+    
     if (param.textContent == "Read More") {
         $(param.parentElement.childNodes[1]).css("max-height", "none");
         param.textContent = "Read Less";
@@ -136,7 +128,7 @@ function readMore(param) {
 }
 
 function readMorePost(param) {
-    console.log(param.previousElementSibling);
+    
     if (param.textContent == "Read More") {
         $(param.previousElementSibling).css("max-height", "none");
         param.textContent = "Read Less";

@@ -82,7 +82,7 @@ $(document).ready(function () {
                     'languages': langs,
                     'excludedkeywords': exkeys
                 },
-                timeout: 10000,
+                timeout: 100000,
                 error: function () {
                     $('#preview-news').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");
                     $("#spin").hide();
@@ -106,7 +106,7 @@ $(document).ready(function () {
                 data: {
                     'keywords': keys,
                 },
-                timeout: 10000,
+                timeout: 100000,
                 error: function () {
                     $('#preview-conversations').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");
                     $("#spin").hide();
@@ -114,7 +114,7 @@ $(document).ready(function () {
             }).success(function (html) {
                 $('#preview-conversations').append(html);
                 var interval = setInterval(function () { // this code is executed every 500 milliseconds:
-                    console.log("I'm waiting");
+                    //console.log("I'm waiting");
                     if ($('blockquote').length === 0) {
                         clearInterval(interval);
                         $('.twitter-tweet-error').remove()
