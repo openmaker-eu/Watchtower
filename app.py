@@ -122,13 +122,13 @@ class PreviewConversationHandler(BaseHandler, TemplateRendering):
         facebookSourceIds = []
         for source in facebookSources:
             facebookSourceIds.append(source['page_id'])
-        
+
         facebookDocument = facebookRedditCrontab.mineFacebookConversations(facebookSourceIds)
-        
+
         redditDocument = facebookRedditCrontab.mineRedditConversation(redditSources)
 
         docs = facebookDocument + redditDocument
-        
+
         self.write(self.render_template("submission.html", {"docs": docs}))
 
 class EventV12Handler(BaseHandler, TemplateRendering):
@@ -150,7 +150,8 @@ class EventPageHandler(BaseHandler, TemplateRendering):
         variables = {
             'title': "Events",
             'alerts': logic.getAlertList(userid),
-            'type': "events"
+            'type': "events",
+            'username': str(tornado.escape.xhtml_escape(self.get_current_username()))
         }
         content = self.render_template(template, variables)
         self.write(content)
