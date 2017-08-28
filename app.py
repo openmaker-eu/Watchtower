@@ -855,8 +855,6 @@ class TopicHandler(BaseHandler, TemplateRendering):
     def post(self):
         userid = tornado.escape.xhtml_escape(self.current_user)
         logic.saveTopicId(self.get_argument("topic_id"), userid)
-        self.redirect("/Alerts")
-
 
 def main(mainT):
     tornado.options.parse_command_line()
