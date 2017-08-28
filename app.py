@@ -462,7 +462,7 @@ class CreateEditAlertsHandler(BaseHandler, TemplateRendering):
         template = 'afterlogintemplate.html'
         variables = {}
         variables['topic'] = logic.getCurrentTopic(tornado.escape.xhtml_escape(self.current_user))
-        variales['username'] = str(tornado.escape.xhtml_escape(self.get_current_username()))
+        variables['username'] = str(tornado.escape.xhtml_escape(self.get_current_username()))
         variables['alerts'] = logic.getAlertList(userid)
 
         if alertid != None:

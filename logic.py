@@ -25,7 +25,7 @@ def setCurrentTopic(userid):
             "update users set current_topic_id = %s where userid = %s;", \
             [topics[0][0], int(userid)])
         Connection.Instance().PostGreSQLConnect.commit()
-    else:
+    elif len(topics) == 0:
         Connection.Instance().cur.execute(
             "update users set current_topic_id = %s where userid = %s;", \
             [None, int(userid)])
