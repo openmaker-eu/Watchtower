@@ -31,11 +31,13 @@ def setCurrentTopic(userid):
             [None, int(userid)])
         Connection.Instance().PostGreSQLConnect.commit()
 
+
 def saveTopicId(topic_id, userid):
     Connection.Instance().cur.execute(
         "update users set current_topic_id = %s where userid = %s;", \
         [int(topic_id), int(userid)])
     Connection.Instance().PostGreSQLConnect.commit()
+
 
 def getCurrentTopic(userid):
     Connection.Instance().cur.execute("select current_topic_id from users where userid = %s", [int(userid)])

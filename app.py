@@ -10,12 +10,9 @@ import tornado.web
 from jinja2 import Environment, FileSystemLoader, TemplateNotFound
 
 import apiv12
+import facebookRedditCrontab
 import logic
 import newapi
-
-import facebookRedditCrontab
-import time
-from datetime import datetime, timedelta
 
 chars = ''.join([string.ascii_letters, string.digits, string.punctuation]).replace('\'', '').replace('"', '').replace(
     '\\', '')
@@ -851,6 +848,7 @@ class PagesHandler(BaseHandler, TemplateRendering):
 
         content = self.render_template(template, variables)
         self.write(content)
+
 
 class TopicHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
