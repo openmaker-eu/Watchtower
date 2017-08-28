@@ -12,11 +12,11 @@ $(document).ready(function () {
         if (($(window).scrollTop() + $(window).height() == $(document).height()) && (isReadyForLoading)) {
             isReadyForLoading = false;
             try {
-                loadNewConversations();    
+                loadNewConversations();
             }
-            catch(err) { // conversation preview
+            catch (err) { // conversation preview
             }
-            
+
         }
     });
 });
@@ -34,7 +34,7 @@ function loadNewConversations() {
             $(".loader").css("visibility", "hidden");
             lastPostScrollNumber += 10;
             $("#all-comments").append(response);
-            
+
             updateReadMores();
         },
         error: function (response) {
@@ -55,7 +55,7 @@ function getConversations(clickedButton, date) {
         url: "/Comments",
         data: {topic_id: topic_id, timeFilter: date, paging: lastPostScrollNumber},
         success: function (response) {
-            
+
             console.log("success");
             lastPostScrollNumber += 10;
             $("#all-comments").empty();
@@ -95,7 +95,7 @@ function updateReadMores() {
 }
 
 function openInnerComment(param) {
-    
+
     if (param.textContent == "-") {
         $(param.parentElement.nextElementSibling).removeClass("comment-opened").addClass("comment-closed");
         param.textContent = "+";
@@ -106,7 +106,7 @@ function openInnerComment(param) {
 }
 
 function openComment(param) {
-    
+
     if (param.textContent == "-") {
         $(param.parentElement.parentElement.childNodes[7]).removeClass("all-comments-opened").addClass("all-comments-closed");
         param.textContent = "+";
@@ -117,7 +117,7 @@ function openComment(param) {
 }
 
 function readMore(param) {
-    
+
     if (param.textContent == "Read More") {
         $(param.parentElement.childNodes[1]).css("max-height", "none");
         param.textContent = "Read Less";
@@ -128,7 +128,7 @@ function readMore(param) {
 }
 
 function readMorePost(param) {
-    
+
     if (param.textContent == "Read More") {
         $(param.previousElementSibling).css("max-height", "none");
         param.textContent = "Read Less";

@@ -12,6 +12,42 @@ import search
 from application.Connections import Connection
 
 
+def setCurrentTopic(userid):
+    Connection.Instance().cur.execute("select alertid from alerts where userid = %s", [int(userid)])
+    topics = Connection.Instance().cur.fetchall()
+    Connection.Instance().cur.execute("select current_topic_id from users where userid = %s", [int(userid)])
+    user = Connection.Instance().cur.fetchall()
+    print(user)
+    print(topics)
+    if user[0][0] is None and len(topics) != 0:
+        print("settopic")
+        Connection.Instance().cur.execute(
+            "update users set current_topic_id = %s where userid = %s;", \
+            [topics[0][0], int(userid)])
+        Connection.Instance().PostGreSQLConnect.commit()
+    else:
+        Connection.Instance().cur.execute(
+            "update users set current_topic_id = %s where userid = %s;", \
+            [None, int(userid)])
+        Connection.Instance().PostGreSQLConnect.commit()
+
+def saveTopicId(topic_id, userid):
+    Connection.Instance().cur.execute(
+        "update users set current_topic_id = %s where userid = %s;", \
+        [int(topic_id), int(userid)])
+    Connection.Instance().PostGreSQLConnect.commit()
+
+def getCurrentTopic(userid):
+    Connection.Instance().cur.execute("select current_topic_id from users where userid = %s", [int(userid)])
+    user = Connection.Instance().cur.fetchall()
+    if user[0][0] is not None:
+        Connection.Instance().cur.execute("select alertid, alertname from alerts where alertid = %s", [int(user[0][0])])
+        topic = Connection.Instance().cur.fetchall()
+        return {'topic_id': topic[0][0], 'topic_name': topic[0][1]}
+    else:
+        return None
+
+
 def sourceSelection(topicList):
     return {'pages': sourceSelectionFromFacebook(topicList),
             'subreddits': sourceSelectionFromReddit(topicList)}
@@ -262,6 +298,7 @@ def addAlert(alert, mainT, userid):
     alert = getAlertAllOfThemList(alert['alertid'])
     setUserAlertLimit(userid, 'decrement')
     mainT.addAlert(alert)
+    setCurrentTopic(userid)
 
 
 # Deletes alert and terminate its thread
@@ -274,6 +311,7 @@ def deleteAlert(alertid, mainT, userid):
     Connection.Instance().newsdB[str(alertid)].drop()
     Connection.Instance().cur.execute("delete from alerts where alertid = %s;", [alertid])
     Connection.Instance().PostGreSQLConnect.commit()
+    setCurrentTopic(userid)
 
 
 # Updates given alert information and kill its thread, then again start its thread.

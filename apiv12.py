@@ -14,7 +14,7 @@ from application.Connections import Connection
 def getEvents(topic_id, filterField, cursor):
     now = time.time()
     cursor = int(cursor)
-    ret = None
+    ret = []
     if filterField == 'interested':
         ret = Connection.Instance().events[str(topic_id)].aggregate([
             {'$match': {'end_time': {'$gte': now}}},
@@ -33,6 +33,7 @@ def getEvents(topic_id, filterField, cursor):
         ])
     ret = list(ret)
     temp = {'events': ret}
+    print(temp)
     return temp
 
 
@@ -69,6 +70,7 @@ def getConversations(topic_id, timeFilter, paging):
                 current["relative_indent"] = current["indent_number"] - prev
                 prev = current["indent_number"]
         return docs
+    return []
 
 
 def my_handler(x):

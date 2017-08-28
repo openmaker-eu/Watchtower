@@ -20,7 +20,7 @@ from datetime import datetime, timedelta
 chars = ''.join([string.ascii_letters, string.digits, string.punctuation]).replace('\'', '').replace('"', '').replace(
     '\\', '')
 secret_key = ''.join([random.SystemRandom().choice(chars) for i in range(100)])
-secret_key = 'PEO+{+RlTK[3~}TS-F%[9J/sIp>W7!r*]YV75GZV)e;Q9lAdNE{m@oWK.+u-&z*-p>~Xa!Z8j~{z,BVv.e0GChY{(1.KVForO#rQ'
+secret_key = 'PEO+{+RlTK[3~}TS-F%[9J/sIp>W7!r*]YV75GZV)e;Q8lAdNE{m@oWK.+u-&z*-p>~Xa!Z8j~{z,BVv.e0GChY{(1.KVForO#rQ'
 
 settings = dict(
     template_path=os.path.join(os.path.dirname(__file__), "templates"),
@@ -87,6 +87,7 @@ class Application(tornado.web.Application):
             (r"/domain", DomainHandler, {'mainT': mainT}),
             (r"/newTweets", NewTweetsHandler, {'mainT': mainT}),
             (r"/newTweets/(.*)", NewTweetsHandler, {'mainT': mainT}),
+            (r"/saveTopicId", TopicHandler, {'mainT': mainT}),
             (r"/api", DocumentationHandler, {'mainT': mainT}),
             (r"/api/v1\.1", Documentationv11Handler, {'mainT': mainT}),
             (r"/api/v1\.2", Documentationv12Handler, {'mainT': mainT}),
@@ -131,6 +132,7 @@ class PreviewConversationHandler(BaseHandler, TemplateRendering):
 
         self.write(self.render_template("submission.html", {"docs": docs}))
 
+
 class EventV12Handler(BaseHandler, TemplateRendering):
     def get(self):
         topic_id = self.get_argument('topic_id', None)
@@ -147,11 +149,16 @@ class EventPageHandler(BaseHandler, TemplateRendering):
     def get(self):
         userid = tornado.escape.xhtml_escape(self.current_user)
         template = 'afterlogintemplate.html'
+        topic = logic.getCurrentTopic(tornado.escape.xhtml_escape(self.current_user))
+        if topic is None:
+            self.redirect("/alertinfo")
         variables = {
             'title': "Events",
             'alerts': logic.getAlertList(userid),
             'type': "events",
-            'username': str(tornado.escape.xhtml_escape(self.get_current_username()))
+            'username': str(tornado.escape.xhtml_escape(self.get_current_username())),
+            "document": apiv12.getEvents(topic['topic_id'], "date", 0),
+            'topic': topic
         }
         content = self.render_template(template, variables)
         self.write(content)
@@ -170,11 +177,16 @@ class ConversationPageHandler(BaseHandler, TemplateRendering):
     def get(self):
         userid = tornado.escape.xhtml_escape(self.current_user)
         template = 'afterlogintemplate.html'
+        topic = logic.getCurrentTopic(tornado.escape.xhtml_escape(self.current_user))
+        if topic is None:
+            self.redirect("/alertinfo")
         variables = {
             'title': "Conversations",
             'alerts': logic.getAlertList(userid),
             'type': "conversation",
-            'username': str(tornado.escape.xhtml_escape(self.get_current_username()))
+            'username': str(tornado.escape.xhtml_escape(self.get_current_username())),
+            "docs": apiv12.getConversations(topic['topic_id'], "day", 0),
+            'topic': topic
         }
         content = self.render_template(template, variables)
         self.write(content)
@@ -378,6 +390,7 @@ class LoginHandler(BaseHandler, TemplateRendering):
         if login_info['response']:
             self.set_secure_cookie("userid", str(login_info['userid']))
             self.set_secure_cookie("username", str(username))
+            logic.setCurrentTopic(str(login_info['userid']))
             self.write({'response': True, 'redirectUrl': self.get_argument('next', '/Alerts')})
         else:
             self.write(json.dumps(login_info))
@@ -395,6 +408,7 @@ class AlertsHandler(BaseHandler, TemplateRendering):
         self.mainT.checkThread()
         userid = tornado.escape.xhtml_escape(self.current_user)
         template = 'afterlogintemplate.html'
+        topic = logic.getCurrentTopic(tornado.escape.xhtml_escape(self.current_user))
         variables = {
             'title': "Alerts",
             'alerts': logic.getAlertList(userid),
@@ -402,7 +416,8 @@ class AlertsHandler(BaseHandler, TemplateRendering):
             'alertlimit': logic.getAlertLimit(userid),
             'threadstatus': logic.getThreadStatus(self.mainT),
             'threadconnection': logic.getThreadConnection(self.mainT),
-            'username': str(tornado.escape.xhtml_escape(self.get_current_username()))
+            'username': str(tornado.escape.xhtml_escape(self.get_current_username())),
+            'topic': topic
         }
         content = self.render_template(template, variables)
         self.write(content)
@@ -428,7 +443,8 @@ class AlertsHandler(BaseHandler, TemplateRendering):
             'alerts': logic.getAlertList(userid),
             'type': "alertlist",
             'alertlimit': logic.getAlertLimit(userid),
-            'username': str(tornado.escape.xhtml_escape(self.get_current_username()))
+            'username': str(tornado.escape.xhtml_escape(self.get_current_username())),
+            'topic': logic.getCurrentTopic(tornado.escape.xhtml_escape(self.current_user))
         }
         content = self.render_template(template, variables)
         self.write(content)
@@ -448,6 +464,10 @@ class CreateEditAlertsHandler(BaseHandler, TemplateRendering):
         userid = tornado.escape.xhtml_escape(self.current_user)
         template = 'afterlogintemplate.html'
         variables = {}
+        variables['topic'] = logic.getCurrentTopic(tornado.escape.xhtml_escape(self.current_user))
+        variales['username'] = str(tornado.escape.xhtml_escape(self.get_current_username()))
+        variables['alerts'] = logic.getAlertList(userid)
+
         if alertid != None:
             if logic.alertExist(alertid):
                 if logic.checkUserIdAlertId(userid, alertid):
@@ -575,7 +595,8 @@ class FeedHandler(BaseHandler, TemplateRendering):
                     'alertname': logic.getAlertName(alertid),
                     'comesAlert': True,
                     'type': "feed",
-                    'username': str(tornado.escape.xhtml_escape(self.get_current_username()))
+                    'username': str(tornado.escape.xhtml_escape(self.get_current_username())),
+                    'topic': logic.getCurrentTopic(tornado.escape.xhtml_escape(self.current_user))
                 }
                 if len(variables['tweets']) == 0:
                     self.write("<p style='color: red; font-size: 15px'><b>Ops! There is no tweet now.</b></p>")
@@ -585,7 +606,8 @@ class FeedHandler(BaseHandler, TemplateRendering):
                     'alerts': logic.getAlertList(userid),
                     'comesAlert': False,
                     'type': "feed",
-                    'username': str(tornado.escape.xhtml_escape(self.get_current_username()))
+                    'username': str(tornado.escape.xhtml_escape(self.get_current_username())),
+                    'topic': logic.getCurrentTopic(tornado.escape.xhtml_escape(self.current_user))
                 }
                 pass
         else:
@@ -594,7 +616,8 @@ class FeedHandler(BaseHandler, TemplateRendering):
                 'alerts': logic.getAlertList(userid),
                 'comesAlert': False,
                 'type': "feed",
-                'username': str(tornado.escape.xhtml_escape(self.get_current_username()))
+                'username': str(tornado.escape.xhtml_escape(self.get_current_username())),
+                'topic': logic.getCurrentTopic(tornado.escape.xhtml_escape(self.current_user))
             }
         content = self.render_template(template, variables)
         self.write(content)
@@ -645,45 +668,23 @@ class NewsHandler(BaseHandler, TemplateRendering):
         variables = {}
         userid = tornado.escape.xhtml_escape(self.current_user)
         template = 'afterlogintemplate.html'
-        if argument is not None:
-            try:
-                alertid = int(argument)
-                try:
-                    date = self.get_argument('date')
-                except:
-                    date = 'yesterday'
-                    pass
-                try:
-                    feeds = logic.getNews(alertid, date, 0)
-                    variables = {
-                        'title': "News",
-                        'feeds': feeds['feeds'],
-                        'cursor': feeds['next_cursor'],
-                        'alertid': alertid,
-                        'alertname': logic.getAlertName(alertid),
-                        'comesAlert': True,
-                        'type': "news",
-                        'username': str(tornado.escape.xhtml_escape(self.get_current_username()))
-                    }
-                except:
-                    self.write("<p style='color: red; font-size: 15px'><b>Ops! There is no news now.</b></p>")
-            except ValueError:
-                variables = {
-                    'title': "News",
-                    'alerts': logic.getAlertList(userid),
-                    'comesAlert': False,
-                    'type': "news",
-                    'username': str(tornado.escape.xhtml_escape(self.get_current_username()))
-                }
-                pass
-        else:
-            variables = {
-                'title': "News",
-                'alerts': logic.getAlertList(userid),
-                'comesAlert': False,
-                'type': "news",
-                'username': str(tornado.escape.xhtml_escape(self.get_current_username()))
-            }
+        topic = logic.getCurrentTopic(tornado.escape.xhtml_escape(self.current_user))
+        if topic is None:
+            self.redirect("/alertinfo")
+
+        print(topic)
+        feeds = logic.getNews(topic['topic_id'], "yesterday", 0)
+        variables = {
+            'title': "News",
+            'feeds': feeds['feeds'],
+            'cursor': feeds['next_cursor'],
+            'alertid': topic['topic_id'],
+            'alerts': logic.getAlertList(userid),
+            'alertname': topic['topic_name'],
+            'type': "news",
+            'username': str(tornado.escape.xhtml_escape(self.get_current_username())),
+            'topic': topic
+        }
         content = self.render_template(template, variables)
         self.write(content)
 
@@ -739,7 +740,8 @@ class SearchHandler(BaseHandler, TemplateRendering):
         variables = {
             'title': "Search",
             'type': "search",
-            'username': str(tornado.escape.xhtml_escape(self.get_current_username()))
+            'username': str(tornado.escape.xhtml_escape(self.get_current_username())),
+            'topic': None
         }
 
         content = self.render_template(template, variables)
@@ -793,38 +795,21 @@ class AudienceHandler(BaseHandler, TemplateRendering):
         variables = {}
         userid = tornado.escape.xhtml_escape(self.current_user)
         template = 'afterlogintemplate.html'
-        if argument is not None:
-            try:
-                alertid = int(argument)
-                try:
-                    audiences = logic.getAudiences(alertid)
-                    variables = {
-                        'title': "Audience",
-                        'alertname': logic.getAlertName(alertid),
-                        'audiences': audiences,
-                        'comesAlert': True,
-                        'type': "audiences",
-                        'username': str(tornado.escape.xhtml_escape(self.get_current_username()))
-                    }
-                except:
-                    self.write("<p style='color: red; font-size: 15px'><b>Ops! There is no news now.</b></p>")
-            except ValueError:
-                variables = {
-                    'title': "Audience",
-                    'alerts': logic.getAlertList(userid),
-                    'comesAlert': False,
-                    'type': "audiences",
-                    'username': str(tornado.escape.xhtml_escape(self.get_current_username()))
-                }
-                pass
-        else:
-            variables = {
-                'title': "Audience",
-                'alerts': logic.getAlertList(userid),
-                'comesAlert': False,
-                'type': "audiences",
-                'username': str(tornado.escape.xhtml_escape(self.get_current_username()))
-            }
+        topic = logic.getCurrentTopic(tornado.escape.xhtml_escape(self.current_user))
+        if topic is None:
+            self.redirect("/alertinfo")
+
+        audiences = logic.getAudiences(topic['topic_id'])
+        variables = {
+            'title': "Audience",
+            'alertname': topic['topic_name'],
+            'audiences': audiences,
+            'alerts': logic.getAlertList(userid),
+            'type': "audiences",
+            'username': str(tornado.escape.xhtml_escape(self.get_current_username())),
+            'topic': topic
+        }
+
         content = self.render_template(template, variables)
         self.write(content)
 
@@ -866,6 +851,12 @@ class PagesHandler(BaseHandler, TemplateRendering):
 
         content = self.render_template(template, variables)
         self.write(content)
+
+class TopicHandler(BaseHandler, TemplateRendering):
+    @tornado.web.authenticated
+    def post(self):
+        userid = tornado.escape.xhtml_escape(self.current_user)
+        logic.saveTopicId(self.get_argument("topic_id"), userid)
 
 
 def main(mainT):

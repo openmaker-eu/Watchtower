@@ -90,7 +90,7 @@
                 <li {% if type=="conversation" %} class="active" {% endif %}>
                     <a href="/Conversations">Conversations</a>
                 </li>
-                <li {% if type=="influencer" %} class="active" {% endif %}>
+                <li {% if type=="audiences" %} class="active" {% endif %}>
                     <a href="/Audience">Audience</a>
                 </li>
                 <li {% if type=="events" %} class="active" {% endif %}>
@@ -146,17 +146,33 @@
                     </div>
                 </li>
             </ul>
-            <div class="col-sm-3 col-md-3 pull-right">
+            <div class="pull-right" style="margin:8px">
+              {% if type == "news" %}
+                  {% include 'newsDateButtons.html' %}
+              {% endif %}
+              {% if type == "conversation" %}
+                  {% include 'conversationDateButtons.html' %}
+              {% endif %}
+              {% if type == "events" %}
+                  {% include 'eventDateButtons.html' %}
+              {% endif %}
+              <!--
                 <form class="navbar-form" role="search">
                     <div class="input-group">
                         <input type="text" class="form-control" placeholder="Search" name="srch-term"
                                id="srch-term">
                         <div class="input-group-btn">
+                          <div class="btn-group" class="col-xs-6" style="float: right">
+                                  <a href="/Search">
+                                      <button class="btn btn-default"><span class="glyphicon glyphicon-search"></span> Search</button>
+                                  </a>
+                              </div>
                             <button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i>
                             </button>
                         </div>
                     </div>
                 </form>
+              -->
             </div>
         </div>
     </div>
@@ -209,9 +225,30 @@
             $(this).parent('li').siblings().removeClass('active');
             $(this).parents('.btn-group').find('.selection').html(selText);
             $(this).parents('li').addClass("active");
+            var topic_id = $(this).attr("data-id");
+            $.ajax({
+                url: '/saveTopicId',
+                method: 'POST',
+                data: {
+                    'topic_id': topic_id
+                }
+            });
         });
     });
 </script>
+
+{% if topic %}
+    <script>
+        $(document).ready(function () {
+              var selText = $("li a[data-id={{topic['topic_id']}}]").children("h4").html();
+              console.log({{topic}});
+              $("li a[data-id={{topic['topic_id']}}]").parent('li').siblings().removeClass('active');
+              $("li a[data-id={{topic['topic_id']}}]").parents('.btn-group').find('.selection').html(selText);
+              $("li a[data-id={{topic['topic_id']}}]").parents('li').addClass("active");
+        });
+    </script>
+{% endif %}
+
 <!-- for alerts -->
 {% if type == "alertlist" %}
 

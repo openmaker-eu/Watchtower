@@ -1,7 +1,8 @@
 {% for audience in audiences %}
     <div class="row margin-bottom-25">
         <div class="col-md-12">
-            <img src="{{ audience['profile_image_url'] }}" width="50px" height="50px" onerror="this.src='/images/default-user-circle.png'"
+            <img src="{{ audience['profile_image_url'] }}" width="50px" height="50px"
+                 onerror="this.src='/images/default-user-circle.png'"
                  class="img-responsive feed_img img-circle">
 
             <a href="http://twitter.com/{{ audience['screen_name'] }}" target="_blank"
