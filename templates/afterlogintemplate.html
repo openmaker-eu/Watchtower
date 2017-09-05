@@ -220,6 +220,7 @@
 <script>
     $(document).ready(function () {
         $(".dropdown-menu").on('click', 'li a', function () {
+          console.log($(this).attr("data-id"));
             var selText = $(this).children("h4").html();
             console.log(selText);
             $(this).parent('li').siblings().removeClass('active');
