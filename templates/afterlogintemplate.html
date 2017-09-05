@@ -2,146 +2,161 @@
 <html lang="en" wp-site wp-site-is-master-page>
 
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="">
-  <meta name="author" content="">
-  <title>{{ title }}</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>{{ title }}</title>
 
-  <!-- Bootstrap core CSS -->
-  <link href="/css/bootstrap.css" rel="stylesheet">
-  <!-- Custom styles for this template -->
-  <link href="/css/starter-template.css" rel="stylesheet">
-  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-  <!--[if lt IE 9]>
+    <!-- Bootstrap core CSS -->
+    <link href="/css/bootstrap.css" rel="stylesheet">
+    <!-- Custom styles for this template -->
+    <link href="/css/starter-template.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
       <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
-  <!-- for alert template -->
-  <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,300,600,700">
-  <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic,700italic">
-  <!-- for alertForm -->
-  <link rel="stylesheet" href="/css/bootstrap-theme.min.css">
-  <link rel="stylesheet" href="/css/bootstrap-tagsinput.css">
-  <style type="text/css">
-    .form-alert form .input-error {
-      border-color: #de615e;
-    }
+    <!-- for alert template -->
+    <link rel="stylesheet"
+          href="http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,300,600,700">
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic,700italic">
+    <!-- for alertForm -->
+    <link rel="stylesheet" href="/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="/css/bootstrap-tagsinput.css">
+    <style type="text/css">
+        .form-alert form .input-error {
+            border-color: #de615e;
+        }
 
-    .bootstrap-tagsinput {
-      width: 100%;
-    }
+        .bootstrap-tagsinput {
+            width: 100%;
+        }
 
-    .bootstrap-tagsinput input {
-      width: 100%;
-    }
+        .bootstrap-tagsinput input {
+            width: 100%;
+        }
 
-    select {
-      overflow: auto;
-    }
+        select {
+            overflow: auto;
+        }
 
-    .img-circle {
-      border-radius: 50%;
-    }
-  </style>
+        .img-circle {
+            border-radius: 50%;
+        }
+    </style>
 
-  {% if type == "conversation" %}
-  <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon">
+    {% if type == "conversation" %}
+        <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon">
 
-  <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css">
-  <link rel="stylesheet" type="text/css" href="static/css/conversation.css" />
-  <script type="text/javascript" src="static/js/jquery-3.2.1.min.js"></script>
-  <script type="text/javascript" src="static/js/conversation.js"></script>
-  {% endif %} {% if type == "events" %}
-  <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon">
+        <link rel="stylesheet" type="text/css"
+              href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css">
+        <link rel="stylesheet" type="text/css" href="static/css/conversation.css"/>
+        <script type="text/javascript" src="static/js/jquery-3.2.1.min.js"></script>
+        <script type="text/javascript" src="static/js/conversation.js"></script>
+    {% endif %}
 
-  <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css">
-  <link rel="stylesheet" type="text/css" href="static/css/event.css" />
-  <script type="text/javascript" src="static/js/jquery-3.2.1.min.js"></script>
-  <script type="text/javascript" src="static/js/event.js"></script>
-  {% endif %}
+    {% if type == "events" %}
+        <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon">
+
+        <link rel="stylesheet" type="text/css"
+              href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css">
+        <link rel="stylesheet" type="text/css" href="static/css/event.css"/>
+        <script type="text/javascript" src="static/js/jquery-3.2.1.min.js"></script>
+        <script type="text/javascript" src="static/js/event.js"></script>
+    {% endif %}
 
 </head>
 
 <body style="padding-top:50px">
-  <nav class="navbar navbar-inverse navbar-fixed-top">
+<nav class="navbar navbar-inverse navbar-fixed-top">
     <div class="container">
-      <div class="navbar-header">
-        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                    aria-expanded="false" aria-controls="navbar">
                 <span class="sr-only">Toggle navigation</span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-        <a href="/Alerts" class="navbar-brand">Watchtower<br></a>
-      </div>
-      <div id="navbar" class="collapse navbar-collapse">
-        <ul class="nav navbar-nav">
-          <li {% if type=="news" %} class="active" {% endif %}>
-            <a href="/News">News</a>
-          </li>
-          <li {% if type=="conversation" %} class="active" {% endif %}>
-            <a href="/Conversations">Conversations</a>
-          </li>
-          <li {% if type=="audiences" %} class="active" {% endif %}>
-            <a href="/Audience">Audience</a>
-          </li>
-          <li {% if type=="events" %} class="active" {% endif %}>
-            <a href="/Events">Events</a>
-          </li>
-          <li class="dropdown">
-            <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span
+            <a href="/Alerts" class="navbar-brand">Watchtower<br></a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li {% if type=="news" %} class="active" {% endif %}>
+                    <a href="/News">News</a>
+                </li>
+                <li {% if type=="conversation" %} class="active" {% endif %}>
+                    <a href="/Conversations">Conversations</a>
+                </li>
+                <li {% if type=="audiences" %} class="active" {% endif %}>
+                    <a href="/Audience">Audience</a>
+                </li>
+                <li {% if type=="events" %} class="active" {% endif %}>
+                    <a href="/Events">Events</a>
+                </li>
+                <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span
                             class="glyphicon glyphicon-user"></span> {{ username }}
                         <span class="caret"></span></a>
-            <ul class="dropdown-menu">
-              <li><a href="#">My Profile</a></li>
-              <li><a href="#">Bookmarks</a></li>
-              <li><a href="/logout">Logout</a></li>
+                    <ul class="dropdown-menu">
+                        <li><a href="#">My Profile</a></li>
+                        <li><a href="#">Bookmarks</a></li>
+                        <li><a href="/logout">Logout</a></li>
+                    </ul>
+                </li>
             </ul>
-          </li>
-        </ul>
-      </div>
-      <!--/.nav-collapse -->
+        </div>
+        <!--/.nav-collapse -->
     </div>
-  </nav>
+</nav>
 
-  <div class="navbar navbar-default navbar-static-top">
+<div class="navbar navbar-default navbar-static-top">
     <div class="container">
-      <div class="navbar-header">
-        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".main-nav">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".main-nav">
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-      </div>
-      <div class="collapse navbar-collapse">
-        <ul class="nav navbar-nav pull-left">
-          <li {% if type=="alertlist" or type=="editAlert" or type=="createAlert" %} class="active" {% endif %}>
-            <a href="/Alerts"><strong>Manage Topics</strong></a>
-          </li>
-          <li>
-            <div class="btn-group" style="margin:8px">
-              <a class="btn btn-default dropdown-toggle btn-blog " data-toggle="dropdown" href="#" id="dropdownMenu1" style="width:200px;"><span
+        </div>
+        <div class="collapse navbar-collapse">
+            <ul class="nav navbar-nav pull-left">
+                <li {% if type=="alertlist" or type=="editAlert" or type=="createAlert" %} class="active" {% endif %}>
+                    <a href="/Alerts"><strong>Manage Topics</strong></a>
+                </li>
+                <li>
+                    <div class="btn-group" style="margin:8px">
+                        <a class="btn btn-default dropdown-toggle btn-blog " data-toggle="dropdown" href="#"
+                           id="dropdownMenu1" style="width:200px;"><span
                                 class="selection pull-left">Select a Topic</span>
                             <span class="pull-right glyphiconglyphicon-chevron-down caret"
                                   style="float:right;margin-top:10px;"></span></a>
-              <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
-                {% for alert in alerts %}
-                <li>
-                  <a data-id="{{ alert['alertid'] }}" class="newsalerts">
-                    <h4><span> {{ alert['name'] }}</span></h4>
-                    <p>Keywords: {{ ", ".join(alert['keywords']) }} <br> Languages: {{ ", ".join(alert['lang']) }} </p>
-                  </a>
+                        <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+                            {% for alert in alerts %}
+                                <li>
+                                    <a data-id="{{ alert['alertid'] }}" class="newsalerts">
+                                        <h4><span> {{ alert['name'] }}</span></h4>
+                                        <p>Keywords: {{ ", ".join(alert['keywords']) }} <br>
+                                            Languages: {{ ", ".join(alert['lang']) }} </p></a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
                 </li>
-                {% endfor %}
-              </ul>
-            </div>
-          </li>
-        </ul>
-        <div class="pull-right" style="margin:8px">
-          {% if type == "news" %} {% include 'newsDateButtons.html' %} {% endif %} {% if type == "conversation" %} {% include 'conversationDateButtons.html' %} {% endif %} {% if type == "events" %} {% include 'eventDateButtons.html' %} {% endif %}
-          <!--
+            </ul>
+            <div class="pull-right" style="margin:8px">
+                {% if type == "news" %}
+                    {% include 'newsDateButtons.html' %}
+                {% endif %}
+                {% if type == "conversation" %}
+                    {% include 'conversationDateButtons.html' %}
+                {% endif %}
+                {% if type == "events" %}
+                    {% include 'eventDateButtons.html' %}
+                {% endif %}
+                <!--
                   <form class="navbar-form" role="search">
                       <div class="input-group">
                           <input type="text" class="form-control" placeholder="Search" name="srch-term"
@@ -158,107 +173,129 @@
                       </div>
                   </form>
                 -->
+            </div>
         </div>
-      </div>
     </div>
-  </div>
+</div>
 
-  {% if type == "alertlist" %}
-  <div class="container" style="padding:10px" id="alertspage">
-    {% include 'alerts.html' %}
-  </div>
-  {% endif %} {% if type == "editAlert" %} {% include 'alertForm.html' %} {% endif %} {% if type == "createAlert" %} {% include 'alertForm.html' %} {% endif %} {% if type == "conversation" %} {% include 'conversation.html' %} {% endif %} {% if type == "news"
-  %} {% include 'news.html' %} {% endif %} {% if type == "audiences" %} {% include 'audience.html' %} {% endif %} {% if type == "search" %} {% include 'search.html' %} {% endif %} {% if type == "events" %} {% include 'event.html' %} {% endif %}
-  <!-- /.container -->
-  <!-- Bootstrap core JavaScript
+{% if type == "alertlist" %}
+    <div class="container" style="padding:10px" id="alertspage">
+        {% include 'alerts.html' %}
+    </div>
+{% endif %}
+{% if type == "editAlert" %}
+    {% include 'alertForm.html' %}
+{% endif %}
+{% if type == "createAlert" %}
+    {% include 'alertForm.html' %}
+{% endif %}
+{% if type == "conversation" %}
+    {% include 'conversation.html' %}
+{% endif %}
+{% if type == "news" %}
+    {% include 'news.html' %}
+{% endif %}
+{% if type == "audiences" %}
+    {% include 'audience.html' %}
+{% endif %}
+{% if type == "search" %}
+    {% include 'search.html' %}
+{% endif %}
+{% if type == "events" %}
+    {% include 'event.html' %}
+{% endif %}
+<!-- /.container -->
+<!-- Bootstrap core JavaScript
 ================================================== -->
-  <!-- Placed at the end of the document so the pages load faster -->
+<!-- Placed at the end of the document so the pages load faster -->
 
-  <script src="/js/jquery.min.js"></script>
-  <script src="/js/bootstrap.min.js"></script>
-  <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-  <script src="/js/ie10-viewport-bug-workaround.js"></script>
+<script src="/js/jquery.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+<script src="/js/ie10-viewport-bug-workaround.js"></script>
 
-  <script src="/js/jquery.babypaunch.spinner.min.js"></script>
+<script src="/js/jquery.babypaunch.spinner.min.js"></script>
 
 
-  <script>
-    $(document).ready(function() {
-      $(".dropdown-menu").on('click', 'li a', function() {
-        if ($(this).attr("data-id") != undefined) {
-          var selText = $(this).children("h4").html();
-          console.log(selText);
-          $(this).parent('li').siblings().removeClass('active');
-          $(this).parents('.btn-group').find('.selection').html(selText);
-          $(this).parents('li').addClass("active");
-          var topic_id = $(this).attr("data-id");
-          $.ajax({
-            url: '/saveTopicId',
-            method: 'POST',
-            data: {
-              'topic_id': topic_id
-            }
-          });
-          location.href = "/Alerts";
-        }
-      });
+<script>
+    $(document).ready(function () {
+        $(".dropdown-menu").on('click', 'li a', function () {
+            if($(this).attr("data-id") != undefined){
+            var selText = $(this).children("h4").html();
+            console.log(selText);
+            $(this).parent('li').siblings().removeClass('active');
+            $(this).parents('.btn-group').find('.selection').html(selText);
+            $(this).parents('li').addClass("active");
+            var topic_id = $(this).attr("data-id");
+            $.ajax({
+                url: '/saveTopicId',
+                method: 'POST',
+                data: {
+                    'topic_id': topic_id
+                }
+            });
+            location.href = "/Alerts";
+          }
+        });
     });
-  </script>
+</script>
 
-  {% if topic %}
-  <script>
-    $(document).ready(function() {
-      var selText = $("li a[data-id={{topic['topic_id']}}]").children("h4").html();
-      console.log({
-        {
-          topic
-        }
-      });
-      $("li a[data-id={{topic['topic_id']}}]").parent('li').siblings().removeClass('active');
-      $("li a[data-id={{topic['topic_id']}}]").parents('.btn-group').find('.selection').html(selText);
-      $("li a[data-id={{topic['topic_id']}}]").parents('li').addClass("active");
-    });
-  </script>
-  {% endif %}
+{% if topic %}
+    <script>
+        $(document).ready(function () {
+            var selText = $("li a[data-id={{topic['topic_id']}}]").children("h4").html();
+            console.log({{topic}});
+            $("li a[data-id={{topic['topic_id']}}]").parent('li').siblings().removeClass('active');
+            $("li a[data-id={{topic['topic_id']}}]").parents('.btn-group').find('.selection').html(selText);
+            $("li a[data-id={{topic['topic_id']}}]").parents('li').addClass("active");
+        });
+    </script>
+{% endif %}
 
-  <!-- for alerts -->
-  {% if type == "alertlist" %}
+<!-- for alerts -->
+{% if type == "alertlist" %}
 
-  <script src="/js/bootstrap-notify.min.js"></script>
-  <script src="/js/bootstrap-notify.js"></script>
-  <script src="/js/alertList.js"></script>
+    <script src="/js/bootstrap-notify.min.js"></script>
+    <script src="/js/bootstrap-notify.js"></script>
+    <script src="/js/alertList.js"></script>
 
-  {% endif %}
-  <!-- for edit form -->
-  {% if type == "editAlert" or type == "createAlert" %}
-  <script src="/js/typeahead.bundle.min.js"></script>
-  <script src="/js/angular.min.js"></script>
-  <script src="/js/rainbow.min.js"></script>
-  <script src="/js/bootstrap-tagsinput.min.js"></script>
-  <script src="/js/bootstrap-tagsinput-angular.min.js"></script>
-  <script src="/js/generic.js"></script>
-  <script src="/js/jquery.babypaunch.spinner.min.js"></script>
-  <script src="/js/conversation.js"></script>
-  <link rel="stylesheet" type="text/css" href="/css/conversation.css" />
-  <script src="/js/editcreatealert.js"></script>
-  {% endif %}
-  <!-- for feed -->
-  {% if type == "feed" %}
-  <script src="/js/feed.js"></script>
-  {% endif %} {% if type == "news" %}
-  <script src="/js/news.js"></script>
-  {% endif %} {% if type == "search" %}
-  <script src="/js/typeahead.bundle.min.js"></script>
-  <script src="/js/angular.min.js"></script>
-  <script src="/js/rainbow.min.js"></script>
-  <script src="/js/bootstrap-tagsinput.min.js"></script>
-  <script src="/js/bootstrap-tagsinput-angular.min.js"></script>
-  <script src="/js/generic.js"></script>
-  <script src="/js/jquery.babypaunch.spinner.min.js"></script>
-  <script src="/js/search.js"></script>
-  {% endif %} {% if type == "audiences" %}
-  <script src="/js/audiences.js"></script>
-  {% endif %}
+{% endif %}
+<!-- for edit form -->
+{% if type == "editAlert" or type == "createAlert" %}
+    <script src="/js/typeahead.bundle.min.js"></script>
+    <script src="/js/angular.min.js"></script>
+    <script src="/js/rainbow.min.js"></script>
+    <script src="/js/bootstrap-tagsinput.min.js"></script>
+    <script src="/js/bootstrap-tagsinput-angular.min.js"></script>
+    <script src="/js/generic.js"></script>
+    <script src="/js/jquery.babypaunch.spinner.min.js"></script>
+    <script src="/js/conversation.js"></script>
+    <link rel="stylesheet" type="text/css" href="/css/conversation.css"/>
+    <script src="/js/editcreatealert.js"></script>
+{% endif %}
+<!-- for feed -->
+{% if type == "feed" %}
+    <script src="/js/feed.js"></script>
+{% endif %}
+
+{% if type == "news" %}
+    <script src="/js/news.js"></script>
+{% endif %}
+
+{% if type == "search" %}
+    <script src="/js/typeahead.bundle.min.js"></script>
+    <script src="/js/angular.min.js"></script>
+    <script src="/js/rainbow.min.js"></script>
+    <script src="/js/bootstrap-tagsinput.min.js"></script>
+    <script src="/js/bootstrap-tagsinput-angular.min.js"></script>
+    <script src="/js/generic.js"></script>
+    <script src="/js/jquery.babypaunch.spinner.min.js"></script>
+    <script src="/js/search.js"></script>
+{% endif %}
+
+{% if type == "audiences" %}
+    <script src="/js/audiences.js"></script>
+{% endif %}
 </body>
 
 </html>
