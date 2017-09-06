@@ -72,7 +72,7 @@ def separates_tweet(alertDic, tweet):
                                 [updatedTime, alert['alertid']])
                             Connection.Instance().PostGreSQLConnect.commit()
                             tweet['_id'] = ObjectId()
-                            if tweet['entities']['urls'] == [] or tweet['entities']['urls'][0]['expanded_url'] == None:
+                            if tweet['entities']['urls'] == [] or tweet['entities']['urls'][0]['expanded_url'] is  None:
                                 tweet['redis'] = True
                             else:
                                 tweet['redis'] = False
@@ -105,9 +105,8 @@ class StdOutListener(StreamListener):
         super(StdOutListener, self).__init__()
 
     def on_data(self, data):
-        if self.terminate == False:
+        if not self.terminate:
             try:
-                print("tweet geldii!!")
                 tweet = json.loads(data)
                 tweet['tweetDBId'] = get_next_tweets_sequence()
                 separates_tweet(self.alertDic, tweet)
@@ -176,12 +175,3 @@ class StreamCreator():
         self.l.running = False
         self.l.stop()
         self.l.terminate = True
-
-    def checkAlive(self):
-        return self.t.isAlive()
-
-    def checkConnection(self):
-        if self.l is not None:
-            return self.l.connection
-        else:
-            return False

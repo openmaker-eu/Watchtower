@@ -14,6 +14,7 @@ def getThemes(userid):
 
 
 def getFeeds(themename, themeid, userid, date, cursor):
+    result = {}
     try:
         themeid = int(themeid)
     except:
@@ -24,7 +25,6 @@ def getFeeds(themename, themeid, userid, date, cursor):
         themename = var[0][0]
     if themeid != "None" or themename != "None":
         dates = ['all', 'yesterday', 'week', 'month']
-        result = {}
         if date not in dates:
             result['Error'] = 'invalid date'
             return json.dumps(result, indent=4)

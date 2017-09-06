@@ -32,7 +32,7 @@ $(document).ready(function () {
 
 $(document).ready(function () {
     $("#spin").spinner();
-    $('a.newsalerts').click(function () {
+    $(".dropdown-menu").on('click', 'li a', function () {
         $('#newscontainer').empty();
         $("#spin").show();
         $("#date_buttons").show();

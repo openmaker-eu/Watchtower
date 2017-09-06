@@ -1,4 +1,4 @@
-from addAlert import AddAlert
+from topic_controller import AddAlert
 from app import webserverInit
 from logic import getAllRunningAlertList
 

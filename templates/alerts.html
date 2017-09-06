@@ -28,7 +28,7 @@
                 <td style="text-align:center">{{ alert['updatedTime'] }}</td>
                 <td style="text-align:center">{{ alert['tweetCount'] }}</td>
                 <td style="text-align:center">
-                    <a href="/alertinfo/{{ alert['alertid'] }}">
+                    <a href="/topicinfo/{{ alert['alertid'] }}">
                         <button type="button" name="edit" class="btn btn-default">Edit</button>
                     </a>
                 </td>
@@ -70,7 +70,7 @@
 
     <div align="center">
         {% if alertlimit != 0 %}
-            <a href="/alertinfo" class="btn btn-primary btn-lg">Create a new topic</a>
+            <a href="/topicinfo" class="btn btn-primary btn-lg">Create a new topic</a>
         {% else %}
             <p style="color: red; font-size: 15px"><b>You cannot create a new topic because your limit is full. If you
                 want create a new topic, please remove old ones.</b></p>

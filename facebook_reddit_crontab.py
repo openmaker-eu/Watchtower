@@ -10,7 +10,7 @@ import link_parser
 from application.Connections import Connection
 
 
-def mineFacebookConversations(search_ids, timeFilter="day", pageNumber="5"):
+def mineFacebookConversations(search_ids, timeFilter="day"):
     my_token = Connection.Instance().redditFacebookDB['tokens'].find_one()["facebook"]["token"]
     graph = facebook.GraphAPI(access_token=my_token, version="2.7")
 
@@ -400,24 +400,30 @@ def searchFacebookNews(topic_id, search_ids):
 
 
 if __name__ == '__main__':
-    Connection.Instance().cur.execute("Select alertid, pages, subreddits, keywords from alerts;")
-    var = Connection.Instance().cur.fetchall()
 
-    dates = ["day", "week", "month"]
-    for v in var:
-        if v[0] == 37:
-            # startEvent(v[0], v[3].split(","))
-            # searchSubredditNews(v[0], v[2].split(','))
-            # searchFacebookNews(v[0], v[1])
-            for date in dates:
-                posts = []
-                if v[2] != None and v[2] != "":
-                    subreddits = v[2].split(",")
-                    posts.extend(mineRedditConversation(subreddits, date))
-                if v[1] != None and v[1] != "":
-                    pages = v[1].split(",")
-                    # posts.extend(mineFacebookConversations(pages, timeFilter=date))
-                if len(posts) != 0:
-                    posts = sorted(posts, key=lambda k: k["numberOfComments"], reverse=True)
-                    Connection.Instance().conversations[str(v[0])].remove({"time_filter": date})
-                    Connection.Instance().conversations[str(v[0])].insert_one({'time_filter': date, 'posts': posts})
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "SELECT alertid, pages, subreddits, keywords "
+            "FROM alerts"
+        )
+        cur.execute(sql)
+        var = cur.fetchall()
+
+        dates = ["day", "week", "month"]
+        for v in var:
+            if v[0] == 37:
+                startEvent(v[0], v[3].split(","))
+                searchSubredditNews(v[0], v[2].split(','))
+                searchFacebookNews(v[0], v[1])
+                for date in dates:
+                    posts = []
+                    if v[2] != None and v[2] != "":
+                        subreddits = v[2].split(",")
+                        posts.extend(mineRedditConversation(subreddits, date))
+                    if v[1] != None and v[1] != "":
+                        pages = v[1].split(",")
+                        posts.extend(mineFacebookConversations(pages, timeFilter=date))
+                    if len(posts) != 0:
+                        posts = sorted(posts, key=lambda k: k["numberOfComments"], reverse=True)
+                        Connection.Instance().conversations[str(v[0])].remove({"time_filter": date})
+                        Connection.Instance().conversations[str(v[0])].insert_one({'time_filter': date, 'posts': posts})

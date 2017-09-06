@@ -1,4 +1,4 @@
-from track import StreamCreator
+from twitter_stream_thread import StreamCreator
 
 
 class AddAlert():
@@ -39,16 +39,6 @@ class AddAlert():
         self.onlyThread.terminate()
         del self.onlyThread
         self.onlyThread = None
-
-    def checkThread(self):
-        if self.onlyThread is not None:
-            return str(self.onlyThread.checkAlive())
-        return ""
-
-    def checkConnection(self):
-        if self.onlyThread is not None:
-            return str(self.onlyThread.checkConnection())
-        return ""
 
     def __getitem__(self):
         return (self.threadDic)

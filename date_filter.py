@@ -81,10 +81,15 @@ def calc(alertid, forbidden_domain):
 
 
 def main():
-    Connection.Instance().cur.execute("Select alertid,domains from alerts;")
-    alert_list = Connection.Instance().cur.fetchall()
-    for alert in alert_list:
-        calc(alert[0], alert[1].split(","))
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "SELECT alertid, domains "
+            "FROM alerts "
+        )
+        cur.execute(sql)
+        alert_list = cur.fetchall()
+        for alert in alert_list:
+            calc(alert[0], alert[1].split(","))
 
 
 if __name__ == '__main__':

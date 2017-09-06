@@ -3,92 +3,24 @@ import re
 import time
 from datetime import datetime
 
-import bson.objectid
 import pymongo
 
-import crontab3
-import dateFilter
+import date_filter
 from application.Connections import Connection
-
-
-def getEvents(topic_id, filterField, cursor):
-    now = time.time()
-    cursor = int(cursor)
-    ret = []
-    if filterField == 'interested':
-        ret = Connection.Instance().events[str(topic_id)].aggregate([
-            {'$match': {'end_time': {'$gte': now}}},
-            {'$project': {'_id': 0}},
-            {'$sort': {'interested': -1}},
-            {'$skip': int(cursor)},
-            {'$limit': 10}
-        ])
-    elif filterField == 'date':
-        ret = Connection.Instance().events[str(topic_id)].aggregate([
-            {'$match': {'end_time': {'$gte': now}}},
-            {'$project': {'_id': 0}},
-            {'$sort': {'start_time': -1}},
-            {'$skip': int(cursor)},
-            {'$limit': 10}
-        ])
-    ret = list(ret)
-    temp = {'events': ret}
-    print(temp)
-    return temp
-
-
-def getConversations(topic_id, timeFilter, paging):
-    curser = Connection.Instance().conversations[str(topic_id)].find({"time_filter": timeFilter},
-                                                                     {"posts": {"$slice": [int(paging), 10]}, "_id": 0})
-    for document in curser:
-        docs = []
-        for submission in document["posts"]:
-            if not submission["numberOfComments"]:
-                continue
-            comments = []
-            for comment in submission["comments"]:
-                comment["relative_indent"] = 0
-                if submission['source'] == 'reddit':
-                    comment["created_time"] = datetime.fromtimestamp(int(comment["created_time"])).strftime(
-                        "%Y-%m-%d %H:%M:%S")
-                else:
-                    comment["created_time"] = comment["created_time"][:10] + " " + comment["created_time"][11:18]
-                comments.append(comment)
-
-            submission['created_time'] = datetime.fromtimestamp(submission['created_time']).strftime('%Y-%m-%d')
-            temp = {"title": submission["title"], "source": submission["source"], "comments": comments,
-                    "url": submission["url"], "commentNumber": submission["numberOfComments"],
-                    'subreddit': submission['subreddit'], 'created_time': submission['created_time']}
-            if "post_text" in submission:
-                temp["post_text"] = submission["post_text"]
-            else:
-                temp["post_text"] = ""
-            docs.append(temp)
-        prev = 0
-        for values in docs:
-            for current in values["comments"]:
-                current["relative_indent"] = current["indent_number"] - prev
-                prev = current["indent_number"]
-        return docs
-    return []
-
-
-def my_handler(x):
-    if isinstance(x, datetime):
-        return x.strftime("%d-%m-%Y")
-    elif isinstance(x, bson.objectid.ObjectId):
-        return str(x)
-    else:
-        raise TypeError(x)
+from application.utils import general_utils
 
 
 def getTopics():
-    Connection.Instance().cur.execute("select alertid, alertname, description from alerts where ispublish = %s", [True])
-    var = Connection.Instance().cur.fetchall()
-    topics = [{'topic_id': i[0], 'topic_name': i[1], 'description': i[2]} for i in var]
-    result = {}
-    result['topics'] = topics
-    return json.dumps(result, indent=4)
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "SELECT alertid, alertname,description "
+            "FROM alerts "
+            "WHERE ispublished = %s"
+        )
+        cur.execute(sql, [True])
+        var = cur.fetchall()
+        topics = [{'topic_id': i[0], 'topic_name': i[1], 'description': i[2]} for i in var]
+        return json.dumps({'topics': topics}, indent=4)
 
 
 def getNewsFeeds(date, cursor, forbidden_domain, topics):
@@ -104,13 +36,13 @@ def getNewsFeeds(date, cursor, forbidden_domain, topics):
     # feeds = list(Connection.Instance().filteredNewsPoolDB[themeid].find({'name': date}, {date: 1}))
     # feeds = list(feeds[0][date][cursor:cursor+20])
 
-    date = crontab3.determine_date(date)
+    date = general_utils.determine_date(date)
 
     news = []
     for topic_id in topics:
         if len(news) >= cursor + 20:
             break
-        news = news + dateFilter.getDateList(topic_id, int(date), forbidden_domain)
+        news = news + date_filter.getDateList(topic_id, int(date), forbidden_domain)
 
     news = news[cursor:cursor + 20]
 
@@ -125,7 +57,7 @@ def getNewsFeeds(date, cursor, forbidden_domain, topics):
 
 
 def getAudiences(topic_id):
-    if topic_id == None:
+    if topic_id is None:
         return json.dumps({}, indent=4)
 
     audiences = list(Connection.Instance().infDB[str(topic_id)].find({}, {'_id': 0, 'screen_name': 1, 'location': 1,
@@ -147,16 +79,6 @@ def getNews(news_ids, keywords, languages, cities, countries, user_location, use
     aggregate_dictionary = []
     find_dictionary = {}
     date_dictionary = {}
-    language_dictionary = None
-    city_dictionary = None
-    country_dictionary = None
-    user_location_dictionary = None
-    user_language_dictionary = None
-    news_ids_in_dictionary = None
-    keywords_in_dictionary = None
-    domains_in_dictionary = None
-    since_in_dictionary = None
-    until_in_dictionary = None
 
     if news_ids != [""]:
         news_ids_in_dictionary = [int(one_id) for one_id in news_ids]
@@ -229,7 +151,7 @@ def getNews(news_ids, keywords, languages, cities, countries, user_location, use
     for alertid in Connection.Instance().newsPoolDB.collection_names():
         if len(news) >= cursor + 20:
             break
-        if topics_filter == []:
+        if topics_filter:
             news = news + list(Connection.Instance().newsPoolDB[str(alertid)].aggregate(aggregate_dictionary))
         else:
             if int(alertid) in topics_filter:
@@ -245,11 +167,11 @@ def getNews(news_ids, keywords, languages, cities, countries, user_location, use
         'news': news[cursor:cursor + 20]
     }
 
-    return json.dumps(result, indent=4, default=my_handler)
+    return json.dumps(result, indent=4, default=general_utils.date_formatter)
 
 
 def getHastags(topic_id, date):
-    if topic_id == None:
+    if topic_id is None:
         return json.dumps({}, indent=4)
 
     hashtags = \
@@ -257,3 +179,65 @@ def getHastags(topic_id, date):
             date]
 
     return json.dumps({'hashtags': hashtags}, indent=4)
+
+
+def getEvents(topic_id, filterField, cursor):
+    now = time.time()
+    cursor = int(cursor)
+    ret = []
+    if filterField == 'interested':
+        ret = Connection.Instance().events[str(topic_id)].aggregate([
+            {'$match': {'end_time': {'$gte': now}}},
+            {'$project': {'_id': 0}},
+            {'$sort': {'interested': -1}},
+            {'$skip': int(cursor)},
+            {'$limit': 10}
+        ])
+    elif filterField == 'date':
+        ret = Connection.Instance().events[str(topic_id)].aggregate([
+            {'$match': {'end_time': {'$gte': now}}},
+            {'$project': {'_id': 0}},
+            {'$sort': {'start_time': -1}},
+            {'$skip': int(cursor)},
+            {'$limit': 10}
+        ])
+    ret = list(ret)
+    temp = {'events': ret}
+    print(temp)
+    return temp
+
+
+def getConversations(topic_id, timeFilter, paging):
+    curser = Connection.Instance().conversations[str(topic_id)].find({"time_filter": timeFilter},
+                                                                     {"posts": {"$slice": [int(paging), 10]}, "_id": 0})
+    for document in curser:
+        docs = []
+        for submission in document["posts"]:
+            if not submission["numberOfComments"]:
+                continue
+            comments = []
+            for comment in submission["comments"]:
+                comment["relative_indent"] = 0
+                if submission['source'] == 'reddit':
+                    comment["created_time"] = datetime.fromtimestamp(int(comment["created_time"])).strftime(
+                        "%Y-%m-%d %H:%M:%S")
+                else:
+                    comment["created_time"] = comment["created_time"][:10] + " " + comment["created_time"][11:18]
+                comments.append(comment)
+
+            submission['created_time'] = datetime.fromtimestamp(submission['created_time']).strftime('%Y-%m-%d')
+            temp = {"title": submission["title"], "source": submission["source"], "comments": comments,
+                    "url": submission["url"], "commentNumber": submission["numberOfComments"],
+                    'subreddit': submission['subreddit'], 'created_time': submission['created_time']}
+            if "post_text" in submission:
+                temp["post_text"] = submission["post_text"]
+            else:
+                temp["post_text"] = ""
+            docs.append(temp)
+        prev = 0
+        for values in docs:
+            for current in values["comments"]:
+                current["relative_indent"] = current["indent_number"] - prev
+                prev = current["indent_number"]
+        return docs
+    return []

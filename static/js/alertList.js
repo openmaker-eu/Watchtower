@@ -37,7 +37,7 @@ function alertbuttonclick(aid, ptype) {
     //var ptype = $(this).attr("posttype");
     console.log(ptype);
     $.ajax({
-        url: "/Alerts",
+        url: "/Topics",
         method: 'POST',
         data: {
             'alertid': aid,

@@ -54,7 +54,8 @@ def linkParser(link):
         author = None
         pass
 
-    """places = get_location.get_place_context(text=description)
+    """
+    places = get_location.get_place_context(text=description)
 
     location = {
         "countries": places.countries,
@@ -62,7 +63,8 @@ def linkParser(link):
         "cities" : places.cities,
         "city_mentions" : places.city_mentions
     }
-"""
+    """
+
     if image != "" and description != "" and title != "":
         dic = {'url': link, 'im': image, 'title': title, 'domain': domain,
                'description': description, 'keywords': keywords, 'source': source,
@@ -201,7 +203,3 @@ def calculateLinks(data):
         except Exception as e:
             print(e)
             pass
-
-
-def createParameters(alertid, tweets):
-    return [[alertid, tweet] for tweet in tweets]

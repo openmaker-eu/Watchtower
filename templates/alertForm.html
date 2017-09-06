@@ -4,8 +4,8 @@
     <div class="row" style="height: 550px">
         <div class="col-xs-6">
             <form id="bootstrapTagsInputForm" class="alert-form" method="post"
-                  action={% if alert[ 'name'] !="" %} "/alertinfo/{{ alert['alertid'] }}"{% else %}
-                      "/alertinfo"{% endif %}
+                  action={% if alert[ 'name'] !="" %} "/topicinfo/{{ alert['alertid'] }}"{% else %}
+                      "/topicinfo"{% endif %}
             onkeypress="return event.keyCode != 13;">
             <!-- Text input-->
             <div class="form-group">

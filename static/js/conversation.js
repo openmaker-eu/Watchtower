@@ -3,7 +3,7 @@ var isReadyForLoading = true;
 var topic_id = -1;
 
 $(document).ready(function () {
-    $('a.feedalerts').click(function () {
+    $(".dropdown-menu").on('click', 'li a', function () {
         topic_id = $(this).attr("data-id");
         getConversations($("#day"), "day");
         lastPostScrollNumber = 0;

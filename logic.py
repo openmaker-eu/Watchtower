@@ -7,8 +7,8 @@ import facebook
 import praw
 import pymongo
 
-import dateFilter
-import search
+import date_filter
+import twitter_search_sample_tweets
 from application.Connections import Connection
 
 
@@ -113,76 +113,34 @@ def sourceSelectionFromReddit(topicList):
     return allSubreddits
 
 
-def getThemes():
-    names = Connection.Instance().feedDB.collection_names()
-    result = {}
-    themes = [{'name': name} for name in names]
-    result['themes'] = themes
-    return json.dumps(result, indent=4)
-
-
-def getInfluencers(themename, cursor):
-    length = len(
-        list(Connection.Instance().infDB[str(themename)].find({"type": "filteredUser"}, {"_id": 0, "type": 0})))
-    if cursor is None:
-        influencers = Connection.Instance().infDB[str(themename)].find({"type": "filteredUser"},
-                                                                       {"_id": 0, "type": 0}).skip(0).limit(20)
-        cursor = 0
-    else:
-        influencers = Connection.Instance().infDB[str(themename)].find({"type": "filteredUser"},
-                                                                       {"_id": 0, "type": 0}).skip(int(cursor)).limit(
-            20)
-    result = {}
-    influencers = list(influencers)
-    if len(influencers) == 0:
-        influencers.append("Cursor is Empty.")
-    else:
-        cursor = int(cursor) + 20
-        if cursor >= length:
-            cursor = length
-        result['next cursor'] = cursor
-    result['cursor length'] = length
-    result['influencers'] = influencers
-    return json.dumps(result, indent=4)
-
-
-def getFeeds(themename, cursor=0):
-    length = len(list(Connection.Instance().feedDB[str(themename)].find({}, {"_id": 0})))
-    if cursor is None:
-        feeds = Connection.Instance().feedDB[str(themename)].find({}, {"_id": 0}).skip(0).limit(20)
-        cursor = 0
-    else:
-        feeds = Connection.Instance().feedDB[str(themename)].find({}, {"_id": 0}).skip(int(cursor)).limit(20)
-    result = {}
-    feeds = list(feeds)
-    if len(feeds) == 0:
-        feeds.append("Cursor is Empty.")
-    else:
-        cursor = int(cursor) + 20
-        if cursor >= length:
-            cursor = length
-        result['next cursor'] = cursor
-    result['cursor length'] = length
-    result['feeds'] = feeds
-    return json.dumps(result, indent=4)
-
-
 def getAlertLimit(userid):
-    Connection.Instance().cur.execute("select alertlimit from users where userid = %s", [userid])
-    fetched = Connection.Instance().cur.fetchall()
-    return fetched[0][0]
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "SELECT alertlimit "
+            "FROM users "
+            "WHERE userid = %s"
+        )
+        cur.execute(sql, [int(userid)])
+        fetched = cur.fetchall()
+        return fetched[0][0]
 
 
 def login(username, password):
-    Connection.Instance().cur.execute("select * from users where username = %s", [username])
-    fetched = Connection.Instance().cur.fetchall()
-    if len(fetched) == 0:
-        return {'response': False, 'error_type': 1, 'message': 'Invalid username'}
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "SELECT * "
+            "FROM users "
+            "WHERE username = %s"
+        )
+        cur.execute(sql, [username])
+        fetched = cur.fetchall()
+        if len(fetched) == 0:
+            return {'response': False, 'error_type': 1, 'message': 'Invalid username'}
 
-    if password != fetched[0][2]:
-        return {'response': False, 'error_type': 2, 'message': 'Invalid password'}
+        if password != fetched[0][2]:
+            return {'response': False, 'error_type': 2, 'message': 'Invalid password'}
 
-    return {'response': True, 'userid': fetched[0][0]}
+        return {'response': True, 'userid': fetched[0][0]}
 
 
 def getAllRunningAlertList():
@@ -199,14 +157,6 @@ def getAllAlertList():
                'lang': i[5].split(","), 'status': i[6], 'creationTime': i[7], 'domains': i[11].split(",")} for i in var]
     alerts = sorted(alerts, key=lambda k: k['alertid'])
     return alerts
-
-
-def getThreadStatus(mainT):
-    return mainT.checkThread()
-
-
-def getThreadConnection(mainT):
-    return mainT.checkConnection()
 
 
 def getAlertName(alertid):
@@ -308,7 +258,7 @@ def banDomain(alertid, domain):
     if "" in domains:
         domains.remove("")
     domains = list(set(domains))
-    dateFilter.calc(alertid, domains)
+    date_filter.calc(alertid, domains)
     domains = ",".join(domains)
     Connection.Instance().cur.execute("update alerts set domains = %s where alertid = %s;", [domains, int(alertid)])
     Connection.Instance().PostGreSQLConnect.commit()
@@ -394,7 +344,7 @@ def addBookmark(alertid, link_id):
     Connection.Instance().PostGreSQLConnect.commit()
     Connection.Instance().cur.execute("Select domains from alerts where alertid = %s;", [int(alertid)])
     domains = Connection.Instance().cur.fetchall()[0][0]
-    dateFilter.calc(alertid, domains.split(","))
+    date_filter.calc(alertid, domains.split(","))
     content = """<a href="javascript:;" onclick="dummy('remove', '{}')" style="color: #000000;text-decoration: none;"><span style="float:right;color:#808080;font-size:24px" align="right" class="glyphicon glyphicon-bookmark"></span></a>""".format(
         link_id)
     return content
@@ -413,7 +363,7 @@ def removeBookmark(alertid, link_id):
     Connection.Instance().PostGreSQLConnect.commit()
     Connection.Instance().cur.execute("Select domains from alerts where alertid = %s;", [int(alertid)])
     domains = Connection.Instance().cur.fetchall()[0][0]
-    dateFilter.calc(alertid, domains.split(","))
+    date_filter.calc(alertid, domains.split(","))
     content = """<a href="javascript:;" onclick="dummy('add', '{}')" style="color: #000000;text-decoration: none;"><span style="float:right;color:#D70000;font-size:24px" align="right" class="glyphicon glyphicon-bookmark"></span></a>""".format(
         link_id)
     return content
@@ -424,7 +374,7 @@ def sentimentPositive(alertid, link_id):
     Connection.Instance().newsPoolDB[str(alertid)].find_one_and_update({'link_id': link_id}, {'$set': {'sentiment': 1}})
     Connection.Instance().cur.execute("Select domains from alerts where alertid = %s;", [int(alertid)])
     domains = Connection.Instance().cur.fetchall()[0][0]
-    dateFilter.calc(alertid, domains.split(","))
+    date_filter.calc(alertid, domains.split(","))
     content = """<a href="javascript:;" onclick="sentiment('positive', '{}')" style="color: #000000;text-decoration: none;">
 <span style="float:right;color:#66BB6A;font-size:24px" align="right" class="glyphicon glyphicon-ok-sign"></span>
 </a>
@@ -443,7 +393,7 @@ def sentimentNegative(alertid, link_id):
                                                                        {'$set': {'sentiment': -1}})
     Connection.Instance().cur.execute("Select domains from alerts where alertid = %s;", [int(alertid)])
     domains = Connection.Instance().cur.fetchall()[0][0]
-    dateFilter.calc(alertid, domains.split(","))
+    date_filter.calc(alertid, domains.split(","))
     content = """<a href="javascript:;" onclick="sentiment('positive', '{}')" style="color: #000000;text-decoration: none;">
 <span style="float:right;color:#BDBDBD;font-size:24px" align="right" class="glyphicon glyphicon-ok-sign"></span>
 </a>
@@ -461,7 +411,7 @@ def sentimentNotr(alertid, link_id):
     Connection.Instance().newsPoolDB[str(alertid)].find_one_and_update({'link_id': link_id}, {'$set': {'sentiment': 0}})
     Connection.Instance().cur.execute("Select domains from alerts where alertid = %s;", [int(alertid)])
     domains = Connection.Instance().cur.fetchall()[0][0]
-    dateFilter.calc(alertid, domains.split(","))
+    date_filter.calc(alertid, domains.split(","))
     content = """<a href="javascript:;" onclick="sentiment('positive', '{}')" style="color: #000000;text-decoration: none;">
 <span style="float:right;color:#BDBDBD;font-size:24px" align="right" class="glyphicon glyphicon-ok-sign"></span>
 </a>
@@ -578,7 +528,7 @@ def searchTweets(keywords, languages):
     # ends
     keywords = " OR ".join(result_keys)
     languages = " OR ".join(languages.split(","))
-    tweets = search.getTweets(keywords, languages)
+    tweets = twitter_search_sample_tweets.getTweets(keywords, languages)
     for tweet in tweets:
         for keyword in keys:
             marked = "<mark>" + keyword + "</mark>"

@@ -10,9 +10,10 @@ import tornado.web
 from jinja2 import Environment, FileSystemLoader, TemplateNotFound
 
 import apiv12
-import facebookRedditCrontab
+import facebook_reddit_crontab
 import logic
-import newapi
+import apiv11
+import apiv1
 
 chars = ''.join([string.ascii_letters, string.digits, string.punctuation]).replace('\'', '').replace('"', '').replace(
     '\\', '')
@@ -57,10 +58,9 @@ class Application(tornado.web.Application):
             (r"/", MainHandler, {'mainT': mainT}),
             (r"/logout", LogoutHandler, {'mainT': mainT}),
             (r"/login", LoginHandler, {'mainT': mainT}),
-            (r"/Alerts", AlertsHandler, {'mainT': mainT}),
-            # (r"/message", MessageHandler, {'mainT':mainT}),
-            (r"/alertinfo", CreateEditAlertsHandler, {'mainT': mainT}),
-            (r"/alertinfo/([0-9]*)", CreateEditAlertsHandler, {'mainT': mainT}),
+            (r"/Topics", TopicsHandler, {'mainT': mainT}),
+            (r"/topicinfo", CreateEditTopicHandler, {'mainT': mainT}),
+            (r"/topicinfo/([0-9]*)", CreateEditTopicHandler, {'mainT': mainT}),
             (r"/Feed/(.*)", FeedHandler, {'mainT': mainT}),
             (r"/Feed", FeedHandler, {'mainT': mainT}),
             (r"/Conversations/(.*)", ConversationPageHandler, {'mainT': mainT}),
@@ -109,27 +109,6 @@ class Application(tornado.web.Application):
         super(Application, self).__init__(handlers, **settings)
 
 
-class PreviewConversationHandler(BaseHandler, TemplateRendering):
-    @tornado.web.authenticated
-    def post(self):
-        keywords = self.get_argument('keyswords', '0')
-        sources = logic.sourceSelection(keywords)
-
-        redditSources = sources['subreddits']
-        facebookSources = sources['pages']
-        facebookSourceIds = []
-        for source in facebookSources:
-            facebookSourceIds.append(source['page_id'])
-
-        facebookDocument = facebookRedditCrontab.mineFacebookConversations(facebookSourceIds)
-
-        redditDocument = facebookRedditCrontab.mineRedditConversation(redditSources)
-
-        docs = facebookDocument + redditDocument
-
-        self.write(self.render_template("submission.html", {"docs": docs}))
-
-
 class EventV12Handler(BaseHandler, TemplateRendering):
     def get(self):
         topic_id = self.get_argument('topic_id', None)
@@ -140,64 +119,6 @@ class EventV12Handler(BaseHandler, TemplateRendering):
         document = apiv12.getEvents(topic_id, date, cursor)
         self.set_header('Content-Type', 'application/json')
         self.write(json.dumps(document, indent=4))
-
-
-class EventPageHandler(BaseHandler, TemplateRendering):
-    def get(self):
-        userid = tornado.escape.xhtml_escape(self.current_user)
-        template = 'afterlogintemplate.html'
-        topic = logic.getCurrentTopic(tornado.escape.xhtml_escape(self.current_user))
-        if topic is None:
-            self.redirect("/alertinfo")
-        variables = {
-            'title': "Events",
-            'alerts': logic.getAlertList(userid),
-            'type': "events",
-            'username': str(tornado.escape.xhtml_escape(self.get_current_username())),
-            "document": apiv12.getEvents(topic['topic_id'], "date", 0),
-            'topic': topic
-        }
-        content = self.render_template(template, variables)
-        self.write(content)
-
-
-class EventHandler(BaseHandler, TemplateRendering):
-    def get(self):
-        topic_id = self.get_argument('topic_id')
-        filter = self.get_argument('filter')
-        cursor = self.get_argument('cursor')
-        document = apiv12.getEvents(topic_id, filter, cursor)
-        self.write(self.render_template("single-event.html", {"document": document}))
-
-
-class ConversationPageHandler(BaseHandler, TemplateRendering):
-    def get(self):
-        userid = tornado.escape.xhtml_escape(self.current_user)
-        template = 'afterlogintemplate.html'
-        topic = logic.getCurrentTopic(tornado.escape.xhtml_escape(self.current_user))
-        if topic is None:
-            self.redirect("/alertinfo")
-        variables = {
-            'title': "Conversations",
-            'alerts': logic.getAlertList(userid),
-            'type': "conversation",
-            'username': str(tornado.escape.xhtml_escape(self.get_current_username())),
-            "docs": apiv12.getConversations(topic['topic_id'], "day", 0),
-            'topic': topic
-        }
-        content = self.render_template(template, variables)
-        self.write(content)
-
-
-class ConversationHandler(BaseHandler, TemplateRendering):
-    def get(self):
-        topic_id = self.get_argument("topic_id")
-        timeFilter = self.get_argument("timeFilter")
-        paging = self.get_argument("paging")
-        docs = apiv12.getConversations(topic_id, timeFilter, paging)
-        if docs == None:
-            docs = []
-        self.write(self.render_template("submission.html", {"docs": docs}))
 
 
 class ConversationV12Handler(BaseHandler, TemplateRendering):
@@ -290,7 +211,7 @@ class Documentationv12Handler(BaseHandler, TemplateRendering):
 
 class ThemesV11Handler(BaseHandler, TemplateRendering):
     def get(self):
-        themes = newapi.getThemes(4)
+        themes = apiv11.getThemes(4)
         self.set_header('Content-Type', 'application/json')
         self.write(themes)
 
@@ -307,7 +228,7 @@ class FeedsV11Handler(BaseHandler, TemplateRendering):
             cursor = 0
             pass
         date = str(self.get_argument("date", "month"))
-        feeds = newapi.getFeeds(themename, themeid, 4, date, cursor)
+        feeds = apiv11.getFeeds(themename, themeid, 4, date, cursor)
         self.set_header('Content-Type', 'application/json')
         self.write(feeds)
 
@@ -316,7 +237,7 @@ class InfluencersV11Handler(BaseHandler, TemplateRendering):
     def get(self):
         themename = str(self.get_argument("themename", None))
         themeid = str(self.get_argument("themeid", None))
-        influencers = newapi.getInfluencers(themename, themeid)
+        influencers = apiv11.getInfluencers(themename, themeid)
         self.set_header('Content-Type', 'application/json')
         self.write(influencers)
 
@@ -333,21 +254,21 @@ class Documentationv11Handler(BaseHandler, TemplateRendering):
 
 class ThemesHandler(BaseHandler, TemplateRendering):
     def get(self):
-        themes = logic.getThemes()
+        themes = apiv1.getThemes()
         self.set_header('Content-Type', 'application/json')
         self.write(themes)
 
 
 class InfluencersHandler(BaseHandler, TemplateRendering):
     def get(self, themename, cursor=None):
-        influencers = logic.getInfluencers(themename, cursor)
+        influencers = apiv1.getInfluencers(themename, cursor)
         self.set_header('Content-Type', 'application/json')
         self.write(influencers)
 
 
 class FeedsHandler(BaseHandler, TemplateRendering):
     def get(self, themename, cursor=None):
-        feeds = logic.getFeeds(themename, cursor)
+        feeds = apiv1.getFeeds(themename, cursor)
         self.set_header('Content-Type', 'application/json')
         self.write(feeds)
 
@@ -388,7 +309,7 @@ class LoginHandler(BaseHandler, TemplateRendering):
             self.set_secure_cookie("userid", str(login_info['userid']))
             self.set_secure_cookie("username", str(username))
             logic.setCurrentTopic(str(login_info['userid']))
-            self.write({'response': True, 'redirectUrl': self.get_argument('next', '/Alerts')})
+            self.write({'response': True, 'redirectUrl': self.get_argument('next', '/Topics')})
         else:
             self.write(json.dumps(login_info))
 
@@ -399,20 +320,17 @@ class LogoutHandler(BaseHandler, TemplateRendering):
         self.redirect("/")
 
 
-class AlertsHandler(BaseHandler, TemplateRendering):
+class TopicsHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
     def get(self):
-        self.mainT.checkThread()
         userid = tornado.escape.xhtml_escape(self.current_user)
         template = 'afterlogintemplate.html'
         topic = logic.getCurrentTopic(tornado.escape.xhtml_escape(self.current_user))
         variables = {
-            'title': "Alerts",
+            'title': "Topics",
             'alerts': logic.getAlertList(userid),
             'type': "alertlist",
             'alertlimit': logic.getAlertLimit(userid),
-            'threadstatus': logic.getThreadStatus(self.mainT),
-            'threadconnection': logic.getThreadConnection(self.mainT),
             'username': str(tornado.escape.xhtml_escape(self.get_current_username())),
             'topic': topic
         }
@@ -425,18 +343,19 @@ class AlertsHandler(BaseHandler, TemplateRendering):
         posttype = self.get_argument("posttype")
         userid = tornado.escape.xhtml_escape(self.current_user)
         if posttype == u'remove':
-            info = logic.deleteAlert(alertid, self.mainT, userid)
+            logic.deleteAlert(alertid, self.mainT, userid)
         elif posttype == u'stop':
-            info = logic.stopAlert(alertid, self.mainT)
+            logic.stopAlert(alertid, self.mainT)
         elif posttype == u'start':
-            info = logic.startAlert(alertid, self.mainT)
+            logic.startAlert(alertid, self.mainT)
         elif posttype == u'publish':
-            info = logic.publishAlert(alertid)
+            logic.publishAlert(alertid)
         elif posttype == u'unpublish':
-            info = logic.unpublishAlert(alertid)
+            logic.unpublishAlert(alertid)
+
         template = "alerts.html"
         variables = {
-            'title': "Alerts",
+            'title': "Topics",
             'alerts': logic.getAlertList(userid),
             'type': "alertlist",
             'alertlimit': logic.getAlertLimit(userid),
@@ -447,15 +366,7 @@ class AlertsHandler(BaseHandler, TemplateRendering):
         self.write(content)
 
 
-class MessageHandler(BaseHandler, TemplateRendering):
-    def post(self):
-        alertid = self.get_argument("alertid")
-        info = logic.response(alertid)
-        result = info['message'] + ";" + info['type']
-        self.write(result)
-
-
-class CreateEditAlertsHandler(BaseHandler, TemplateRendering):
+class CreateEditTopicHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
     def get(self, alertid=None):
         userid = tornado.escape.xhtml_escape(self.current_user)
@@ -468,17 +379,17 @@ class CreateEditAlertsHandler(BaseHandler, TemplateRendering):
         if alertid != None:
             if logic.alertExist(alertid):
                 if logic.checkUserIdAlertId(userid, alertid):
-                    variables['title'] = "Edit Alert"
+                    variables['title'] = "Edit Topic"
                     variables['alert'] = logic.getAlert(alertid)
                     variables['type'] = "editAlert"
                 else:
-                    self.redirect("/Alerts")
+                    self.redirect("/Topics")
             else:
-                self.redirect("/Alerts")
+                self.redirect("/Topics")
         else:
             if logic.getAlertLimit(userid) == 0:
-                self.redirect("/Alerts")
-            variables['title'] = "Create Alert"
+                self.redirect("/Topics")
+            variables['title'] = "Create Topic"
             variables['alert'] = logic.getAlert(alertid)
             variables['type'] = "createAlert"
         content = self.render_template(template, variables)
@@ -493,7 +404,6 @@ class CreateEditAlertsHandler(BaseHandler, TemplateRendering):
             alert['domains'] = ",".join(self.get_argument("domains").split(","))
         except:
             alert['domains'] = ""
-        print(alert['domains'])
         alert['description'] = self.get_argument("description")
         keywordlimit = 10 - len(self.get_argument("keywords").split(","))
         alert['keywordlimit'] = keywordlimit
@@ -513,15 +423,13 @@ class CreateEditAlertsHandler(BaseHandler, TemplateRendering):
         else:
             alert['subreddits'] = ""
 
-        print(alert['subreddits'], alert['pages'])
         if alertid != None:
             alert['alertid'] = alertid
             logic.updateAlert(alert, self.mainT, userid)
         else:
             alert['name'] = self.get_argument('alertname')
-            alertid = logic.getNextAlertId()
             logic.addAlert(alert, self.mainT, userid)
-        self.redirect("/Alerts")
+        self.redirect("/Topics")
 
 
 class PreviewHandler(BaseHandler, TemplateRendering):
@@ -541,6 +449,10 @@ class PreviewHandler(BaseHandler, TemplateRendering):
 
 
 class BookmarkHandler(BaseHandler, TemplateRendering):
+    @tornado.web.authenticated
+    def get(self):
+        self.write("asd")
+
     @tornado.web.authenticated
     def post(self):
         link_id = self.get_argument("link_id")
@@ -577,45 +489,27 @@ class DomainHandler(BaseHandler, TemplateRendering):
         self.write({})
 
 
+# This handler gets all tweets about given topic
 class FeedHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
-    def get(self, argument=None):
+    def get(self):
         userid = tornado.escape.xhtml_escape(self.current_user)
         template = 'afterlogintemplate.html'
-        if argument is not None:
-            try:
-                alertid = int(argument)
-                variables = {
-                    'title': "Feed",
-                    'tweets': logic.getTweets(alertid),
-                    'alertid': alertid,
-                    'alertname': logic.getAlertName(alertid),
-                    'comesAlert': True,
-                    'type': "feed",
-                    'username': str(tornado.escape.xhtml_escape(self.get_current_username())),
-                    'topic': logic.getCurrentTopic(tornado.escape.xhtml_escape(self.current_user))
-                }
-                if len(variables['tweets']) == 0:
-                    self.write("<p style='color: red; font-size: 15px'><b>Ops! There is no tweet now.</b></p>")
-            except ValueError:
-                variables = {
-                    'title': "Feed",
-                    'alerts': logic.getAlertList(userid),
-                    'comesAlert': False,
-                    'type': "feed",
-                    'username': str(tornado.escape.xhtml_escape(self.get_current_username())),
-                    'topic': logic.getCurrentTopic(tornado.escape.xhtml_escape(self.current_user))
-                }
-                pass
-        else:
-            variables = {
-                'title': "Feed",
-                'alerts': logic.getAlertList(userid),
-                'comesAlert': False,
-                'type': "feed",
-                'username': str(tornado.escape.xhtml_escape(self.get_current_username())),
-                'topic': logic.getCurrentTopic(tornado.escape.xhtml_escape(self.current_user))
-            }
+
+        topic = logic.getCurrentTopic(tornado.escape.xhtml_escape(self.current_user))
+        if topic is None:
+            self.redirect("/topicinfo")
+
+        tweets = logic.getTweets(topic['topic_id'])
+        variables = {
+            'title': "Feed",
+            'alerts': logic.getAlertList(userid),
+            'type': "feed",
+            'tweets': tweets,
+            'username': str(tornado.escape.xhtml_escape(self.get_current_username())),
+            'topic': logic.getCurrentTopic(tornado.escape.xhtml_escape(self.current_user))
+        }
+
         content = self.render_template(template, variables)
         self.write(content)
 
@@ -662,14 +556,12 @@ class NewTweetsHandler(BaseHandler, TemplateRendering):
 class NewsHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
     def get(self, argument=None):
-        variables = {}
         userid = tornado.escape.xhtml_escape(self.current_user)
         template = 'afterlogintemplate.html'
         topic = logic.getCurrentTopic(tornado.escape.xhtml_escape(self.current_user))
         if topic is None:
-            self.redirect("/alertinfo")
+            self.redirect("/topicinfo")
 
-        print(topic)
         feeds = logic.getNews(topic['topic_id'], "yesterday", 0)
         variables = {
             'title': "News",
@@ -755,7 +647,6 @@ class SearchNewsHandler(BaseHandler, TemplateRendering):
         cities = self.get_argument('cities').split(",")
         user_location = self.get_argument("mention_location").split(",")
         user_language = self.get_argument('mention_language').split(",")
-        cursor = self.get_argument("cursor")
         since = ""
         until = ""
 
@@ -789,12 +680,11 @@ class SearchNewsHandler(BaseHandler, TemplateRendering):
 class AudienceHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
     def get(self, argument=None):
-        variables = {}
         userid = tornado.escape.xhtml_escape(self.current_user)
         template = 'afterlogintemplate.html'
         topic = logic.getCurrentTopic(tornado.escape.xhtml_escape(self.current_user))
         if topic is None:
-            self.redirect("/alertinfo")
+            self.redirect("/topicinfo")
 
         audiences = logic.getAudiences(topic['topic_id'])
         variables = {
@@ -844,8 +734,6 @@ class PagesHandler(BaseHandler, TemplateRendering):
             'redditsubreddits': sourceSelection['subreddits']
         }
 
-        print(variables)
-
         content = self.render_template(template, variables)
         self.write(content)
 
@@ -855,6 +743,90 @@ class TopicHandler(BaseHandler, TemplateRendering):
     def post(self):
         userid = tornado.escape.xhtml_escape(self.current_user)
         logic.saveTopicId(self.get_argument("topic_id"), userid)
+
+
+class PreviewConversationHandler(BaseHandler, TemplateRendering):
+    @tornado.web.authenticated
+    def post(self):
+        keywords = self.get_argument('keyswords', '0')
+        sources = logic.sourceSelection(keywords)
+
+        redditSources = sources['subreddits']
+        facebookSources = sources['pages']
+        facebookSourceIds = []
+        for source in facebookSources:
+            facebookSourceIds.append(source['page_id'])
+
+        facebookDocument = facebook_reddit_crontab.mineFacebookConversations(facebookSourceIds)
+
+        redditDocument = facebook_reddit_crontab.mineRedditConversation(redditSources)
+
+        docs = facebookDocument + redditDocument
+
+        self.write(self.render_template("submission.html", {"docs": docs}))
+
+
+class EventPageHandler(BaseHandler, TemplateRendering):
+    @tornado.web.authenticated
+    def get(self):
+        userid = tornado.escape.xhtml_escape(self.current_user)
+        template = 'afterlogintemplate.html'
+        topic = logic.getCurrentTopic(tornado.escape.xhtml_escape(self.current_user))
+        if topic is None:
+            self.redirect("/topicinfo")
+        variables = {
+            'title': "Events",
+            'alerts': logic.getAlertList(userid),
+            'type': "events",
+            'username': str(tornado.escape.xhtml_escape(self.get_current_username())),
+            "document": apiv12.getEvents(topic['topic_id'], "date", 0),
+            'topic': topic
+        }
+        content = self.render_template(template, variables)
+        self.write(content)
+
+
+class EventHandler(BaseHandler, TemplateRendering):
+    @tornado.web.authenticated
+    def get(self):
+        topic_id = self.get_argument('topic_id')
+        filter = self.get_argument('filter')
+        cursor = self.get_argument('cursor')
+        document = apiv12.getEvents(topic_id, filter, cursor)
+        self.write(self.render_template("single-event.html", {"document": document}))
+
+
+class ConversationPageHandler(BaseHandler, TemplateRendering):
+    @tornado.web.authenticated
+    def get(self):
+        userid = tornado.escape.xhtml_escape(self.current_user)
+        template = 'afterlogintemplate.html'
+        topic = logic.getCurrentTopic(tornado.escape.xhtml_escape(self.current_user))
+        if topic is None:
+            self.redirect("/topicinfo")
+        variables = {
+            'title': "Conversations",
+            'alerts': logic.getAlertList(userid),
+            'type': "conversation",
+            'username': str(tornado.escape.xhtml_escape(self.get_current_username())),
+            "docs": apiv12.getConversations(topic['topic_id'], "day", 0),
+            'topic': topic
+        }
+        content = self.render_template(template, variables)
+        self.write(content)
+
+
+class ConversationHandler(BaseHandler, TemplateRendering):
+    @tornado.web.authenticated
+    def get(self):
+        topic_id = self.get_argument("topic_id")
+        timeFilter = self.get_argument("timeFilter")
+        paging = self.get_argument("paging")
+        docs = apiv12.getConversations(topic_id, timeFilter, paging)
+        if docs == None:
+            docs = []
+        self.write(self.render_template("submission.html", {"docs": docs}))
+
 
 def main(mainT):
     tornado.options.parse_command_line()

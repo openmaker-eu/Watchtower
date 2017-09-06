@@ -23,10 +23,14 @@ def get_influencer(alert_id, alert_keywords_list):
         Connection.Instance().infDB[str(alert_id)].insert_one(user_dict)
 
 
-Connection.Instance().cur.execute("select alertid, alertname from alerts;")
-alerts = Connection.Instance().cur.fetchall()
+with Connection.Instance().get_cursor() as cur:
+    sql = (
+        "SELECT alertid, alertname "
+        "FROM alerts "
+    )
+    cur.execute(sql)
+    alerts = cur.fetchall()
 
-print(len(alerts))
-
-for alert in alerts:
-    get_influencer(alert[0], alert[1].split(","))
+    for alert in alerts:
+        Connection.Instance().infDB[str(alert[0])].drop()
+        get_influencer(alert[0], alert[1].split(","))
