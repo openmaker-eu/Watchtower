@@ -13,41 +13,67 @@ from application.Connections import Connection
 
 
 def setCurrentTopic(userid):
-    Connection.Instance().cur.execute("select alertid from alerts where userid = %s", [int(userid)])
-    topics = Connection.Instance().cur.fetchall()
-    Connection.Instance().cur.execute("select current_topic_id from users where userid = %s", [int(userid)])
-    user = Connection.Instance().cur.fetchall()
-    print(user)
-    print(topics)
-    if user[0][0] is None and len(topics) != 0:
-        print("settopic")
-        Connection.Instance().cur.execute(
-            "update users set current_topic_id = %s where userid = %s;", \
-            [topics[0][0], int(userid)])
-        Connection.Instance().PostGreSQLConnect.commit()
-    elif len(topics) == 0:
-        Connection.Instance().cur.execute(
-            "update users set current_topic_id = %s where userid = %s;", \
-            [None, int(userid)])
-        Connection.Instance().PostGreSQLConnect.commit()
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "SELECT alertid "
+            "FROM alerts "
+            "WHERE userid = %s"
+        )
+        cur.execute(sql, [int(userid)])
+        topics = cur.fetchall()
+        sql = (
+            "SELECT current_topic_id "
+            "FROM users "
+            "WHERE userid = %s"
+        )
+        cur.execute(sql, [int(userid)])
+        user = cur.fetchall()
+        if user[0][0] is None and len(topics) != 0:
+            sql = (
+                "UPDATE users "
+                "SET current_topic_id = %s "
+                "WHERE userid = %s"
+            )
+            cur.execute(sql, [topics[0][0], int(userid)])
+        elif len(topics) == 0:
+            sql = (
+                "UPDATE users "
+                "SET current_topic_id = %s "
+                "WHERE userid = %s"
+            )
+            cur.execute(sql, [None, int(userid)])
 
 
 def saveTopicId(topic_id, userid):
-    Connection.Instance().cur.execute(
-        "update users set current_topic_id = %s where userid = %s;", \
-        [int(topic_id), int(userid)])
-    Connection.Instance().PostGreSQLConnect.commit()
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "UPDATE users "
+            "SET current_topic_id = %s "
+            "WHERE userid = %s"
+        )
+        cur.execute(sql, [int(topic_id), int(userid)])
 
 
 def getCurrentTopic(userid):
-    Connection.Instance().cur.execute("select current_topic_id from users where userid = %s", [int(userid)])
-    user = Connection.Instance().cur.fetchall()
-    if user[0][0] is not None:
-        Connection.Instance().cur.execute("select alertid, alertname from alerts where alertid = %s", [int(user[0][0])])
-        topic = Connection.Instance().cur.fetchall()
-        return {'topic_id': topic[0][0], 'topic_name': topic[0][1]}
-    else:
-        return None
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "SELECT current_topic_id "
+            "FROM users "
+            "WHERE userid = %s"
+        )
+        cur.execute(sql, [int(userid)])
+        user = cur.fetchall()
+        if user[0][0] is not None:
+            sql = (
+                "SELECT alertid, alertname "
+                "FROM alerts "
+                "WHERE alertid = %s"
+            )
+            cur.execute(sql, [int(user[0][0])])
+            topic = cur.fetchall()
+            return {'topic_id': topic[0][0], 'topic_name': topic[0][1]}
+        else:
+            return None
 
 
 def sourceSelection(topicList):
