@@ -82,22 +82,6 @@ $(document).ready(function () {
             var exkeys = $("#excludedkeywords").val();
             var langs = $("#languages").val().join();
             
-            // ajax for events
-            $.ajax({
-                url: '/previewEvents',
-                method: 'GET',
-                data: {
-                    'keywords': keys,
-                },
-                timeout: 1000000,
-                async: true,
-                error: function () {
-                    $('#preview-events').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");  
-                }
-            }).success(function (html) {
-                $('#preview-events').prepend(html);
-                $("#loader-events").css("visibility", "hidden");
-            });
             
             // ajax for news
             $.ajax({
@@ -141,6 +125,23 @@ $(document).ready(function () {
                 $('#preview-conversations').prepend(html);
                 $("#loader-conversations").css("visibility", "hidden");
                 updateReadMores();
+            });
+            
+            // ajax for events
+            $.ajax({
+                url: '/previewEvents',
+                method: 'GET',
+                data: {
+                    'keywords': keys,
+                },
+                timeout: 1000000,
+                async: true,
+                error: function () {
+                    $('#preview-events').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");  
+                }
+            }).success(function (html) {
+                $('#preview-events').prepend(html);
+                $("#loader-events").css("visibility", "hidden");
             });
             
         }
