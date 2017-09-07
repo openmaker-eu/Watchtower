@@ -434,7 +434,7 @@ class CreateEditTopicHandler(BaseHandler, TemplateRendering):
 
 class PreviewHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
-    def post(self):
+    def get(self):
         template = 'tweetsTemplate.html'
         keywords = self.get_argument("keywords")
         # exculdedkeywords = self.get_argument("excludedkeywords")
@@ -442,6 +442,7 @@ class PreviewHandler(BaseHandler, TemplateRendering):
         variables = {
             'tweets': logic.searchTweets(keywords, languages)
         }
+        
         if len(variables['tweets']) == 0:
             self.write("<p style='color: red; font-size: 15px'><b>Ops! There is no tweet now.</b></p>")
         content = self.render_template(template, variables)
@@ -747,7 +748,7 @@ class TopicHandler(BaseHandler, TemplateRendering):
 
 class PreviewConversationHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
-    def post(self):
+    def get(self):
         keywords = self.get_argument('keyswords', '0')
         sources = logic.sourceSelection(keywords)
 

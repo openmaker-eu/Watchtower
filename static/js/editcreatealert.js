@@ -27,9 +27,9 @@ $(document).ready(function () {
             }
         });
         if ($('.input-error').length == 0) {
-            $("#spin").spinner();
+            
             $('#pages').empty();
-            $("#spin").show();
+            
             var keys = $("#keywords").val();
             $.ajax({
                 url: '/getPages',
@@ -40,11 +40,11 @@ $(document).ready(function () {
                 timeout: 10000,
                 error: function () {
                     $('#pages').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");
-                    $("#spin").hide();
+                    
                 }
             }).success(function (html) {
                 $('#pages').append(html);
-                $("#spin").hide();
+                
             });
         }
     });
@@ -67,63 +67,65 @@ $(document).ready(function () {
             }
         });
         if ($('.input-error').length == 0) {
-            $("#spin").spinner();
+
             $('#preview-news').empty();
-            $("#spin").show();
+            $('#preview-news').append('<div class="loader" id="loader-news" style="margin-top:50px"></div>');
+            $('#preview-conversations').empty();
+            $('#preview-conversations').append('<div class="loader" id="loader-conversations" style="margin-top:50px"></div>');
+            $('#preview-events').empty();
+            $('#preview-events').append('<div class="loader" id="loader-events" style="margin-top:50px"></div>');
+            $(".loader").css("visibility", "visible");
+
+            
+            
             var keys = $("#keywords").val();
             var exkeys = $("#excludedkeywords").val();
             var langs = $("#languages").val().join();
+            
             // ajax for news
             $.ajax({
                 url: '/preview',
-                method: 'POST',
+                method: 'GET',
                 data: {
                     'keywords': keys,
                     'languages': langs,
                     'excludedkeywords': exkeys
                 },
-                timeout: 100000,
+                timeout: 10000,
+                async: true,
                 error: function () {
                     $('#preview-news').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");
-                    $("#spin").hide();
                 }
             }).success(function (html) {
-                $('#preview-news').append(html);
                 var interval = setInterval(function () { // this code is executed every 500 milliseconds:
                     //console.log("I'm waiting");
                     if ($('blockquote').length === 0) {
                         clearInterval(interval);
                         $('.twitter-tweet-error').remove()
-                        $('#spin').hide();
                     }
-
                 }, 500);
+                $("#loader-news").css("visibility", "hidden");
+
             });
+            
             // ajax for conversations
             $.ajax({
                 url: '/previewConversation',
-                method: 'POST',
+                method: 'GET',
                 data: {
                     'keywords': keys,
                 },
-                timeout: 100000,
+                timeout: 10000,
+                async: true,
                 error: function () {
-                    $('#preview-conversations').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");
-                    $("#spin").hide();
+                    $('#preview-conversations').pend("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");  
                 }
             }).success(function (html) {
-                $('#preview-conversations').append(html);
-                var interval = setInterval(function () { // this code is executed every 500 milliseconds:
-                    //console.log("I'm waiting");
-                    if ($('blockquote').length === 0) {
-                        clearInterval(interval);
-                        $('.twitter-tweet-error').remove()
-                        $('#spin').hide();
-                    }
-
-                }, 500);
-                updateReadMores()
+                $('#preview-conversations').prepend(html);
+                $("#loader-conversations").css("visibility", "hidden");
+                updateReadMores();
             });
+            
         }
     });
 });
