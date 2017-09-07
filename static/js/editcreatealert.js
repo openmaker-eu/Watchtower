@@ -82,6 +82,23 @@ $(document).ready(function () {
             var exkeys = $("#excludedkeywords").val();
             var langs = $("#languages").val().join();
             
+            // ajax for events
+            $.ajax({
+                url: '/previewEvents',
+                method: 'GET',
+                data: {
+                    'keywords': keys,
+                },
+                timeout: 1000000,
+                async: true,
+                error: function () {
+                    $('#preview-events').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");  
+                }
+            }).success(function (html) {
+                $('#preview-events').prepend(html);
+                $("#loader-events").css("visibility", "hidden");
+            });
+            
             // ajax for news
             $.ajax({
                 url: '/preview',
@@ -91,7 +108,7 @@ $(document).ready(function () {
                     'languages': langs,
                     'excludedkeywords': exkeys
                 },
-                timeout: 10000,
+                timeout: 1000000,
                 async: true,
                 error: function () {
                     $('#preview-news').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");
@@ -110,15 +127,15 @@ $(document).ready(function () {
             
             // ajax for conversations
             $.ajax({
-                url: '/previewConversation',
+                url: '/previewConversations',
                 method: 'GET',
                 data: {
                     'keywords': keys,
                 },
-                timeout: 10000,
+                timeout: 1000000,
                 async: true,
                 error: function () {
-                    $('#preview-conversations').pend("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");  
+                    $('#preview-conversations').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");  
                 }
             }).success(function (html) {
                 $('#preview-conversations').prepend(html);

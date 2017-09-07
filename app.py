@@ -78,7 +78,8 @@ class Application(tornado.web.Application):
             (r"/get_news/(.*)", SearchNewsHandler, {'mainT': mainT}),
             (r"/Audience", AudienceHandler, {'mainT': mainT}),
             (r"/preview", PreviewHandler, {'mainT': mainT}),
-            (r"/previewConversation", PreviewConversationHandler, {'mainT': mainT}),
+            (r"/previewConversations", PreviewConversationHandler, {'mainT': mainT}),
+            (r"/previewEvents", PreviewEventHandler, {'mainT': mainT}),
             (r"/sentiment", SentimentHandler, {'mainT': mainT}),
             (r"/bookmark", BookmarkHandler, {'mainT': mainT}),
             (r"/domain", DomainHandler, {'mainT': mainT}),
@@ -745,12 +746,32 @@ class TopicHandler(BaseHandler, TemplateRendering):
         userid = tornado.escape.xhtml_escape(self.current_user)
         logic.saveTopicId(self.get_argument("topic_id"), userid)
 
+class PreviewEventHandler(BaseHandler, TemplateRendering):
+    @tornado.web.authenticated
+    def get(self):
+        keywords = self.get_argument('keywords', '0')
+        keywordsList = self.get_argument("keywords").split(",")
+        sources = facebook_reddit_crontab.sourceSelection(keywordsList)
+        t = []
+        
+        for source in sources:
+             
+            ids = []
+            for event in source['events']:
+                ids.append(event['event_id'])
+            t.extend(facebook_reddit_crontab.mineEvents(ids))
+
+        print(t)
+        document = {"events" : t}
+        self.write(self.render_template("single-event.html", {"document": document}))
+        
 
 class PreviewConversationHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
     def get(self):
-        keywords = self.get_argument('keyswords', '0')
-        sources = logic.sourceSelection(keywords)
+        keywords = self.get_argument('keywords', '0')
+        keywordsList = self.get_argument("keywords").split(",")
+        sources = logic.sourceSelection(keywordsList)
 
         redditSources = sources['subreddits']
         facebookSources = sources['pages']
@@ -759,9 +780,7 @@ class PreviewConversationHandler(BaseHandler, TemplateRendering):
             facebookSourceIds.append(source['page_id'])
 
         facebookDocument = facebook_reddit_crontab.mineFacebookConversations(facebookSourceIds)
-
         redditDocument = facebook_reddit_crontab.mineRedditConversation(redditSources)
-
         docs = facebookDocument + redditDocument
 
         self.write(self.render_template("submission.html", {"docs": docs}))

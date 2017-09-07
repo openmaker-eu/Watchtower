@@ -29,45 +29,52 @@ def mineFacebookConversations(search_ids, timeFilter="day"):
     posts = []
     print("search: ", search_ids)
     for ids in search_ids:
-        p = graph.get_object(
-            ids + "?fields=feed{permalink_url,attachments,message,created_time,comments{comments,message,created_time,from,attachment}}",
-            page=True, retry=5)
-        print("facebook pages: ", ids)
-        if "feed" in p:
-            for post in p["feed"]["data"]:
-                temp = post["created_time"][:-5]
-                postTime = datetime.strptime(temp, "%Y-%m-%dT%H:%M:%S")
-                if postTime > timeAgo:
-                    if "comments" in post:
-                        post["comments"] = post["comments"]["data"]
-                        for index in range(len(post["comments"])):
-                            post["comments"][index]["indent_number"] = 0
-                            post["comments"][index]["comment_text"] = post["comments"][index].pop("message")
-                            post["comments"][index]["comment_author"] = post["comments"][index]["from"]["name"]
-                            post["comments"][index].pop("from")
-                        for comment in post["comments"]:
-                            if "comments" in comment:
-                                comment["comments"] = comment["comments"]["data"]
-                                for subComment in comment["comments"]:
-                                    subComment["indent_number"] = 1
-                                    subComment["comment_text"] = subComment.pop("message")
-                                    subComment["comment_author"] = subComment["from"]["name"]
-                                    subComment.pop("from")
-                        for index in range(len(post["comments"])):
-                            if "comments" in post["comments"][index]:
-                                post["comments"][index + 1:index + 1] = post["comments"][index]["comments"]
-                                post["comments"][index].pop("comments")
-                        post["numberOfComments"] = len(post["comments"])
-                    else:
-                        post["numberOfComments"] = 0
-                    if "message" in post:
-                        post["post_text"] = post.pop("message")
-                    post["url"] = ""
-                    post["source"] = "facebook"
-                    post["title"] = ""
-                    posts.append(post)
-                else:
-                    break
+        for i in range(5):
+            try:
+                p = graph.get_object(
+                    ids + "?fields=feed{permalink_url,attachments,message,created_time,comments{comments,message,created_time,from,attachment}}",
+                    page=True, retry=5)
+                print("facebook pages: ", ids)
+                if "feed" in p:
+                    for post in p["feed"]["data"]:
+                        temp = post["created_time"][:-5]
+                        postTime = datetime.strptime(temp, "%Y-%m-%dT%H:%M:%S")
+                        if postTime > timeAgo:
+                            if "comments" in post:
+                                post["comments"] = post["comments"]["data"]
+                                for index in range(len(post["comments"])):
+                                    post["comments"][index]["indent_number"] = 0
+                                    post["comments"][index]["comment_text"] = post["comments"][index].pop("message")
+                                    post["comments"][index]["comment_author"] = post["comments"][index]["from"]["name"]
+                                    post["comments"][index].pop("from")
+                                for comment in post["comments"]:
+                                    if "comments" in comment:
+                                        comment["comments"] = comment["comments"]["data"]
+                                        for subComment in comment["comments"]:
+                                            subComment["indent_number"] = 1
+                                            subComment["comment_text"] = subComment.pop("message")
+                                            subComment["comment_author"] = subComment["from"]["name"]
+                                            subComment.pop("from")
+                                for index in range(len(post["comments"])):
+                                    if "comments" in post["comments"][index]:
+                                        post["comments"][index + 1:index + 1] = post["comments"][index]["comments"]
+                                        post["comments"][index].pop("comments")
+                                post["numberOfComments"] = len(post["comments"])
+                            else:
+                                post["numberOfComments"] = 0
+                            if "message" in post:
+                                post["post_text"] = post.pop("message")
+                            post["url"] = ""
+                            post["source"] = "facebook"
+                            post["title"] = ""
+                            posts.append(post)
+                        else:
+                            break
+                break
+            except:
+                print(ids, "tried again")
+
+
     # Sorting all comments with comment numbers, because I will use them in web page in this order
     # posts = sorted(posts, key=lambda k: k["numberOfComments"], reverse=True)
     docs = []
@@ -77,17 +84,14 @@ def mineFacebookConversations(search_ids, timeFilter="day"):
         comments = []
         for comment in submission["comments"]:
             comment["relative_indent"] = 0
-            if submission['source'] == 'reddit':
-                comment["created_time"] = datetime.fromtimestamp(int(comment["created_time"])).strftime(
-                    "%Y-%m-%d %H:%M:%S")
-            else:
-                comment["created_time"] = comment["created_time"][:10] + " " + comment["created_time"][11:18]
+            comment["created_time"] = comment["created_time"][:10] + " " + comment["created_time"][11:18]
             comments.append(comment)
 
-        submission['created_time'] = datetime.fromtimestamp(submission['created_time']).strftime('%Y-%m-%d')
+        submission['created_time'] = datetime.strptime(submission['created_time'][:10],'%Y-%m-%d').strftime('%Y-%m-%d')
+
         temp = {"title": submission["title"], "source": submission["source"], "comments": comments,
                 "url": submission["url"], "commentNumber": submission["numberOfComments"],
-                'subreddit': submission['subreddit'], 'created_time': submission['created_time']}
+                'subreddit': 'writtenWithHand', 'created_time': submission['created_time']}
         if "post_text" in submission:
             temp["post_text"] = submission["post_text"]
         else:
@@ -134,48 +138,51 @@ def mineRedditConversation(subreddits, timeFilter='day'):
     posts = []
     for subreddit in subreddits:
         s = reddit.subreddit(subreddit)
-        for submission in s.top(time_filter=timeFilter, limit=None):
-            try:
-                print("subreddit: ", submission)
-                if (re.search(r"^https://www.reddit.com", submission.url) or re.search(r"^https://i.redd.it",
-                                                                                       submission.url)):
-                    commentStack, comList = [], []
-                    submission.comments.replace_more(limit=0)
-                    if submission.comments:
-                        temp = reversed(submission.comments)
-                        for x in temp:
-                            commentStack.append([x, 0, "true", "true"])
-                        while commentStack:
-                            comment = commentStack.pop()
-                            if comment[0].replies:
-                                temp = reversed(comment[0].replies)
-                                for x in temp:
-                                    commentStack.append([x, comment[1] + 1, "true", "false"])
-                                comment[2] = "false"
-                            comList.append(comment)
-                    cList = []
-                    for c in comList:
-                        temp = {"parent": c[0].parent_id[3:], "comment_text": c[0].body, "created_time": c[0].created,
-                                "comment_id": c[0].id, "indent_number": c[1], "is_leaf": c[2], "is_root": c[3]}
-                        if c[0].author:
-                            temp["comment_author"] = c[0].author.name
-                        else:
-                            temp["comment_author"] = "[deleted]"
-                        cList.append(temp)
+        try:
+            for submission in s.top(time_filter=timeFilter, limit=None):
+                try:
+                    print("subreddit: ", submission)
+                    if (re.search(r"^https://www.reddit.com", submission.url) or re.search(r"^https://i.redd.it",
+                                                                                           submission.url)):
+                        commentStack, comList = [], []
+                        submission.comments.replace_more(limit=0)
+                        if submission.comments:
+                            temp = reversed(submission.comments)
+                            for x in temp:
+                                commentStack.append([x, 0, "true", "true"])
+                            while commentStack:
+                                comment = commentStack.pop()
+                                if comment[0].replies:
+                                    temp = reversed(comment[0].replies)
+                                    for x in temp:
+                                        commentStack.append([x, comment[1] + 1, "true", "false"])
+                                    comment[2] = "false"
+                                comList.append(comment)
+                        cList = []
+                        for c in comList:
+                            temp = {"parent": c[0].parent_id[3:], "comment_text": c[0].body, "created_time": c[0].created,
+                                    "comment_id": c[0].id, "indent_number": c[1], "is_leaf": c[2], "is_root": c[3]}
+                            if c[0].author:
+                                temp["comment_author"] = c[0].author.name
+                            else:
+                                temp["comment_author"] = "[deleted]"
+                            cList.append(temp)
 
-                    posts.append({
-                        "source": "reddit",
-                        "created_time": submission.created,
-                        "title": submission.title,
-                        "post_text": submission.selftext,
-                        "comments": cList,
-                        "url": submission.url,
-                        "numberOfComments": len(cList),
-                        "subreddit": subreddit
-                    })
-            except:
-                print("one submission passed")
-                pass
+                        posts.append({
+                            "source": "reddit",
+                            "created_time": submission.created,
+                            "title": submission.title,
+                            "post_text": submission.selftext,
+                            "comments": cList,
+                            "url": submission.url,
+                            "numberOfComments": len(cList),
+                            "subreddit": subreddit
+                        })
+                except:
+                    print("one submission passed")
+                    pass
+        except:
+            pass
 
     docs = []
     for submission in posts:
@@ -184,11 +191,7 @@ def mineRedditConversation(subreddits, timeFilter='day'):
         comments = []
         for comment in submission["comments"]:
             comment["relative_indent"] = 0
-            if submission['source'] == 'reddit':
-                comment["created_time"] = datetime.fromtimestamp(int(comment["created_time"])).strftime(
-                    "%Y-%m-%d %H:%M:%S")
-            else:
-                comment["created_time"] = comment["created_time"][:10] + " " + comment["created_time"][11:18]
+            comment["created_time"] = datetime.fromtimestamp(int(comment["created_time"])).strftime("%Y-%m-%d %H:%M:%S")
             comments.append(comment)
 
         submission['created_time'] = datetime.fromtimestamp(submission['created_time']).strftime('%Y-%m-%d')
@@ -230,11 +233,13 @@ def sourceSelection(topicList):
     return allSearches
 
 
-def mineEvents(topic_id, search_id_list):
+def mineEvents(search_id_list):
     my_token = Connection.Instance().redditFacebookDB['tokens'].find_one()["facebook"]["token"]
     graph = facebook.GraphAPI(access_token=my_token, version="2.7")
-
+    t = []
+    c = 0
     for ids in search_id_list:
+        c += 1
         print(ids)
         # event = graph.get_object(id+'?fields=attending_count,cover,description,end_time,id,interested_count,is_canceled,maybe_count,name,noreply_count,owner,place,start_time,timezone,type,updated_time,declined_count,admins,picture,photos,interested,maybe', page=True, retry=5)
         event = graph.get_object(
@@ -258,6 +263,17 @@ def mineEvents(topic_id, search_id_list):
         if 'cover' in event:
             event['cover'] = event['cover']['source']
 
+        t.append(event)
+        if c == 5:
+            break
+
+    return t
+
+
+        
+
+def insertEventsIntoDataBase(eventsDic, topic_id):
+    for event in eventsDic:
         ret = Connection.Instance().events[str(topic_id)].aggregate([
             {'$match': {'id': ids}},
             {'$limit': 1}
@@ -286,7 +302,8 @@ def startEvent(topic_id, topicList):
         ids = []
         for event in source['events']:
             ids.append(event['event_id'])
-        mineEvents(topic_id, ids)
+        events = mineEvents(ids)
+        insertEventsIntoDataBase(events, topic_id)
 
 
 def getCommentsOfSubmission(submission):
