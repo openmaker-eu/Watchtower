@@ -77,7 +77,7 @@ class Application(tornado.web.Application):
             (r"/get_news", SearchNewsHandler, {'mainT': mainT}),
             (r"/get_news/(.*)", SearchNewsHandler, {'mainT': mainT}),
             (r"/Audience", AudienceHandler, {'mainT': mainT}),
-            (r"/preview", PreviewHandler, {'mainT': mainT}),
+            (r"/previewNews", PreviewNewsHandler, {'mainT': mainT}),
             (r"/previewConversations", PreviewConversationHandler, {'mainT': mainT}),
             (r"/previewEvents", PreviewEventHandler, {'mainT': mainT}),
             (r"/sentiment", SentimentHandler, {'mainT': mainT}),
@@ -433,7 +433,7 @@ class CreateEditTopicHandler(BaseHandler, TemplateRendering):
         self.redirect("/Topics")
 
 
-class PreviewHandler(BaseHandler, TemplateRendering):
+class PreviewNewsHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
     def get(self):
         template = 'tweetsTemplate.html'
@@ -761,7 +761,6 @@ class PreviewEventHandler(BaseHandler, TemplateRendering):
                 ids.append(event['event_id'])
             t.extend(facebook_reddit_crontab.mineEvents(ids))
 
-        print(t)
         document = {"events" : t}
         self.write(self.render_template("single-event.html", {"document": document}))
         

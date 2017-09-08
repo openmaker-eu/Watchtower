@@ -85,7 +85,7 @@ $(document).ready(function () {
             
             // ajax for news
             $.ajax({
-                url: '/preview',
+                url: '/previewNews',
                 method: 'GET',
                 data: {
                     'keywords': keys,
@@ -96,6 +96,7 @@ $(document).ready(function () {
                 async: true,
                 error: function () {
                     $('#preview-news').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");
+                    $("#loader-events").css("visibility", "hidden");
                 }
             }).success(function (html) {
                 var interval = setInterval(function () { // this code is executed every 500 milliseconds:
@@ -120,13 +121,14 @@ $(document).ready(function () {
                 async: true,
                 error: function () {
                     $('#preview-conversations').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");  
+                    $("#loader-events").css("visibility", "hidden");
                 }
             }).success(function (html) {
                 $('#preview-conversations').prepend(html);
                 $("#loader-conversations").css("visibility", "hidden");
                 updateReadMores();
             });
-            
+
             // ajax for events
             $.ajax({
                 url: '/previewEvents',
@@ -138,6 +140,7 @@ $(document).ready(function () {
                 async: true,
                 error: function () {
                     $('#preview-events').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");  
+                    $("#loader-events").css("visibility", "hidden");
                 }
             }).success(function (html) {
                 $('#preview-events').prepend(html);
