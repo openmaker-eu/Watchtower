@@ -187,7 +187,8 @@ def mineRedditConversation(subreddits, isPreview, timeFilter='day'):
                             "numberOfComments": len(cList),
                             "subreddit": subreddit
                         })
-                        previewCounter += 1
+                        if len(cList) != 0:
+                            previewCounter += 1
                         if isPreview and (previewCounter == 5):
                             print("conversation is broke")
                             break

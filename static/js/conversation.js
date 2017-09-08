@@ -3,6 +3,7 @@ var isReadyForLoading = true;
 var topic_id = -1;
 
 $(document).ready(function () {
+    
     $(".dropdown-menu").on('click', 'li a', function () {
         topic_id = $(this).attr("data-id");
         getConversations($("#day"), "day");
@@ -39,6 +40,7 @@ function loadNewConversations() {
         },
         error: function (response) {
             console.log("failed");
+
             $("#all-comments").empty();
             $("#all-comments").append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");
         }
@@ -46,16 +48,18 @@ function loadNewConversations() {
 }
 
 function getConversations(clickedButton, date) {
+    
     $(".btn-success").removeClass("btn-success");
     $("#all-comments").empty();
     $(clickedButton).addClass("btn-success");
     lastPostScrollNumber = 0;
+    
+
     $.ajax({
         type: "GET",
         url: "/Comments",
         data: {topic_id: topic_id, timeFilter: date, paging: lastPostScrollNumber},
         success: function (response) {
-
             console.log("success");
             lastPostScrollNumber += 10;
             $("#all-comments").empty();
@@ -71,7 +75,7 @@ function getConversations(clickedButton, date) {
 }
 
 function updateReadMores() {
-    console.log($(".all-comments-opened"));
+    $(".all-comments-opened").removeClass("all-comments-closed").addClass("all-comments-opened");
     var allButtons = document.querySelectorAll("[id^=read-more-post-button]");
     for (var i in allButtons) {
         if (allButtons[i].previousElementSibling != null) {
