@@ -436,6 +436,7 @@ class CreateEditTopicHandler(BaseHandler, TemplateRendering):
 class PreviewNewsHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
     def get(self):
+        print(self.request)
         template = 'tweetsTemplate.html'
         keywords = self.get_argument("keywords")
         # exculdedkeywords = self.get_argument("excludedkeywords")
@@ -749,17 +750,18 @@ class TopicHandler(BaseHandler, TemplateRendering):
 class PreviewEventHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
     def get(self):
+        print(self.request)
         keywords = self.get_argument('keywords', '0')
         keywordsList = self.get_argument("keywords").split(",")
         sources = facebook_reddit_crontab.sourceSelection(keywordsList)
         t = []
-        
         for source in sources:
-             
             ids = []
             for event in source['events']:
                 ids.append(event['event_id'])
-            t.extend(facebook_reddit_crontab.mineEvents(ids))
+            t.extend(facebook_reddit_crontab.mineEvents(ids,True))
+            if len(t) > 4:
+                break
 
         document = {"events" : t}
         self.write(self.render_template("single-event.html", {"document": document}))
@@ -768,26 +770,33 @@ class PreviewEventHandler(BaseHandler, TemplateRendering):
 class PreviewConversationHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
     def get(self):
+        print(self.request)
         keywords = self.get_argument('keywords', '0')
         keywordsList = self.get_argument("keywords").split(",")
         sources = logic.sourceSelection(keywordsList)
 
         redditSources = sources['subreddits']
+        '''
         facebookSources = sources['pages']
         facebookSourceIds = []
         for source in facebookSources:
             facebookSourceIds.append(source['page_id'])
 
-        facebookDocument = facebook_reddit_crontab.mineFacebookConversations(facebookSourceIds)
-        redditDocument = facebook_reddit_crontab.mineRedditConversation(redditSources)
-        docs = facebookDocument + redditDocument
+        facebookDocument = facebook_reddit_crontab.mineFacebookConversations(facebookSourceIds,True,"day")
 
+        print("facebookDocument is: ", facebookDocument)
+        redditDocument = facebook_reddit_crontab.mineRedditConversation(redditSources,True,"day")
+
+        docs = facebookDocument + redditDocument
+        '''
+        docs = facebook_reddit_crontab.mineRedditConversation(redditSources,True,"day")        
         self.write(self.render_template("submission.html", {"docs": docs}))
 
 
 class EventPageHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
     def get(self):
+
         userid = tornado.escape.xhtml_escape(self.current_user)
         template = 'afterlogintemplate.html'
         topic = logic.getCurrentTopic(tornado.escape.xhtml_escape(self.current_user))

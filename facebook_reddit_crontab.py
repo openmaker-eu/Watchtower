@@ -10,7 +10,7 @@ import link_parser
 from application.Connections import Connection
 
 
-def mineFacebookConversations(search_ids, timeFilter="day"):
+def mineFacebookConversations(search_ids, isPreview, timeFilter="day"):
     my_token = Connection.Instance().redditFacebookDB['tokens'].find_one()["facebook"]["token"]
     graph = facebook.GraphAPI(access_token=my_token, version="2.7")
 
@@ -26,6 +26,7 @@ def mineFacebookConversations(search_ids, timeFilter="day"):
     timeAgo = d[:10] + "T" + d[11:19]
     timeAgo = datetime.strptime(timeAgo, "%Y-%m-%dT%H:%M:%S")
 
+    previewCounter = 0
     posts = []
     print("search: ", search_ids)
     for ids in search_ids:
@@ -68,11 +69,17 @@ def mineFacebookConversations(search_ids, timeFilter="day"):
                             post["source"] = "facebook"
                             post["title"] = ""
                             posts.append(post)
+                            previewCounter += 1
+                            if isPreview and (previewCounter == 5):
+                                break
                         else:
                             break
+
                 break
             except:
                 print(ids, "tried again")
+        if isPreview and (previewCounter == 5):
+            break
 
 
     # Sorting all comments with comment numbers, because I will use them in web page in this order
@@ -129,19 +136,21 @@ def getComments(submission):
     return comList
 
 
-def mineRedditConversation(subreddits, timeFilter='day'):
+def mineRedditConversation(subreddits, isPreview, timeFilter='day'):
     keys = Connection.Instance().redditFacebookDB['tokens'].find_one()["reddit"]
     reddit = praw.Reddit(client_id=keys["client_id"],
                          client_secret=keys["client_secret"],
                          user_agent=keys["user_agent"],
                          api_type=keys["api_type"])
+    previewCounter = 0
     posts = []
     for subreddit in subreddits:
         s = reddit.subreddit(subreddit)
+        print("subreddit: ", subreddit)
         try:
             for submission in s.top(time_filter=timeFilter, limit=None):
                 try:
-                    print("subreddit: ", submission)
+                    print("submission: ", submission)
                     if (re.search(r"^https://www.reddit.com", submission.url) or re.search(r"^https://i.redd.it",
                                                                                            submission.url)):
                         commentStack, comList = [], []
@@ -178,11 +187,19 @@ def mineRedditConversation(subreddits, timeFilter='day'):
                             "numberOfComments": len(cList),
                             "subreddit": subreddit
                         })
+                        previewCounter += 1
+                        if isPreview and (previewCounter == 5):
+                            print("conversation is broke")
+                            break
+
                 except:
                     print("one submission passed")
                     pass
         except:
             pass
+
+        if isPreview and (previewCounter == 5):
+            break
 
     docs = []
     for submission in posts:
@@ -233,7 +250,7 @@ def sourceSelection(topicList):
     return allSearches
 
 
-def mineEvents(search_id_list):
+def mineEvents(search_id_list, isPreview):
     my_token = Connection.Instance().redditFacebookDB['tokens'].find_one()["facebook"]["token"]
     graph = facebook.GraphAPI(access_token=my_token, version="2.7")
     t = []
@@ -241,7 +258,7 @@ def mineEvents(search_id_list):
     for ids in search_id_list:
         c += 1
         print(ids)
-        # event = graph.get_object(id+'?fields=attending_count,cover,description,end_time,id,interested_count,is_canceled,maybe_count,name,noreply_count,owner,place,start_time,timezone,type,updated_time,declined_count,admins,picture,photos,interested,maybe', page=True, retry=5)
+        
         event = graph.get_object(
             ids + '?fields=attending_count,updated_time,cover,end_time,id,interested_count,name,place,start_time',
             page=True, retry=5)
@@ -265,6 +282,8 @@ def mineEvents(search_id_list):
 
         t.append(event)
         if c == 5:
+            print("c is : ", str(c))
+            print("in event we broke")
             break
 
     return t
@@ -302,7 +321,7 @@ def startEvent(topic_id, topicList):
         ids = []
         for event in source['events']:
             ids.append(event['event_id'])
-        events = mineEvents(ids)
+        events = mineEvents(ids,False)
         insertEventsIntoDataBase(events, topic_id)
 
 
@@ -436,10 +455,10 @@ if __name__ == '__main__':
                     posts = []
                     if v[2] != None and v[2] != "":
                         subreddits = v[2].split(",")
-                        posts.extend(mineRedditConversation(subreddits, date))
+                        posts.extend(mineRedditConversation(subreddits, False, date))
                     if v[1] != None and v[1] != "":
                         pages = v[1].split(",")
-                        posts.extend(mineFacebookConversations(pages, timeFilter=date))
+                        posts.extend(mineFacebookConversations(pages, False, date))
                     if len(posts) != 0:
                         posts = sorted(posts, key=lambda k: k["numberOfComments"], reverse=True)
                         Connection.Instance().conversations[str(v[0])].remove({"time_filter": date})

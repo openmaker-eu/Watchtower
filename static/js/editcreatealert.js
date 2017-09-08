@@ -82,53 +82,6 @@ $(document).ready(function () {
             var exkeys = $("#excludedkeywords").val();
             var langs = $("#languages").val().join();
             
-            
-            // ajax for news
-            $.ajax({
-                url: '/previewNews',
-                method: 'GET',
-                data: {
-                    'keywords': keys,
-                    'languages': langs,
-                    'excludedkeywords': exkeys
-                },
-                timeout: 1000000,
-                async: true,
-                error: function () {
-                    $('#preview-news').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");
-                    $("#loader-events").css("visibility", "hidden");
-                }
-            }).success(function (html) {
-                var interval = setInterval(function () { // this code is executed every 500 milliseconds:
-                    //console.log("I'm waiting");
-                    if ($('blockquote').length === 0) {
-                        clearInterval(interval);
-                        $('.twitter-tweet-error').remove()
-                    }
-                }, 500);
-                $("#loader-news").css("visibility", "hidden");
-
-            });
-            
-            // ajax for conversations
-            $.ajax({
-                url: '/previewConversations',
-                method: 'GET',
-                data: {
-                    'keywords': keys,
-                },
-                timeout: 1000000,
-                async: true,
-                error: function () {
-                    $('#preview-conversations').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");  
-                    $("#loader-events").css("visibility", "hidden");
-                }
-            }).success(function (html) {
-                $('#preview-conversations').prepend(html);
-                $("#loader-conversations").css("visibility", "hidden");
-                updateReadMores();
-            });
-
             // ajax for events
             $.ajax({
                 url: '/previewEvents',
@@ -145,7 +98,61 @@ $(document).ready(function () {
             }).success(function (html) {
                 $('#preview-events').prepend(html);
                 $("#loader-events").css("visibility", "hidden");
+                // ajax for conversations
+                //--------------------------------------------
+                $.ajax({
+                    url: '/previewConversations',
+                    method: 'GET',
+                    data: {
+                        'keywords': keys,
+                    },
+                    timeout: 1000000,
+                    async: true,
+                    error: function () {
+                        $('#preview-conversations').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");  
+                        $("#loader-events").css("visibility", "hidden");
+                    }
+                }).success(function (html) {
+                    $('#preview-conversations').prepend(html);
+                    $("#loader-conversations").css("visibility", "hidden");
+                    updateReadMores();
+                    // ajax for news
+                    //--------------------------------------------
+                    $.ajax({
+                        url: '/previewNews',
+                        method: 'GET',
+                        data: {
+                            'keywords': keys,
+                            'languages': langs,
+                            'excludedkeywords': exkeys
+                        },
+                        timeout: 1000000,
+                        async: true,
+                        error: function () {
+                            $('#preview-news').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");
+                            $("#loader-events").css("visibility", "hidden");
+                        }
+                    }).success(function (html) {
+                        var interval = setInterval(function () { // this code is executed every 500 milliseconds:
+                            //console.log("I'm waiting");
+                            if ($('blockquote').length === 0) {
+                                clearInterval(interval);
+                                $('.twitter-tweet-error').remove()
+                            }
+                        }, 500);
+                        $("#loader-news").css("visibility", "hidden");
+
+                    });
+                    //--------------------------------------------
+                });
+                //--------------------------------------------
+
             });
+            
+
+            
+            
+            
             
         }
     });
