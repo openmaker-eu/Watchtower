@@ -436,7 +436,6 @@ class CreateEditTopicHandler(BaseHandler, TemplateRendering):
 class PreviewNewsHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
     def get(self):
-        print(self.request)
         template = 'tweetsTemplate.html'
         keywords = self.get_argument("keywords")
         # exculdedkeywords = self.get_argument("excludedkeywords")
@@ -750,7 +749,6 @@ class TopicHandler(BaseHandler, TemplateRendering):
 class PreviewEventHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
     def get(self):
-        print(self.request)
         keywords = self.get_argument('keywords', '0')
         keywordsList = self.get_argument("keywords").split(",")
         sources = facebook_reddit_crontab.sourceSelection(keywordsList)
@@ -762,15 +760,17 @@ class PreviewEventHandler(BaseHandler, TemplateRendering):
             t.extend(facebook_reddit_crontab.mineEvents(ids,True))
             if len(t) > 4:
                 break
+        temp = []
+        for a, b in t:
+            temp.append(a)
 
-        document = {"events" : t}
+        document = {"events" : temp}
         self.write(self.render_template("single-event.html", {"document": document}))
         
 
 class PreviewConversationHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
     def get(self):
-        print(self.request)
         keywords = self.get_argument('keywords', '0')
         keywordsList = self.get_argument("keywords").split(",")
         sources = logic.sourceSelection(keywordsList)

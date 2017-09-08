@@ -190,7 +190,6 @@ def mineRedditConversation(subreddits, isPreview, timeFilter='day'):
                         if len(cList) != 0:
                             previewCounter += 1
                         if isPreview and (previewCounter == 5):
-                            print("conversation is broke")
                             break
 
                 except:
@@ -281,10 +280,8 @@ def mineEvents(search_id_list, isPreview):
         if 'cover' in event:
             event['cover'] = event['cover']['source']
 
-        t.append(event)
+        t.append((event,ids))
         if c == 5:
-            print("c is : ", str(c))
-            print("in event we broke")
             break
 
     return t
@@ -292,25 +289,26 @@ def mineEvents(search_id_list, isPreview):
 
         
 
-def insertEventsIntoDataBase(eventsDic, topic_id):
-    for event in eventsDic:
+def insertEventsIntoDataBase(eventsWithIds, topic_id):
+    for event, ids in eventsWithIds:
         ret = Connection.Instance().events[str(topic_id)].aggregate([
             {'$match': {'id': ids}},
             {'$limit': 1}
         ])
 
         if ret.alive:
-            newEventUpdateTime = datetime.strptime(event['updated_time'][:-5], "%Y-%m-%dT%H:%M:%S")
-            oldEventUpdateTime = datetime.strptime(event['updated_time'][:-5], "%Y-%m-%dT%H:%M:%S")
-            if newEventUpdateTime != oldEventUpdateTime:
-                print(newEventUpdateTime)
-                print(oldEventUpdateTime)
-            if newEventUpdateTime > oldEventUpdateTime:
-                Connection.Instance().events[str(topic_id)].remove({'id': ids})
-                Connection.Instance().events[str(topic_id)].insert_one(event)
-                print('updated')
-            else:
-                print('existing')
+            for elem in ret:
+                newEventUpdateTime = datetime.strptime(event['updated_time'][:-5], "%Y-%m-%dT%H:%M:%S")
+                oldEventUpdateTime = datetime.strptime(elem['updated_time'][:-5], "%Y-%m-%dT%H:%M:%S")
+                if newEventUpdateTime != oldEventUpdateTime:
+                    print(newEventUpdateTime)
+                    print(oldEventUpdateTime)
+                if newEventUpdateTime > oldEventUpdateTime:
+                    Connection.Instance().events[str(topic_id)].remove({'id': ids})
+                    Connection.Instance().events[str(topic_id)].insert_one(event)
+                    print('updated')
+                else:
+                    print('existing')
         else:
             Connection.Instance().events[str(topic_id)].insert_one(event)
             print('added new')
@@ -322,8 +320,8 @@ def startEvent(topic_id, topicList):
         ids = []
         for event in source['events']:
             ids.append(event['event_id'])
-        events = mineEvents(ids,False)
-        insertEventsIntoDataBase(events, topic_id)
+        eventsWithIds = mineEvents(ids,False)
+        insertEventsIntoDataBase(eventsWithIds, topic_id)
 
 
 def getCommentsOfSubmission(submission):
@@ -434,6 +432,37 @@ def searchFacebookNews(topic_id, search_ids):
                             })
                 else:
                     break
+'''
+def mineEvents(topicList):
+    client = MongoClient('localhost', 27017)
+    db = client['tes']
+    my_token = db.tokens.find_one()['eventbrite']['token']
+    collection = db.eventbrite_events
+    for topic in topicList:
+        response = requests.get(
+            "https://www.eventbriteapi.com/v3/events/search/",
+            headers = {
+                "Authorization": "Bearer " + my_token,
+            },
+            params = {
+                'q' : topic
+            },
+            verify = True,  # Verify SSL certificate
+        )
+        response = response.json()
+        for event in response['events']:
+            ret = db.eventbrite_events.aggregate([
+                {'$match': { 'event.id': event['id']}},
+                {'$limit': 1}
+            ])
+
+            if ret.alive:
+                print("alive")
+                for elem in ret:
+                    collection.delete_one({'event.id' : event['id']})
+                    
+            collection.insert_one({'topic':topic, 'event':event})
+'''  
 
 
 if __name__ == '__main__':
