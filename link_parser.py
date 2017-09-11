@@ -98,9 +98,6 @@ def calculateLinks(data):
                 else:
                     dic['link_id'] = get_next_links_sequence()
                     dic['mentions'] = data['mentions']
-                    dic['forbidden'] = False
-                    dic['bookmark'] = False
-                    dic['bookmark_date'] = None
                     Connection.Instance().newsPoolDB[str(topic_id)].insert_one(dic)
         except Exception as e:
             print(link)
@@ -135,9 +132,6 @@ def calculateLinks(data):
                 else:
                     dic['link_id'] = get_next_links_sequence()
                     dic['mentions'] = data['mentions']
-                    dic['forbidden'] = False
-                    dic['bookmark'] = False
-                    dic['bookmark_date'] = None
                     dic['short_links'] = [short_link]
                     Connection.Instance().newsPoolDB[str(topic_id)].insert_one(dic)
         except Exception as e:

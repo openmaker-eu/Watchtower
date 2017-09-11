@@ -411,10 +411,6 @@ class CreateEditTopicHandler(BaseHandler, TemplateRendering):
         else:
             alert['lang'] = ""
 
-        print("------------")
-        print(alert['keywords'])
-        print("------------")
-
         if alertid != None:
             alert['alertid'] = alertid
             logic.updateAlert(alert, self.mainT, userid)
