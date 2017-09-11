@@ -298,6 +298,7 @@ def addAlert(alert, mainT, user_id):
             "ORDER BY topic_id DESC "
             "LIMIT 1"
         )
+        cur.execute(sql)
         topic = cur.fetchone()
         if alert['name'] == topic[1]:
             sql = (
