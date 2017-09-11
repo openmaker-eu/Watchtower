@@ -246,6 +246,7 @@ def getAlertAllOfThemList(alertid):
         )
         cur.execute(sql, [alertid])
         var = cur.fetchone()
+        print(var)
         alert = {'alertid': var[0], 'name': var[1], 'keywords': var[3].split(","), 'lang': var[4].split(","),
                  'status': var[8]}
         return alert
