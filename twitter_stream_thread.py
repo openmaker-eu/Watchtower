@@ -53,10 +53,13 @@ def separates_tweet(alertDic, tweet):
                     if 'extended_tweet' in tweet and 'full_text' in tweet['extended_tweet']:
                         if re.search(keyword, str(tweet['extended_tweet']['full_text'])):
                             updatedTime = datetime.fromtimestamp(int(tweet['timestamp_ms']) / 1e3)
-                            Connection.Instance().cur.execute(
-                                "update alerts set lasttweetdate = %s where alertid = %s;",
-                                [updatedTime, alert['alertid']])
-                            Connection.Instance().PostGreSQLConnect.commit()
+                            with Connection.Instance().get_cursor() as cur:
+                                sql = (
+                                    "UPDATE topics "
+                                    "SET late_tweet_date = %s "
+                                    "WHERE topic_id = %s"
+                                )
+                                cur.execute(sql, [updatedTime, alert['alertid']])
                             tweet['_id'] = ObjectId()
                             if tweet['entities']['urls'] != []:
                                 tweet['redis'] = False
@@ -67,10 +70,13 @@ def separates_tweet(alertDic, tweet):
                     else:
                         if re.search(keyword, str(tweet['text'])):
                             updatedTime = datetime.fromtimestamp(int(tweet['timestamp_ms']) / 1e3)
-                            Connection.Instance().cur.execute(
-                                "update alerts set lasttweetdate = %s where alertid = %s;",
-                                [updatedTime, alert['alertid']])
-                            Connection.Instance().PostGreSQLConnect.commit()
+                            with Connection.Instance().get_cursor() as cur:
+                                sql = (
+                                    "UPDATE topics "
+                                    "SET late_tweet_date = %s "
+                                    "WHERE topic_id = %s"
+                                )
+                                cur.execute(sql, [updatedTime, alert['alertid']])
                             tweet['_id'] = ObjectId()
                             if tweet['entities']['urls'] == [] or tweet['entities']['urls'][0]['expanded_url'] is  None:
                                 tweet['redis'] = True

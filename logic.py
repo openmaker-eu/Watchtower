@@ -257,7 +257,7 @@ def setUserAlertLimit(userid, setType):
         sql = (
             "SELECT alertlimit "
             "FROM users "
-            "WHERE user_id = %s"
+            "WHERE userid = %s"
         )
         cur.execute(sql, [userid])
         fetched = cur.fetchall()
@@ -269,9 +269,9 @@ def setUserAlertLimit(userid, setType):
         sql = (
             "UPDATE users "
             "SET alertlimit = %s "
-            "WHERE user_id = %s"
+            "WHERE userid = %s"
         )
-        cur.execute(sql, [newLimit, userid])
+        cur.execute(sql, [newLimit, int(userid)])
 
 
 def banDomain(user_id, domain):
@@ -301,19 +301,21 @@ def addAlert(alert, mainT, user_id):
         )
         cur.execute(sql)
         topic = cur.fetchone()
-        if alert['name'] == topic[1]:
-            sql = (
-                "INSERT INTO user_topic "
-                "(user_id, topic_id) "
-                "VALUES (%s, %s)"
-            )
-            cur.execute(sql, [int(user_id), int(topic[0])])
-            alert = getAlertAllOfThemList(int(topic[0]))
-            setUserAlertLimit(user_id, 'decrement')
-            mainT.addAlert(alert)
-            setCurrentTopic(user_id)
-            t = Thread(target=addFacebookPagesAndSubreddits, args=(alert['alertid'], alert['keywords'],))
-            t.start()
+        print(topic)
+
+    if alert['name'] == topic[1]:
+        sql = (
+            "INSERT INTO user_topic "
+            "(user_id, topic_id) "
+            "VALUES (%s, %s)"
+        )
+        cur.execute(sql, [int(user_id), int(topic[0])])
+        alert = getAlertAllOfThemList(int(topic[0]))
+        setUserAlertLimit(user_id, 'decrement')
+        mainT.addAlert(alert)
+        setCurrentTopic(user_id)
+        t = Thread(target=addFacebookPagesAndSubreddits, args=(alert['alertid'], alert['keywords'],))
+        t.start()
 
 
 # Deletes alert and terminate its thread
@@ -350,7 +352,6 @@ def deleteAlert(alertid, mainT, userid):
 
 # Updates given alert information and kill its thread, then again start its thread.
 def updateAlert(alert, mainT, userid):
-    print(alert)
     with Connection.Instance().get_cursor() as cur:
         sql = (
             "UPDATE topics "
