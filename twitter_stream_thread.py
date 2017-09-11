@@ -56,7 +56,7 @@ def separates_tweet(alertDic, tweet):
                             with Connection.Instance().get_cursor() as cur:
                                 sql = (
                                     "UPDATE topics "
-                                    "SET late_tweet_date = %s "
+                                    "SET last_tweet_date = %s "
                                     "WHERE topic_id = %s"
                                 )
                                 cur.execute(sql, [updatedTime, alert['alertid']])
@@ -73,7 +73,7 @@ def separates_tweet(alertDic, tweet):
                             with Connection.Instance().get_cursor() as cur:
                                 sql = (
                                     "UPDATE topics "
-                                    "SET late_tweet_date = %s "
+                                    "SET last_tweet_date = %s "
                                     "WHERE topic_id = %s"
                                 )
                                 cur.execute(sql, [updatedTime, alert['alertid']])
