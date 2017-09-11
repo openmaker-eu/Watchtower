@@ -289,7 +289,7 @@ def addAlert(alert, mainT, user_id):
         sql = (
             "INSERT INTO topics "
             "(topic_name, topic_description, keywords, languages, keyword_limit) "
-            "VALUES (%s, %s, %s, %s, %s, %s)"
+            "VALUES (%s, %s, %s, %s, %s)"
         )
         cur.execute(sql, [alert['name'], alert['description'], alert['keywords'], alert['lang'], alert['keywordlimit']])
         sql = (
