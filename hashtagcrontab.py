@@ -59,7 +59,12 @@ def calc(alertid):
 
 
 if __name__ == '__main__':
-    Connection.Instance().cur.execute("Select alertid from alerts;")
-    alert_list = Connection.Instance().cur.fetchall()
-    for alert in alert_list:
-        calc(alert[0])
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "SELECT topic_id "
+            "FROM topics"
+        )
+        cur.execute(sql)
+        alert_list = cur.fetchall()
+        for alert in alert_list:
+            calc(alert[0])

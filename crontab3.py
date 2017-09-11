@@ -114,16 +114,21 @@ def createParameters(alertid_list):
 
 
 def main():
-    Connection.Instance().cur.execute("Select alertid from alerts;")
-    alertid_list = sorted(list(Connection.Instance().cur.fetchall()))
-    parameters = createParameters(alertid_list)
-    alertid_list = [31, 32, 33, 37, 38, 39]
-    dates = ['yesterday', 'week', 'month']
-    parameters = [[alert, date] for alert in alertid_list for date in dates]
-    print(alertid_list)
-    pool = ThreadPool(1, True)
-    pool.map(calculateLinks, parameters)
-    pool.wait_completion()
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "SELECT topic_id "
+            "FROM topics"
+        )
+        cur.execute(sql)
+        alertid_list = sorted(list(cur.fetchall()))
+        parameters = createParameters(alertid_list)
+        alertid_list = [31, 32, 33, 37, 38, 39]
+        dates = ['yesterday', 'week', 'month']
+        parameters = [[alert, date] for alert in alertid_list for date in dates]
+        print(alertid_list)
+        pool = ThreadPool(1, True)
+        pool.map(calculateLinks, parameters)
+        pool.wait_completion()
 
 
 """

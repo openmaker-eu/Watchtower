@@ -28,15 +28,23 @@ def getFeeds(themename, themeid, userid, date, cursor):
         if date not in dates:
             result['Error'] = 'invalid date'
             return json.dumps(result, indent=4)
-        themeid = str(logic.getAlertIdwithUserId(themename, int(userid)))
-        feeds = list(Connection.Instance().newsdB[themeid].find({'name': date}, {date: 1}))
-        feeds = list(feeds[0][date][cursor:cursor + 20])
-        cursor = int(cursor) + 20
-        if cursor >= 60:
-            cursor = 0
-        result['next_cursor'] = cursor
-        result['next_cursor_str'] = str(cursor)
-        result['feeds'] = feeds
+
+        with Connection.Instance().get_cursor() as cur:
+            sql = (
+                "SELECT topic_id "
+                "FROM topics "
+                "WHERE topic_name = %s"
+            )
+            cur.execute(sql, [themename])
+            themeid = cur.fetchAll()[0][0]
+            feeds = list(Connection.Instance().newsdB[themeid].find({'name': date}, {date: 1}))
+            feeds = list(feeds[0][date][cursor:cursor + 20])
+            cursor = int(cursor) + 20
+            if cursor >= 60:
+                cursor = 0
+            result['next_cursor'] = cursor
+            result['next_cursor_str'] = str(cursor)
+            result['feeds'] = feeds
     else:
         result['feeds'] = "theme not found"
     return json.dumps(result, indent=4)

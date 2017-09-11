@@ -25,8 +25,8 @@ def get_influencer(alert_id, alert_keywords_list):
 
 with Connection.Instance().get_cursor() as cur:
     sql = (
-        "SELECT alertid, alertname "
-        "FROM alerts "
+        "SELECT topic_id, topic_name "
+        "FROM topics"
     )
     cur.execute(sql)
     alerts = cur.fetchall()

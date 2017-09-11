@@ -378,13 +378,10 @@ class CreateEditTopicHandler(BaseHandler, TemplateRendering):
         variables['alerts'] = logic.getAlertList(userid)
 
         if alertid != None:
-            if logic.alertExist(alertid):
-                if logic.checkUserIdAlertId(userid, alertid):
-                    variables['title'] = "Edit Topic"
-                    variables['alert'] = logic.getAlert(alertid)
-                    variables['type'] = "editAlert"
-                else:
-                    self.redirect("/Topics")
+            if logic.alertExist(userid):
+                variables['title'] = "Edit Topic"
+                variables['alert'] = logic.getAlert(alertid)
+                variables['type'] = "editAlert"
             else:
                 self.redirect("/Topics")
         else:
@@ -413,16 +410,10 @@ class CreateEditTopicHandler(BaseHandler, TemplateRendering):
             alert['lang'] = b','.join(self.request.arguments.get("languages")).decode("utf-8")
         else:
             alert['lang'] = ""
-        facebookpages = self.request.arguments.get("facebookpages")
-        if facebookpages != None and len(facebookpages) != 0:
-            alert['pages'] = b','.join(facebookpages).decode("utf-8")
-        else:
-            alert['pages'] = ""
-        subreddits = self.request.arguments.get("subreddits")
-        if subreddits != None and len(subreddits) != 0:
-            alert['subreddits'] = b','.join(subreddits).decode("utf-8")
-        else:
-            alert['subreddits'] = ""
+
+        print("------------")
+        print(alert['keywords'])
+        print("------------")
 
         if alertid != None:
             alert['alertid'] = alertid
@@ -443,7 +434,7 @@ class PreviewNewsHandler(BaseHandler, TemplateRendering):
         variables = {
             'tweets': logic.searchTweets(keywords, languages)
         }
-        
+
         if len(variables['tweets']) == 0:
             self.write("<p style='color: red; font-size: 15px'><b>Ops! There is no tweet now.</b></p>")
         content = self.render_template(template, variables)
@@ -452,18 +443,36 @@ class PreviewNewsHandler(BaseHandler, TemplateRendering):
 
 class BookmarkHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
-    def get(self):
-        self.write("asd")
+    def get(self, argument=None):
+        userid = tornado.escape.xhtml_escape(self.current_user)
+        template = 'afterlogintemplate.html'
+        topic = logic.getCurrentTopic(tornado.escape.xhtml_escape(self.current_user))
+        if topic is None:
+            self.redirect("/topicinfo")
+
+        variables = {
+            'title': "Bookmark",
+            'feeds': logic.getBookmarks(userid),
+            'alertid': topic['topic_id'],
+            'alerts': logic.getAlertList(userid),
+            'alertname': topic['topic_name'],
+            'type': "bookmark",
+            'username': str(tornado.escape.xhtml_escape(self.get_current_username())),
+            'topic': topic
+        }
+        content = self.render_template(template, variables)
+        self.write(content)
 
     @tornado.web.authenticated
     def post(self):
         link_id = self.get_argument("link_id")
-        alertid = self.get_argument("alertid")
+        alert_id = self.get_argument("alertid")
+        user_id = tornado.escape.xhtml_escape(self.current_user)
         posttype = self.get_argument("posttype")
         if posttype == "add":
-            content = logic.addBookmark(alertid, link_id)
+            content = logic.addBookmark(alert_id, user_id, link_id)
         else:
-            content = logic.removeBookmark(alertid, link_id)
+            content = logic.removeBookmark(alert_id, user_id, link_id)
         self.write(content)
 
 
@@ -473,21 +482,20 @@ class SentimentHandler(BaseHandler, TemplateRendering):
         link_id = self.get_argument("link_id")
         alertid = self.get_argument("alertid")
         posttype = self.get_argument("posttype")
+        user_id = tornado.escape.xhtml_escape(self.current_user)
         if posttype == "positive":
-            content = logic.sentimentPositive(alertid, link_id)
+            content = logic.sentimentPositive(alertid, user_id, link_id)
         elif posttype == "negative":
-            content = logic.sentimentNegative(alertid, link_id)
-        else:
-            content = logic.sentimentNotr(alertid, link_id)
+            content = logic.sentimentNegative(alertid, user_id, link_id)
         self.write(content)
 
 
 class DomainHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
     def post(self):
+        userid = tornado.escape.xhtml_escape(self.current_user)
         domain = self.get_argument("domain")
-        alertid = self.get_argument("alertid")
-        logic.banDomain(alertid, domain)
+        logic.banDomain(userid, domain)
         self.write({})
 
 
@@ -766,7 +774,7 @@ class PreviewEventHandler(BaseHandler, TemplateRendering):
 
         document = {"events" : temp}
         self.write(self.render_template("single-event.html", {"document": document}))
-        
+
 
 class PreviewConversationHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
@@ -789,7 +797,7 @@ class PreviewConversationHandler(BaseHandler, TemplateRendering):
 
         docs = facebookDocument + redditDocument
         '''
-        docs = facebook_reddit_crontab.mineRedditConversation(redditSources,True,"day")        
+        docs = facebook_reddit_crontab.mineRedditConversation(redditSources,True,"day")
         self.write(self.render_template("submission.html", {"docs": docs}))
 
 

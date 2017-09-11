@@ -2,6 +2,7 @@ import json
 import re
 from datetime import datetime
 from time import gmtime, strftime, strptime
+from threading import Thread
 
 import facebook
 import praw
@@ -15,9 +16,9 @@ from application.Connections import Connection
 def setCurrentTopic(userid):
     with Connection.Instance().get_cursor() as cur:
         sql = (
-            "SELECT alertid "
-            "FROM alerts "
-            "WHERE userid = %s"
+            "SELECT topic_id "
+            "FROM user_topic "
+            "WHERE user_id = %s"
         )
         cur.execute(sql, [int(userid)])
         topics = cur.fetchall()
@@ -65,9 +66,9 @@ def getCurrentTopic(userid):
         user = cur.fetchall()
         if user[0][0] is not None:
             sql = (
-                "SELECT alertid, alertname "
-                "FROM alerts "
-                "WHERE alertid = %s"
+                "SELECT topic_id, topic_name "
+                "FROM topics "
+                "WHERE topic_id = %s"
             )
             cur.execute(sql, [int(user[0][0])])
             topic = cur.fetchall()
@@ -75,6 +76,26 @@ def getCurrentTopic(userid):
         else:
             return None
 
+
+def addFacebookPagesAndSubreddits(topic_id, topic_list):
+    print(topic_list)
+    sources = sourceSelection(topic_list)
+    with Connection.Instance().get_cursor() as cur:
+        for facebook_page_id in sources['pages']:
+            sql = (
+                "INSERT INTO topic_facebook_page "
+                "(topic_id, facebook_page_id) "
+                "VALUES (%s, %s)"
+            )
+            cur.execute(sql, [int(topic_id), facebook_page_id['page_id']])
+
+        for subreddit in sources['subreddits']:
+            sql = (
+                "INSERT INTO topic_subreddit "
+                "(topic_id, subreddit) "
+                "VALUES (%s, %s)"
+            )
+            cur.execute(sql, [int(topic_id), subreddit])
 
 def sourceSelection(topicList):
     return {'pages': sourceSelectionFromFacebook(topicList),
@@ -144,75 +165,71 @@ def login(username, password):
 
 
 def getAllRunningAlertList():
-    Connection.Instance().cur.execute("Select * from alerts where isrunning = %s;", [True])
-    var = Connection.Instance().cur.fetchall()
-    alerts = [{'alertid': i[0], 'name': i[2], 'keywords': i[3].split(","), 'lang': i[5].split(",")} for i in var]
-    return alerts
-
-
-def getAllAlertList():
-    Connection.Instance().cur.execute("Select * from alerts;")
-    var = Connection.Instance().cur.fetchall()
-    alerts = [{'alertid': i[0], 'name': i[2], 'keywords': i[3].split(","), \
-               'lang': i[5].split(","), 'status': i[6], 'creationTime': i[7], 'domains': i[11].split(",")} for i in var]
-    alerts = sorted(alerts, key=lambda k: k['alertid'])
-    return alerts
-
-
-def getAlertName(alertid):
-    Connection.Instance().cur.execute("Select alertname from alerts where alertid = %s;", [alertid])
-    return Connection.Instance().cur.fetchall()[0][0]
-
-
-def getAlertId(alertname):
-    Connection.Instance().cur.execute("Select alertid from alerts where alertname = %s;", [alertname])
-    return Connection.Instance().cur.fetchall()[0][0]
-
-
-def getAlertIdwithUserId(alertname, userid):
-    Connection.Instance().cur.execute("Select alertid from alerts where alertname = %s;", [alertname])
-    return Connection.Instance().cur.fetchall()[0][0]
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "SELECT * "
+            "FROM topics "
+            "WHERE is_running = %s"
+        )
+        cur.execute(sql, [True])
+        var = cur.fetchall()
+        alerts = [
+            {'alertid': i[0], 'name': i[1], 'description': i[2], 'keywords': i[3].split(","), 'lang': i[4].split(",")}
+            for i in var]
+        return alerts
 
 
 # Gives alerts as lists
 def getAlertList(userid):
-    Connection.Instance().cur.execute("Select * from alerts where userid = %s;", [userid])
-    var = Connection.Instance().cur.fetchall()
-    alerts = [{'alertid': i[0], 'name': i[2], 'keywords': i[3].split(","), 'lang': i[5].split(","), \
-               'status': i[6], 'creationTime': i[7], 'publish': i[10], 'domains': i[11].split(","),
-               'updatedTime': i[15]} for i in var]
-    alerts = sorted(alerts, key=lambda k: k['alertid'])
-    for alert in alerts:
-        alert['tweetCount'] = Connection.Instance().db[str(alert['alertid'])].find().count()
-    return alerts
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "SELECT * FROM ( "
+            "SELECT * FROM ( "
+            "SELECT topic_id FROM user_topic WHERE user_id = %s "
+            ") AS ut "
+            "INNER JOIN topics AS t "
+            "ON t.topic_id = ut.topic_id) as a"
+        )
+        cur.execute(sql, [userid])
+        var = cur.fetchall()
+        alerts = [
+            {'alertid': i[1], 'name': i[2], 'description': i[3], 'keywords': i[4].split(","), 'lang': i[5].split(","), \
+             'creationTime': i[6], 'updatedTime': i[8], 'status': i[9], 'publish': i[10]} for i in var]
+        alerts = sorted(alerts, key=lambda k: k['alertid'])
+        for alert in alerts:
+            alert['tweetCount'] = Connection.Instance().db[str(alert['alertid'])].find().count()
+        return alerts
 
 
-def alertExist(alertid):
-    Connection.Instance().cur.execute("Select userid from alerts where alertid = %s;", [alertid])
-    var = Connection.Instance().cur.fetchone()
-    if var != None:
-        return True
-    else:
-        return False
-
-
-def checkUserIdAlertId(userid, alertid):
-    Connection.Instance().cur.execute("Select userid from alerts where alertid = %s;", [alertid])
-    var = Connection.Instance().cur.fetchone()
-    if var != None and len(var) != 0:
-        return int(var[0]) == int(userid)
-    else:
-        return False
+def alertExist(userid):
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "SELECT topic_id "
+            "FROM user_topic "
+            "WHERE user_id = %s"
+        )
+        cur.execute(sql, [userid])
+        var = cur.fetchone()
+        if var is not None:
+            return True
+        else:
+            return False
 
 
 # Take alertid and return that alert as not lists
 def getAlert(alertid):
-    if alertid != None:
-        Connection.Instance().cur.execute("Select * from alerts where alertid = %s;", [alertid])
-        var = Connection.Instance().cur.fetchone()
-        alert = {'alertid': var[0], 'name': var[2], 'keywords': var[3], 'lang': var[5].split(","), 'status': var[6],
-                 'keywordlimit': var[8], \
-                 'description': var[9], 'domains': var[11]}
+    if alertid is not None:
+        with Connection.Instance().get_cursor() as cur:
+            sql = (
+                "SELECT * "
+                "FROM topics "
+                "WHERE topic_id = %s"
+            )
+            cur.execute(sql, [alertid])
+            var = cur.fetchone()
+            alert = {'alertid': var[0], 'name': var[1], 'description': var[2], 'keywords': var[3],
+                     'lang': var[4].split(","), 'status': var[8],
+                     'keywordlimit': var[6]}
     else:
         alert = {'alertid': "", 'name': "", 'keywords': "", 'lang': "", 'status': False, 'keywordlimit': 10,
                  'description': ""}
@@ -221,62 +238,80 @@ def getAlert(alertid):
 
 # Take alertid and return that alert as not lists
 def getAlertAllOfThemList(alertid):
-    Connection.Instance().cur.execute("Select * from alerts where alertid = %s;", [alertid])
-    var = Connection.Instance().cur.fetchone()
-    alert = {'alertid': var[0], 'name': var[2], 'keywords': var[3].split(","), 'lang': var[5].split(","),
-             'status': var[6]}
-    return alert
-
-
-# Give nextalertid
-def getNextAlertId():
-    Connection.Instance().cur.execute("select alertid from alerts order by alertid desc limit 1;")
-    rows = Connection.Instance().cur.fetchall()
-    if (len(rows) == 0):
-        return 0
-    else:
-        for temp in rows:
-            return temp[0] + 1
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "SELECT * "
+            "FROM topics "
+            "WHERE topic_id = %s"
+        )
+        cur.execute(sql, [alertid])
+        var = cur.fetchone()
+        alert = {'alertid': var[0], 'name': var[1], 'keywords': var[3].split(","), 'lang': var[4].split(","),
+                 'status': var[8]}
+        return alert
 
 
 def setUserAlertLimit(userid, setType):
-    Connection.Instance().cur.execute("select alertlimit from users where userid = %s", [userid])
-    fetched = Connection.Instance().cur.fetchall()
-    if setType == 'decrement':
-        newLimit = fetched[0][0] - 1
-    elif setType == 'increment':
-        newLimit = fetched[0][0] + 1
-    Connection.Instance().cur.execute("update users set alertlimit = %s where userid = %s", [newLimit, userid])
-    Connection.Instance().PostGreSQLConnect.commit()
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "SELECT alertlimit "
+            "FROM users "
+            "WHERE user_id = %s"
+        )
+        cur.execute(sql, [userid])
+        fetched = cur.fetchall()
+        if setType == 'decrement':
+            newLimit = fetched[0][0] - 1
+        elif setType == 'increment':
+            newLimit = fetched[0][0] + 1
+
+        sql = (
+            "UPDATE users "
+            "SET alertlimit = %s "
+            "WHERE user_id = %s"
+        )
+        cur.execute(sql, [newLimit, userid])
 
 
-def banDomain(alertid, domain):
-    Connection.Instance().cur.execute("select domains from alerts where alertid = %s", [int(alertid)])
-    domains = Connection.Instance().cur.fetchall()[0][0]
-    domains = domains.split(",")
-    domains.append(domain)
-    if "" in domains:
-        domains.remove("")
-    domains = list(set(domains))
-    date_filter.calc(alertid, domains)
-    domains = ",".join(domains)
-    Connection.Instance().cur.execute("update alerts set domains = %s where alertid = %s;", [domains, int(alertid)])
-    Connection.Instance().PostGreSQLConnect.commit()
+def banDomain(user_id, domain):
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "INSERT INTO user_domain "
+            "(user_id, domain) "
+            "VALUES (%s, %s)"
+        )
+        cur.execute(sql, [user_id, domain])
 
 
 # Take alert information, give an id and add it DB
-def addAlert(alert, mainT, userid):
-    alert['alertid'] = getNextAlertId()
-    now = strftime("%Y-%m-%d", gmtime())
-    Connection.Instance().cur.execute(
-        "INSERT INTO alerts (alertid, userid, alertname, keywords, languages, creationtime, keywordlimit, isrunning, description, domains, bookmarks, pages, subreddits) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);", \
-        [alert['alertid'], userid, alert['name'], alert['keywords'], alert['lang'], now, alert['keywordlimit'], True,
-         alert['description'], alert['domains'], [], alert['pages'], alert['subreddits']])
-    Connection.Instance().PostGreSQLConnect.commit()
-    alert = getAlertAllOfThemList(alert['alertid'])
-    setUserAlertLimit(userid, 'decrement')
-    mainT.addAlert(alert)
-    setCurrentTopic(userid)
+def addAlert(alert, mainT, user_id):
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "INSERT INTO topics "
+            "(topic_name, topic_description, keywords, languages, keyword_limit) "
+            "VALUES (%s, %s, %s, %s, %s, %s)"
+        )
+        cur.execute(sql, [alert['name'], alert['description'], alert['keywords'], alert['lang'], alert['keywordlimit']])
+        sql = (
+            "SELECT topic_id, topic_name "
+            "FROM topics "
+            "ORDER BY topic_id DESC "
+            "LIMIT 1"
+        )
+        topic = cur.fetchone()
+        if alert['name'] == topic[1]:
+            sql = (
+                "INSERT INTO user_topic "
+                "(user_id, topic_id) "
+                "VALUES (%s, %s)"
+            )
+            cur.execute(sql, [int(user_id), int(topic[0])])
+            alert = getAlertAllOfThemList(int(topic[0]))
+            setUserAlertLimit(user_id, 'decrement')
+            mainT.addAlert(alert)
+            setCurrentTopic(user_id)
+            t = Thread(target=addFacebookPagesAndSubreddits, args=(alert['alertid'], alert['keywords'],))
+            t.start()
 
 
 # Deletes alert and terminate its thread
@@ -287,139 +322,172 @@ def deleteAlert(alertid, mainT, userid):
     Connection.Instance().db[str(alertid)].drop()
     Connection.Instance().newsPoolDB[str(alertid)].drop()
     Connection.Instance().newsdB[str(alertid)].drop()
-    Connection.Instance().cur.execute("delete from alerts where alertid = %s;", [alertid])
-    Connection.Instance().PostGreSQLConnect.commit()
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "DELETE FROM topics "
+            "WHERE topic_id = %s"
+        )
+        cur.execute(sql, [alertid])
+        sql = (
+            "DELETE FROM user_topic "
+            "WHERE topic_id = %s AND user_id = %s"
+        )
+        cur.execute(sql, [alertid, userid])
+        sql = (
+            "DELETE FROM topic_facebook_page "
+            "WHERE topic_id = %s"
+        )
+        cur.execute(sql, [alertid])
+        sql = (
+            "DELETE FROM topic_subreddit "
+            "WHERE topic_id = %s"
+        )
+        cur.execute(sql, [alertid])
     setCurrentTopic(userid)
 
 
 # Updates given alert information and kill its thread, then again start its thread.
 def updateAlert(alert, mainT, userid):
-    Connection.Instance().cur.execute(
-        "update alerts set userid = %s, keywords = %s , languages = %s, domains = %s, isrunning = %s, description = %s, pages = %s, subreddits = %s where alertid = %s;", \
-        [userid, alert['keywords'], alert['lang'], alert['domains'], True, alert['description'], alert['pages'],
-         alert['subreddits'], alert['alertid']])
-    Connection.Instance().PostGreSQLConnect.commit()
+    print(alert)
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "UPDATE topics "
+            "SET topic_description = %s, keywords = %s, languages = %s "
+            "WHERE topic_id = %s"
+        )
+        cur.execute(sql, [alert['description'], alert['keywords'], alert['lang'], alert['alertid']])
     alert = getAlertAllOfThemList(alert['alertid'])
+    t = Thread(target=addFacebookPagesAndSubreddits, args=(alert['alertid'], alert['keywords'],))
+    t.start()
     mainT.updateAlert(alert)
 
 
 # Starts alert streaming.
 def startAlert(alertid, mainT):
-    alert = getAlertAllOfThemList(alertid)
-    Connection.Instance().cur.execute("update alerts set isrunning = %s where alertid = %s;", [True, alert['alertid']])
-    Connection.Instance().PostGreSQLConnect.commit()
-    mainT.addAlert(alert)
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "UPDATE topics "
+            "SET is_running = %s "
+            "WHERE topic_id = %s"
+        )
+        cur.execute(sql, [True, alertid])
+        alert = getAlertAllOfThemList(alertid)
+        mainT.addAlert(alert)
 
 
 # Stops alert streaming.
 def stopAlert(alertid, mainT):
-    Connection.Instance().cur.execute("update alerts set isrunning = %s where alertid = %s;", [False, alertid])
-    Connection.Instance().PostGreSQLConnect.commit()
-    alert = getAlertAllOfThemList(alertid)
-    mainT.delAlert(alert)
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "UPDATE topics "
+            "SET is_running = %s "
+            "WHERE topic_id = %s"
+        )
+        cur.execute(sql, [False, alertid])
+        alert = getAlertAllOfThemList(alertid)
+        mainT.delAlert(alert)
 
 
 # Publishs the given alert
 def publishAlert(alertid):
-    Connection.Instance().cur.execute("update alerts set ispublish = %s where alertid = %s;", [True, alertid])
-    Connection.Instance().PostGreSQLConnect.commit()
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "UPDATE topics "
+            "SET is_publish = %s "
+            "WHERE topic_id = %s"
+        )
+        cur.execute(sql, [True, alertid])
 
 
 # Unpublishs the given alert
 def unpublishAlert(alertid):
-    Connection.Instance().cur.execute("update alerts set ispublish = %s where alertid = %s;", [False, alertid])
-    Connection.Instance().PostGreSQLConnect.commit()
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "UPDATE topics "
+            "SET is_publish = %s "
+            "WHERE topic_id = %s"
+        )
+        cur.execute(sql, [False, alertid])
 
+
+def getBookmarks(user_id):
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "SELECT bookmark_link_id "
+            "FROM user_bookmark "
+            "WHERE user_id = %s"
+        )
+        cur.execute(sql, [user_id])
+        bookmark_link_ids = [ a[0] for a in cur.fetchall() ]
+
+        news = []
+        for alertid in Connection.Instance().newsPoolDB.collection_names():
+            news = news + list(Connection.Instance().newsPoolDB[str(alertid)].find({'link_id' : {'$in': bookmark_link_ids}}))
+
+        return news
 
 # Adds bookmark
-def addBookmark(alertid, link_id):
-    link_id = int(link_id)
-    Connection.Instance().newsPoolDB[str(alertid)].find_one_and_update({'link_id': link_id}, {
-        '$set': {'bookmark': True, 'bookmark_date': datetime.datetime.utcnow()}})
-    Connection.Instance().cur.execute("Select bookmarks from alerts where alertid = %s;", [int(alertid)])
-    bookmarks = Connection.Instance().cur.fetchall()[0][0]
-    bookmarks.insert(0, link_id)
-    bookmarks = list(sorted(set(bookmarks), key=bookmarks.index))
-    Connection.Instance().cur.execute("update alerts set bookmarks = %s where alertid = %s;", [bookmarks, int(alertid)])
-    Connection.Instance().PostGreSQLConnect.commit()
-    Connection.Instance().cur.execute("Select domains from alerts where alertid = %s;", [int(alertid)])
-    domains = Connection.Instance().cur.fetchall()[0][0]
-    date_filter.calc(alertid, domains.split(","))
-    content = """<a href="javascript:;" onclick="dummy('remove', '{}')" style="color: #000000;text-decoration: none;"><span style="float:right;color:#808080;font-size:24px" align="right" class="glyphicon glyphicon-bookmark"></span></a>""".format(
-        link_id)
-    return content
+def addBookmark(topic_id, user_id, link_id):
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "INSERT INTO user_bookmark "
+            "(user_id, bookmark_link_id) "
+            "VALUES (%s, %s)"
+        )
+        cur.execute(sql, [int(user_id), int(link_id)])
+        updateNewsFeed(topic_id, user_id)
+        content = """<a href="javascript:;" onclick="dummy('remove', '{}')" style="color: #000000;text-decoration: none;"><span style="float:right;color:#808080;font-size:24px" align="right" class="glyphicon glyphicon-bookmark"></span></a>""".format(
+            link_id)
+        return content
 
 
 # Removes bookmarks
-def removeBookmark(alertid, link_id):
-    link_id = int(link_id)
-    Connection.Instance().newsPoolDB[str(alertid)].find_one_and_update({'link_id': link_id}, {
-        '$set': {'bookmark': False, 'bookmark_date': None}})
-    Connection.Instance().cur.execute("Select bookmarks from alerts where alertid = %s;", [int(alertid)])
-    bookmarks = Connection.Instance().cur.fetchall()[0][0]
-    bookmarks.remove(link_id)
-    bookmarks = list(sorted(set(bookmarks), key=bookmarks.index))
-    Connection.Instance().cur.execute("update alerts set bookmarks = %s where alertid = %s;", [bookmarks, int(alertid)])
-    Connection.Instance().PostGreSQLConnect.commit()
-    Connection.Instance().cur.execute("Select domains from alerts where alertid = %s;", [int(alertid)])
-    domains = Connection.Instance().cur.fetchall()[0][0]
-    date_filter.calc(alertid, domains.split(","))
-    content = """<a href="javascript:;" onclick="dummy('add', '{}')" style="color: #000000;text-decoration: none;"><span style="float:right;color:#D70000;font-size:24px" align="right" class="glyphicon glyphicon-bookmark"></span></a>""".format(
+def removeBookmark(topic_id, user_id, link_id):
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "DELETE FROM user_bookmark "
+            "WHERE user_id = %s AND bookmark_link_id = %s"
+        )
+        cur.execute(sql, [int(user_id), int(link_id)])
+        updateNewsFeed(topic_id, user_id)
+        content = """<a href="javascript:;" onclick="dummy('add', '{}')" style="color: #000000;text-decoration: none;"><span style="float:right;color:#D70000;font-size:24px" align="right" class="glyphicon glyphicon-bookmark"></span></a>""".format(
         link_id)
-    return content
+        return content
 
+def updateNewsFeed(topic_id, user_id):
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "SELECT domain "
+            "FROM user_domain "
+            "WHERE user_id = %s"
+        )
+        cur.execute(sql, [int(user_id)])
+        domains = [ a[0] for a in cur.fetchall() ]
+        date_filter.calc(topic_id, domains)
 
-def sentimentPositive(alertid, link_id):
+def sentimentPositive(alertid, user_id, link_id):
     link_id = int(link_id)
     Connection.Instance().newsPoolDB[str(alertid)].find_one_and_update({'link_id': link_id}, {'$set': {'sentiment': 1}})
-    Connection.Instance().cur.execute("Select domains from alerts where alertid = %s;", [int(alertid)])
-    domains = Connection.Instance().cur.fetchall()[0][0]
-    date_filter.calc(alertid, domains.split(","))
+    updateNewsFeed(alertid, user_id)
     content = """<a href="javascript:;" onclick="sentiment('positive', '{}')" style="color: #000000;text-decoration: none;">
 <span style="float:right;color:#66BB6A;font-size:24px" align="right" class="glyphicon glyphicon-ok-sign"></span>
 </a>
-<a href="javascript:;" onclick="sentiment('notr', '{}')" style="color: #000000;text-decoration: none;">
-<span style="float:right;color:#BDBDBD;font-size:24px" align="right" class="glyphicon glyphicon-question-sign"></span>
-</a>
 <a href="javascript:;" onclick="sentiment('negative', '{}')" style="color: #000000;text-decoration: none;">
 <span style="float:right;color:#BDBDBD;font-size:24px" align="right" class="glyphicon glyphicon-remove-sign"></span>
 </a>""".format(link_id, link_id, link_id)
     return content
 
 
-def sentimentNegative(alertid, link_id):
+def sentimentNegative(alertid, user_id, link_id):
     link_id = int(link_id)
     Connection.Instance().newsPoolDB[str(alertid)].find_one_and_update({'link_id': link_id},
                                                                        {'$set': {'sentiment': -1}})
-    Connection.Instance().cur.execute("Select domains from alerts where alertid = %s;", [int(alertid)])
-    domains = Connection.Instance().cur.fetchall()[0][0]
-    date_filter.calc(alertid, domains.split(","))
+    updateNewsFeed(alertid, user_id)
     content = """<a href="javascript:;" onclick="sentiment('positive', '{}')" style="color: #000000;text-decoration: none;">
 <span style="float:right;color:#BDBDBD;font-size:24px" align="right" class="glyphicon glyphicon-ok-sign"></span>
-</a>
-<a href="javascript:;" onclick="sentiment('notr', '{}')" style="color: #000000;text-decoration: none;">
-<span style="float:right;color:#BDBDBD;font-size:24px" align="right" class="glyphicon glyphicon-question-sign"></span>
 </a>
 <a href="javascript:;" onclick="sentiment('negative', '{}')" style="color: #000000;text-decoration: none;">
 <span style="float:right;color:#66BB6A;font-size:24px" align="right" class="glyphicon glyphicon-remove-sign"></span>
-</a>""".format(link_id, link_id, link_id)
-    return content
-
-
-def sentimentNotr(alertid, link_id):
-    link_id = int(link_id)
-    Connection.Instance().newsPoolDB[str(alertid)].find_one_and_update({'link_id': link_id}, {'$set': {'sentiment': 0}})
-    Connection.Instance().cur.execute("Select domains from alerts where alertid = %s;", [int(alertid)])
-    domains = Connection.Instance().cur.fetchall()[0][0]
-    date_filter.calc(alertid, domains.split(","))
-    content = """<a href="javascript:;" onclick="sentiment('positive', '{}')" style="color: #000000;text-decoration: none;">
-<span style="float:right;color:#BDBDBD;font-size:24px" align="right" class="glyphicon glyphicon-ok-sign"></span>
-</a>
-<a href="javascript:;" onclick="sentiment('notr', '{}')" style="color: #000000;text-decoration: none;">
-<span style="float:right;color:#66BB6A;font-size:24px" align="right" class="glyphicon glyphicon-question-sign"></span>
-</a>
-<a href="javascript:;" onclick="sentiment('negative', '{}')" style="color: #000000;text-decoration: none;">
-<span style="float:right;color:#BDBDBD;font-size:24px" align="right" class="glyphicon glyphicon-remove-sign"></span>
 </a>""".format(link_id, link_id, link_id)
     return content
 
@@ -429,20 +497,6 @@ def getTweets(alertid):
                                                               'created_at': 1, "_id": 0}).sort(
         [('tweetDBId', pymongo.DESCENDING)]).limit(25)
     tweets = list(tweets)
-    alert_keywords = getAlertAllOfThemList(alertid)['keywords']
-    for tweet in tweets:
-        tweet['created_at'] = strftime('%B %d, %Y', strptime(tweet['created_at'], '%a %b %d %H:%M:%S +0000 %Y'))
-        for keyword in alert_keywords:
-            marked = "<mark>" + keyword + "</mark>"
-            keyword = re.compile(re.escape(keyword), re.IGNORECASE)
-            tweet['text'] = keyword.sub(marked, tweet['text'])
-        urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+',
-                          tweet['text'])
-        if len(urls) != 0:
-            for url in urls:
-                ahref = '<a target="_blank" href="' + url + '">' + url + '</a>'
-                url = re.compile(re.escape(url), re.IGNORECASE)
-                tweet['text'] = url.sub(ahref, tweet['text'])
     return tweets
 
 
@@ -453,20 +507,6 @@ def getSkipTweets(alertid, lastTweetId):
                                                           'created_at': 1, "_id": 0}).sort(
         [('tweetDBId', pymongo.DESCENDING)]).limit(25)
     tweets = list(tweets)
-    alert_keywords = getAlertAllOfThemList(alertid)['keywords']
-    for tweet in tweets:
-        tweet['created_at'] = strftime('%B %d, %Y', strptime(tweet['created_at'], '%a %b %d %H:%M:%S +0000 %Y'))
-        for keyword in alert_keywords:
-            marked = "<mark>" + keyword + "</mark>"
-            keyword = re.compile(re.escape(keyword), re.IGNORECASE)
-            tweet['text'] = keyword.sub(marked, tweet['text'])
-        urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+',
-                          tweet['text'])
-        if len(urls) != 0:
-            for url in urls:
-                ahref = '<a target="_blank" href="' + url + '">' + url + '</a>'
-                url = re.compile(re.escape(url), re.IGNORECASE)
-                tweet['text'] = url.sub(ahref, tweet['text'])
     return tweets
 
 
@@ -496,28 +536,11 @@ def getNewTweets(alertid, newestId):
                                                               'created_at': 1, "_id": 0}).sort(
             [('tweetDBId', pymongo.DESCENDING)])
     tweets = list(tweets)
-    alert_keywords = getAlertAllOfThemList(alertid)['keywords']
-    for tweet in tweets:
-        tweet['created_at'] = strftime('%B %d, %Y', strptime(tweet['created_at'], '%a %b %d %H:%M:%S +0000 %Y'))
-        for keyword in alert_keywords:
-            marked = "<mark>" + keyword + "</mark>"
-            keyword = re.compile(re.escape(keyword), re.IGNORECASE)
-            tweet['text'] = keyword.sub(marked, tweet['text'])
-        urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+',
-                          tweet['text'])
-        if len(urls) != 0:
-            for url in urls:
-                ahref = '<a target="_blank" href="' + url + '">' + url + '</a>'
-                url = re.compile(re.escape(url), re.IGNORECASE)
-                tweet['text'] = url.sub(ahref, tweet['text'])
     return tweets
 
 
 # Return preview alert search tweets
 def searchTweets(keywords, languages):
-    """
-    This is for the phares.
-    """
     keys = keywords.split(",")
     result_keys = []
     for key in keys:
@@ -529,41 +552,10 @@ def searchTweets(keywords, languages):
     keywords = " OR ".join(result_keys)
     languages = " OR ".join(languages.split(","))
     tweets = twitter_search_sample_tweets.getTweets(keywords, languages)
-    for tweet in tweets:
-        for keyword in keys:
-            marked = "<mark>" + keyword + "</mark>"
-            keyword = re.compile(re.escape(keyword), re.IGNORECASE)
-            tweet['text'] = keyword.sub(marked, tweet['text'])
-        urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+',
-                          tweet['text'])
-        if len(urls) != 0:
-            for url in urls:
-                ahref = '<a target="_blank" href="' + url + '">' + url + '</a>'
-                url = re.compile(re.escape(url), re.IGNORECASE)
-                tweet['text'] = url.sub(ahref, tweet['text'])
     return tweets
 
 
 def getNews(alertid, date, cursor):
-    if date == 'bookmarks':
-        Connection.Instance().cur.execute("Select bookmarks from alerts where alertid = %s;", [int(alertid)])
-        bookmarks = Connection.Instance().cur.fetchall()[0][0]
-        bookmarks = [int(one_id) for one_id in bookmarks]
-        news = list(Connection.Instance().newsPoolDB[str(alertid)].find({'link_id': {'$in': bookmarks}},
-                                                                        {"_id": 0, 'mentions': 0}).sort(
-            [('bookmark_date', pymongo.DESCENDING)]))
-        news = news[cursor:cursor + 20]
-
-        cursor = int(cursor) + 20
-        if cursor >= 60:
-            cursor = 60
-
-        result = {
-            'next_cursor': cursor,
-            'cursor_length': len(bookmarks),
-            'feeds': news
-        }
-        return result
     dates = ['all', 'yesterday', 'week', 'month']
     result = {}
     if date not in dates:

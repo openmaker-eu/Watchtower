@@ -145,7 +145,6 @@ class StreamCreator():
         # This handles Twitter authetification and the connection to Twitter Streaming API
         self.l = StdOutListener(alertDic)
 
-        """ TODO merge keywords langs and alerts in one method """
         self.info = get_info(alertDic=alertDic)
         self.keywords = self.info['keywords']
         self.lang = self.info['lang']

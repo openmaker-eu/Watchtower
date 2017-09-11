@@ -16,41 +16,6 @@ var main = function () {
 $(document).ready(main);
 
 $(document).ready(function () {
-    $('#findpages').click(function (e) {
-        $('.alert-form').find('input[name="keywords"]').each(function () {
-            if ($(this).val() == "" || $(this).val() == null) {
-                e.preventDefault();
-                $(".keyword > .bootstrap-tagsinput").addClass("input-error");
-            }
-            else {
-                $(this).removeClass('input-error');
-            }
-        });
-        if ($('.input-error').length == 0) {
-            
-            $('#pages').empty();
-            
-            var keys = $("#keywords").val();
-            $.ajax({
-                url: '/getPages',
-                method: 'GET',
-                data: {
-                    'keywords': keys,
-                },
-                timeout: 10000,
-                error: function () {
-                    $('#pages').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");
-                    
-                }
-            }).success(function (html) {
-                $('#pages').append(html);
-                
-            });
-        }
-    });
-});
-
-$(document).ready(function () {
     $('#previewbutton').click(function (e) {
         $('.alert-form').find('input[name="alertname"], input[name="description"], input[name="keywords"], select[name="languages"]').each(function () {
             if ($(this).val() == "" || $(this).val() == null) {
@@ -76,12 +41,12 @@ $(document).ready(function () {
             $('#preview-events').append('<div class="loader" id="loader-events" style="margin-top:50px"></div>');
             $(".loader").css("visibility", "visible");
 
-            
-            
+
+
             var keys = $("#keywords").val();
             var exkeys = $("#excludedkeywords").val();
             var langs = $("#languages").val().join();
-            
+
             // ajax for events
             $.ajax({
                 url: '/previewEvents',
@@ -92,7 +57,7 @@ $(document).ready(function () {
                 timeout: 1000000,
                 async: true,
                 error: function () {
-                    $('#preview-events').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");  
+                    $('#preview-events').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");
                     $("#loader-events").css("visibility", "hidden");
                 }
             }).success(function (html) {
@@ -109,7 +74,7 @@ $(document).ready(function () {
                     timeout: 1000000,
                     async: true,
                     error: function () {
-                        $('#preview-conversations').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");  
+                        $('#preview-conversations').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");
                         $("#loader-events").css("visibility", "hidden");
                     }
                 }).success(function (html) {
@@ -148,12 +113,12 @@ $(document).ready(function () {
                 //--------------------------------------------
 
             });
-            
 
-            
-            
-            
-            
+
+
+
+
+
         }
     });
 });

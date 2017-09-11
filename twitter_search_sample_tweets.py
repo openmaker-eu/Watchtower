@@ -17,4 +17,4 @@ def getTweets(keywords, languages):
     data = tweepy.Cursor(api.search, q=keywords, lang=languages).items(25)
     for tweet in data:
         tweets.append(tweet._json)
-    return tweets
+    return list(tweets)

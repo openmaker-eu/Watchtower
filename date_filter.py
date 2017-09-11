@@ -83,13 +83,30 @@ def calc(alertid, forbidden_domain):
 def main():
     with Connection.Instance().get_cursor() as cur:
         sql = (
-            "SELECT alertid, domains "
-            "FROM alerts "
+            "SELECT user_id, ARRAY_agg(topic_id) as topics "
+            "FROM user_topic "
+            "GROUP BY user_id"
         )
         cur.execute(sql)
-        alert_list = cur.fetchall()
-        for alert in alert_list:
-            calc(alert[0], alert[1].split(","))
+        user_topics = cur.fetchall()
+        print(user_topics)
+        for user_topic in user_topics:
+            sql = (
+                "SELECT ARRAY_agg(domain) as domains "
+                "FROM user_domain "
+                "WHERE user_id = %s "
+                "GROUP BY user_id"
+            )
+            cur.execute(sql, [user_topic[0]])
+            domains = cur.fetchone()
+            if domains is not None:
+                domains = domains[0]
+            else:
+                domains = []
+
+            print(domains)
+            for topic_id in user_topic[1]:
+                calc(topic_id, domains)
 
 
 if __name__ == '__main__':

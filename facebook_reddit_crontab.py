@@ -97,7 +97,7 @@ def mineFacebookConversations(search_ids, isPreview, timeFilter="day"):
         submission['created_time'] = datetime.strptime(submission['created_time'][:10],'%Y-%m-%d').strftime('%Y-%m-%d')
 
         temp = {"title": submission["title"], "source": submission["source"], "comments": comments,
-                "url": submission["url"], "commentNumber": submission["numberOfComments"],
+                "url": submission["url"], "numberOfComments": submission["numberOfComments"],
                 'subreddit': 'writtenWithHand', 'created_time': submission['created_time']}
         if "post_text" in submission:
             temp["post_text"] = submission["post_text"]
@@ -213,7 +213,7 @@ def mineRedditConversation(subreddits, isPreview, timeFilter='day'):
 
         submission['created_time'] = datetime.fromtimestamp(submission['created_time']).strftime('%Y-%m-%d')
         temp = {"title": submission["title"], "source": submission["source"], "comments": comments,
-                "url": submission["url"], "commentNumber": submission["numberOfComments"],
+                "url": submission["url"], "numberOfComments": submission["numberOfComments"],
                 'subreddit': submission['subreddit'], 'created_time': submission['created_time']}
         if "post_text" in submission:
             temp["post_text"] = submission["post_text"]
@@ -258,7 +258,7 @@ def mineEvents(search_id_list, isPreview):
     for ids in search_id_list:
         c += 1
         print(ids)
-        
+
         event = graph.get_object(
             ids + '?fields=attending_count,updated_time,cover,end_time,id,interested_count,name,place,start_time',
             page=True, retry=5)
@@ -287,7 +287,7 @@ def mineEvents(search_id_list, isPreview):
     return t
 
 
-        
+
 
 def insertEventsIntoDataBase(eventsWithIds, topic_id):
     for event, ids in eventsWithIds:
@@ -352,32 +352,36 @@ def getCommentsOfSubmission(submission):
 
 
 def searchSubredditNews(topic_id, subredditNames):
-    keys = Connection.Instance().redditFacebookDB['tokens'].find_one()["reddit"]
-    reddit = praw.Reddit(client_id=keys["client_id"],
-                         client_secret=keys["client_secret"],
-                         user_agent=keys["user_agent"],
-                         api_type=keys["api_type"])
+    try:
+        keys = Connection.Instance().redditFacebookDB['tokens'].find_one()["reddit"]
+        reddit = praw.Reddit(client_id=keys["client_id"],
+                             client_secret=keys["client_secret"],
+                             user_agent=keys["user_agent"],
+                             api_type=keys["api_type"])
 
-    submissions = []
-    for subredditName in subredditNames:
-        for submission in reddit.subreddit(subredditName).top(time_filter='month'):
-            if not (re.search(r"^https://www.reddit.com", submission.url) or
-                        re.search(r"^https://i.redd.it", submission.url) or
-                        re.search(r"imgur.com", submission.url) or
-                        re.search(r".mp4$", submission.url)):
-                submissions.append(submission)
+        submissions = []
+        for subredditName in subredditNames:
+            for submission in reddit.subreddit(subredditName).top(time_filter='month'):
+                if not (re.search(r"^https://www.reddit.com", submission.url) or
+                            re.search(r"^https://i.redd.it", submission.url) or
+                            re.search(r"imgur.com", submission.url) or
+                            re.search(r".mp4$", submission.url)):
+                    submissions.append(submission)
 
-    for submission in submissions:
-        mentions = getCommentsOfSubmission(submission)
-        s = {
-            'channel': 'reddit',
-            'url': submission.url,
-            'topic_id': topic_id,
-            'mentions': mentions
-        }
+        for submission in submissions:
+            mentions = getCommentsOfSubmission(submission)
+            s = {
+                'channel': 'reddit',
+                'url': submission.url,
+                'topic_id': topic_id,
+                'mentions': mentions
+            }
 
-        if len(mentions) != 0:
-            link_parser.calculateLinks(s)
+            if len(mentions) != 0:
+                link_parser.calculateLinks(s)
+    except:
+        print(subredditName)
+        pass
 
 
 # day filter can be 'day', 'week', 'month'; default is 'day'
@@ -385,7 +389,7 @@ def searchFacebookNews(topic_id, search_ids):
     my_token = Connection.Instance().redditFacebookDB['tokens'].find_one()["facebook"]["token"]
     graph = facebook.GraphAPI(access_token=my_token, version="2.7")
 
-    dayAgo = (int(round(time())) - 86400000) * 1000
+    dayAgo = (int(round(time.time())) - 86400000) * 1000
 
     for id in search_ids:
         p = graph.get_object(str(
@@ -460,35 +464,54 @@ def mineEvents(topicList):
                 print("alive")
                 for elem in ret:
                     collection.delete_one({'event.id' : event['id']})
-                    
+
             collection.insert_one({'topic':topic, 'event':event})
-'''  
+'''
 
 
 if __name__ == '__main__':
 
     with Connection.Instance().get_cursor() as cur:
         sql = (
-            "SELECT alertid, pages, subreddits, keywords "
-            "FROM alerts"
+            "SELECT topic_id, keywords "
+            "FROM topics"
         )
         cur.execute(sql)
         var = cur.fetchall()
 
         dates = ["day", "week", "month"]
         for v in var:
-            if v[0] == 37:
-                startEvent(v[0], v[3].split(","))
-                searchSubredditNews(v[0], v[2].split(','))
-                searchFacebookNews(v[0], v[1])
+            #startEvent(v[0], v[1].split(","))
+            with Connection.Instance().get_cursor() as cur:
+                sql = (
+                    "SELECT ARRAY_agg(facebook_page_id) as pages "
+                    "FROM topic_facebook_page "
+                    "WHERE topic_id = %s "
+                    "GROUP BY topic_id"
+                )
+                cur.execute(sql, [v[0]])
+                pages = cur.fetchone()
+
+                sql = (
+                    "SELECT ARRAY_agg(subreddit) as subreddits "
+                    "FROM topic_subreddit "
+                    "WHERE topic_id = %s "
+                    "GROUP BY topic_id"
+                )
+                cur.execute(sql, [v[0]])
+                subreddits = cur.fetchone()
+
+                if subreddits is not None and len(subreddits):
+                    searchSubredditNews(v[0], subreddits[0])
+                if pages is not None and len(subreddits):
+                    searchFacebookNews(v[0], pages[0])
+
                 for date in dates:
                     posts = []
-                    if v[2] != None and v[2] != "":
-                        subreddits = v[2].split(",")
-                        posts.extend(mineRedditConversation(subreddits, False, date))
-                    if v[1] != None and v[1] != "":
-                        pages = v[1].split(",")
-                        posts.extend(mineFacebookConversations(pages, False, date))
+                    if subreddits is not None and len(subreddits):
+                        posts.extend(mineRedditConversation(subreddits[0], False, date))
+                    if pages is not None and len(pages):
+                        posts.extend(mineFacebookConversations(pages[0], False, date))
                     if len(posts) != 0:
                         posts = sorted(posts, key=lambda k: k["numberOfComments"], reverse=True)
                         Connection.Instance().conversations[str(v[0])].remove({"time_filter": date})

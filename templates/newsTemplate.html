@@ -48,12 +48,6 @@
                     <span style="float:right;{% if feed['sentiment'] == 1 %} color:#66BB6A {% else %} color:#BDBDBD {% endif %};font-size:24px"
                           align="right" class="glyphicon glyphicon-ok-sign"></span>
                 </a>
-                <!--
-          <a href="javascript:;" onclick="sentiment('notr', '{{feed['link_id']}}')" style="color: #000000;text-decoration: none;">
-            <span style="float:right;{% if feed['sentiment'] is not defined or feed['sentiment'] == 0 %}
-                     color:#66BB6A {% else %} color:#BDBDBD {% endif %};font-size:24px" align="right" class="glyphicon glyphicon-question-sign"></span>
-          </a>
-        -->
                 <a href="javascript:;" onclick="sentiment('negative', '{{ feed['link_id'] }}')"
                    style="color: #000000;text-decoration: none;">
                     <span style="float:right;{% if feed['sentiment'] == -1 %} color:#66BB6A {% else %} color:#BDBDBD {% endif %};font-size:24px"
