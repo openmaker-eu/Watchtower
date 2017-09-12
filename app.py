@@ -424,16 +424,18 @@ class CreateEditTopicHandler(BaseHandler, TemplateRendering):
 class PreviewNewsHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
     def get(self):
-        template = 'tweetsTemplate.html'
+        template = 'newsTemplate.html'
         keywords = self.get_argument("keywords")
         # exculdedkeywords = self.get_argument("excludedkeywords")
         languages = self.get_argument("languages")
         variables = {
-            'tweets': logic.searchTweets(keywords, languages)
+            'feeds': logic.searchNews(keywords, languages)
         }
 
-        if len(variables['tweets']) == 0:
-            self.write("<p style='color: red; font-size: 15px'><b>Ops! There is no tweet now.</b></p>")
+        print(variables['feeds'])
+
+        if len(variables['feeds']) == 0:
+            self.write("<p style='color: red; font-size: 15px'><b>Ops! There is no news now.</b></p>")
         content = self.render_template(template, variables)
         self.write(content)
 

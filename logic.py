@@ -553,7 +553,7 @@ def getNewTweets(alertid, newestId):
 
 
 # Return preview alert search tweets
-def searchTweets(keywords, languages):
+def searchNews(keywords, languages):
     keys = keywords.split(",")
     result_keys = []
     for key in keys:
@@ -564,8 +564,8 @@ def searchTweets(keywords, languages):
     # ends
     keywords = " OR ".join(result_keys)
     languages = " OR ".join(languages.split(","))
-    tweets = twitter_search_sample_tweets.getTweets(keywords, languages)
-    return tweets
+    news = twitter_search_sample_tweets.getNewsFromTweets(keywords, languages)
+    return news
 
 
 def getNews(alertid, date, cursor):

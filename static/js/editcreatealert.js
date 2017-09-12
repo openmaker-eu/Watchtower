@@ -97,13 +97,10 @@ $(document).ready(function () {
                             $("#loader-events").css("visibility", "hidden");
                         }
                     }).success(function (html) {
-                        var interval = setInterval(function () { // this code is executed every 500 milliseconds:
-                            //console.log("I'm waiting");
-                            if ($('blockquote').length === 0) {
-                                clearInterval(interval);
-                                $('.twitter-tweet-error').remove()
-                            }
-                        }, 500);
+                        $('#preview-news').prepend(html);
+                        $(".bookmark").css("visibility", "hidden");
+                        $(".sentiment").css("visibility", "hidden");
+                        $(".ban-domain").css("visibility", "hidden");
                         $("#loader-news").css("visibility", "hidden");
 
                     });
