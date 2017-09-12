@@ -3,7 +3,7 @@ var isReadyForLoading = true;
 var topic_id = -1;
 
 $(document).ready(function () {
-    
+
     $(".dropdown-menu").on('click', 'li a', function () {
         topic_id = $(this).attr("data-id");
         getConversations($("#day"), "day");
@@ -48,12 +48,12 @@ function loadNewConversations() {
 }
 
 function getConversations(clickedButton, date) {
-    
+
     $(".btn-success").removeClass("btn-success");
     $("#all-comments").empty();
     $(clickedButton).addClass("btn-success");
     lastPostScrollNumber = 0;
-    
+
 
     $.ajax({
         type: "GET",

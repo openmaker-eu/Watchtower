@@ -29,11 +29,11 @@ class Connection:
 
             self.pg_pool = psycopg2.pool.ThreadedConnectionPool(
                 1, 15,
-                host = '138.68.92.181',
-                port ='5432',
-                user = 'openmakerpsql',
-                password = 'smio1EUp',
-                database = 'openmakerdb')
+                host='138.68.92.181',
+                port='5432',
+                user='openmakerpsql',
+                password='smio1EUp',
+                database='openmakerdb')
 
             print("new connection")
         except Exception as e:

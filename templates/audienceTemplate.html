@@ -1,23 +1,22 @@
-{% for audience in audiences %}
-    <div class="row margin-bottom-25">
-        <div class="col-md-12">
-            <img src="{{ audience['profile_image_url'] }}" width="50px" height="50px"
-                 onerror="this.src='/images/default-user-circle.png'"
-                 class="img-responsive feed_img img-circle">
+<div class="wrapper">
+    {% for audience in audiences %}
 
-            <a href="http://twitter.com/{{ audience['screen_name'] }}" target="_blank"
-               style="color: #000000;text-decoration: none;">
-                <h5>
-                    <small>@{{ audience['screen_name'] }}</small>
-                    </br>{{ audience['name'] }}</h5>
-            </a>
-            <p>Followers Count: {{ audience['followers_count'] }} </p>
-            <p>
-            </p>
-            <p>{{ audience['description'] }} </p>
+        <div class="audience_card">
+            <div class="bg" style="background-image:url({{ audience['profile_banner_url'] }})"></div>
+            <div class="pp" align="center">
+                <img src="{{ (audience['profile_image_url']).replace('normal', '400x400') }}" alt=""/>
+            </div>
+            <div class="details">
+                <span id="name">{{ audience['name'] }}</span>
+                <a href="http://twitter.com/{{ audience['screen_name'] }}" target="_blank"><span
+                        id="nick"> @{{ audience['screen_name'] }} </span></a>
+                <ul>
+                    <li><a href="">Tweets <span>{{ audience['statuses_count'] }}</span> </a></li>
+                    <li><a href="">Follow <span>{{ audience['friends_count'] }}</span> </a></li>
+                    <li><a href="">Followers <span>{{ audience['followers_count'] }}</span> </a></li>
+                </ul>
+            </div>
         </div>
-        <div class="col-md-12 margin-top-10">
-            <hr>
-        </div>
-    </div>
-{% endfor %}
+
+    {% endfor %}
+</div>

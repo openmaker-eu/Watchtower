@@ -750,6 +750,7 @@ class TopicHandler(BaseHandler, TemplateRendering):
         userid = tornado.escape.xhtml_escape(self.current_user)
         logic.saveTopicId(self.get_argument("topic_id"), userid)
 
+
 class PreviewEventHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
     def get(self):
@@ -761,14 +762,14 @@ class PreviewEventHandler(BaseHandler, TemplateRendering):
             ids = []
             for event in source['events']:
                 ids.append(event['event_id'])
-            t.extend(facebook_reddit_crontab.mineEvents(ids,True))
+            t.extend(facebook_reddit_crontab.mineEvents(ids, True))
             if len(t) > 4:
                 break
         temp = []
         for a, b in t:
             temp.append(a)
 
-        document = {"events" : temp}
+        document = {"events": temp}
         self.write(self.render_template("single-event.html", {"document": document}))
 
 
@@ -793,14 +794,13 @@ class PreviewConversationHandler(BaseHandler, TemplateRendering):
 
         docs = facebookDocument + redditDocument
         '''
-        docs = facebook_reddit_crontab.mineRedditConversation(redditSources,True,"day")
+        docs = facebook_reddit_crontab.mineRedditConversation(redditSources, True, "day")
         self.write(self.render_template("submission.html", {"docs": docs}))
 
 
 class EventPageHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
     def get(self):
-
         userid = tornado.escape.xhtml_escape(self.current_user)
         template = 'afterlogintemplate.html'
         topic = logic.getCurrentTopic(tornado.escape.xhtml_escape(self.current_user))

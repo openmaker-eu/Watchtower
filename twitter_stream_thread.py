@@ -78,7 +78,7 @@ def separates_tweet(alertDic, tweet):
                                 )
                                 cur.execute(sql, [updatedTime, alert['alertid']])
                             tweet['_id'] = ObjectId()
-                            if tweet['entities']['urls'] == [] or tweet['entities']['urls'][0]['expanded_url'] is  None:
+                            if tweet['entities']['urls'] == [] or tweet['entities']['urls'][0]['expanded_url'] is None:
                                 tweet['redis'] = True
                             else:
                                 tweet['redis'] = False

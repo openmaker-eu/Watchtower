@@ -97,6 +97,7 @@ def addFacebookPagesAndSubreddits(topic_id, topic_list):
             )
             cur.execute(sql, [int(topic_id), subreddit])
 
+
 def sourceSelection(topicList):
     return {'pages': sourceSelectionFromFacebook(topicList),
             'subreddits': sourceSelectionFromReddit(topicList)}
@@ -198,6 +199,12 @@ def getAlertList(userid):
         alerts = sorted(alerts, key=lambda k: k['alertid'])
         for alert in alerts:
             alert['tweetCount'] = Connection.Instance().db[str(alert['alertid'])].find().count()
+            hashtags = \
+            list(Connection.Instance().hashtags[str(alert['alertid'])].find({'name': 'month'}, {'month': 1, '_id': 0}))[
+                0]['month']
+            hashtags = ["#", hashtag['hashtag']
+            for hashtag in hashtags]
+            alert['hashtags'] = ", ".join(hashtags[:5])
         return alerts
 
 
@@ -421,13 +428,15 @@ def getBookmarks(user_id):
             "WHERE user_id = %s"
         )
         cur.execute(sql, [user_id])
-        bookmark_link_ids = [ a[0] for a in cur.fetchall() ]
+        bookmark_link_ids = [a[0] for a in cur.fetchall()]
 
         news = []
         for alertid in Connection.Instance().newsPoolDB.collection_names():
-            news = news + list(Connection.Instance().newsPoolDB[str(alertid)].find({'link_id' : {'$in': bookmark_link_ids}}))
+            news = news + list(
+                Connection.Instance().newsPoolDB[str(alertid)].find({'link_id': {'$in': bookmark_link_ids}}))
 
         return news
+
 
 # Adds bookmark
 def addBookmark(topic_id, user_id, link_id):
@@ -454,8 +463,9 @@ def removeBookmark(topic_id, user_id, link_id):
         cur.execute(sql, [int(user_id), int(link_id)])
         updateNewsFeed(topic_id, user_id)
         content = """<a href="javascript:;" onclick="dummy('add', '{}')" style="color: #000000;text-decoration: none;"><span style="float:right;color:#D70000;font-size:24px" align="right" class="glyphicon glyphicon-bookmark"></span></a>""".format(
-        link_id)
+            link_id)
         return content
+
 
 def updateNewsFeed(topic_id, user_id):
     with Connection.Instance().get_cursor() as cur:
@@ -465,8 +475,9 @@ def updateNewsFeed(topic_id, user_id):
             "WHERE user_id = %s"
         )
         cur.execute(sql, [int(user_id)])
-        domains = [ a[0] for a in cur.fetchall() ]
+        domains = [a[0] for a in cur.fetchall()]
         date_filter.calc(topic_id, domains)
+
 
 def sentimentPositive(alertid, user_id, link_id):
     link_id = int(link_id)

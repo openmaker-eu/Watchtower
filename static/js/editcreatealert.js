@@ -42,7 +42,6 @@ $(document).ready(function () {
             $(".loader").css("visibility", "visible");
 
 
-
             var keys = $("#keywords").val();
             var exkeys = $("#excludedkeywords").val();
             var langs = $("#languages").val().join();
@@ -113,10 +112,6 @@ $(document).ready(function () {
                 //--------------------------------------------
 
             });
-
-
-
-
 
 
         }

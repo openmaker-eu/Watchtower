@@ -81,7 +81,6 @@ def mineFacebookConversations(search_ids, isPreview, timeFilter="day"):
         if isPreview and (previewCounter == 5):
             break
 
-
     # Sorting all comments with comment numbers, because I will use them in web page in this order
     # posts = sorted(posts, key=lambda k: k["numberOfComments"], reverse=True)
     docs = []
@@ -94,7 +93,7 @@ def mineFacebookConversations(search_ids, isPreview, timeFilter="day"):
             comment["created_time"] = comment["created_time"][:10] + " " + comment["created_time"][11:18]
             comments.append(comment)
 
-        submission['created_time'] = datetime.strptime(submission['created_time'][:10],'%Y-%m-%d').strftime('%Y-%m-%d')
+        submission['created_time'] = datetime.strptime(submission['created_time'][:10], '%Y-%m-%d').strftime('%Y-%m-%d')
 
         temp = {"title": submission["title"], "source": submission["source"], "comments": comments,
                 "url": submission["url"], "numberOfComments": submission["numberOfComments"],
@@ -169,7 +168,8 @@ def mineRedditConversation(subreddits, isPreview, timeFilter='day'):
                                 comList.append(comment)
                         cList = []
                         for c in comList:
-                            temp = {"parent": c[0].parent_id[3:], "comment_text": c[0].body, "created_time": c[0].created,
+                            temp = {"parent": c[0].parent_id[3:], "comment_text": c[0].body,
+                                    "created_time": c[0].created,
                                     "comment_id": c[0].id, "indent_number": c[1], "is_leaf": c[2], "is_root": c[3]}
                             if c[0].author:
                                 temp["comment_author"] = c[0].author.name
@@ -280,13 +280,11 @@ def mineEvents(search_id_list, isPreview):
         if 'cover' in event:
             event['cover'] = event['cover']['source']
 
-        t.append((event,ids))
+        t.append((event, ids))
         if c == 5:
             break
 
     return t
-
-
 
 
 def insertEventsIntoDataBase(eventsWithIds, topic_id):
@@ -320,7 +318,7 @@ def startEvent(topic_id, topicList):
         ids = []
         for event in source['events']:
             ids.append(event['event_id'])
-        eventsWithIds = mineEvents(ids,False)
+        eventsWithIds = mineEvents(ids, False)
         insertEventsIntoDataBase(eventsWithIds, topic_id)
 
 
@@ -436,6 +434,8 @@ def searchFacebookNews(topic_id, search_ids):
                             })
                 else:
                     break
+
+
 '''
 def mineEvents(topicList):
     client = MongoClient('localhost', 27017)
@@ -468,7 +468,6 @@ def mineEvents(topicList):
             collection.insert_one({'topic':topic, 'event':event})
 '''
 
-
 if __name__ == '__main__':
 
     with Connection.Instance().get_cursor() as cur:
@@ -481,7 +480,7 @@ if __name__ == '__main__':
 
         dates = ["day", "week", "month"]
         for v in var:
-            #startEvent(v[0], v[1].split(","))
+            # startEvent(v[0], v[1].split(","))
             with Connection.Instance().get_cursor() as cur:
                 sql = (
                     "SELECT ARRAY_agg(facebook_page_id) as pages "
