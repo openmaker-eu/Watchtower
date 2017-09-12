@@ -76,6 +76,7 @@ class Application(tornado.web.Application):
             (r"/Search", SearchHandler, {'mainT': mainT}),
             (r"/get_news", SearchNewsHandler, {'mainT': mainT}),
             (r"/get_news/(.*)", SearchNewsHandler, {'mainT': mainT}),
+            (r"/Audience/(.*)", AudienceHandler, {'mainT': mainT}),
             (r"/Audience", AudienceHandler, {'mainT': mainT}),
             (r"/previewNews", PreviewNewsHandler, {'mainT': mainT}),
             (r"/previewConversations", PreviewConversationHandler, {'mainT': mainT}),
