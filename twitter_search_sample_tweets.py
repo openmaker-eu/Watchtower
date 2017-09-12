@@ -21,13 +21,16 @@ def getNewsFromTweets(keywords, languages):
     news = []
     data = tweepy.Cursor(api.search, q=keywords, lang=languages).items(25)
     for tweet in data:
-        temp = tweet._json
-        if temp['entities']['urls'] != []:
-            link = temp['entities']['urls'][0]['expanded_url']
-            if link is not None:
-                parsed_link = link_parser.linkParser(unshorten_url(link))
-                if parsed_link is not None:
-                    news.append(parsed_link)
-                    if len(news) >= 3:
-                        break
+        try:
+            temp = tweet._json
+            if temp['entities']['urls'] != []:
+                link = temp['entities']['urls'][0]['expanded_url']
+                if link is not None:
+                    parsed_link = link_parser.linkParser(unshorten_url(link))
+                    if parsed_link is not None:
+                        news.append(parsed_link)
+                        if len(news) >= 3:
+                            break
+        except:
+            pass
     return list(news)

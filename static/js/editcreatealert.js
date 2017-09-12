@@ -98,6 +98,7 @@ $(document).ready(function () {
                         }
                     }).success(function (html) {
                         $('#preview-news').prepend(html);
+                        $('.preview').css('z-index', 9999);
                         $(".bookmark").css("visibility", "hidden");
                         $(".sentiment").css("visibility", "hidden");
                         $(".ban-domain").css("visibility", "hidden");
