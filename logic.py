@@ -202,8 +202,7 @@ def getAlertList(userid):
             hashtags = \
             list(Connection.Instance().hashtags[str(alert['alertid'])].find({'name': 'month'}, {'month': 1, '_id': 0}))[
                 0]['month']
-            hashtags = ["#", hashtag['hashtag']
-            for hashtag in hashtags]
+            hashtags = ["#", hashtag['hashtag'] for hashtag in hashtags]
             alert['hashtags'] = ", ".join(hashtags[:5])
         return alerts
 
