@@ -1,5 +1,5 @@
 {% for feed in feeds %}
-    <div class="row margin-bottom-25" cursor="{{ cursor }}" domain="{{ feed['domain'] }}">
+    <div class="margin-bottom-25" cursor="{{ cursor }}" domain="{{ feed['domain'] }}">
         <div class="col-md-3">
             <img src="{{ feed['im'] }}" onerror="this.src='/images/image-not-found.png'"
                  class="img-responsive feed_img">
