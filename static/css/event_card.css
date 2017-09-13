@@ -53,6 +53,8 @@
     width: 48%;
     list-style-type: none;
     display: inline-block;
+    color: #AAA;
+    text-decoration: none;
 }
 
 .details li span {

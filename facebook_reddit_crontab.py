@@ -480,7 +480,7 @@ if __name__ == '__main__':
 
         dates = ["day", "week", "month"]
         for v in var:
-            # startEvent(v[0], v[1].split(","))
+            startEvent(v[0], v[1].split(","))
             with Connection.Instance().get_cursor() as cur:
                 sql = (
                     "SELECT ARRAY_agg(facebook_page_id) as pages "
