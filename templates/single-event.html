@@ -1,22 +1,19 @@
-<link rel="stylesheet" type="text/css" href="/static/css/event.css"/>
+<div class="wrapper">
+    {% for event in document['events'] %}
 
-{% for event in document['events'] %}
-    <div class="event">
-        {% if 'cover' in event %}
-            <div class="img"><a href='{{ event['link'] }}' target='_blank'><img src="{{ event['cover'] }}"
-                                                                                alt="Placeholder"></a></div>
-        {% else %}
-            <div class="img"><a href='{{ event['link'] }}' target='_blank'><img src="static/images/image-not-found.png"
-                                                                                alt="Placeholder"></a></div>
-        {% endif %}
-        <div class='time'><span style='font-weight:bold'>Date : </span>{{ event['start_time'] }}</div>
+        <div class="event_card">
+            <div class="bg" style="background-image:url({{ event['cover'] }})"></div>
 
-        <div class='name' style='font-size:24px'><a href='{{ event['link'] }}' target='_blank'
-                                                    style="color: black; text-decoration: none;">{{ event['name'] }}</a>
+            <div class="details">
+                <a href='{{ event['link'] }}' target='_blank'><span id="title"><b>{{ event['name'] }}</b></span></a>
+                <span id="place">{{ event['place'] }}</span>
+                <span id="date">{{ event['start_time'] }}</span>
+                <ul>
+                    <li>Coming <span>{{ event['coming'] }}</span></li>
+                    <li>Interested <span>{{ event['interested'] }}</span></li>
+                </ul>
+            </div>
         </div>
-        <div class='location'><span style='font-weight:bold'>Location : </span>{{ event['place'] }}</div>
 
-        <div class='coming'><span style='font-weight:bold'>Coming : </span>{{ event['coming'] }}</div>
-        <div class='maybe'><span style='font-weight:bold'>Interested : </span>{{ event['interested'] }}</div>
-    </div>
-{% endfor %}
+    {% endfor %}
+</div>
