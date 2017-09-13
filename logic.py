@@ -447,7 +447,7 @@ def addBookmark(topic_id, user_id, link_id):
         )
         cur.execute(sql, [int(user_id), int(link_id)])
         updateNewsFeed(topic_id, user_id)
-        content = """<a href="javascript:;" onclick="dummy('remove', '{}')" style="color: #000000;text-decoration: none;"><span style="float:right;color:#808080;font-size:24px" align="right" class="glyphicon glyphicon-bookmark"></span></a>""".format(
+        content = """<a href="javascript:;" onclick="dummy('remove', '{}')"><span style="float:center;color:#808080;" class="glyphicon glyphicon-bookmark"></span></a>""".format(
             link_id)
         return content
 
@@ -482,11 +482,11 @@ def sentimentPositive(alertid, user_id, link_id):
     link_id = int(link_id)
     Connection.Instance().newsPoolDB[str(alertid)].find_one_and_update({'link_id': link_id}, {'$set': {'sentiment': 1}})
     updateNewsFeed(alertid, user_id)
-    content = """<a href="javascript:;" onclick="sentiment('positive', '{}')" style="color: #000000;text-decoration: none;">
-<span style="float:right;color:#66BB6A;font-size:24px" align="right" class="glyphicon glyphicon-ok-sign"></span>
+    content = """<a href="javascript:;" onclick="sentiment('negative', '{}')">
+<span style="display:inline;color:#BDBDBD" class="glyphicon glyphicon-remove-sign"></span>
 </a>
-<a href="javascript:;" onclick="sentiment('negative', '{}')" style="color: #000000;text-decoration: none;">
-<span style="float:right;color:#BDBDBD;font-size:24px" align="right" class="glyphicon glyphicon-remove-sign"></span>
+<a href="javascript:;" onclick="sentiment('positive', '{}')">
+<span style="display:inline;color:#66BB6A" class="glyphicon glyphicon-ok-sign"></span>
 </a>""".format(link_id, link_id, link_id)
     return content
 
@@ -496,11 +496,11 @@ def sentimentNegative(alertid, user_id, link_id):
     Connection.Instance().newsPoolDB[str(alertid)].find_one_and_update({'link_id': link_id},
                                                                        {'$set': {'sentiment': -1}})
     updateNewsFeed(alertid, user_id)
-    content = """<a href="javascript:;" onclick="sentiment('positive', '{}')" style="color: #000000;text-decoration: none;">
-<span style="float:right;color:#BDBDBD;font-size:24px" align="right" class="glyphicon glyphicon-ok-sign"></span>
+    content = """<a href="javascript:;" onclick="sentiment('negative', '{}')">
+<span style="display:inline;color:#66BB6A" class="glyphicon glyphicon-remove-sign"></span>
 </a>
-<a href="javascript:;" onclick="sentiment('negative', '{}')" style="color: #000000;text-decoration: none;">
-<span style="float:right;color:#66BB6A;font-size:24px" align="right" class="glyphicon glyphicon-remove-sign"></span>
+<a href="javascript:;" onclick="sentiment('positive', '{}')">
+<span style="display:inline;color:#BDBDBD" class="glyphicon glyphicon-ok-sign"></span>
 </a>""".format(link_id, link_id, link_id)
     return content
 

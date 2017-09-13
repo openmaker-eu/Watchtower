@@ -10,8 +10,8 @@ $(document).ready(function () {
         if ($(window).scrollTop() + $(window).height() == $(document).height()) {
             if ($('#newsDiv').length != 0) {
                 $("#spin").show();
-                var ncursor = $("ol > div").last().attr("cursor");
-                var aid = $("ol").attr("alertid");
+                var ncursor = $("#news > div").last().attr("cursor");
+                var aid = $("#news").attr("alertid");
                 var date = $('#newscontainer').attr("date");
                 $.ajax({
                     url: '/News/scroll',
@@ -70,7 +70,7 @@ $(document).ready(function () {
 });
 
 function getDate(date) {
-    var aid = $("ol").attr("alertid");
+    var aid = $("#news").attr("alertid");
     $("#spin").show();
     console.log(date);
     $('#newscontainer').attr("date", date);
@@ -106,7 +106,7 @@ function getDate(date) {
 
 function dummy(posttype, link_id) {
     $("#spin").show();
-    var aid = $("ol").attr("alertid");
+    var aid = $("#news").attr("alertid");
     $.ajax({
         url: '/bookmark',
         method: 'POST',
@@ -124,7 +124,7 @@ function dummy(posttype, link_id) {
 
 function sentiment(posttype, link_id) {
     $("#spin").show();
-    var aid = $("ol").attr("alertid");
+    var aid = $("#news").attr("alertid");
     $.ajax({
         url: '/sentiment',
         method: 'POST',
@@ -142,7 +142,7 @@ function sentiment(posttype, link_id) {
 
 function ban_domain(domain) {
     $("#spin").show();
-    var aid = $("ol").attr("alertid");
+    var aid = $("#news").attr("alertid");
     $.ajax({
         url: '/domain',
         method: 'POST',

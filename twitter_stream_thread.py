@@ -113,7 +113,6 @@ class StdOutListener(StreamListener):
     def on_data(self, data):
         if not self.terminate:
             try:
-                print("tweet geldi!")
                 tweet = json.loads(data)
                 tweet['tweetDBId'] = get_next_tweets_sequence()
                 separates_tweet(self.alertDic, tweet)
