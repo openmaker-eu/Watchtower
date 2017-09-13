@@ -507,4 +507,3 @@ if __name__ == '__main__':
 
     for v in var:
         triggerOneTopic(v[0], v[1].split(","), list(set(v[2])), list(set(v[3])))
-        break
