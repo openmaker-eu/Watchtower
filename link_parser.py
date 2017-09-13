@@ -106,9 +106,9 @@ def calculateLinks(data):
     elif data['channel'] == 'facebook':
         short_link = data['url']
         topic_id = data['topic_id']
-        link = unshorten_url(short_link)
 
         try:
+            link = unshorten_url(short_link)
             if len(list(Connection.Instance().newsPoolDB[str(topic_id)].find({'url': link}))) != 0:
                 Connection.Instance().newsPoolDB[str(topic_id)].find_one_and_update({'url': link}, {
                     '$push': {'mentions': {'$each': data['mentions']}}})

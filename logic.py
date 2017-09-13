@@ -3,6 +3,7 @@ import re
 from datetime import datetime
 from time import gmtime, strftime, strptime
 from threading import Thread
+import facebook_reddit_crontab
 
 import facebook
 import praw
@@ -96,6 +97,10 @@ def addFacebookPagesAndSubreddits(topic_id, topic_list):
                 "VALUES (%s, %s)"
             )
             cur.execute(sql, [int(topic_id), subreddit])
+
+    pages = [facebook_page_id['page_id'] for facebook_page_id in sources['pages']]
+    subreddits = [subreddit for subreddit in sources['subreddits']]
+    facebook_reddit_crontab.triggerOneTopic(topic_id, topic_list, set(pages), set(subreddits))
 
 
 def sourceSelection(topicList):

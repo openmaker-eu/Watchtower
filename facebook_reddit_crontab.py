@@ -468,50 +468,43 @@ def mineEvents(topicList):
             collection.insert_one({'topic':topic, 'event':event})
 '''
 
-if __name__ == '__main__':
+def triggerOneTopic(topic_id, topic_keyword_list, pages, subreddits):
+    dates = ["day", "week", "month"]
 
+    print("pages: ", pages)
+    print("subreddits: ", subreddits)
+
+    startEvent(topic_id, topic_keyword_list)
+
+    if subreddits is not None and len(subreddits) and subreddits[0] is not None:
+        searchSubredditNews(topic_id, subreddits)
+    if pages is not None and len(pages) and pages[0] is not None :
+        searchFacebookNews(topic_id, pages)
+
+    for date in dates:
+        posts = []
+        if subreddits is not None and len(subreddits) and subreddits[0] is not None:
+            posts.extend(mineRedditConversation(subreddits, False, date))
+        if pages is not None and len(pages) and pages is not None :
+            posts.extend(mineFacebookConversations(pages, False, date))
+        if len(posts) != 0:
+            posts = sorted(posts, key=lambda k: k["numberOfComments"], reverse=True)
+            Connection.Instance().conversations[str(topic_id)].remove({"time_filter": date})
+            Connection.Instance().conversations[str(topic_id)].insert_one({'time_filter': date, 'posts': posts})
+
+
+if __name__ == '__main__':
     with Connection.Instance().get_cursor() as cur:
         sql = (
-            "SELECT topic_id, keywords "
-            "FROM topics"
+            "SELECT topics.topic_id, topics.keywords, array_agg(topic_facebook_page.facebook_page_id), array_agg(topic_subreddit.subreddit) "
+            "FROM topics "
+            "LEFT JOIN topic_facebook_page ON topics.topic_id = topic_facebook_page.topic_id "
+            "LEFT JOIN topic_subreddit on topics.topic_id = topic_subreddit.topic_id "
+            "GROUP BY topics.topic_id"
         )
         cur.execute(sql)
         var = cur.fetchall()
 
-        dates = ["day", "week", "month"]
-        for v in var:
-            startEvent(v[0], v[1].split(","))
-            with Connection.Instance().get_cursor() as cur:
-                sql = (
-                    "SELECT ARRAY_agg(facebook_page_id) as pages "
-                    "FROM topic_facebook_page "
-                    "WHERE topic_id = %s "
-                    "GROUP BY topic_id"
-                )
-                cur.execute(sql, [v[0]])
-                pages = cur.fetchone()
-
-                sql = (
-                    "SELECT ARRAY_agg(subreddit) as subreddits "
-                    "FROM topic_subreddit "
-                    "WHERE topic_id = %s "
-                    "GROUP BY topic_id"
-                )
-                cur.execute(sql, [v[0]])
-                subreddits = cur.fetchone()
-
-                if subreddits is not None and len(subreddits):
-                    searchSubredditNews(v[0], subreddits[0])
-                if pages is not None and len(subreddits):
-                    searchFacebookNews(v[0], pages[0])
-
-                for date in dates:
-                    posts = []
-                    if subreddits is not None and len(subreddits):
-                        posts.extend(mineRedditConversation(subreddits[0], False, date))
-                    if pages is not None and len(pages):
-                        posts.extend(mineFacebookConversations(pages[0], False, date))
-                    if len(posts) != 0:
-                        posts = sorted(posts, key=lambda k: k["numberOfComments"], reverse=True)
-                        Connection.Instance().conversations[str(v[0])].remove({"time_filter": date})
-                        Connection.Instance().conversations[str(v[0])].insert_one({'time_filter': date, 'posts': posts})
+    for v in var:
+        triggerOneTopic(v[0], v[1].split(","), list(set(v[2])), list(set(v[3])))
+        break

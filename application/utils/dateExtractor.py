@@ -195,8 +195,6 @@ def _extractFromHTMLTag(parsedHTML):
 
 
 def extractArticlePublishedDate(articleLink, html=None):
-    print("Extracting date from " + articleLink)
-
     articleDate = None
 
     try:
