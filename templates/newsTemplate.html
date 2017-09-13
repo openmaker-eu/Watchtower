@@ -1,3 +1,70 @@
+{% for feed in feeds %}
+    <div class="margin-bottom-25" cursor="{{ cursor }}" domain="{{ feed['domain'] }}">
+       <div class="col-md-3">
+           <img src="{{ feed['im'] }}" onerror="this.src='/images/image-not-found.png'"
+                class="img-responsive feed_img">
+       </div>
+       <div class="col-md-9">
+           <p></p>
+           <h4 style="margin-bottom:4px;">
+               <div class="ban-domain">
+                   <a href="javascript:;" onclick="ban_domain('{{ feed['domain'] }}')"
+                      style="color: #000000;text-decoration: none;">
+                       <span style="float:right;font-size:24px" align="right"
+                             class="glyphicon glyphicon-ban-circle"></span>
+                   </a>
+               </div>
+               <div class="bookmark" id="{{ feed['link_id'] }}">
+                   {% if not feed['bookmark'] %}
+                       <a href="javascript:;" onclick="dummy('add', '{{ feed['link_id'] }}')"
+                          style="color: #000000;text-decoration: none;">
+                           <span style="float:right;color:#D70000;font-size:24px" align="right"
+                                 class="glyphicon glyphicon-bookmark"></span>
+                       </a>
+                   {% else %}
+                       <a href="javascript:;" onclick="dummy('remove', '{{ feed['link_id'] }}')"
+                          style="color: #000000;text-decoration: none;">
+                           <span style="float:right;color:#808080;font-size:24px" align="right"
+                                 class="glyphicon glyphicon-bookmark"></span>
+                       </a>
+                   {% endif %}
+               </div>
+               <a href="{{ feed['url'] }}" target="_blank"
+                  style="color: #000000;text-decoration: none;"><span> <strong>{{ feed['title'] }}</strong></span></a>
+           </h4>
+           <a style="margin-bottom:3px;color:#666666;text-decoration: none;" href="http://{{ feed['source'] }}"
+              target="_blank">{{ feed['source'] }}</a><br>
+           <p style="margin-top:-3px">
+               <small>{% if feed['published_at'] %} {{ feed['published_at'] }} {% endif %}</small>
+           </p>
+           <p></p>
+           <p>
+           </p>
+           <p>{{ feed['description'] }}</p>
+           <p></p>
+           <div class="sentiment" id="sentiment_{{ feed['link_id'] }}">
+               <a href="javascript:;" onclick="sentiment('positive', '{{ feed['link_id'] }}')"
+                  style="color: #000000;text-decoration: none;">
+                   <span style="float:right;{% if feed['sentiment'] == 1 %} color:#66BB6A {% else %} color:#BDBDBD {% endif %};font-size:24px"
+                         align="right" class="glyphicon glyphicon-ok-sign"></span>
+               </a>
+               <a href="javascript:;" onclick="sentiment('negative', '{{ feed['link_id'] }}')"
+                  style="color: #000000;text-decoration: none;">
+                   <span style="float:right;{% if feed['sentiment'] == -1 %} color:#66BB6A {% else %} color:#BDBDBD {% endif %};font-size:24px"
+                         align="right" class="glyphicon glyphicon-remove-sign"></span>
+                 </a>
+           </div>
+           <br>
+
+       </div>
+       <div class="col-md-12 margin-top-25">
+           <hr>
+       </div>
+   </div>
+ {% endfor %}
+
+
+<!--
  {% for feed in feeds %}
 
 <div class="news_card" cursor="{{ cursor }}" domain="{{ feed['domain'] }}">
@@ -40,4 +107,4 @@
   </div>
 </div>
 
-{% endfor %}
+{% endfor %}-->
