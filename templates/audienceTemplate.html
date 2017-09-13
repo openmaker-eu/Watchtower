@@ -10,10 +10,11 @@
                 <span id="name">{{ audience['name'] }}</span>
                 <a href="http://twitter.com/{{ audience['screen_name'] }}" target="_blank"><span
                         id="nick"> @{{ audience['screen_name'] }} </span></a>
+                <span id="description">{{ audience['description'] }}</span>
                 <ul>
-                    <li><a href="">Tweets <span>{{ audience['statuses_count'] }}</span> </a></li>
-                    <li><a href="">Follow <span>{{ audience['friends_count'] }}</span> </a></li>
-                    <li><a href="">Followers <span>{{ audience['followers_count'] }}</span> </a></li>
+                    <li>Tweets <span>{{ audience['statuses_count'] }}</span></li>
+                    <li>Follow <span>{{ audience['friends_count'] }}</span></li>
+                    <li>Followers <span>{{ audience['followers_count'] }}</span></li>
                 </ul>
             </div>
         </div>
