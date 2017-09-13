@@ -100,7 +100,7 @@ def addFacebookPagesAndSubreddits(topic_id, topic_list):
 
     pages = [facebook_page_id['page_id'] for facebook_page_id in sources['pages']]
     subreddits = [subreddit for subreddit in sources['subreddits']]
-    facebook_reddit_crontab.triggerOneTopic(topic_id, topic_list, set(pages), set(subreddits))
+    facebook_reddit_crontab.triggerOneTopic(topic_id, topic_list, list(set(pages)), list(set(subreddits)))
 
 
 def sourceSelection(topicList):
