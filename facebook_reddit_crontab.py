@@ -476,16 +476,16 @@ def triggerOneTopic(topic_id, topic_keyword_list, pages, subreddits):
 
     startEvent(topic_id, topic_keyword_list)
 
-    if subreddits is not None and len(subreddits) and subreddits[0] is not None:
+    if subreddits is not None and len(subreddits) and subreddits[0] is not None and subreddits[0] != "":
         searchSubredditNews(topic_id, subreddits)
-    if pages is not None and len(pages) and pages[0] is not None :
+    if pages is not None and len(pages) and pages[0] is not None and pages[0] != "":
         searchFacebookNews(topic_id, pages)
 
     for date in dates:
         posts = []
-        if subreddits is not None and len(subreddits) and subreddits[0] is not None:
+        if subreddits is not None and len(subreddits) and subreddits[0] is not None and subreddits[0] != "":
             posts.extend(mineRedditConversation(subreddits, False, date))
-        if pages is not None and len(pages) and pages is not None :
+        if pages is not None and len(pages) and pages[0] is not None and pages[0] != "":
             posts.extend(mineFacebookConversations(pages, False, date))
         if len(posts) != 0:
             posts = sorted(posts, key=lambda k: k["numberOfComments"], reverse=True)

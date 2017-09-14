@@ -76,6 +76,34 @@
         <!--<link rel="stylesheet" type="text/css" href="static/css/news_card.css"/>-->
     {% endif %}
 
+    {% if type == "profile" %}
+    <style type="text/css">
+      @import url("//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css");
+
+      .spinner {
+        display: inline-block;
+        opacity: 0;
+        max-width: 0;
+
+        -webkit-transition: opacity 0.25s, max-width 0.45s;
+        -moz-transition: opacity 0.25s, max-width 0.45s;
+        -o-transition: opacity 0.25s, max-width 0.45s;
+        transition: opacity 0.25s, max-width 0.45s;
+        /* Duration fixed since we animate additional hidden width */
+      }
+
+      .has-spinner.active {
+        cursor: progress;
+      }
+
+      .has-spinner.active .spinner {
+        opacity: 1;
+        max-width: 50px;
+        /* More than it will ever come, notice that this affects on animation duration */
+      }
+    </style>
+    {% endif %}
+
     {% if type == "audiences" %}
         <link rel="stylesheet" type="text/css" href="static/css/audience_card.css"/>
         <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
@@ -115,7 +143,7 @@
                             class="glyphicon glyphicon-user"></span> {{ username }}
                         <span class="caret"></span></a>
                     <ul class="dropdown-menu">
-                        <li><a href="#">My Profile</a></li>
+                        <li><a href="/profile">My Profile</a></li>
                         <li><a href="/bookmark">Bookmarks</a></li>
                         <li><a href="/logout">Logout</a></li>
                     </ul>
@@ -221,6 +249,9 @@
 {% if type == "bookmark" %}
     {% include 'news.html' %}
 {% endif %}
+{% if type == "profile" %}
+    {% include 'profile.html' %}
+{% endif %}
 <!-- /.container -->
 <!-- Bootstrap core JavaScript
 ================================================== -->
@@ -314,6 +345,12 @@
 
 {% if type == "audiences" %}
     <script src="/js/audiences.js"></script>
+{% endif %}
+
+{% if type == "profile" %}
+<script src="/js/jquery-1.11.1.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="static/js/profile.js"></script>
 {% endif %}
 </body>
 

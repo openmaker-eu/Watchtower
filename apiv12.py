@@ -210,6 +210,7 @@ def getEvents(topic_id, filterField, cursor):
 def getConversations(topic_id, timeFilter, paging):
     curser = Connection.Instance().conversations[str(topic_id)].find({"time_filter": timeFilter},
                                                                      {"posts": {"$slice": [int(paging), 10]}, "_id": 0})
+
     for document in curser:
         docs = []
         for submission in document["posts"]:
@@ -238,4 +239,3 @@ def getConversations(topic_id, timeFilter, paging):
                 current["relative_indent"] = current["indent_number"] - prev
                 prev = current["indent_number"]
         return docs
-    return []

@@ -59,6 +59,7 @@ class Application(tornado.web.Application):
             (r"/logout", LogoutHandler, {'mainT': mainT}),
             (r"/login", LoginHandler, {'mainT': mainT}),
             (r"/register", RegisterHandler, {'mainT': mainT}),
+            (r"/profile", ProfileHandler, {'mainT': mainT}),
             (r"/Topics", TopicsHandler, {'mainT': mainT}),
             (r"/topicinfo", CreateEditTopicHandler, {'mainT': mainT}),
             (r"/topicinfo/([0-9]*)", CreateEditTopicHandler, {'mainT': mainT}),
@@ -307,14 +308,15 @@ class RegisterHandler(BaseHandler, TemplateRendering):
 
     def post(self):
         username = self.get_argument("username")
-        login_info = logic.login(str(username), str(self.get_argument("password")))
-        if login_info['response']:
-            self.set_secure_cookie("user_id", str(login_info['user_id']))
+        password = str(self.get_argument("password"))
+        country = str(self.get_argument("country"))
+        register_info = logic.register(str(username), password, country.upper())
+        if register_info['response']:
+            self.set_secure_cookie("user_id", str(register_info['user_id']))
             self.set_secure_cookie("username", str(username))
-            logic.setCurrentTopic(str(login_info['user_id']))
-            self.write({'response': True, 'redirectUrl': self.get_argument('next', '/Topics')})
+            self.write({'response': True, 'redirectUrl': '/Topics'})
         else:
-            self.write(json.dumps(login_info))
+            self.write(json.dumps(register_info))
 
 
 class LoginHandler(BaseHandler, TemplateRendering):
@@ -342,6 +344,36 @@ class LogoutHandler(BaseHandler, TemplateRendering):
     def get(self):
         self.clear_all_cookies()
         self.redirect("/")
+
+
+class ProfileHandler(BaseHandler, TemplateRendering):
+    @tornado.web.authenticated
+    def get(self):
+        user_id = tornado.escape.xhtml_escape(self.current_user)
+        template = 'afterlogintemplate.html'
+        topic = logic.getCurrentTopic(tornado.escape.xhtml_escape(self.current_user))
+        user = logic.getUser(user_id)
+        variables = {
+            'title': "My Profile",
+            'type': "profile",
+            'username': user['username'],
+            'country': user['country'],
+            'alerts': logic.getAlertList(user_id),
+            'topic': topic
+        }
+        content = self.render_template(template, variables)
+        self.write(content)
+
+    @tornado.web.authenticated
+    def post(self):
+        password = str(self.get_argument("password"))
+        country = str(self.get_argument("country"))
+        user_id = tornado.escape.xhtml_escape(self.current_user)
+        update_info = logic.updateUser(user_id, password, country.upper())
+        if update_info['response']:
+            self.write({'response': True, 'redirectUrl': '/Topics'})
+        else:
+            self.write(json.dumps(update_info))
 
 
 class TopicsHandler(BaseHandler, TemplateRendering):

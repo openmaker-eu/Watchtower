@@ -151,6 +151,78 @@ def getAlertLimit(user_id):
         fetched = cur.fetchall()
         return fetched[0][0]
 
+def register(username, password, country_code):
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "SELECT EXISTS (SELECT 1 FROM users where username = %s)"
+        )
+        cur.execute(sql, [username])
+        fetched = cur.fetchone()
+
+        if fetched[0]:
+            return {'response': False, 'error_type': 1, 'message': 'Username already taken.'}
+
+        sql = (
+            "SELECT NOT EXISTS (SELECT 1 FROM country_code where country_code = %s)"
+        )
+        cur.execute(sql, [country_code])
+        fetched = cur.fetchone()
+
+        if fetched[0]:
+            return {'response': False, 'error_type': 2, 'message': 'Invalid country code.'}
+
+        sql = (
+            "INSERT INTO users "
+            "(username, password, alertlimit, country_code) "
+            "VALUES (%s, %s, %s, %s)"
+        )
+        cur.execute(sql, [username,password, 5, country_code])
+
+        sql = (
+            "SELECT * "
+            "FROM users "
+            "WHERE username = %s"
+        )
+        cur.execute(sql, [username])
+        fetched = cur.fetchall()
+
+        return {'response': True, 'user_id': fetched[0][0]}
+
+def getUser(user_id):
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "SELECT username, country_code "
+            "FROM users "
+            "WHERE user_id = %s"
+        )
+        cur.execute(sql, [user_id])
+        fetched = cur.fetchone()
+
+        country = ""
+        if fetched[1] is not None:
+            country = fetched[1]
+
+        return {'username': fetched[0], 'country': country}
+
+def updateUser(user_id, password, country_code):
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "SELECT NOT EXISTS (SELECT 1 FROM country_code where country_code = %s)"
+        )
+        cur.execute(sql, [country_code])
+        fetched = cur.fetchone()
+
+        if fetched[0]:
+            return {'response': False, 'error_type': 1, 'message': 'Invalid country code.'}
+
+        sql = (
+            "UPDATE users "
+            "SET password = %s, country_code = %s "
+            "WHERE user_id = %s"
+        )
+        cur.execute(sql, [password, country_code, user_id])
+
+        return {'response': True}
 
 def login(username, password):
     with Connection.Instance().get_cursor() as cur:

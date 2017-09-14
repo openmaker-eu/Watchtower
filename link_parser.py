@@ -100,7 +100,6 @@ def calculateLinks(data):
                     dic['mentions'] = data['mentions']
                     Connection.Instance().newsPoolDB[str(topic_id)].insert_one(dic)
         except Exception as e:
-            print(link)
             print(e)
             pass
     elif data['channel'] == 'facebook':
@@ -135,7 +134,6 @@ def calculateLinks(data):
                     dic['short_links'] = [short_link]
                     Connection.Instance().newsPoolDB[str(topic_id)].insert_one(dic)
         except Exception as e:
-            print(link)
             print(e)
             pass
     else:
@@ -191,7 +189,6 @@ def calculateLinks(data):
                             dic['short_links'] = [short_link]
                             Connection.Instance().newsPoolDB[str(alertid)].insert_one(dic)
                 except Exception as e:
-                    print(link)
                     print(e)
                     pass
         except Exception as e:

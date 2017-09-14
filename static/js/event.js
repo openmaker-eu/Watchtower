@@ -3,6 +3,12 @@ var isReadyForLoading = true;
 var isEventsOver = false;
 var topic_id = -1;
 
+var main = function () {
+      topic_id = $('.dropdown-menu > li.active > a').attr("data-id");
+      updateReadMores();
+};
+$(document).ready(main);
+
 $(document).ready(function () {
 
     $(".dropdown-menu").on('click', 'li a', function () {

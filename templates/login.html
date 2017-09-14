@@ -89,7 +89,7 @@
                                     Login
                                 </a>
                             </p>
-                            <a href="/register">Please, click to register</a>
+                            <a style="color:white" href="/register">Please, click to register</a>
                         </form>
                     </div>
                 </div>
@@ -159,19 +159,16 @@
             $(this).removeClass('input-error');
         });
 
-        $('.login-form').on('submit', function (e) {
 
-            $(this).find('input[type="text"], input[type="password"], textarea').each(function () {
-                if ($(this).val() == "") {
-                    e.preventDefault();
-                    $(this).addClass('input-error');
-                }
-                else {
-                    $(this).removeClass('input-error');
-                }
-            });
-
+        $('.login-form').find('input[type="text"], input[type="password"], textarea').each(function () {
+            if ($(this).val() == "") {
+                $(this).addClass('input-error');
+            }
+            else {
+                $(this).removeClass('input-error');
+            }
         });
+
         if ($('.input-error').length == 0) {
             if ($("#form-password").parent().next(".validation").length != 0) // only add if not added
             {
