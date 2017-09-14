@@ -224,7 +224,6 @@ def getConversations(topic_id, timeFilter, paging):
                     comment["created_time"] = comment["created_time"][:10] + " " + comment["created_time"][11:18]
                 comments.append(comment)
 
-            submission['created_time'] = datetime.fromtimestamp(submission['created_time']).strftime('%Y-%m-%d')
             temp = {"title": submission["title"], "source": submission["source"], "comments": comments,
                     "url": submission["url"], "commentNumber": submission["numberOfComments"],
                     'subreddit': submission['subreddit'], 'created_time': submission['created_time']}
