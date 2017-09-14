@@ -219,8 +219,7 @@ def getConversations(topic_id, timeFilter, paging):
             for comment in submission["comments"]:
                 comment["relative_indent"] = 0
                 if submission['source'] == 'reddit':
-                    comment["created_time"] = datetime.fromtimestamp(int(comment["created_time"])).strftime(
-                        "%Y-%m-%d %H:%M:%S")
+                    comment["created_time"] = comment["created_time"]
                 else:
                     comment["created_time"] = comment["created_time"][:10] + " " + comment["created_time"][11:18]
                 comments.append(comment)
