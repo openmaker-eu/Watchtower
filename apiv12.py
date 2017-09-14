@@ -152,7 +152,7 @@ def getNews(news_ids, keywords, languages, cities, countries, user_location, use
     for alertid in Connection.Instance().newsPoolDB.collection_names():
         if len(news) >= cursor + 20:
             break
-        if topics_filter:
+        if not topics_filter:
             news = news + list(Connection.Instance().newsPoolDB[str(alertid)].aggregate(aggregate_dictionary))
         else:
             if int(alertid) in topics_filter:
