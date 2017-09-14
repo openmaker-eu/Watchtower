@@ -500,7 +500,8 @@ if __name__ == '__main__':
             "FROM topics "
             "LEFT JOIN topic_facebook_page ON topics.topic_id = topic_facebook_page.topic_id "
             "LEFT JOIN topic_subreddit on topics.topic_id = topic_subreddit.topic_id "
-            "GROUP BY topics.topic_id"
+            "GROUP BY topics.topic_id "
+            "ORDER BY topics.topic_id"
         )
         cur.execute(sql)
         var = cur.fetchall()
