@@ -15,7 +15,8 @@ def getTopics():
         sql = (
             "SELECT topic_id, topic_name, topic_description "
             "FROM topics "
-            "WHERE is_published = %s"
+            "WHERE is_publish = %s "
+            "ORDER BY topic_id"
         )
         cur.execute(sql, [True])
         var = cur.fetchall()
