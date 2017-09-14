@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ title }}</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:400,100,300,500">
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/css/form-elements.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <style type="text/css">
+        @import url("//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css");
+
+        .spinner {
+            display: inline-block;
+            opacity: 0;
+            max-width: 0;
+
+            -webkit-transition: opacity 0.25s, max-width 0.45s;
+            -moz-transition: opacity 0.25s, max-width 0.45s;
+            -o-transition: opacity 0.25s, max-width 0.45s;
+            transition: opacity 0.25s, max-width 0.45s; /* Duration fixed since we animate additional hidden width */
+        }
+
+        .has-spinner.active {
+            cursor: progress;
+        }
+
+        .has-spinner.active .spinner {
+            opacity: 1;
+            max-width: 50px; /* More than it will ever come, notice that this affects on animation duration */
+        }
+    </style>
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+</head>
+
+<body>
+
+<!-- Top content -->
+<div class="top-content">
+
+    <div class="inner-bg">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-8 col-sm-offset-2 text">
+                    <h1><strong>Watchtower</strong> Register Form</h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6 col-sm-offset-3 form-box">
+                    <div class="form-top">
+                        <div class="form-top-left">
+                            <h3>Register to our site</h3>
+                            <p>Enter all fields to register:</p>
+                        </div>
+                        <div class="form-top-right">
+                            <i class="fa fa-lock"></i>
+                        </div>
+                    </div>
+                    <div class="form-bottom">
+                        <form role="form" action="" method="post" class="login-form">
+                            <div class="form-group">
+                                <label class="sr-only" for="form-username">Username</label>
+                                <input type="text" name="username" placeholder="Username"
+                                       class="form-username form-control" id="form-username">
+                            </div>
+                            <div class="form-group">
+                                <label class="sr-only" for="form-password">Password</label>
+                                <input type="password" name="password" placeholder="Password"
+                                       class="form-password form-control" id="form-password">
+                            </div>
+                            <div class="form-group">
+                                <label class="sr-only" for="form-repassword">Confirm Password</label>
+                                <input type="repassword" name="repassword" placeholder="Confirm Password"
+                                       class="form-password form-control" id="form-password">
+                            </div>
+                            <p>
+                                <a class="btn btn-md btn-success has-spinner">
+                                    <span class="spinner"><i class="fa fa-refresh fa-spin"></i></span>
+                                    Register
+                                </a>
+                            </p>
+                            <a href="/login">Please, click to login</a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <!--<div class="row">
+                <div class="col-sm-6 col-sm-offset-3 social-login">
+                    <h3>...or login with:</h3>
+                    <div class="social-login-buttons">
+                        <a class="btn btn-link-2" href="#">
+                            <i class="fa fa-facebook"></i> Facebook
+                        </a>
+                        <a class="btn btn-link-2" href="#">
+                            <i class="fa fa-twitter"></i> Twitter
+                        </a>
+                        <a class="btn btn-link-2" href="#">
+                            <i class="fa fa-google-plus"></i> Google Plus
+                        </a>
+                    </div>
+                </div>
+            </div>-->
+        </div>
+    </div>
+
+</div>
+
+
+<!-- Javascript -->
+<script src="/js/jquery-1.11.1.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/jquery.backstretch.min.js"></script>
+<script>
+
+    jQuery(document).ready(function () {
+
+        /*
+            Fullscreen background
+        */
+        $.backstretch("../static/images/1.jpeg");
+
+    });
+
+</script>
+
+<script>
+    $(document).ready(function () {
+        $('.has-spinner').click(function (e) {
+            register();
+        });
+
+        $('#form-username').keypress(function (event) {
+            if (event.keyCode == 13 || event.which == 13) {
+                $('#form-password').focus();
+                event.preventDefault();
+            }
+        });
+
+        $('#form-password').keypress(function (event) {
+            if (event.keyCode == 13 || event.which == 13) {
+                login();
+            }
+        });
+
+    });
+
+    function register() {
+        $('.login-form input[type="text"], .login-form input[type="password"], .login-form textarea').on('focus', function () {
+            $(this).removeClass('input-error');
+        });
+
+        $('.login-form').on('submit', function (e) {
+
+            $(this).find('input[type="text"], input[type="password"], textarea').each(function () {
+                if ($(this).val() == "") {
+                    e.preventDefault();
+                    $(this).addClass('input-error');
+                }
+                else {
+                    $(this).removeClass('input-error');
+                }
+            });
+
+        });
+        if ($('.input-error').length == 0) {
+            if ($("#form-password").parent().next(".validation").length != 0) // only add if not added
+            {
+                $("#form-password").parent().next(".validation").remove();
+            }
+            if ($("#form-username").parent().next(".validation").length != 0) // only add if not added
+            {
+                $("#form-username").parent().next(".validation").remove();
+            }
+            $(this).toggleClass('active');
+            var username = $("#form-username").val();
+            var password = $("#form-password").val();
+
+            $.ajax({
+                url: '/login',
+                method: 'POST',
+                data: {
+                    'username': username,
+                    'password': password
+                },
+                timeout: 10000,
+                error: function () {
+                    alert("Please, try again later.");
+                }
+            }).success(function (response) {
+                $(".has-spinner").toggleClass('active');
+                if (response.response) {
+                    location.href = response.redirectUrl;
+                }
+                var returnedData = JSON.parse(response);
+                var str = "<div class='validation' style='color:red;margin-top: -10px;margin-bottom:10px;'>".concat(returnedData.message.concat("</div>"));
+                if (returnedData.error_type == 2) {
+                    if ($("#form-password").parent().next(".validation").length == 0) // only add if not added
+                    {
+                        $("#form-password").parent().after(str);
+
+                    }
+                } else {
+                    if ($("#form-username").parent().next(".validation").length == 0) // only add if not added
+                    {
+                        $("#form-username").parent().after(str);
+
+                    }
+                }
+            });
+        }
+    }
+</script>
+
+
+<!--[if lt IE 10]>
+            <script src="assets/js/placeholder.js"></script>
+        <![endif]-->
+
+</body>
+
+</html>
