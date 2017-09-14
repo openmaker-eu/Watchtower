@@ -13,11 +13,11 @@ from application.utils.Singleton import Singleton
 class Connection:
     def __init__(self):
         try:
-            hosts = ['138.68.92.181']
+            hosts = ['138.68.92.181', '194.116.76.78']
 
             with urllib.request.urlopen('http://ipinfo.io/ip') as response:
                 html = response.read()
-                
+
             a = re.findall("\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}", str(html))
 
             h = a[0]

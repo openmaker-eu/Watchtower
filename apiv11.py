@@ -5,7 +5,7 @@ from application.Connections import Connection
 
 
 def getThemes(userid):
-    Connection.Instance().cur.execute("select alertid, alertname, description from alerts where ispublish = %s", [True])
+    Connection.Instance().cur.execute("select topic_id, topic_name, topic_description from topics where is_publish = %s Order by topic_id", [True])
     var = Connection.Instance().cur.fetchall()
     themes = [{'alertid': i[0], 'name': i[1], 'description': i[2]} for i in var]
     result = {}
@@ -20,7 +20,7 @@ def getFeeds(themename, themeid, userid, date, cursor):
     except:
         pass
     if (str(themeid) != "None") and (themename == "None"):
-        Connection.Instance().cur.execute("select alertname from alerts where alertid = %s;", [themeid])
+        Connection.Instance().cur.execute("select topic_name from topics where topic_id = %s;", [themeid])
         var = Connection.Instance().cur.fetchall()
         themename = var[0][0]
     if themeid != "None" or themename != "None":
@@ -56,7 +56,7 @@ def getInfluencers(themename, themeid):
     except:
         pass
     if (str(themeid) != "None") and (themename == "None"):
-        Connection.Instance().cur.execute("select alertname from alerts where alertid = %s;", [themeid])
+        Connection.Instance().cur.execute("select topic_name from topics where topic_id = %s;", [themeid])
         var = Connection.Instance().cur.fetchall()
         themename = var[0][0]
     if themeid != "None" or themename != "None":

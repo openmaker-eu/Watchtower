@@ -13,9 +13,9 @@ from application.utils import general_utils
 def getTopics():
     with Connection.Instance().get_cursor() as cur:
         sql = (
-            "SELECT alertid, alertname,description "
-            "FROM alerts "
-            "WHERE ispublished = %s"
+            "SELECT topic_id, topic_name, topic_description "
+            "FROM topics "
+            "WHERE is_published = %s"
         )
         cur.execute(sql, [True])
         var = cur.fetchall()
