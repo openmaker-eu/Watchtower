@@ -14,56 +14,56 @@ import twitter_search_sample_tweets
 from application.Connections import Connection
 
 
-def setCurrentTopic(userid):
+def setCurrentTopic(user_id):
     with Connection.Instance().get_cursor() as cur:
         sql = (
             "SELECT topic_id "
             "FROM user_topic "
             "WHERE user_id = %s"
         )
-        cur.execute(sql, [int(userid)])
+        cur.execute(sql, [int(user_id)])
         topics = cur.fetchall()
         sql = (
             "SELECT current_topic_id "
             "FROM users "
-            "WHERE userid = %s"
+            "WHERE user_id = %s"
         )
-        cur.execute(sql, [int(userid)])
+        cur.execute(sql, [int(user_id)])
         user = cur.fetchall()
         if user[0][0] is None and len(topics) != 0:
             sql = (
                 "UPDATE users "
                 "SET current_topic_id = %s "
-                "WHERE userid = %s"
+                "WHERE user_id = %s"
             )
-            cur.execute(sql, [topics[0][0], int(userid)])
+            cur.execute(sql, [topics[0][0], int(user_id)])
         elif len(topics) == 0:
             sql = (
                 "UPDATE users "
                 "SET current_topic_id = %s "
-                "WHERE userid = %s"
+                "WHERE user_id = %s"
             )
-            cur.execute(sql, [None, int(userid)])
+            cur.execute(sql, [None, int(user_id)])
 
 
-def saveTopicId(topic_id, userid):
+def saveTopicId(topic_id, user_id):
     with Connection.Instance().get_cursor() as cur:
         sql = (
             "UPDATE users "
             "SET current_topic_id = %s "
-            "WHERE userid = %s"
+            "WHERE user_id = %s"
         )
-        cur.execute(sql, [int(topic_id), int(userid)])
+        cur.execute(sql, [int(topic_id), int(user_id)])
 
 
-def getCurrentTopic(userid):
+def getCurrentTopic(user_id):
     with Connection.Instance().get_cursor() as cur:
         sql = (
             "SELECT current_topic_id "
             "FROM users "
-            "WHERE userid = %s"
+            "WHERE user_id = %s"
         )
-        cur.execute(sql, [int(userid)])
+        cur.execute(sql, [int(user_id)])
         user = cur.fetchall()
         if user[0][0] is not None:
             sql = (
@@ -140,14 +140,14 @@ def sourceSelectionFromReddit(topicList):
     return allSubreddits
 
 
-def getAlertLimit(userid):
+def getAlertLimit(user_id):
     with Connection.Instance().get_cursor() as cur:
         sql = (
             "SELECT alertlimit "
             "FROM users "
-            "WHERE userid = %s"
+            "WHERE user_id = %s"
         )
-        cur.execute(sql, [int(userid)])
+        cur.execute(sql, [int(user_id)])
         fetched = cur.fetchall()
         return fetched[0][0]
 
@@ -167,7 +167,7 @@ def login(username, password):
         if password != fetched[0][2]:
             return {'response': False, 'error_type': 2, 'message': 'Invalid password'}
 
-        return {'response': True, 'userid': fetched[0][0]}
+        return {'response': True, 'user_id': fetched[0][0]}
 
 
 def getAllRunningAlertList():
@@ -186,7 +186,7 @@ def getAllRunningAlertList():
 
 
 # Gives alerts as lists
-def getAlertList(userid):
+def getAlertList(user_id):
     with Connection.Instance().get_cursor() as cur:
         sql = (
             "SELECT * FROM ( "
@@ -196,7 +196,7 @@ def getAlertList(userid):
             "INNER JOIN topics AS t "
             "ON t.topic_id = ut.topic_id) as a"
         )
-        cur.execute(sql, [userid])
+        cur.execute(sql, [user_id])
         var = cur.fetchall()
         alerts = [
             {'alertid': i[1], 'name': i[2], 'description': i[3], 'keywords': i[4].split(","), 'lang': i[5].split(","), \
@@ -212,14 +212,14 @@ def getAlertList(userid):
         return alerts
 
 
-def alertExist(userid):
+def alertExist(user_id):
     with Connection.Instance().get_cursor() as cur:
         sql = (
             "SELECT topic_id "
             "FROM user_topic "
             "WHERE user_id = %s"
         )
-        cur.execute(sql, [userid])
+        cur.execute(sql, [user_id])
         var = cur.fetchone()
         if var is not None:
             return True
@@ -263,14 +263,14 @@ def getAlertAllOfThemList(alertid):
         return alert
 
 
-def setUserAlertLimit(userid, setType):
+def setUserAlertLimit(user_id, setType):
     with Connection.Instance().get_cursor() as cur:
         sql = (
             "SELECT alertlimit "
             "FROM users "
-            "WHERE userid = %s"
+            "WHERE user_id = %s"
         )
-        cur.execute(sql, [userid])
+        cur.execute(sql, [user_id])
         fetched = cur.fetchall()
         if setType == 'decrement':
             newLimit = fetched[0][0] - 1
@@ -280,9 +280,9 @@ def setUserAlertLimit(userid, setType):
         sql = (
             "UPDATE users "
             "SET alertlimit = %s "
-            "WHERE userid = %s"
+            "WHERE user_id = %s"
         )
-        cur.execute(sql, [newLimit, int(userid)])
+        cur.execute(sql, [newLimit, int(user_id)])
 
 
 def banDomain(user_id, domain):
@@ -330,9 +330,9 @@ def addAlert(alert, mainT, user_id):
 
 
 # Deletes alert and terminate its thread
-def deleteAlert(alertid, mainT, userid):
+def deleteAlert(alertid, mainT, user_id):
     alert = getAlertAllOfThemList(alertid)
-    setUserAlertLimit(userid, 'increment')
+    setUserAlertLimit(user_id, 'increment')
     mainT.delAlert(alert)
     Connection.Instance().db[str(alertid)].drop()
     Connection.Instance().newsPoolDB[str(alertid)].drop()
@@ -347,7 +347,7 @@ def deleteAlert(alertid, mainT, userid):
             "DELETE FROM user_topic "
             "WHERE topic_id = %s AND user_id = %s"
         )
-        cur.execute(sql, [alertid, userid])
+        cur.execute(sql, [alertid, user_id])
         sql = (
             "DELETE FROM topic_facebook_page "
             "WHERE topic_id = %s"
@@ -358,11 +358,11 @@ def deleteAlert(alertid, mainT, userid):
             "WHERE topic_id = %s"
         )
         cur.execute(sql, [alertid])
-    setCurrentTopic(userid)
+    setCurrentTopic(user_id)
 
 
 # Updates given alert information and kill its thread, then again start its thread.
-def updateAlert(alert, mainT, userid):
+def updateAlert(alert, mainT, user_id):
     with Connection.Instance().get_cursor() as cur:
         sql = (
             "UPDATE topics "
