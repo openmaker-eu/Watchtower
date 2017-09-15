@@ -133,7 +133,7 @@ def calculateLinks(data, machine_host):
                          '$set': {'published_at': dic['published_at'], 'language': dic['language'],
                                   'author': dic['author']}, '$addToSet': {'short_links': short_link}})
                 else:
-                    dic['link_id'] = get_next_links_sequence()
+                    dic['link_id'] = get_next_links_sequence(machine_host)
                     dic['mentions'] = data['mentions']
                     dic['short_links'] = [short_link]
                     newsPoolDB[str(topic_id)].insert_one(dic)
@@ -185,7 +185,7 @@ def calculateLinks(data, machine_host):
                                  '$set': {'published_at': dic['published_at'], 'language': dic['language'],
                                           'author': dic['author']}, '$addToSet': {'short_links': short_link}})
                         else:
-                            dic['link_id'] = get_next_links_sequence()
+                            dic['link_id'] = get_next_links_sequence(machine_host)
                             dic['mentions'] = [tweet_tuple]
                             dic['short_links'] = [short_link]
                             newsPoolDB[str(alertid)].insert_one(dic)
