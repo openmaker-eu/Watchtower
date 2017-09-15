@@ -1,6 +1,6 @@
 {% if not docs %}
     <p style='color: red; font-size: 15px'><b>Conversations Feed is empty.</b></p>
-{% endif %}
+{% else %}
 
 {% for post in docs %}
     <div class="post">
@@ -120,3 +120,5 @@
     </div>
     </div>
 {% endfor %}
+
+{% endif %}
