@@ -276,9 +276,13 @@ def getAlertList(user_id):
         alerts = sorted(alerts, key=lambda k: k['alertid'])
         for alert in alerts:
             alert['tweetCount'] = Connection.Instance().db[str(alert['alertid'])].find().count()
-            hashtags = \
-                list(Connection.Instance().hashtags[str(alert['alertid'])].find({'name': 'month'},
-                                                                                {'month': 1, '_id': 0}))[0]['month']
+            try:
+                hashtags = \
+                    list(Connection.Instance().hashtags[str(alert['alertid'])].find({'name': 'month'},
+                                                                                    {'month': 1, '_id': 0}))[0]['month']
+            except:
+                hashtags = []
+                pass
             hashtags = ["#" + hashtag['hashtag'] for hashtag in hashtags]
             alert['hashtags'] = ", ".join(hashtags[:5])
         return alerts
