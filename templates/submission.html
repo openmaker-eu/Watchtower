@@ -1,4 +1,4 @@
-{% if docs|length == 0 %}
+{% if not docs %}
     <p style='color: red; font-size: 15px'><b>Conversations Feed is empty.</b></p>
 {% endif %}
 
@@ -7,7 +7,7 @@
 
         <div class="post-box">
 
-            
+
 			<span>
 				{% if post["source"] == "reddit" %}
                     <img src="/images/r-logo.png" alt="logo" style="width:30px;height:30px">
@@ -40,13 +40,13 @@
                 <span style='color:#666666;padding-left:0.3em'>
                     {% if post["source"] == "reddit" %}
                         r/{{ post['subreddit'] }}
-                    {% endif %}    
+                    {% endif %}
                 </span>
 
                 <span style='color:#666666;padding-left:1.5em'>
                     {% if post["source"] == "reddit" %}
                         {{ post['created_time'] }}
-                    {% endif %}    
+                    {% endif %}
                 </span>
             </div>
 
