@@ -12,7 +12,7 @@ redis_conn = Redis()
 q = Queue(connection=redis_conn)  # no args implies the default queue
 
 while True:
-    for collection in sorted(list(db.collection_names()), reverse=True):
+    for collection in sorted(list(Connection.Instance().db.collection_names()), reverse=True):
         if str(collection) != 'counters':
             print('id: ', collection)
             tweets = list(Connection.Instance().db[str(collection)].find({'redis': {'$exists': True}, 'redis': False}, \
