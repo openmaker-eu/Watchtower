@@ -87,7 +87,7 @@ def calculateLinks(data, machine_host):
             if len(list(newsPoolDB[str(topic_id)].find({'url': link}))) != 0:
                 print("found in db")
                 newsPoolDB[str(topic_id)].find_one_and_update({'url': link}, {
-                    '$push': {'mentions': {'$each': data['mentions']}}})
+                    '$addToSet': {'mentions': {'$each': data['mentions']}}})
 
             dic = linkParser(link)
             if dic is not None:
@@ -96,7 +96,7 @@ def calculateLinks(data, machine_host):
                     newsPoolDB[str(topic_id)] \
                         .find_one_and_update(
                         {'source': dic['source'], 'title': dic['title']},
-                        {'$push': {'mentions': {'$each': data['mentions']}},
+                        {'$addToSet': {'mentions': {'$each': data['mentions']}},
                          '$set': {'published_at': dic['published_at'], 'language': dic['language'],
                                   'author': dic['author']}})
                 else:
@@ -114,12 +114,12 @@ def calculateLinks(data, machine_host):
             link = unshorten_url(short_link)
             if len(list(newsPoolDB[str(topic_id)].find({'url': link}))) != 0:
                 newsPoolDB[str(topic_id)].find_one_and_update({'url': link}, {
-                    '$push': {'mentions': {'$each': data['mentions']}}})
+                    '$addToSet': {'mentions': {'$each': data['mentions']}}})
 
             if len(list(newsPoolDB[str(topic_id)].find(
                     {'short_links': short_link}))) != 0:
                 newsPoolDB[str(topic_id)].find_one_and_update(
-                    {'short_links': short_link}, {'$push': {'mentions': {'$each': data['mentions']}}})
+                    {'short_links': short_link}, {'$addToSet': {'mentions': {'$each': data['mentions']}}})
                 print('short_link : ', short_link)
 
             dic = linkParser(link)
@@ -129,7 +129,7 @@ def calculateLinks(data, machine_host):
                     newsPoolDB[str(topic_id)] \
                         .find_one_and_update(
                         {'source': dic['source'], 'title': dic['title']},
-                        {'$push': {'mentions': {'$each': data['mentions']}},
+                        {'$addToSet': {'mentions': {'$each': data['mentions']}},
                          '$set': {'published_at': dic['published_at'], 'language': dic['language'],
                                   'author': dic['author']}, '$addToSet': {'short_links': short_link}})
                 else:
@@ -166,12 +166,12 @@ def calculateLinks(data, machine_host):
                     link = unshorten_url(link)
                     if len(list(newsPoolDB[str(alertid)].find({'url': link}))) != 0:
                         newsPoolDB[str(alertid)].find_one_and_update({'url': link}, {
-                            '$push': {'mentions': tweet_tuple}})
+                            '$addToSet': {'mentions': tweet_tuple}})
                         continue
                     if len(list(newsPoolDB[str(alertid)].find(
                             {'short_links': short_link}))) != 0:
                         newsPoolDB[str(alertid)].find_one_and_update(
-                            {'short_links': short_link}, {'$push': {'mentions': tweet_tuple}})
+                            {'short_links': short_link}, {'$addToSet': {'mentions': tweet_tuple}})
                         print('short_link : ', short_link)
                         continue
                     dic = linkParser(link)
@@ -181,7 +181,7 @@ def calculateLinks(data, machine_host):
                             newsPoolDB[str(alertid)] \
                                 .find_one_and_update(
                                 {'source': dic['source'], 'title': dic['title']},
-                                {'$push': {'mentions': tweet_tuple},
+                                {'$addToSet': {'mentions': tweet_tuple},
                                  '$set': {'published_at': dic['published_at'], 'language': dic['language'],
                                           'author': dic['author']}, '$addToSet': {'short_links': short_link}})
                         else:
