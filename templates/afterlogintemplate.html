@@ -76,6 +76,10 @@
         <!--<link rel="stylesheet" type="text/css" href="static/css/news_card.css"/>-->
     {% endif %}
 
+    {% if type == "editAlert" or type == "createAlert" %}
+        <link rel="stylesheet" type="text/css" href="/static/css/event_card.css"/>
+    {% endif %}
+
     {% if type == "profile" %}
     <style type="text/css">
       @import url("//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css");

@@ -6,6 +6,7 @@ from contextlib import contextmanager
 from psycopg2.pool import ThreadedConnectionPool
 import urllib.request
 import re
+import sys
 
 from application.utils.Singleton import Singleton
 
@@ -25,11 +26,16 @@ class Connection:
             if h in hosts:
                 host = h
             else:
-                print("Please select a host: ")
-                for i in range(0, len(hosts)):
-                    print(str(i+1) + "->" + hosts[i])
+                if len(sys.argv) > 1:
+                    host = sys.argv[1]
+                else:
+                    print("Please select a host: ")
+                    for i in range(0, len(hosts)):
+                        print(str(i+1) + "->" + hosts[i])
 
-                host = hosts[int(input())-1]
+                    host = hosts[int(input())-1]
+
+            self.machine_host = host
 
             self.MongoDBClient = pymongo.MongoClient('mongodb://admin:smio1EUp@'+host+':27017/', connect=False)
             self.db = self.MongoDBClient.openMakerdB

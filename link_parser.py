@@ -6,11 +6,13 @@ from tldextract import extract
 
 # import application.utils.location.get_locations as get_location
 import application.utils.dateExtractor as dateExtractor
-from application.Connections import Connection
+import pymongo
 
 
-def get_next_links_sequence():
-    cursor = Connection.Instance().newsPoolDB["counters"].find_and_modify(
+def get_next_links_sequence(machine_host):
+    MongoDBClient = pymongo.MongoClient('mongodb://admin:smio1EUp@'+machine_host+':27017/', connect=False)
+    newsPoolDB = MongoDBClient.newsPool
+    cursor = newsPoolDB["counters"].find_and_modify(
         query={'_id': "link_id"},
         update={'$inc': {'seq': 1}},
         new=True,
@@ -73,32 +75,34 @@ def linkParser(link):
         return dic
 
 
-def calculateLinks(data):
+def calculateLinks(data, machine_host):
+    MongoDBClient = pymongo.MongoClient('mongodb://admin:smio1EUp@'+machine_host+':27017/', connect=False)
+    newsPoolDB = MongoDBClient.newsPool
     if data['channel'] == 'reddit':
         link = data['url']
         topic_id = data['topic_id']
 
         try:
             link = unshorten_url(link)
-            if len(list(Connection.Instance().newsPoolDB[str(topic_id)].find({'url': link}))) != 0:
+            if len(list(newsPoolDB[str(topic_id)].find({'url': link}))) != 0:
                 print("found in db")
-                Connection.Instance().newsPoolDB[str(topic_id)].find_one_and_update({'url': link}, {
+                newsPoolDB[str(topic_id)].find_one_and_update({'url': link}, {
                     '$push': {'mentions': {'$each': data['mentions']}}})
 
             dic = linkParser(link)
             if dic is not None:
-                if len(list(Connection.Instance().newsPoolDB[str(topic_id)].find(
+                if len(list(newsPoolDB[str(topic_id)].find(
                         {'domain': dic['domain'], 'title': dic['title']}))) != 0:
-                    Connection.Instance().newsPoolDB[str(topic_id)] \
+                    newsPoolDB[str(topic_id)] \
                         .find_one_and_update(
                         {'source': dic['source'], 'title': dic['title']},
                         {'$push': {'mentions': {'$each': data['mentions']}},
                          '$set': {'published_at': dic['published_at'], 'language': dic['language'],
                                   'author': dic['author']}})
                 else:
-                    dic['link_id'] = get_next_links_sequence()
+                    dic['link_id'] = get_next_links_sequence(machine_host)
                     dic['mentions'] = data['mentions']
-                    Connection.Instance().newsPoolDB[str(topic_id)].insert_one(dic)
+                    newsPoolDB[str(topic_id)].insert_one(dic)
         except Exception as e:
             print(e)
             pass
@@ -108,21 +112,21 @@ def calculateLinks(data):
 
         try:
             link = unshorten_url(short_link)
-            if len(list(Connection.Instance().newsPoolDB[str(topic_id)].find({'url': link}))) != 0:
-                Connection.Instance().newsPoolDB[str(topic_id)].find_one_and_update({'url': link}, {
+            if len(list(newsPoolDB[str(topic_id)].find({'url': link}))) != 0:
+                newsPoolDB[str(topic_id)].find_one_and_update({'url': link}, {
                     '$push': {'mentions': {'$each': data['mentions']}}})
 
-            if len(list(Connection.Instance().newsPoolDB[str(topic_id)].find(
+            if len(list(newsPoolDB[str(topic_id)].find(
                     {'short_links': short_link}))) != 0:
-                Connection.Instance().newsPoolDB[str(topic_id)].find_one_and_update(
+                newsPoolDB[str(topic_id)].find_one_and_update(
                     {'short_links': short_link}, {'$push': {'mentions': {'$each': data['mentions']}}})
                 print('short_link : ', short_link)
 
             dic = linkParser(link)
             if dic is not None:
-                if len(list(Connection.Instance().newsPoolDB[str(topic_id)].find(
+                if len(list(newsPoolDB[str(topic_id)].find(
                         {'domain': dic['domain'], 'title': dic['title']}))) != 0:
-                    Connection.Instance().newsPoolDB[str(topic_id)] \
+                    newsPoolDB[str(topic_id)] \
                         .find_one_and_update(
                         {'source': dic['source'], 'title': dic['title']},
                         {'$push': {'mentions': {'$each': data['mentions']}},
@@ -132,7 +136,7 @@ def calculateLinks(data):
                     dic['link_id'] = get_next_links_sequence()
                     dic['mentions'] = data['mentions']
                     dic['short_links'] = [short_link]
-                    Connection.Instance().newsPoolDB[str(topic_id)].insert_one(dic)
+                    newsPoolDB[str(topic_id)].insert_one(dic)
         except Exception as e:
             print(e)
             pass
@@ -160,21 +164,21 @@ def calculateLinks(data):
                 try:
                     short_link = link
                     link = unshorten_url(link)
-                    if len(list(Connection.Instance().newsPoolDB[str(alertid)].find({'url': link}))) != 0:
-                        Connection.Instance().newsPoolDB[str(alertid)].find_one_and_update({'url': link}, {
+                    if len(list(newsPoolDB[str(alertid)].find({'url': link}))) != 0:
+                        newsPoolDB[str(alertid)].find_one_and_update({'url': link}, {
                             '$push': {'mentions': tweet_tuple}})
                         continue
-                    if len(list(Connection.Instance().newsPoolDB[str(alertid)].find(
+                    if len(list(newsPoolDB[str(alertid)].find(
                             {'short_links': short_link}))) != 0:
-                        Connection.Instance().newsPoolDB[str(alertid)].find_one_and_update(
+                        newsPoolDB[str(alertid)].find_one_and_update(
                             {'short_links': short_link}, {'$push': {'mentions': tweet_tuple}})
                         print('short_link : ', short_link)
                         continue
                     dic = linkParser(link)
                     if dic is not None:
-                        if len(list(Connection.Instance().newsPoolDB[str(alertid)].find(
+                        if len(list(newsPoolDB[str(alertid)].find(
                                 {'domain': dic['domain'], 'title': dic['title']}))) != 0:
-                            Connection.Instance().newsPoolDB[str(alertid)] \
+                            newsPoolDB[str(alertid)] \
                                 .find_one_and_update(
                                 {'source': dic['source'], 'title': dic['title']},
                                 {'$push': {'mentions': tweet_tuple},
@@ -183,11 +187,8 @@ def calculateLinks(data):
                         else:
                             dic['link_id'] = get_next_links_sequence()
                             dic['mentions'] = [tweet_tuple]
-                            dic['forbidden'] = False
-                            dic['bookmark'] = False
-                            dic['bookmark_date'] = None
                             dic['short_links'] = [short_link]
-                            Connection.Instance().newsPoolDB[str(alertid)].insert_one(dic)
+                            newsPoolDB[str(alertid)].insert_one(dic)
                 except Exception as e:
                     print(e)
                     pass

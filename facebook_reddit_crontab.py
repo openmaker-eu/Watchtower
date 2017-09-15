@@ -376,7 +376,7 @@ def searchSubredditNews(topic_id, subredditNames):
             }
 
             if len(mentions) != 0:
-                link_parser.calculateLinks(s)
+                link_parser.calculateLinks(s, Connection.Instance().machine_host)
     except:
         print(subredditName)
         pass
@@ -431,7 +431,7 @@ def searchFacebookNews(topic_id, search_ids):
                                 'url': post['link'],
                                 'topic_id': topic_id,
                                 'mentions': listOfMention
-                            })
+                            }, Connection.Instance().machine_host)
                 else:
                     break
 

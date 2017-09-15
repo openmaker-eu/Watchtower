@@ -4,13 +4,15 @@ from redis import Redis
 from rq import Queue
 
 import link_parser
+import pymongo
+
 from application.Connections import Connection
 
 redis_conn = Redis()
 q = Queue(connection=redis_conn)  # no args implies the default queue
 
 while True:
-    for collection in sorted(list(Connection.Instance().db.collection_names()), reverse=True):
+    for collection in sorted(list(db.collection_names()), reverse=True):
         if str(collection) != 'counters':
             print('id: ', collection)
             tweets = list(Connection.Instance().db[str(collection)].find({'redis': {'$exists': True}, 'redis': False}, \
@@ -26,6 +28,6 @@ while True:
                     'channel': 'twitter'
                 }
                 q.enqueue_call(func=link_parser.calculateLinks,
-                               args=(data,),
+                               args=(data,Connection.Instance().machine_host,),
                                timeout=20)
     time.sleep(15)
