@@ -1,4 +1,4 @@
-var cursor = 0;
+var cursor = 10;
 var isReadyForLoading = true;
 var isEventsOver = false;
 var topic_id = -1;

@@ -1,4 +1,4 @@
-var lastPostScrollNumber = 0;
+var lastPostScrollNumber = 10;
 var isReadyForLoading = true;
 var topic_id = -1;
 
