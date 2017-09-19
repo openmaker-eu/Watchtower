@@ -38,7 +38,6 @@ def getFeeds(themename, themeid, userid, date, cursor):
             cur.execute(sql, [themename])
             themeid = cur.fetchall()[0][0]
             feeds = list(Connection.Instance().filteredNewsPoolDB[str(themeid)].find({"name": date}, {date: 1}))
-            print(feeds, themeid)
             feeds = list(feeds[0][date][cursor:cursor + 20])
             cursor = int(cursor) + 20
             if cursor >= 60:

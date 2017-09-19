@@ -412,7 +412,7 @@ def deleteAlert(alertid, mainT, user_id):
     mainT.delAlert(alert)
     Connection.Instance().db[str(alertid)].drop()
     Connection.Instance().newsPoolDB[str(alertid)].drop()
-    Connection.Instance().newsdB[str(alertid)].drop()
+    Connection.Instance().filteredNewsPoolDB[str(alertid)].drop()
     with Connection.Instance().get_cursor() as cur:
         sql = (
             "DELETE FROM topics "
