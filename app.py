@@ -89,18 +89,22 @@ class Application(tornado.web.Application):
             (r"/newTweets", NewTweetsHandler, {'mainT': mainT}),
             (r"/newTweets/(.*)", NewTweetsHandler, {'mainT': mainT}),
             (r"/saveTopicId", TopicHandler, {'mainT': mainT}),
+            (r"/getPages", PagesHandler, {'mainT': mainT}),
+
             (r"/api", DocumentationHandler, {'mainT': mainT}),
             (r"/api/v1\.1", Documentationv11Handler, {'mainT': mainT}),
             (r"/api/v1\.2", Documentationv12Handler, {'mainT': mainT}),
+            
             (r"/api/get_themes", ThemesHandler, {'mainT': mainT}),
             (r"/api/get_influencers/(.*)/(.*)", InfluencersHandler, {'mainT': mainT}),
             (r"/api/get_feeds/(.*)/(.*)", FeedsHandler, {'mainT': mainT}),
             (r"/api/get_influencers/(.*)", InfluencersHandler, {'mainT': mainT}),
             (r"/api/get_feeds/(.*)", FeedsHandler, {'mainT': mainT}),
-            (r"/getPages", PagesHandler, {'mainT': mainT}),
+
             (r"/api/v1.1/get_themes", ThemesV11Handler, {'mainT': mainT}),
             (r"/api/v1.1/get_feeds", FeedsV11Handler, {'mainT': mainT}),
             (r"/api/v1.1/get_influencers", InfluencersV11Handler, {'mainT': mainT}),
+
             (r"/api/v1.2/get_topics", TopicsV12Handler, {'mainT': mainT}),
             (r"/api/v1.2/get_news", NewsFeedsV12Handler, {'mainT': mainT}),
             (r"/api/v1.2/get_audiences", AudiencesV12Handler, {'mainT': mainT}),
