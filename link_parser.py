@@ -73,7 +73,7 @@ def linkParser(link):
     }
     """
 
-    if image != "" and description != "" and title != "":
+    if image != "" and full_text != "" and title != "":
         dic = {'url': link, 'im': image, 'title': title, 'domain': domain, 'full_text': full_text,
                'summary': summary, 'keywords': keywords, 'source': source,
                'published_at': published_at, 'language': language, 'author': author}
