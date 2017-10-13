@@ -31,9 +31,15 @@ def linkParser(link):
     domain = extract(link).domain
     article = Article(link)
     article.build()
+    try:
+        full_text = article.text
+    except:
+        full_text = None
+        pass
+
     image = article.top_image
     keywords = article.keywords
-    description = article.summary
+    summary = article.summary
     title = article.title
 
     try:
@@ -67,9 +73,9 @@ def linkParser(link):
     }
     """
 
-    if image != "" and description != "" and title != "":
-        dic = {'url': link, 'im': image, 'title': title, 'domain': domain,
-               'description': description, 'keywords': keywords, 'source': source,
+    if image != "" and full_text != "" and title != "":
+        dic = {'url': link, 'im': image, 'title': title, 'domain': domain, 'full_text': full_text,
+               'summary': summary, 'keywords': keywords, 'source': source,
                'published_at': published_at, 'language': language, 'author': author}
         print('done')
         return dic
@@ -88,21 +94,21 @@ def calculateLinks(data, machine_host):
                 print("found in db")
                 newsPoolDB[str(topic_id)].find_one_and_update({'url': link}, {
                     '$addToSet': {'mentions': {'$each': data['mentions']}}})
-
-            dic = linkParser(link)
-            if dic is not None:
-                if len(list(newsPoolDB[str(topic_id)].find(
-                        {'domain': dic['domain'], 'title': dic['title']}))) != 0:
-                    newsPoolDB[str(topic_id)] \
-                        .find_one_and_update(
-                        {'source': dic['source'], 'title': dic['title']},
-                        {'$addToSet': {'mentions': {'$each': data['mentions']}},
-                         '$set': {'published_at': dic['published_at'], 'language': dic['language'],
-                                  'author': dic['author']}})
-                else:
-                    dic['link_id'] = get_next_links_sequence(machine_host)
-                    dic['mentions'] = data['mentions']
-                    newsPoolDB[str(topic_id)].insert_one(dic)
+            else:
+                dic = linkParser(link)
+                if dic is not None:
+                    if len(list(newsPoolDB[str(topic_id)].find(
+                            {'domain': dic['domain'], 'title': dic['title']}))) != 0:
+                        newsPoolDB[str(topic_id)] \
+                            .find_one_and_update(
+                            {'source': dic['source'], 'title': dic['title']},
+                            {'$addToSet': {'mentions': {'$each': data['mentions']}},
+                             '$set': {'published_at': dic['published_at'], 'language': dic['language'],
+                                      'author': dic['author']}})
+                    else:
+                        dic['link_id'] = get_next_links_sequence(machine_host)
+                        dic['mentions'] = data['mentions']
+                        newsPoolDB[str(topic_id)].insert_one(dic)
         except Exception as e:
             print(e)
             pass
@@ -116,27 +122,28 @@ def calculateLinks(data, machine_host):
                 newsPoolDB[str(topic_id)].find_one_and_update({'url': link}, {
                     '$addToSet': {'mentions': {'$each': data['mentions']}}})
 
-            if len(list(newsPoolDB[str(topic_id)].find(
+            elif len(list(newsPoolDB[str(topic_id)].find(
                     {'short_links': short_link}))) != 0:
                 newsPoolDB[str(topic_id)].find_one_and_update(
                     {'short_links': short_link}, {'$addToSet': {'mentions': {'$each': data['mentions']}}})
                 print('short_link : ', short_link)
 
-            dic = linkParser(link)
-            if dic is not None:
-                if len(list(newsPoolDB[str(topic_id)].find(
-                        {'domain': dic['domain'], 'title': dic['title']}))) != 0:
-                    newsPoolDB[str(topic_id)] \
-                        .find_one_and_update(
-                        {'source': dic['source'], 'title': dic['title']},
-                        {'$addToSet': {'mentions': {'$each': data['mentions']}},
-                         '$set': {'published_at': dic['published_at'], 'language': dic['language'],
-                                  'author': dic['author']}, '$addToSet': {'short_links': short_link}})
-                else:
-                    dic['link_id'] = get_next_links_sequence(machine_host)
-                    dic['mentions'] = data['mentions']
-                    dic['short_links'] = [short_link]
-                    newsPoolDB[str(topic_id)].insert_one(dic)
+            else:
+                dic = linkParser(link)
+                if dic is not None:
+                    if len(list(newsPoolDB[str(topic_id)].find(
+                            {'domain': dic['domain'], 'title': dic['title']}))) != 0:
+                        newsPoolDB[str(topic_id)] \
+                            .find_one_and_update(
+                            {'source': dic['source'], 'title': dic['title']},
+                            {'$addToSet': {'mentions': {'$each': data['mentions']}},
+                             '$set': {'published_at': dic['published_at'], 'language': dic['language'],
+                                      'author': dic['author']}, '$addToSet': {'short_links': short_link}})
+                    else:
+                        dic['link_id'] = get_next_links_sequence(machine_host)
+                        dic['mentions'] = data['mentions']
+                        dic['short_links'] = [short_link]
+                        newsPoolDB[str(topic_id)].insert_one(dic)
         except Exception as e:
             print(e)
             pass
@@ -168,27 +175,28 @@ def calculateLinks(data, machine_host):
                         newsPoolDB[str(alertid)].find_one_and_update({'url': link}, {
                             '$addToSet': {'mentions': tweet_tuple}})
                         continue
-                    if len(list(newsPoolDB[str(alertid)].find(
+                    elif len(list(newsPoolDB[str(alertid)].find(
                             {'short_links': short_link}))) != 0:
                         newsPoolDB[str(alertid)].find_one_and_update(
                             {'short_links': short_link}, {'$addToSet': {'mentions': tweet_tuple}})
                         print('short_link : ', short_link)
                         continue
-                    dic = linkParser(link)
-                    if dic is not None:
-                        if len(list(newsPoolDB[str(alertid)].find(
-                                {'domain': dic['domain'], 'title': dic['title']}))) != 0:
-                            newsPoolDB[str(alertid)] \
-                                .find_one_and_update(
-                                {'source': dic['source'], 'title': dic['title']},
-                                {'$addToSet': {'mentions': tweet_tuple},
-                                 '$set': {'published_at': dic['published_at'], 'language': dic['language'],
-                                          'author': dic['author']}, '$addToSet': {'short_links': short_link}})
-                        else:
-                            dic['link_id'] = get_next_links_sequence(machine_host)
-                            dic['mentions'] = [tweet_tuple]
-                            dic['short_links'] = [short_link]
-                            newsPoolDB[str(alertid)].insert_one(dic)
+                    else:
+                        dic = linkParser(link)
+                        if dic is not None:
+                            if len(list(newsPoolDB[str(alertid)].find(
+                                    {'domain': dic['domain'], 'title': dic['title']}))) != 0:
+                                newsPoolDB[str(alertid)] \
+                                    .find_one_and_update(
+                                    {'source': dic['source'], 'title': dic['title']},
+                                    {'$addToSet': {'mentions': tweet_tuple},
+                                     '$set': {'published_at': dic['published_at'], 'language': dic['language'],
+                                              'author': dic['author']}, '$addToSet': {'short_links': short_link}})
+                            else:
+                                dic['link_id'] = get_next_links_sequence(machine_host)
+                                dic['mentions'] = [tweet_tuple]
+                                dic['short_links'] = [short_link]
+                                newsPoolDB[str(alertid)].insert_one(dic)
                 except Exception as e:
                     print(e)
                     pass

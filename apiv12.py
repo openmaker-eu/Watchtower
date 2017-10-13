@@ -63,7 +63,7 @@ def getAudiences(topic_id):
 
     audiences = list(Connection.Instance().infDB[str(topic_id)].find({}, {'_id': 0, 'screen_name': 1, 'location': 1,
                                                                           'name': 1, 'profile_image_url': 1, 'lang': 1,
-                                                                          'description': 1, 'time_zone': 1}).sort(
+                                                                          'summary': 1, 'full_text': 1, 'time_zone': 1}).sort(
         [('rank', pymongo.ASCENDING)]))
 
     return json.dumps({'audiences': audiences}, indent=4)
@@ -88,7 +88,8 @@ def getNews(news_ids, keywords, languages, cities, countries, user_location, use
     if keywords != [""]:
         keywords_in_dictionary = [re.compile(key, re.IGNORECASE) for key in keywords]
         find_dictionary['$or'] = [{'title': {'$in': keywords_in_dictionary}},
-                                  {'description': {'$in': keywords_in_dictionary}}]
+                                  {'summary': {'$in': keywords_in_dictionary}},
+                                  {'full_text': {'$in': keywords_in_dictionary}}]
 
     if domains != [""]:
         domains_in_dictionary = [re.compile(key, re.IGNORECASE) for key in domains]

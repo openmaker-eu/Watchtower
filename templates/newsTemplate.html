@@ -40,7 +40,7 @@
            <p></p>
            <p>
            </p>
-           <p>{{ feed['description'] }}</p>
+           <p>{{ feed['summary'] }}</p>
            <p></p>
            <div class="sentiment" id="sentiment_{{ feed['link_id'] }}">
                <a href="javascript:;" onclick="sentiment('positive', '{{ feed['link_id'] }}')"
@@ -76,7 +76,7 @@
     <a href="http://{{ feed['source'] }}" target="_blank"><span
                         id="source"> {{ feed['source'] }}  {% if feed['published_at'] %} {{ feed['published_at'] }} {% endif %}</span></a>
     <br>
-    <span id="description">{{ feed['description'] }}</span> <br>
+    <span id="description">{{ feed['summary'] }}</span> <br>
     <ul>
       <li class="bookmark" id="{{ feed['link_id'] }}">
         {% if not feed['bookmark'] %}
