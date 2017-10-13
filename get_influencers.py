@@ -1,5 +1,7 @@
 import tweepy  # Twitter API helper package
 from tweepy import OAuthHandler
+import pprint # to print human readable dictionary
+import json
 
 from application.Connections import Connection
 
@@ -13,24 +15,70 @@ auth.set_access_token(access_token, access_secret)
 api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
 
 
-def get_influencer(alert_id, alert_keywords_list):
-    rank = 1
-    print(alert_keywords_list)
-    for user in api.search_users(q=alert_keywords_list):
-        user_dict = user._json
-        user_dict['rank'] = rank
-        rank = rank + 1
-        Connection.Instance().infDB[str(alert_id)].insert_one(user_dict)
 
+# Fetches and saves the influencers of a specific topic to MongoDB
+def get_influencers(topicID):
+	with Connection.Instance().get_cursor() as cur:
+		sql = (
+			"SELECT topic_name, keywords "
+			"FROM topics "
+			"WHERE topic_id= " + str(topicID)
+		)
+		cur.execute(sql)
+		topic = cur.fetchall()
 
+		influencers=dict()
+		keywords = topic[0][1]
+		topic_name = topic[0][0]
+
+		for keyword in keywords.split(','):
+			print("Retrieving for keyword: " + str(keyword.strip()))
+
+			for influencer in api.search_users(q=keyword.strip()): # !!!: retrieves 20 influencers per request (first page only)
+				# get influencer from Twitter
+				influencer_dict = influencer._json
+				# check if he already exists in the database
+				inf = Connection.Instance().influencerDB.all_influencers.find_one({ 'id': influencer_dict['id'] })
+				# if he exists,
+				if (inf!=None):  #update his topics list
+					if(topicID not in inf['topics']):
+						Connection.Instance().influencerDB.all_influencers.update(
+   							{ 'id': inf['id'] },
+   							{ '$addToSet':{'topics': topicID}} # add current topic to his topics list
+						)
+
+					pprint.pprint("influencer already in the list: " + inf['screen_name'])
+				else: # if not, add him to the collection
+					influencer_dict['topics']= [topicID]
+					Connection.Instance().influencerDB['all_influencers'].insert_one(influencer_dict)
+
+		print("Influencers of topic: " + topic_name + " found and inserted into database.")
+
+# FETCH AND SAVE INFLUENCERS OF ALL TOPICS IN THE POSTGRE DATABASE
 with Connection.Instance().get_cursor() as cur:
-    sql = (
-        "SELECT topic_id, topic_name "
-        "FROM topics"
-    )
-    cur.execute(sql)
-    alerts = cur.fetchall()
+	sql = (
+		"SELECT topic_id "
+		"FROM topics "
+	)
+	cur.execute(sql)
+	topics = cur.fetchall() # list of all topics
 
-    for alert in alerts:
-        Connection.Instance().infDB[str(alert[0])].drop()
-        get_influencer(alert[0], alert[1].split(","))
+	#Connection.Instance().influencerDB['all_influencers'].create_index('id', unique=True)
+
+	for topic in topics:
+		Connection.Instance().influencerDB[str(topic[0])].drop()
+		get_influencers(topic[0]) # topic[0] is the topic id
+
+	# GENERATE TOPIC-INFLUENCER COLLECTIONS
+	count=1
+	insertcount=1
+	for influencer in Connection.Instance().influencerDB.all_influencers.find({}):
+		print("influencer # "+ str(count) + " topics: " + str(influencer['topics']))
+		count+=1
+		for topicID in influencer['topics']:
+			inf = Connection.Instance().influencerDB[str(topicID)].find_one({ 'id': influencer['id'] })
+			if(inf==None):
+				if ('topics' in influencer): del influencer['topics'] # get rid of topics list - we do not need it in topic-influencer collections
+				Connection.Instance().influencerDB[str(topicID)].insert_one(influencer)
+				print(insertcount)
+				insertcount+=1

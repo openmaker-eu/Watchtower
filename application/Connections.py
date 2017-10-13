@@ -46,6 +46,11 @@ class Connection:
             self.hashtags = self.MongoDBClient.hashtags
             self.redditFacebookDB = self.MongoDBClient.redditFacebookDB
             self.newsPoolDB = self.MongoDBClient.newsPool
+
+            self.influencerDB = self.MongoDBClient.influencers # new db for influencers
+            self.audienceDB = self.MongoDBClient.audience # new db for audience
+            self.topics_audienceDB = self.MongoDBClient.topics_audience # new db for topics and audience user ids
+
             self.filteredNewsPoolDB = self.MongoDBClient.filteredNewsPool
             self.infDB = self.MongoDBClient.influenceRanks
             self.PostGreSQLConnect = psycopg2.connect(
