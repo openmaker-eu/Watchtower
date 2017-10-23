@@ -510,10 +510,28 @@ def getBookmarks(user_id):
         cur.execute(sql, [user_id])
         bookmark_link_ids = [a[0] for a in cur.fetchall()]
 
+        sql = (
+            "SELECT news_id, rating "
+            "FROM user_news_rating "
+            "WHERE user_id = %s and news_id IN %s"
+        )
+        cur.execute(sql, [int(user_id), tuple(bookmark_link_ids)])
+        rating_list = cur.fetchall()
+        ratings = {str(rating[0]): rating[1] for rating in rating_list}
+
         news = []
         for alertid in Connection.Instance().newsPoolDB.collection_names():
             news = news + list(
                 Connection.Instance().newsPoolDB[str(alertid)].find({'link_id': {'$in': bookmark_link_ids}}))
+
+        for news_item in news:
+            news_item['bookmark'] = True
+
+            news_item['sentiment'] = 0
+            try:
+                news_item['sentiment'] = ratings[str(news_item['link_id'])]
+            except KeyError:
+                pass
 
         return news
 
