@@ -94,7 +94,7 @@ class Application(tornado.web.Application):
             (r"/api", DocumentationHandler, {'mainT': mainT}),
             (r"/api/v1\.1", Documentationv11Handler, {'mainT': mainT}),
             (r"/api/v1\.2", Documentationv12Handler, {'mainT': mainT}),
-            
+
             (r"/api/get_themes", ThemesHandler, {'mainT': mainT}),
             (r"/api/get_influencers/(.*)/(.*)", InfluencersHandler, {'mainT': mainT}),
             (r"/api/get_feeds/(.*)/(.*)", FeedsHandler, {'mainT': mainT}),
@@ -527,10 +527,10 @@ class BookmarkHandler(BaseHandler, TemplateRendering):
         user_id = tornado.escape.xhtml_escape(self.current_user)
         posttype = self.get_argument("posttype")
         if posttype == "add":
-            content = logic.addBookmark(alert_id, user_id, link_id)
+            logic.addBookmark(alert_id, user_id, link_id)
         else:
-            content = logic.removeBookmark(alert_id, user_id, link_id)
-        self.write(content)
+            logic.removeBookmark(alert_id, user_id, link_id)
+        self.write("")
 
 
 class SentimentHandler(BaseHandler, TemplateRendering):
@@ -541,10 +541,10 @@ class SentimentHandler(BaseHandler, TemplateRendering):
         posttype = self.get_argument("posttype")
         user_id = tornado.escape.xhtml_escape(self.current_user)
         if posttype == "positive":
-            content = logic.sentimentPositive(alertid, user_id, link_id)
+            logic.sentimentPositive(alertid, user_id, link_id)
         elif posttype == "negative":
-            content = logic.sentimentNegative(alertid, user_id, link_id)
-        self.write(content)
+            logic.sentimentNegative(alertid, user_id, link_id)
+        self.write("")
 
 
 class DomainHandler(BaseHandler, TemplateRendering):
@@ -629,7 +629,7 @@ class NewsHandler(BaseHandler, TemplateRendering):
         if topic is None:
             self.redirect("/topicinfo")
 
-        feeds = logic.getNews(topic['topic_id'], "yesterday", 0)
+        feeds = logic.getNews(user_id, topic['topic_id'], "yesterday", 0)
         variables = {
             'title': "News",
             'feeds': feeds['feeds'],

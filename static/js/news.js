@@ -116,8 +116,13 @@ function dummy(posttype, link_id) {
             'link_id': link_id
         },
     }).success(function (html) {
-        $('#'.concat(link_id)).empty();
-        $('#'.concat(link_id)).append(html);
+        if (posttype == 'add') {
+            $('#'.concat(link_id).concat(' a span')).css('color', '#808080');
+            $('#'.concat(link_id).concat(' a')).attr("onclick", "dummy('add', '".concat(link_id).concat("')"));
+        } else {
+            $('#'.concat(link_id).concat(' a span')).css('color', '#D70000');
+            $('#'.concat(link_id).concat(' a')).attr("onclick", "dummy('remove', '".concat(link_id).concat("')"));
+        }
         $("#spin").hide();
     });
 }
@@ -134,8 +139,17 @@ function sentiment(posttype, link_id) {
             'link_id': link_id
         },
     }).success(function (html) {
-        $('#sentiment_'.concat(link_id)).empty();
-        $('#sentiment_'.concat(link_id)).append(html);
+        var colorOk = '';
+        var colorRemove = '';
+        if(posttype == 'positive'){
+          colorOk = '#66BB6A';
+          colorRemove = '#BDBDBD';
+        } else {
+          colorRemove = '#66BB6A';
+          colorOk = '#BDBDBD';
+        }
+        $('#sentiment_'.concat(link_id).concat(' a span.glyphicon-ok-sign')).css('color', colorOk);
+        $('#sentiment_'.concat(link_id).concat(' a span.glyphicon-remove-sign')).css('color', colorRemove);
         $("#spin").hide();
     });
 }
