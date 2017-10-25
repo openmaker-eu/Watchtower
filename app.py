@@ -650,7 +650,11 @@ class NewsHandler(BaseHandler, TemplateRendering):
         if argument is not None:
             template = 'newsTemplate.html'
             alertid = self.get_argument('alertid')
-            next_cursor = self.get_argument('next_cursor')
+            try:
+                next_cursor = self.get_argument('next_cursor')
+            except:
+                next_cursor = 0
+                pass
             try:
                 date = self.get_argument('date')
             except:
