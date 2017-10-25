@@ -646,6 +646,7 @@ class NewsHandler(BaseHandler, TemplateRendering):
 
     @tornado.web.authenticated
     def post(self, argument=None):
+        user_id = tornado.escape.xhtml_escape(self.current_user)
         variables = {}
         if argument is not None:
             template = 'newsTemplate.html'
@@ -661,7 +662,7 @@ class NewsHandler(BaseHandler, TemplateRendering):
                 date = 'yesterday'
                 pass
             try:
-                feeds = logic.getNews(alertid, date, int(next_cursor))
+                feeds = logic.getNews(user_id, alertid, date, int(next_cursor))
                 variables = {
                     'feeds': feeds['feeds'],
                     'cursor': feeds['next_cursor'],
@@ -678,7 +679,7 @@ class NewsHandler(BaseHandler, TemplateRendering):
                 date = 'yesterday'
                 pass
             try:
-                feeds = logic.getNews(alertid, date, 0)
+                feeds = logic.getNews(user_id, alertid, date, 0)
                 variables = {
                     'feeds': feeds['feeds'],
                     'cursor': feeds['next_cursor'],
