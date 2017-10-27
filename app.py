@@ -777,8 +777,9 @@ class AudienceHandler(BaseHandler, TemplateRendering):
         variables = {}
         template = 'alertAudience.html'
         alertid = self.get_argument('alertid')
+        user_id = tornado.escape.xhtml_escape(self.current_user)
         try:
-            audiences = logic.getAudiences(alertid)
+            audiences = logic.getAudiences(alertid, user_id)
             variables = {
                 'audiences': audiences,
                 'alertid': alertid
