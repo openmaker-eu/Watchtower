@@ -510,10 +510,28 @@ def getBookmarks(user_id):
         cur.execute(sql, [user_id])
         bookmark_link_ids = [a[0] for a in cur.fetchall()]
 
+        sql = (
+            "SELECT news_id, rating "
+            "FROM user_news_rating "
+            "WHERE user_id = %s and news_id IN %s"
+        )
+        cur.execute(sql, [int(user_id), tuple(bookmark_link_ids)])
+        rating_list = cur.fetchall()
+        ratings = {str(rating[0]): rating[1] for rating in rating_list}
+
         news = []
         for alertid in Connection.Instance().newsPoolDB.collection_names():
             news = news + list(
                 Connection.Instance().newsPoolDB[str(alertid)].find({'link_id': {'$in': bookmark_link_ids}}))
+
+        for news_item in news:
+            news_item['bookmark'] = True
+
+            news_item['sentiment'] = 0
+            try:
+                news_item['sentiment'] = ratings[str(news_item['link_id'])]
+            except KeyError:
+                pass
 
         return news
 
@@ -527,10 +545,6 @@ def addBookmark(topic_id, user_id, link_id):
             "VALUES (%s, %s)"
         )
         cur.execute(sql, [int(user_id), int(link_id)])
-        updateNewsFeed(topic_id, user_id)
-        content = """<a href="javascript:;" onclick="dummy('remove', '{}')"><span style="float:center;color:#808080;" class="glyphicon glyphicon-bookmark"></span></a>""".format(
-            link_id)
-        return content
 
 
 # Removes bookmarks
@@ -541,49 +555,54 @@ def removeBookmark(topic_id, user_id, link_id):
             "WHERE user_id = %s AND bookmark_link_id = %s"
         )
         cur.execute(sql, [int(user_id), int(link_id)])
-        updateNewsFeed(topic_id, user_id)
-        content = """<a href="javascript:;" onclick="dummy('add', '{}')" style="color: #000000;text-decoration: none;"><span style="float:right;color:#D70000;font-size:24px" align="right" class="glyphicon glyphicon-bookmark"></span></a>""".format(
-            link_id)
-        return content
-
-
-def updateNewsFeed(topic_id, user_id):
-    with Connection.Instance().get_cursor() as cur:
-        sql = (
-            "SELECT domain "
-            "FROM user_domain "
-            "WHERE user_id = %s"
-        )
-        cur.execute(sql, [int(user_id)])
-        domains = [a[0] for a in cur.fetchall()]
-        date_filter.calc(topic_id, domains)
 
 
 def sentimentPositive(alertid, user_id, link_id):
-    link_id = int(link_id)
-    Connection.Instance().newsPoolDB[str(alertid)].find_one_and_update({'link_id': link_id}, {'$set': {'sentiment': 1}})
-    updateNewsFeed(alertid, user_id)
-    content = """<a href="javascript:;" onclick="sentiment('negative', '{}')">
-<span style="display:inline;color:#BDBDBD" class="glyphicon glyphicon-remove-sign"></span>
-</a>
-<a href="javascript:;" onclick="sentiment('positive', '{}')">
-<span style="display:inline;color:#66BB6A" class="glyphicon glyphicon-ok-sign"></span>
-</a>""".format(link_id, link_id, link_id)
-    return content
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "SELECT EXISTS (SELECT 1 FROM user_news_rating where user_id = %s and news_id = %s)"
+        )
+        cur.execute(sql, [int(user_id), int(link_id)])
+        fetched = cur.fetchone()
+
+        if fetched[0]:
+            sql = (
+                "UPDATE user_news_rating "
+                "SET rating = %s "
+                "WHERE user_id = %s and news_id = %s"
+            )
+            cur.execute(sql, [1, int(user_id), int(link_id)])
+        else:
+            sql = (
+                "INSERT INTO user_news_rating "
+                "(user_id, news_id, rating) "
+                "VALUES (%s, %s, %s)"
+            )
+            cur.execute(sql, [int(user_id), int(link_id), 1])
 
 
 def sentimentNegative(alertid, user_id, link_id):
-    link_id = int(link_id)
-    Connection.Instance().newsPoolDB[str(alertid)].find_one_and_update({'link_id': link_id},
-                                                                       {'$set': {'sentiment': -1}})
-    updateNewsFeed(alertid, user_id)
-    content = """<a href="javascript:;" onclick="sentiment('negative', '{}')">
-<span style="display:inline;color:#66BB6A" class="glyphicon glyphicon-remove-sign"></span>
-</a>
-<a href="javascript:;" onclick="sentiment('positive', '{}')">
-<span style="display:inline;color:#BDBDBD" class="glyphicon glyphicon-ok-sign"></span>
-</a>""".format(link_id, link_id, link_id)
-    return content
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "SELECT EXISTS (SELECT 1 FROM user_news_rating where user_id = %s and news_id = %s)"
+        )
+        cur.execute(sql, [int(user_id), int(link_id)])
+        fetched = cur.fetchone()
+
+        if fetched[0]:
+            sql = (
+                "UPDATE user_news_rating "
+                "SET rating = %s "
+                "WHERE user_id = %s and news_id = %s"
+            )
+            cur.execute(sql, [-1, int(user_id), int(link_id)])
+        else:
+            sql = (
+                "INSERT INTO user_news_rating "
+                "(user_id, news_id, rating) "
+                "VALUES (%s, %s, %s)"
+            )
+            cur.execute(sql, [int(user_id), int(link_id), -1])
 
 
 def getTweets(alertid):
@@ -649,15 +668,57 @@ def searchNews(keywords, languages):
     return news
 
 
-def getNews(alertid, date, cursor):
+def getNews(user_id, alertid, date, cursor):
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "SELECT topic_id "
+            "FROM user_topic "
+            "WHERE user_id = %s"
+        )
+        cur.execute(sql, [int(user_id)])
+        topics = cur.fetchall()
+
+
+
     dates = ['all', 'yesterday', 'week', 'month']
     result = {}
     if date not in dates:
         result['Error'] = 'invalid date'
         return json.dumps(result, indent=4)
     feeds = list(Connection.Instance().filteredNewsPoolDB[str(alertid)].find({'name': date}, {date: 1}))
+    link_ids = []
     if len(feeds) != 0:
         feeds = list(feeds[0][date][cursor:cursor + 20])
+        link_ids = [news['link_id'] for news in feeds]
+
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "SELECT news_id, rating "
+            "FROM user_news_rating "
+            "WHERE user_id = %s and news_id IN %s"
+        )
+        cur.execute(sql, [int(user_id), tuple(link_ids)])
+        rating_list = cur.fetchall()
+        ratings = {str(rating[0]): rating[1] for rating in rating_list}
+
+        sql = (
+            "SELECT bookmark_link_id "
+            "FROM user_bookmark "
+            "WHERE user_id = %s"
+        )
+        cur.execute(sql, [int(user_id)])
+        bookmarks = [link_id[0] for link_id in cur.fetchall()]
+
+    for feed in feeds:
+        feed['bookmark'] = False
+        if feed['link_id'] in bookmarks:
+            feed['bookmark'] = True
+
+        feed['sentiment'] = 0
+        try:
+            feed['sentiment'] = ratings[str(feed['link_id'])]
+        except KeyError:
+            pass
 
     cursor = int(cursor) + 20
     if cursor >= 60:

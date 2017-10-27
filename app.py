@@ -527,10 +527,10 @@ class BookmarkHandler(BaseHandler, TemplateRendering):
         user_id = tornado.escape.xhtml_escape(self.current_user)
         posttype = self.get_argument("posttype")
         if posttype == "add":
-            content = logic.addBookmark(alert_id, user_id, link_id)
+            logic.addBookmark(alert_id, user_id, link_id)
         else:
-            content = logic.removeBookmark(alert_id, user_id, link_id)
-        self.write(content)
+            logic.removeBookmark(alert_id, user_id, link_id)
+        self.write("")
 
 
 class SentimentHandler(BaseHandler, TemplateRendering):
@@ -541,10 +541,10 @@ class SentimentHandler(BaseHandler, TemplateRendering):
         posttype = self.get_argument("posttype")
         user_id = tornado.escape.xhtml_escape(self.current_user)
         if posttype == "positive":
-            content = logic.sentimentPositive(alertid, user_id, link_id)
+            logic.sentimentPositive(alertid, user_id, link_id)
         elif posttype == "negative":
-            content = logic.sentimentNegative(alertid, user_id, link_id)
-        self.write(content)
+            logic.sentimentNegative(alertid, user_id, link_id)
+        self.write("")
 
 
 class DomainHandler(BaseHandler, TemplateRendering):
@@ -629,7 +629,7 @@ class NewsHandler(BaseHandler, TemplateRendering):
         if topic is None:
             self.redirect("/topicinfo")
 
-        feeds = logic.getNews(topic['topic_id'], "yesterday", 0)
+        feeds = logic.getNews(user_id, topic['topic_id'], "yesterday", 0)
         variables = {
             'title': "News",
             'feeds': feeds['feeds'],
@@ -646,18 +646,23 @@ class NewsHandler(BaseHandler, TemplateRendering):
 
     @tornado.web.authenticated
     def post(self, argument=None):
+        user_id = tornado.escape.xhtml_escape(self.current_user)
         variables = {}
         if argument is not None:
             template = 'newsTemplate.html'
             alertid = self.get_argument('alertid')
-            next_cursor = self.get_argument('next_cursor')
+            try:
+                next_cursor = self.get_argument('next_cursor')
+            except:
+                next_cursor = 0
+                pass
             try:
                 date = self.get_argument('date')
             except:
                 date = 'yesterday'
                 pass
             try:
-                feeds = logic.getNews(alertid, date, int(next_cursor))
+                feeds = logic.getNews(user_id, alertid, date, int(next_cursor))
                 variables = {
                     'feeds': feeds['feeds'],
                     'cursor': feeds['next_cursor'],
@@ -674,7 +679,7 @@ class NewsHandler(BaseHandler, TemplateRendering):
                 date = 'yesterday'
                 pass
             try:
-                feeds = logic.getNews(alertid, date, 0)
+                feeds = logic.getNews(user_id, alertid, date, 0)
                 variables = {
                     'feeds': feeds['feeds'],
                     'cursor': feeds['next_cursor'],

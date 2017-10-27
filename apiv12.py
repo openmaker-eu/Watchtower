@@ -206,7 +206,6 @@ def getEvents(topic_id, filterField, cursor):
         ])
     ret = list(ret)
     temp = {'events': ret}
-    print(temp)
     return temp
 
 
