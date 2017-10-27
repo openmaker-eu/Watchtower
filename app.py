@@ -94,7 +94,7 @@ class Application(tornado.web.Application):
             (r"/api", DocumentationHandler, {'mainT': mainT}),
             (r"/api/v1\.1", Documentationv11Handler, {'mainT': mainT}),
             (r"/api/v1\.2", Documentationv12Handler, {'mainT': mainT}),
-            
+
             (r"/api/get_themes", ThemesHandler, {'mainT': mainT}),
             (r"/api/get_influencers/(.*)/(.*)", InfluencersHandler, {'mainT': mainT}),
             (r"/api/get_feeds/(.*)/(.*)", FeedsHandler, {'mainT': mainT}),
@@ -753,7 +753,7 @@ class AudienceHandler(BaseHandler, TemplateRendering):
         if topic is None:
             self.redirect("/topicinfo")
 
-        audiences = logic.getAudiences(topic['topic_id'])
+        audiences = logic.getAudiences(topic['topic_id'], user_id)
         variables = {
             'title': "Audience",
             'alertname': topic['topic_name'],

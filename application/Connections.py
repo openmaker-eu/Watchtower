@@ -47,9 +47,9 @@ class Connection:
             self.redditFacebookDB = self.MongoDBClient.redditFacebookDB
             self.newsPoolDB = self.MongoDBClient.newsPool
 
-            self.influencerDB = self.MongoDBClient.influencers # new db for influencers
-            self.audienceDB = self.MongoDBClient.audience # new db for audience
-            self.topics_audienceDB = self.MongoDBClient.topics_audience # new db for topics and audience user ids
+            self.influencerDB = self.MongoDBClient.influencers_test # new db for influencers
+            self.audienceDB = self.MongoDBClient.audience_test # new db for audience
+            self.audience_samples_DB = self.MongoDBClient.audience_samples # new db for audience samples
 
             self.filteredNewsPoolDB = self.MongoDBClient.filteredNewsPool
             self.infDB = self.MongoDBClient.influenceRanks

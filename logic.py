@@ -668,5 +668,6 @@ def getNews(alertid, date, cursor):
     return result
 
 
-def getAudiences(alertid):
-    return list(Connection.Instance().infDB[str(alertid)].find({}).sort([('rank', pymongo.ASCENDING)]))
+def getAudiences(topic_id, user_id):
+    print(topic_id, user_id)
+    return list(Connection.Instance().audience_samples_DB[str(user_id)+"_"+str(topic_id)].find({}))
