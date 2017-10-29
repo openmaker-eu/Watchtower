@@ -73,7 +73,16 @@
     {% endif %}
 
     {% if type == "news" %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
+    <link rel="stylesheet" type="text/css" href="static/css/star-rating.css"/>
         <!--<link rel="stylesheet" type="text/css" href="static/css/news_card.css"/>-->
+    {% endif %}
+
+    {% if type == "audiences" %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
+    <link rel="stylesheet" type="text/css" href="static/css/star-rating.css"/>
+        <link rel="stylesheet" type="text/css" href="static/css/audience_card.css"/>
+        <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
     {% endif %}
 
     {% if type == "editAlert" or type == "createAlert" %}
@@ -106,11 +115,6 @@
         /* More than it will ever come, notice that this affects on animation duration */
       }
     </style>
-    {% endif %}
-
-    {% if type == "audiences" %}
-        <link rel="stylesheet" type="text/css" href="static/css/audience_card.css"/>
-        <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
     {% endif %}
 
 </head>

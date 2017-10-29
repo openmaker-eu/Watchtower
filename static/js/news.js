@@ -20,10 +20,11 @@ $(document).ready(function () {
                         'next_cursor': ncursor,
                         'alertid': aid,
                         'date': date
+                    },
+                    success: function (html) {
+                        $('#news').append(html);
+                        $("#spin").hide();
                     }
-                }).success(function (html) {
-                    $('#news').append(html);
-                    $("#spin").hide();
                 });
             }
         }
@@ -60,11 +61,12 @@ $(document).ready(function () {
             error: function () {
                 $('#newscontainer').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");
                 $("#spin").hide();
+            },
+            success: function (html) {
+                $('#newscontainer').empty();
+                $('#newscontainer').append(html);
+                $("#spin").hide();
             }
-        }).success(function (html) {
-            $('#newscontainer').empty();
-            $('#newscontainer').append(html);
-            $("#spin").hide();
         });
     });
 });
@@ -96,11 +98,12 @@ function getDate(date) {
             $('#newscontainer').empty();
             $('#newscontainer').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");
             $("#spin").hide();
+        },
+        success: function (html) {
+            $('#newscontainer').empty();
+            $('#newscontainer').append(html);
+            $("#spin").hide();
         }
-    }).success(function (html) {
-        $('#newscontainer').empty();
-        $('#newscontainer').append(html);
-        $("#spin").hide();
     });
 }
 
@@ -115,42 +118,33 @@ function dummy(posttype, link_id) {
             'posttype': posttype,
             'link_id': link_id
         },
-    }).success(function (html) {
-        if (posttype == 'add') {
-            $('#'.concat(link_id).concat(' a span')).css('color', '#808080');
-            $('#'.concat(link_id).concat(' a')).attr("onclick", "dummy('add', '".concat(link_id).concat("')"));
-        } else {
-            $('#'.concat(link_id).concat(' a span')).css('color', '#D70000');
-            $('#'.concat(link_id).concat(' a')).attr("onclick", "dummy('remove', '".concat(link_id).concat("')"));
+        success: function (html) {
+            if (posttype == 'add') {
+                $('#'.concat(link_id).concat(' a span')).css('color', '#808080');
+                $('#'.concat(link_id).concat(' a')).attr("onclick", "dummy('add', '".concat(link_id).concat("')"));
+            } else {
+                $('#'.concat(link_id).concat(' a span')).css('color', '#D70000');
+                $('#'.concat(link_id).concat(' a')).attr("onclick", "dummy('remove', '".concat(link_id).concat("')"));
+            }
+            $("#spin").hide();
         }
-        $("#spin").hide();
     });
 }
 
-function sentiment(posttype, link_id) {
-    $("#spin").show();
+function sentiment(link_id) {
     var aid = $("#news").attr("alertid");
+    var rating = $("#sentiment_".concat(link_id)).val();
+    if(rating == "") rating = 0;
     $.ajax({
         url: '/sentiment',
         method: 'POST',
         data: {
             'alertid': aid,
-            'posttype': posttype,
+            'rating': rating,
             'link_id': link_id
         },
-    }).success(function (html) {
-        var colorOk = '';
-        var colorRemove = '';
-        if(posttype == 'positive'){
-          colorOk = '#66BB6A';
-          colorRemove = '#BDBDBD';
-        } else {
-          colorRemove = '#66BB6A';
-          colorOk = '#BDBDBD';
+        success: function (html) {
         }
-        $('#sentiment_'.concat(link_id).concat(' a span.glyphicon-ok-sign')).css('color', colorOk);
-        $('#sentiment_'.concat(link_id).concat(' a span.glyphicon-remove-sign')).css('color', colorRemove);
-        $("#spin").hide();
     });
 }
 
@@ -164,8 +158,9 @@ function ban_domain(domain) {
             'alertid': aid,
             'domain': domain
         },
-    }).success(function (html) {
-        $("[domain='".concat(domain).concat("']")).remove();
-        $("#spin").hide();
+        success: function (html) {
+            $("[domain='".concat(domain).concat("']")).remove();
+            $("#spin").hide();
+        }
     });
 }

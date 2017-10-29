@@ -83,6 +83,7 @@ class Application(tornado.web.Application):
             (r"/previewNews", PreviewNewsHandler, {'mainT': mainT}),
             (r"/previewConversations", PreviewConversationHandler, {'mainT': mainT}),
             (r"/previewEvents", PreviewEventHandler, {'mainT': mainT}),
+            (r"/rate_audience", RateAudienceHandler, {'mainT': mainT}),
             (r"/sentiment", SentimentHandler, {'mainT': mainT}),
             (r"/bookmark", BookmarkHandler, {'mainT': mainT}),
             (r"/domain", DomainHandler, {'mainT': mainT}),
@@ -533,17 +534,25 @@ class BookmarkHandler(BaseHandler, TemplateRendering):
         self.write("")
 
 
+class RateAudienceHandler(BaseHandler, TemplateRendering):
+    @tornado.web.authenticated
+    def post(self):
+        audience_id = self.get_argument("audience_id")
+        alertid = self.get_argument("alertid")
+        rating = self.get_argument("rating")
+        user_id = tornado.escape.xhtml_escape(self.current_user)
+        logic.rateAudience(alertid, user_id, audience_id, rating)
+        self.write("")
+
+
 class SentimentHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
     def post(self):
         link_id = self.get_argument("link_id")
         alertid = self.get_argument("alertid")
-        posttype = self.get_argument("posttype")
+        rating = self.get_argument("rating")
         user_id = tornado.escape.xhtml_escape(self.current_user)
-        if posttype == "positive":
-            logic.sentimentPositive(alertid, user_id, link_id)
-        elif posttype == "negative":
-            logic.sentimentNegative(alertid, user_id, link_id)
+        logic.sentimentNews(alertid, user_id, link_id, rating)
         self.write("")
 
 
@@ -758,11 +767,12 @@ class AudienceHandler(BaseHandler, TemplateRendering):
         if topic is None:
             self.redirect("/topicinfo")
 
-        audiences = logic.getAudiences(topic['topic_id'], user_id)
+        audiences = logic.getAudiences(topic['topic_id'], user_id, 0)
         variables = {
             'title': "Audience",
             'alertname': topic['topic_name'],
-            'audiences': audiences,
+            'audiences': audiences['audiences'],
+            'cursor': audiences['next_cursor'],
             'alerts': logic.getAlertList(user_id),
             'type': "audiences",
             'username': str(tornado.escape.xhtml_escape(self.get_current_username())),
@@ -773,20 +783,41 @@ class AudienceHandler(BaseHandler, TemplateRendering):
         self.write(content)
 
     @tornado.web.authenticated
-    def post(self):
+    def post(self, argument=None):
         variables = {}
-        template = 'alertAudience.html'
-        alertid = self.get_argument('alertid')
+        topic = logic.getCurrentTopic(tornado.escape.xhtml_escape(self.current_user))
         user_id = tornado.escape.xhtml_escape(self.current_user)
-        try:
-            audiences = logic.getAudiences(alertid, user_id)
-            variables = {
-                'audiences': audiences,
-                'alertid': alertid
-            }
-        except Exception as e:
-            print(e)
-            self.write("<p style='color: red; font-size: 15px'><b>Ops! There is no audience now.</b></p>")
+        if argument is not None:
+            template = 'audienceTemplate.html'
+            alertid = self.get_argument('alertid')
+            try:
+                next_cursor = self.get_argument('next_cursor')
+            except:
+                next_cursor = 0
+                pass
+            try:
+                audiences = logic.getAudiences(topic['topic_id'], user_id, int(next_cursor))
+                variables = {
+                    'audiences': audiences['audiences'],
+                    'cursor': audiences['next_cursor']
+                }
+            except Exception as e:
+                print(e)
+                self.write("")
+        else:
+            template = 'alertAudience.html'
+            alertid = self.get_argument('alertid')
+            user_id = tornado.escape.xhtml_escape(self.current_user)
+            try:
+                audiences = logic.getAudiences(alertid, user_id, 0)
+                variables = {
+                    'audiences': audiences['audiences'],
+                    'alertid': alertid,
+                    'cursor': audiences['next_cursor']
+                }
+            except Exception as e:
+                print(e)
+                self.write("")
         content = self.render_template(template, variables)
         self.write(content)
 

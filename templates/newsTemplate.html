@@ -1,5 +1,5 @@
 {% for feed in feeds %}
-    <div class="margin-bottom-25" cursor="{{ cursor }}" domain="{{ feed['domain'] }}">
+    <div class="margin-bottom-15" cursor="{{ cursor }}" domain="{{ feed['domain'] }}">
        <div class="col-md-3">
            <img src="{{ feed['im'] }}" onerror="this.src='/images/image-not-found.png'"
                 class="img-responsive feed_img">
@@ -42,26 +42,23 @@
            </p>
            <p>{{ feed['summary'] }}</p>
            <p></p>
-           <div class="sentiment" id="sentiment_{{ feed['link_id'] }}">
-               <a href="javascript:;" onclick="sentiment('positive', '{{ feed['link_id'] }}')"
-                  style="color: #000000;text-decoration: none;">
-                   <span style="float:right;{% if feed['sentiment'] == 1 %} color:#66BB6A {% else %} color:#BDBDBD {% endif %};font-size:24px"
-                         align="right" class="glyphicon glyphicon-ok-sign"></span>
-               </a>
-               <a href="javascript:;" onclick="sentiment('negative', '{{ feed['link_id'] }}')"
-                  style="color: #000000;text-decoration: none;">
-                   <span style="float:right;{% if feed['sentiment'] == -1 %} color:#66BB6A {% else %} color:#BDBDBD {% endif %};font-size:24px"
-                         align="right" class="glyphicon glyphicon-remove-sign"></span>
-                 </a>
-           </div>
+
+           <div class="sentiment" style="font-size:0.8em;text-align:right">
+             <input id="sentiment_{{ feed['link_id'] }}" data-show-caption="false" onchange="sentiment('{{ feed['link_id']}}')" class="rating rating-loading" data-size="xs" data-min="0" data-max="5" data-step="0.5" value="{{ feed['sentiment'] }}">
+            </div>
+
            <br>
 
        </div>
-       <div class="col-md-12 margin-top-25">
+
+       <div class="col-md-12 margin-top-15">
            <hr>
        </div>
    </div>
  {% endfor %}
+
+
+<script type="text/javascript" src="static/js/star-rating.js"/>
 
 
 <!--

@@ -557,7 +557,7 @@ def removeBookmark(topic_id, user_id, link_id):
         cur.execute(sql, [int(user_id), int(link_id)])
 
 
-def sentimentPositive(alertid, user_id, link_id):
+def sentimentNews(alertid, user_id, link_id, rating):
     with Connection.Instance().get_cursor() as cur:
         sql = (
             "SELECT EXISTS (SELECT 1 FROM user_news_rating where user_id = %s and news_id = %s)"
@@ -571,38 +571,38 @@ def sentimentPositive(alertid, user_id, link_id):
                 "SET rating = %s "
                 "WHERE user_id = %s and news_id = %s"
             )
-            cur.execute(sql, [1, int(user_id), int(link_id)])
+            cur.execute(sql, [float(rating), int(user_id), int(link_id)])
         else:
             sql = (
                 "INSERT INTO user_news_rating "
                 "(user_id, news_id, rating) "
                 "VALUES (%s, %s, %s)"
             )
-            cur.execute(sql, [int(user_id), int(link_id), 1])
+            cur.execute(sql, [int(user_id), int(link_id), float(rating)])
 
 
-def sentimentNegative(alertid, user_id, link_id):
+def rateAudience(alertid, user_id, audience_id, rating):
     with Connection.Instance().get_cursor() as cur:
         sql = (
-            "SELECT EXISTS (SELECT 1 FROM user_news_rating where user_id = %s and news_id = %s)"
+            "SELECT EXISTS (SELECT 1 FROM user_audience_rating where user_id = %s and audience_id = %s)"
         )
-        cur.execute(sql, [int(user_id), int(link_id)])
+        cur.execute(sql, [int(user_id), int(audience_id)])
         fetched = cur.fetchone()
 
         if fetched[0]:
             sql = (
-                "UPDATE user_news_rating "
+                "UPDATE user_audience_rating "
                 "SET rating = %s "
-                "WHERE user_id = %s and news_id = %s"
+                "WHERE user_id = %s and audience_id = %s"
             )
-            cur.execute(sql, [-1, int(user_id), int(link_id)])
+            cur.execute(sql, [float(rating), int(user_id), int(audience_id)])
         else:
             sql = (
-                "INSERT INTO user_news_rating "
-                "(user_id, news_id, rating) "
+                "INSERT INTO user_audience_rating "
+                "(user_id, audience_id, rating) "
                 "VALUES (%s, %s, %s)"
             )
-            cur.execute(sql, [int(user_id), int(link_id), -1])
+            cur.execute(sql, [int(user_id), int(audience_id), float(rating)])
 
 
 def getTweets(alertid):
@@ -691,6 +691,9 @@ def getNews(user_id, alertid, date, cursor):
         feeds = list(feeds[0][date][cursor:cursor + 20])
         link_ids = [news['link_id'] for news in feeds]
 
+    if len(link_ids) == 0:
+        link_ids = [-1]
+
     with Connection.Instance().get_cursor() as cur:
         sql = (
             "SELECT news_id, rating "
@@ -729,6 +732,38 @@ def getNews(user_id, alertid, date, cursor):
     return result
 
 
-def getAudiences(topic_id, user_id):
-    print(topic_id, user_id)
-    return list(Connection.Instance().audience_samples_DB[str(user_id)+"_"+str(topic_id)].find({}))
+def getAudiences(topic_id, user_id, cursor):
+    result = {}
+    audiences = list(Connection.Instance().audience_samples_DB[str(user_id)+"_"+str(topic_id)].find({}))[cursor:cursor + 20]
+    audience_ids = []
+    if len(audiences) != 0:
+        audience_ids = [audience['id'] for audience in audiences]
+
+    if len(audience_ids) == 0:
+        audience_ids = [-1]
+
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "SELECT audience_id, rating "
+            "FROM user_audience_rating "
+            "WHERE user_id = %s and audience_id IN %s"
+        )
+        cur.execute(sql, [int(user_id), tuple(audience_ids)])
+        rating_list = cur.fetchall()
+        ratings = {str(rating[0]): rating[1] for rating in rating_list}
+
+    for audience in audiences:
+
+        audience['rate'] = 0
+        try:
+            audience['rate'] = ratings[str(audience['id_str'])]
+        except KeyError:
+            pass
+
+    cursor = int(cursor) + 20
+    if cursor >= 100:
+        cursor = 100
+    result['next_cursor'] = cursor
+    result['cursor_length'] = 100
+    result['audiences'] = audiences
+    return result

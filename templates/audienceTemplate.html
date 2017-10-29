@@ -1,38 +1,27 @@
-<div class="wrapper">
-    {% for audience in audiences %}
+{% for audience in audiences %}
 
-        <div class="audience_card">
-            <div class="bg" style="background-image:url({{ audience['profile_banner_url'] }})"></div>
-            <div class="pp" align="center">
-                <img src="{{ (audience['profile_image_url']).replace('normal', '400x400') }}" alt=""/>
-            </div>
-            <div class="details">
-                <span id="name">{{ audience['name'] }}</span>
-                <a href="http://twitter.com/{{ audience['screen_name'] }}" target="_blank"><span
-                        id="nick"> @{{ audience['screen_name'] }} </span></a>
-                <span id="description">{{ audience['description'] }}</span>
-                <ul>
-                    <li>Tweets <span>{{ audience['statuses_count'] }}</span></li>
-                    <li>Follow <span>{{ audience['friends_count'] }}</span></li>
-                    <li>Followers <span>{{ audience['followers_count'] }}</span></li>
-                </ul>
-            </div>
-
-            <fieldset class="rating" id ="{{ audience['screen_name']}}">
-              <input type="radio" class="rating">
-              <input type="radio" id= "{{ audience['screen_name'] + 'star5' }}"  name="{{ audience['screen_name'] + 'rating'}}" value="5" /><label class = "full" for="{{ audience['screen_name']+ 'star5' }}" title="Awesome - 5 stars"></label>
-              <input type="radio" id= "{{ audience['screen_name'] + 'star4half' }}" name="{{ audience['screen_name'] + 'rating'}}" value="4 and a half" /><label class="half" for="{{ audience['screen_name'] + 'star4half' }}" title="Pretty good - 4.5 stars"></label>
-              <input type="radio" id= "{{ audience['screen_name'] + 'star4' }}" name="{{ audience['screen_name'] + 'rating'}}" value="4" /><label class = "full" for=""{{ audience['screen_name'] + 'star4' }}"" title="Pretty good - 4 stars"></label>
-              <input type="radio" id= "{{ audience['screen_name'] + 'star3half' }}" name="{{ audience['screen_name'] + 'rating'}}" value="3 and a half" /><label class="half" for="{{ audience['screen_name'] + 'star3half' }}" title="Meh - 3.5 stars"></label>
-              <input type="radio" id= "{{ audience['screen_name'] + 'star3' }}" name="{{ audience['screen_name'] + 'rating'}}" value="3" /><label class = "full" for="{{ audience['screen_name'] + 'star3' }}" title="Meh - 3 stars"></label>
-              <input type="radio" id= "{{ audience['screen_name'] + 'star2half' }}" name="{{ audience['screen_name'] + 'rating'}}" value="2 and a half" /><label class="half" for="{{ audience['screen_name'] + 'star2half' }}" title="Kinda bad - 2.5 stars"></label>
-              <input type="radio" id= "{{ audience['screen_name'] + 'star2' }}" name="{{ audience['screen_name'] + 'rating'}}" value="2" /><label class = "full" for="{{ audience['screen_name'] + 'star2' }}" title="Kinda bad - 2 stars"></label>
-              <input type="radio" id= "{{ audience['screen_name'] + 'star1half' }}" name="{{ audience['screen_name'] + 'rating'}}" value="1 and a half" /><label class="half" for="{{ audience['screen_name'] + 'star1half' }}" title="Meh - 1.5 stars"></label>
-              <input type="radio" id= "{{ audience['screen_name'] + 'star1' }}" name="{{ audience['screen_name'] + 'rating'}}" value="1" /><label class = "full" for="{{ audience['screen_name'] + 'star1' }}" title="Sucks big time - 1 star"></label>
-              <input type="radio" id= "{{ audience['screen_name'] + 'starhalf' }}" name="{{ audience['screen_name'] + 'rating'}}" value="half" /><label class="half" for="{{ audience['screen_name'] + 'starhalf' }}" title="Sucks big time - 0.5 stars"></label>
-            </fieldset>
-
+    <div class="audience_card" cursor="{{ cursor }}">
+        <div class="bg" style="background-image:url({{ audience['profile_banner_url'] }})"></div>
+        <div class="pp" align="center">
+            <img src="{{ (audience['profile_image_url']).replace('normal', '400x400') }}" alt=""/>
+        </div>
+        <div class="details">
+            <span id="name">{{ audience['name'] }}</span>
+            <a href="http://twitter.com/{{ audience['screen_name'] }}" target="_blank"><span
+                    id="nick"> @{{ audience['screen_name'] }} </span></a>
+            <span id="description">{{ audience['description'] }}</span>
+            <ul>
+                <li>Tweets <span>{{ audience['statuses_count'] }}</span></li>
+                <li>Follow <span>{{ audience['friends_count'] }}</span></li>
+                <li>Followers <span>{{ audience['followers_count'] }}</span></li>
+            </ul>
         </div>
 
-    {% endfor %}
-</div>
+        <div class="vote_audience" style="font-size:0.7em;text-align:right">
+          <input id="rate_{{ audience['id_str'] }}" data-show-caption="false" onchange="rateAudience('{{ audience['id_str'] }}')" class="rating rating-loading" data-size="xs" data-min="0" data-max="5" data-step="0.5" value="{{ audience['rate'] }}">
+        </div>
+    </div>
+
+{% endfor %}
+
+<script type="text/javascript" src="static/js/star-rating.js"/>
