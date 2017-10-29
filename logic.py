@@ -557,52 +557,52 @@ def removeBookmark(topic_id, user_id, link_id):
         cur.execute(sql, [int(user_id), int(link_id)])
 
 
-def sentimentNews(alertid, user_id, link_id, rating):
+def sentimentNews(topic_id, user_id, link_id, rating):
     with Connection.Instance().get_cursor() as cur:
         sql = (
-            "SELECT EXISTS (SELECT 1 FROM user_news_rating where user_id = %s and news_id = %s)"
+            "SELECT EXISTS (SELECT 1 FROM user_news_rating where user_id = %s and topic_id = %s and news_id = %s)"
         )
-        cur.execute(sql, [int(user_id), int(link_id)])
+        cur.execute(sql, [int(user_id), int(topic_id), int(link_id)])
         fetched = cur.fetchone()
 
         if fetched[0]:
             sql = (
                 "UPDATE user_news_rating "
                 "SET rating = %s "
-                "WHERE user_id = %s and news_id = %s"
+                "WHERE user_id = %s and news_id = %s and topic_id = %s"
             )
-            cur.execute(sql, [float(rating), int(user_id), int(link_id)])
+            cur.execute(sql, [float(rating), int(user_id), int(link_id), int(topic_id)])
         else:
             sql = (
                 "INSERT INTO user_news_rating "
-                "(user_id, news_id, rating) "
-                "VALUES (%s, %s, %s)"
+                "(user_id, news_id, topic_id, rating) "
+                "VALUES (%s, %s, %s, %s)"
             )
-            cur.execute(sql, [int(user_id), int(link_id), float(rating)])
+            cur.execute(sql, [int(user_id), int(link_id), int(topic_id), float(rating)])
 
 
-def rateAudience(alertid, user_id, audience_id, rating):
+def rateAudience(topic_id, user_id, audience_id, rating):
     with Connection.Instance().get_cursor() as cur:
         sql = (
-            "SELECT EXISTS (SELECT 1 FROM user_audience_rating where user_id = %s and audience_id = %s)"
+            "SELECT EXISTS (SELECT 1 FROM user_audience_rating where user_id = %s and topic_id = %s and audience_id = %s)"
         )
-        cur.execute(sql, [int(user_id), int(audience_id)])
+        cur.execute(sql, [int(user_id), int(topic_id), int(audience_id)])
         fetched = cur.fetchone()
 
         if fetched[0]:
             sql = (
                 "UPDATE user_audience_rating "
                 "SET rating = %s "
-                "WHERE user_id = %s and audience_id = %s"
+                "WHERE user_id = %s and audience_id = %s and topic_id = %s"
             )
-            cur.execute(sql, [float(rating), int(user_id), int(audience_id)])
+            cur.execute(sql, [float(rating), int(user_id), int(audience_id), int(topic_id)])
         else:
             sql = (
                 "INSERT INTO user_audience_rating "
-                "(user_id, audience_id, rating) "
-                "VALUES (%s, %s, %s)"
+                "(user_id, audience_id, topic_id, rating) "
+                "VALUES (%s, %s, %s, %s)"
             )
-            cur.execute(sql, [int(user_id), int(audience_id), float(rating)])
+            cur.execute(sql, [int(user_id), int(audience_id), int(topic_id), float(rating)])
 
 
 def getTweets(alertid):
@@ -698,9 +698,9 @@ def getNews(user_id, alertid, date, cursor):
         sql = (
             "SELECT news_id, rating "
             "FROM user_news_rating "
-            "WHERE user_id = %s and news_id IN %s"
+            "WHERE user_id = %s and topic_id = %s and news_id IN %s"
         )
-        cur.execute(sql, [int(user_id), tuple(link_ids)])
+        cur.execute(sql, [int(user_id), int(alertid), tuple(link_ids)])
         rating_list = cur.fetchall()
         ratings = {str(rating[0]): rating[1] for rating in rating_list}
 
@@ -746,9 +746,9 @@ def getAudiences(topic_id, user_id, cursor):
         sql = (
             "SELECT audience_id, rating "
             "FROM user_audience_rating "
-            "WHERE user_id = %s and audience_id IN %s"
+            "WHERE user_id = %s and topic_id = %s and audience_id IN %s"
         )
-        cur.execute(sql, [int(user_id), tuple(audience_ids)])
+        cur.execute(sql, [int(user_id), int(topic_id), tuple(audience_ids)])
         rating_list = cur.fetchall()
         ratings = {str(rating[0]): rating[1] for rating in rating_list}
 

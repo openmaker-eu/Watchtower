@@ -771,6 +771,7 @@ class AudienceHandler(BaseHandler, TemplateRendering):
         variables = {
             'title': "Audience",
             'alertname': topic['topic_name'],
+            'alertid': topic['topic_id'],
             'audiences': audiences['audiences'],
             'cursor': audiences['next_cursor'],
             'alerts': logic.getAlertList(user_id),
