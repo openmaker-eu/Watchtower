@@ -510,6 +510,9 @@ def getBookmarks(user_id):
         cur.execute(sql, [user_id])
         bookmark_link_ids = [a[0] for a in cur.fetchall()]
 
+        if len(bookmark_link_ids) == 0:
+            bookmark_link_ids = [-1]
+
         sql = (
             "SELECT news_id, rating "
             "FROM user_news_rating "
