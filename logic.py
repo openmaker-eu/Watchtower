@@ -728,7 +728,7 @@ def getNews(user_id, alertid, date, cursor):
 
     cursor = int(cursor) + 20
     if cursor >= 60:
-        cursor = 60
+        cursor = 0
     result['next_cursor'] = cursor
     result['cursor_length'] = 60
     result['feeds'] = feeds
@@ -765,7 +765,7 @@ def getAudiences(topic_id, user_id, cursor):
 
     cursor = int(cursor) + 20
     if cursor >= 100:
-        cursor = 100
+        cursor = 0
     result['next_cursor'] = cursor
     result['cursor_length'] = 100
     result['audiences'] = audiences

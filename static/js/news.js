@@ -7,10 +7,11 @@ $(document).ready(function () {
     });
 
     $(window).scroll(function () {
-        if ($(window).scrollTop() + $(window).height() == $(document).height()) {
-            if ($('#newsDiv').length != 0) {
+        if ($("#spin").css("display") == "none" && $(window).scrollTop() + $(window).height() == $(document).height()) {
+            var ncursor = 0;
+            if($("#news > div").last().attr("cursor") != undefined) ncursor = $("#news > div").last().attr("cursor");
+            if (ncursor != 0 && $('#newsDiv').length != 0) {
                 $("#spin").show();
-                var ncursor = $("#news > div").last().attr("cursor");
                 var aid = $("#news").attr("alertid");
                 var date = $('#newscontainer').attr("date");
                 $.ajax({

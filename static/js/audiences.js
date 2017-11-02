@@ -24,10 +24,11 @@ $(document).ready(function () {
     });
 
     $(window).scroll(function () {
-        if ($(window).scrollTop() + $(window).height() == $(document).height()) {
-            if ($('#audiencewrapper').length != 0) {
+      if ($("#spin").css("display") == "none" && $(window).scrollTop() + $(window).height() == $(document).height()) {
+          var ncursor = 0;
+          if($("#audiencewrapper > div").last().attr("cursor") != undefined) ncursor = $("#audiencewrapper > div").last().attr("cursor");
+          if (ncursor != 0 && $('#audiencewrapper').length != 0) {
                 $("#spin").show();
-                var ncursor = $("#audiencewrapper > div").last().attr("cursor");
                 var aid = $("#audienceDiv").attr("alertid");
                 $.ajax({
                     url: '/Audience/scroll',
