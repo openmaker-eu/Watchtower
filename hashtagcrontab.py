@@ -14,8 +14,15 @@ def getDateHashtags(alertid, date):
             '$unwind': '$entities.hashtags'
         },
         {
+            '$project': {
+                'hashtag': {
+                    '$toLower': "$entities.hashtags.text"
+                }
+            },
+        },
+        {
             '$group': {
-                '_id': '$entities.hashtags.text',
+                '_id': '$hashtag',
                 'count': {
                     '$sum': 1
                 }
@@ -67,4 +74,5 @@ if __name__ == '__main__':
         cur.execute(sql)
         alert_list = cur.fetchall()
         for alert in alert_list:
+            print(alert[0])
             calc(alert[0])
