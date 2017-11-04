@@ -561,7 +561,8 @@ class DomainHandler(BaseHandler, TemplateRendering):
     def post(self):
         user_id = tornado.escape.xhtml_escape(self.current_user)
         domain = self.get_argument("domain")
-        logic.banDomain(user_id, domain)
+        alertid = self.get_argument("alertid")
+        logic.banDomain(user_id, alertid, domain)
         self.write({})
 
 

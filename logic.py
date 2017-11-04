@@ -361,14 +361,29 @@ def setUserAlertLimit(user_id, setType):
         cur.execute(sql, [newLimit, int(user_id)])
 
 
-def banDomain(user_id, domain):
+def banDomain(user_id, topic_id, domain):
     with Connection.Instance().get_cursor() as cur:
         sql = (
-            "INSERT INTO user_domain "
-            "(user_id, domain) "
-            "VALUES (%s, %s)"
+            "SELECT EXISTS (SELECT 1 FROM user_domain where user_id = %s and domain = %s)"
         )
-        cur.execute(sql, [user_id, domain])
+        cur.execute(sql, [int(user_id), domain])
+        fetched = cur.fetchone()
+
+        if not fetched[0]:
+            sql = (
+                "INSERT INTO user_domain "
+                "(user_id, domain) "
+                "VALUES (%s, %s)"
+            )
+            cur.execute(sql, [user_id, domain])
+            Connection.Instance().filteredNewsPoolDB[str(topic_id)].update_many(
+            {},
+            {'$pull':{
+                'yesterday': {'domain': domain},
+                'week': {'domain': domain},
+                'month': {'domain': domain}
+            }})
+
 
 
 # Take alert information, give an id and add it DB
@@ -727,7 +742,7 @@ def getNews(user_id, alertid, date, cursor):
             pass
 
     cursor = int(cursor) + 20
-    if cursor >= 60:
+    if cursor >= 60 or len(feeds) == 0:
         cursor = 0
     result['next_cursor'] = cursor
     result['cursor_length'] = 60
@@ -764,7 +779,7 @@ def getAudiences(topic_id, user_id, cursor):
             pass
 
     cursor = int(cursor) + 20
-    if cursor >= 100:
+    if cursor >= 100 or len(audiences) == 0:
         cursor = 0
     result['next_cursor'] = cursor
     result['cursor_length'] = 100
