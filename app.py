@@ -144,7 +144,8 @@ class ConversationV12Handler(BaseHandler, TemplateRendering):
 
 class TopicsV12Handler(BaseHandler, TemplateRendering):
     def get(self):
-        topics = apiv12.getTopics()
+        keywords = self.get_argument('keywords', "").split(",")
+        topics = apiv12.getTopics(keywords)
         self.set_header('Content-Type', 'application/json')
         self.write(topics)
 
