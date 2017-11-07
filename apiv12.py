@@ -2,7 +2,7 @@ import json
 import re
 import time
 from datetime import datetime
-
+import operator
 import pymongo
 
 import date_filter
@@ -10,18 +10,78 @@ from application.Connections import Connection
 from application.utils import general_utils
 
 
-def getTopics():
-    with Connection.Instance().get_cursor() as cur:
-        sql = (
-            "SELECT topic_id, topic_name, topic_description "
-            "FROM topics "
-            "WHERE is_publish = %s "
-            "ORDER BY topic_id"
-        )
-        cur.execute(sql, [True])
-        var = cur.fetchall()
-        topics = [{'topic_id': i[0], 'topic_name': i[1], 'description': i[2]} for i in var]
-        return json.dumps({'topics': topics}, indent=4)
+def getTopics(keywords):
+    if keywords != [""]:
+        with Connection.Instance().get_cursor() as cur:
+            sql = (
+                "SELECT topic_id "
+                "FROM topics "
+                "WHERE is_publish = %s"
+            )
+            cur.execute(sql, [True])
+            var = cur.fetchall()
+            published_topics = []
+            if var is not None:
+                published_topics = [i[0] for i in var]
+            print(published_topics)
+            keywords_in_dictionary = [re.compile(key, re.IGNORECASE) for key in keywords]
+            topic_list = {}
+            for topic_id in Connection.Instance().hashtags.collection_names():
+                if topic_id != "counters" and int(topic_id) in published_topics:
+                    try:
+                        count = list(Connection.Instance().hashtags[str(topic_id)].aggregate([
+                            { '$unwind': "$month" },
+                            { '$project': {
+                                    'hashtag': '$month.hashtag', 'count': '$month.count'
+                                }
+                            },
+                            {
+                                '$match': {
+                                    'hashtag': { '$in': keywords_in_dictionary }
+                                }
+                            },
+                            {
+                               '$group':
+                                 {
+                                   '_id': {},
+                                   'count': { '$sum': "$count" }
+                                 }
+                             }]))[0]['count']
+                        topic_list[str(topic_id)] = count
+                    except:
+                        pass
+            topics = topic_list.keys()
+            topics = [int(topic_id) for topic_id in topics]
+            print(sorted(topic_list.items(), key=operator.itemgetter(1), reverse=True))
+            if len(topics) == 0:
+                topics = [-1]
+            sql = (
+                "SELECT topic_id, topic_name, topic_description "
+                "FROM topics "
+                "WHERE is_publish = %s and topic_id IN %s"
+            )
+            cur.execute(sql, [True, tuple(topics)])
+            var = cur.fetchall()
+            topics = {str(i[0]): {'topic_name': i[1], 'description': i[2]} for i in var}
+            result = []
+            for topic in sorted(topic_list.items(), key=operator.itemgetter(1), reverse=True):
+                if str(topic[0]) in topics:
+                    temp = topics[str(topic[0])]
+                    temp['topic_id'] = topic[0]
+                    result.append(temp)
+            return json.dumps({'topics': result}, indent=4)
+    else:
+        with Connection.Instance().get_cursor() as cur:
+            sql = (
+                "SELECT topic_id, topic_name, topic_description "
+                "FROM topics "
+                "WHERE is_publish = %s "
+                "ORDER BY topic_id"
+            )
+            cur.execute(sql, [True])
+            var = cur.fetchall()
+            topics = [{'topic_id': i[0], 'topic_name': i[1], 'description': i[2]} for i in var]
+            return json.dumps({'topics': topics}, indent=4)
 
 
 def getNewsFeeds(date, cursor, forbidden_domain, topics):
