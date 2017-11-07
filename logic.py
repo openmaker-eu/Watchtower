@@ -759,7 +759,7 @@ def getAudiences(topic_id, user_id, cursor):
 
         audience['rate'] = 0
         try:
-            audience['rate'] = ratings[str(audience['id_str'])]
+            audience['rate'] = ratings[str(audience['id'])]
         except KeyError:
             pass
 

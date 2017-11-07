@@ -66,6 +66,7 @@ def get_user_profile(unprocessed_user_ids, topicID):
 
 def get_all_user_profiles_by_topic(topicID):
     start = time.time()
+    print("============================================")
     print("Getting user profiles for topic: " + str(topicID))
     print("Finding already processed profiles...")
     # find user IDS whose profiles have been processed for this topic
@@ -190,7 +191,6 @@ def main():
             while(1):
                     for topic in topics:
                           get_all_user_profiles_by_topic(topicID=topic[0])
-
 if __name__ == "__main__":
     main()
 

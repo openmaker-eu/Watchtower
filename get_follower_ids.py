@@ -21,9 +21,12 @@ api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
 
 def get_follower_ids_by_influencer(influencer):
 	'''
-	get the follower ids for a specific influencer from Twitter from the last page where we left off.
+	gets the follower ids for a specific influencer from Twitter and saves them to MongoDB for each of the influencer's topics.
+
+	most recent followers are in page 0.
+	Start from page 0 and go until we come across <THRESHOLD> follower ids successively that we already have in our DB retrieved from this influencer.
+
 	for new topics, followers are copied from the first topic of the influencer.
-	save the follower ids to MongoDB for each topic of the influencer.
 	'''
 	print("Getting follower ids for influencer " + str(influencer['screen_name']))
 
@@ -31,31 +34,18 @@ def get_follower_ids_by_influencer(influencer):
 		print("The account of this influencer is protected at the moment.")
 		return 0
 
-	if 	'last_cursor' in influencer:
-		start_cursor=influencer['last_cursor']
-	else:
-		start_cursor = -1
-	print("Start cursor value: " + str(start_cursor))
+	# get all the follower ids page by page
+	# starting from most recent follower
+	cursor = tweepy.Cursor(api.followers_ids, screen_name=influencer['screen_name'], cursor=-1)
 
-	# get all the follower ids page by page starting from the last page where we left off.
-
-	# ATTENTION (!): the influencer might have lost some followers and gained others,
-	# in which case we have a possibility of ignoring some of his new followers.
-
-	# Another problem is that the last cursor value could be invalid if that page no longer exists.
-	# We could keep track of the followers count, but since each influencer is updated on a weekly basis, it would not be
-	# very accurate.
-
-	cursor = tweepy.Cursor(api.followers_ids, screen_name=influencer['screen_name'], cursor=start_cursor)
-
-	last_cursor = start_cursor
-	page_count = 0
+	page_count = 1
 	followers_count = 0
+	STOP_FLAG= 0
+	THRESHOLD = 10
+	already_added_ids = []
 
 	try:
 		for page in cursor.pages():
-			if (cursor.iterator.next_cursor!=0):
-				last_cursor= cursor.iterator.next_cursor
 			#pprint.pprint(api.rate_limit_status()['resources']['followers'])
 			print("Page length: " + str(len(page)))
 
@@ -77,35 +67,51 @@ def get_follower_ids_by_influencer(influencer):
 				except:
 					print("Exception in insert_many.")
 
+			# upsert many
+			print("UPSERTING")
+			operations = []
+			for i in range(len(page)):
+				follower_id = page[i]
+				if Connection.Instance().audienceDB[str(influencer['topics'][0])].count({"$and":[ {"id":follower_id}, {"influencers":influencer['id']}]}) != 0:
+					already_added_ids.append(follower_id)
+					print("follower # " + str(i) + " was already added. Follower id: " + str(follower_id))
+				# uncomment if we want successive followers to be already added.
+				else:
+					already_added_ids=[]
+					print("ALREADY ADDED IDS EMTPIED at follower # " + str(i) + " with follower id: " + str(follower_id))
+					operations.append(
+				           pymongo.UpdateOne(
+				           { 'id': follower_id},
+				           { '$setOnInsert':{'processed': False}, # if the follower already exists, do not touch the 'processed' field
+						'$addToSet': {'influencers': influencer['id']}
+				           }, upsert=True)
+					)
+					followers_count +=1
+
+				if len(already_added_ids) == THRESHOLD:
+					STOP_FLAG=1
+					break
+
+			print("Saving audience gathered to topics of this influencer. # of updates: " + str(len(operations)))
+			print("first 10 opearations:")
+			print(operations[:10])
 			for topicID in influencer['topics']:
 				# add follower ids under each topicID collection in MongoDB
 				# Follower ids should be unique within a topic collection
 				Connection.Instance().audienceDB[str(topicID)].create_index("id", unique=True)
-				# upsert many
-				print("UPSERTING")
-				operations = []
-				for follower_id in page:
-					followers_count +=1
-					operations.append(
-			            pymongo.UpdateOne(
-			            { 'id': follower_id},
-			            { '$setOnInsert':{'processed': False}, # if the follower already exists, do not touch the 'processed' field
-						'$addToSet': {'influencers': influencer['id']}
-			            }, upsert=True)
-			        )
 				# max size of operations will be 5000 (page size).
-				Connection.Instance().audienceDB[str(topicID)].bulk_write(operations,ordered=False)
+				if (len(operations)!=0):
+					Connection.Instance().audienceDB[str(topicID)].bulk_write(operations,ordered=False)
 
-			Connection.Instance().influencerDB['all_influencers'].update(
-				{ 'id': influencer['id'] },
-				{ '$set':{'last_cursor':last_cursor}} # update last cursor of this influencer
-			)
+			if STOP_FLAG == 1:
+				print("Stopping at page " + str(page_count-1))
+				break
 
 			page_count +=1 # increment page count
 
 
 	except tweepy.TweepError as twperr:
-		print(twperr) # in case of errors due to protected accounts or if the page of the last cursor doesnt exist
+		print(twperr) # in case of errors due to protected accounts
 		pass
 
 	print("Processed " + str(page_count) + " pages.")
@@ -116,7 +122,8 @@ def get_follower_ids_by_influencer(influencer):
 		}
 	)
 
-	print("Processed influencer: " + influencer['screen_name'] + " : " + str(followers_count) + " followers." ) # Processing DONE.
+	print("Processed influencer: " + influencer['screen_name'] + " : " + str(followers_count) + " new followers." ) # Processing DONE.
+	print("Followers that resulted in STOP: " + str (already_added_ids))
 	print("========================================")
 	return 1
 
@@ -125,9 +132,12 @@ def get_follower_ids():
 	gets the follower ids for all topics. Will be run periodically.
 	'''
 	INFLUENCER_COUNT = 0
-	N=5
+	INFLUENCER_NUMBER = 0
+	N=1000
 	for influencer in Connection.Instance().influencerDB['all_influencers'].find({}):
-		if influencer['followers_count'] > 10000: continue
+		INFLUENCER_NUMBER +=1
+		print("\nLooking at influencer no " + str(INFLUENCER_NUMBER) + ":" + influencer['screen_name'])
+		# if influencer['followers_count'] > 10000: continue
 		# if the influencer has been processed before, wait for at least a day to process him again.
 		# get_influencers will be run once per week. Therefore, no new topic can be added to the influencer throughout a day.
 		if 'last_processed' in influencer:

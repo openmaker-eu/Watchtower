@@ -3,7 +3,7 @@
     <div class="audience_card" cursor="{{ cursor }}">
         <div class="bg" style="background-image:url({{ audience['profile_banner_url'] }})"></div>
         <div class="pp" align="center">
-            <img src="{{ (audience['profile_image_url']).replace('normal', '400x400') }}" alt=""/>
+            <img src="{{ (audience['profile_image_url_https'][:4] + audience['profile_image_url_https'][5:]).replace('normal', '400x400') }}" alt=""/>
         </div>
         <div class="details">
             <span id="name">{{ audience['name'] }}</span>
@@ -18,7 +18,7 @@
         </div>
 
         <div class="vote_audience" style="font-size:0.7em;text-align:right">
-          <input id="rate_{{ audience['id_str'] }}" data-show-caption="false" onchange="rateAudience('{{ audience['id_str'] }}')" class="rating rating-loading" data-size="xs" data-min="0" data-max="5" data-step="0.5" value="{{ audience['rate'] }}">
+          <input id="rate_{{ audience['id'] }}" data-show-caption="false" onchange="rateAudience('{{ audience['id'] }}')" class="rating rating-loading" data-size="xs" data-min="0" data-max="5" data-step="0.5" value="{{ audience['rate'] }}">
         </div>
     </div>
 
