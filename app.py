@@ -127,7 +127,7 @@ class EventV12Handler(BaseHandler, TemplateRendering):
         cursor = self.get_argument('cursor', '0')
         document = apiv12.getEvents(topic_id, date, cursor)
         self.set_header('Content-Type', 'application/json')
-        self.write(json.dumps(document, indent=4))
+        self.write(json.dumps(document))
 
 
 class ConversationV12Handler(BaseHandler, TemplateRendering):
@@ -139,7 +139,7 @@ class ConversationV12Handler(BaseHandler, TemplateRendering):
         paging = self.get_argument("cursor", "0")
         docs = apiv12.getConversations(int(topic_id), timeFilter, paging)
         self.set_header('Content-Type', 'application/json')
-        self.write(json.dumps({'conversations': docs}, indent=4))
+        self.write(json.dumps({'conversations': docs}))
 
 
 class TopicsV12Handler(BaseHandler, TemplateRendering):

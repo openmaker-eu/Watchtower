@@ -67,9 +67,9 @@ def getTopics(keywords):
             for topic in sorted(topic_list.items(), key=operator.itemgetter(1), reverse=True):
                 if str(topic[0]) in topics:
                     temp = topics[str(topic[0])]
-                    temp['topic_id'] = topic[0]
+                    temp['topic_id'] = int(topic[0])
                     result.append(temp)
-            return json.dumps({'topics': result}, indent=4)
+            return json.dumps({'topics': result})
     else:
         with Connection.Instance().get_cursor() as cur:
             sql = (
@@ -81,18 +81,18 @@ def getTopics(keywords):
             cur.execute(sql, [True])
             var = cur.fetchall()
             topics = [{'topic_id': i[0], 'topic_name': i[1], 'description': i[2]} for i in var]
-            return json.dumps({'topics': topics}, indent=4)
+            return json.dumps({'topics': topics})
 
 
 def getNewsFeeds(date, cursor, forbidden_domain, topics):
     if topics == [""]:
-        return json.dumps({}, indent=4)
+        return json.dumps({})
 
     dates = ['yesterday', 'week', 'month']
     result = {}
     if date not in dates:
         result['Error'] = 'invalid date'
-        return json.dumps(result, indent=4)
+        return json.dumps(result)
 
     # feeds = list(Connection.Instance().filteredNewsPoolDB[themeid].find({'name': date}, {date: 1}))
     # feeds = list(feeds[0][date][cursor:cursor+20])
@@ -114,19 +114,19 @@ def getNewsFeeds(date, cursor, forbidden_domain, topics):
     result['next_cursor_str'] = str(cursor)
     result['news'] = news
 
-    return json.dumps(result, indent=4)
+    return json.dumps(result)
 
 
 def getAudiences(topic_id):
     if topic_id is None:
-        return json.dumps({}, indent=4)
+        return json.dumps({})
 
     audiences = list(Connection.Instance().infDB[str(topic_id)].find({}, {'_id': 0, 'screen_name': 1, 'location': 1,
                                                                           'name': 1, 'profile_image_url': 1, 'lang': 1,
                                                                           'summary': 1, 'full_text': 1, 'time_zone': 1}).sort(
         [('rank', pymongo.ASCENDING)]))
 
-    return json.dumps({'audiences': audiences}, indent=4)
+    return json.dumps({'audiences': audiences})
 
 
 def getNews(news_ids, keywords, languages, cities, countries, user_location, user_language, cursor, since, until,
@@ -135,7 +135,7 @@ def getNews(news_ids, keywords, languages, cities, countries, user_location, use
     if news_ids == [""] and keywords == [""] and since == "" and until == "" and \
                     languages == [""] and cities == [""] and countries == [""] and user_location == [""] \
             and user_language == [""] and domains == [""]:
-        return json.dumps({'news': [], 'next_cursor': 0, 'next_cursor_str': "0"}, indent=4)
+        return json.dumps({'news': [], 'next_cursor': 0, 'next_cursor_str': "0"})
 
     aggregate_dictionary = []
     find_dictionary = {}
@@ -184,14 +184,14 @@ def getNews(news_ids, keywords, languages, cities, countries, user_location, use
             since_in_dictionary = datetime.strptime(since, "%d-%m-%Y")
             date_dictionary['$gte'] = since_in_dictionary
         except ValueError:
-            return json.dumps({'error': "please, enter a valid since day. DAY-MONTH-YEAR"}, indent=4)
+            return json.dumps({'error': "please, enter a valid since day. DAY-MONTH-YEAR"})
 
     if until != "":
         try:
             until_in_dictionary = datetime.strptime(until, "%d-%m-%Y")
             date_dictionary['$lte'] = until_in_dictionary
         except ValueError:
-            return json.dumps({'error': "please, enter a valid since day. DAY-MONTH-YEAR"}, indent=4)
+            return json.dumps({'error': "please, enter a valid since day. DAY-MONTH-YEAR"})
 
     if date_dictionary != {}:
         find_dictionary['published_at'] = date_dictionary
@@ -230,18 +230,18 @@ def getNews(news_ids, keywords, languages, cities, countries, user_location, use
         'news': news[cursor:cursor + 20]
     }
 
-    return json.dumps(result, indent=4, default=general_utils.date_formatter)
+    return json.dumps(result, default=general_utils.date_formatter)
 
 
 def getHastags(topic_id, date):
     if topic_id is None:
-        return json.dumps({}, indent=4)
+        return json.dumps({})
 
     hashtags = \
         list(Connection.Instance().hashtags[str(topic_id)].find({'name': date}, {'_id': 0, 'modified_date': 0}))[0][
             date]
 
-    return json.dumps({'hashtags': hashtags}, indent=4)
+    return json.dumps({'hashtags': hashtags})
 
 
 def getEvents(topic_id, filterField, cursor):
