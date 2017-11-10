@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 import facebook
 import praw
 import requests
+import pprint, json
 
 import link_parser
 from application.Connections import Connection
@@ -250,7 +251,7 @@ def sourceSelection(topicList):
     return allSearches
 
 
-def mineEvents(search_id_list, isPreview):
+def mineEventsFromFacebook(search_id_list, isPreview):
     my_token = Connection.Instance().redditFacebookDB['tokens'].find_one()["facebook"]["token"]
     graph = facebook.GraphAPI(access_token=my_token, version="2.7")
     t = []
@@ -318,7 +319,9 @@ def startEvent(topic_id, topicList):
         ids = []
         for event in source['events']:
             ids.append(event['event_id'])
-        eventsWithIds = mineEvents(ids, False)
+        eventsWithIds = mineEventsFromFacebook(ids, False)
+        eventsWithTopiclist = mineEventsFromEventBrite(topicList)
+        insertEventsIntoDataBase(eventsWithTopiclist, topic_id)
         insertEventsIntoDataBase(eventsWithIds, topic_id)
 
 
@@ -436,12 +439,8 @@ def searchFacebookNews(topic_id, search_ids):
                     break
 
 
-'''
-def mineEvents(topicList):
-    client = MongoClient('localhost', 27017)
-    db = client['tes']
-    my_token = db.tokens.find_one()['eventbrite']['token']
-    collection = db.eventbrite_events
+def mineEventsFromEventBrite(topicList):
+    my_token = Connection.Instance().redditFacebookDB['tokens'].find_one()["eventbrite"]["token"]
     for topic in topicList:
         response = requests.get(
             "https://www.eventbriteapi.com/v3/events/search/",
@@ -454,19 +453,25 @@ def mineEvents(topicList):
             verify = True,  # Verify SSL certificate
         )
         response = response.json()
+        result_events = []
         for event in response['events']:
-            ret = db.eventbrite_events.aggregate([
-                {'$match': { 'event.id': event['id']}},
-                {'$limit': 1}
-            ])
+            if 'end' in event and 'utc' in event['end']:
+                event['end_time'] = time.mktime(datetime.strptime(event['end']['utc'][:10], "%Y-%m-%d").timetuple())
+            else:
+                event['end_time'] = time.mktime(datetime.strptime(event['created'][:10], "%Y-%m-%d").timetuple())
+            event['start_time'] = event['start']['utc'][:10]
+            event['link'] = event['url']
+            event['name'] = event['name']['text']
+            event['cover'] = None
+            event['updated_time'] = str(event['changed'])[:-1] + "+0000"
+            event['interested'] = -1
+            event['coming'] = -1
+            if event['logo'] is not None:
+                event['cover'] = event['logo']['original']['url']
 
-            if ret.alive:
-                print("alive")
-                for elem in ret:
-                    collection.delete_one({'event.id' : event['id']})
+            result_events.append((event, event['id']))
+        return result_events
 
-            collection.insert_one({'topic':topic, 'event':event})
-'''
 
 def triggerOneTopic(topic_id, topic_keyword_list, pages, subreddits):
     dates = ["day", "week", "month"]
