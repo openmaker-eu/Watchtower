@@ -9,11 +9,15 @@ import tornado.options
 import tornado.web
 from jinja2 import Environment, FileSystemLoader, TemplateNotFound
 
+# API VERSIONS
+import apiv13
 import apiv12
-import facebook_reddit_crontab
-import logic
 import apiv11
 import apiv1
+
+import facebook_reddit_crontab
+import logic
+
 
 chars = ''.join([string.ascii_letters, string.digits, string.punctuation]).replace('\'', '').replace('"', '').replace(
     '\\', '')
@@ -113,9 +117,42 @@ class Application(tornado.web.Application):
             (r"/api/v1.2/get_events", EventV12Handler, {'mainT': mainT}),
             (r"/api/v1.2/get_conversations", ConversationV12Handler, {'mainT': mainT}),
             (r"/api/v1.2/get_hashtags", HashtagsV12Handler, {'mainT': mainT}),
+
+            (r"/api/v1.3/get_local_influencers", LocalInfluencersV13Handler, {'mainT': mainT}),
+            (r"/api/v1.3/get_audience_sample", AudienceSampleV13Handler, {'mainT': mainT}),
+            (r"/api/v1.3/get_events", EventV13Handler, {'mainT': mainT}),
+
             (r"/(.*)", tornado.web.StaticFileHandler, {'path': settings['static_path']}),
         ]
         super(Application, self).__init__(handlers, **settings)
+
+class EventV13Handler(BaseHandler, TemplateRendering):
+    def get(self):
+        topic_id = self.get_argument('topic_id', None)
+        if topic_id is None:
+            self.write({})
+        date = self.get_argument('date', 'date')
+        place = self.get_argument('place','place')
+        cursor = self.get_argument('cursor', '0')
+        events = apiv13.getEvents(topic_id, date, place, cursor)
+        self.set_header('Content-Type', 'application/json')
+        self.write(json.dumps(events))
+
+class AudienceSampleV13Handler(BaseHandler, TemplateRendering):
+    def get(self):
+        topic_id = str(self.get_argument("topic_id", None))
+        location = str(self.get_argument("location",None))
+        audience_sample = apiv13.getAudienceSample(topic_id,location)
+        self.set_header('Content-Type', 'application/json')
+        self.write(audience_sample)
+
+class LocalInfluencersV13Handler(BaseHandler, TemplateRendering):
+    def get(self):
+        topic_id = str(self.get_argument("topic_id", None))
+        location = str(self.get_argument("location",None))
+        local_influencers = apiv13.getLocalInfluencers(topic_id,location)
+        self.set_header('Content-Type', 'application/json')
+        self.write(local_influencers)
 
 
 class EventV12Handler(BaseHandler, TemplateRendering):
@@ -912,7 +949,7 @@ class EventPageHandler(BaseHandler, TemplateRendering):
             'alerts': logic.getAlertList(user_id),
             'type': "events",
             'username': str(tornado.escape.xhtml_escape(self.get_current_username())),
-            "document": apiv12.getEvents(topic['topic_id'], "date", 0),
+            "document": apiv13.getEvents(topic['topic_id'], "date","place", 0),
             'topic': topic
         }
         content = self.render_template(template, variables)
@@ -922,10 +959,11 @@ class EventPageHandler(BaseHandler, TemplateRendering):
 class EventHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
     def get(self):
+        print("Entering variables!!!!")
         topic_id = self.get_argument('topic_id')
         filter = self.get_argument('filter')
         cursor = self.get_argument('cursor')
-        document = apiv12.getEvents(topic_id, filter, cursor)
+        document = apiv13.getEvents(topic_id, filter, place, cursor)
         self.write(self.render_template("single-event.html", {"document": document}))
 
 

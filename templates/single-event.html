@@ -9,8 +9,8 @@
                 <span id="place">{{ event['place'] }}</span>
                 <span id="date">{{ event['start_time'] }}</span>
                 <ul>
-                    <li>Coming <span>{{ event['coming'] }}</span></li>
-                    <li>Interested <span>{{ event['interested'] }}</span></li>
+                    <li>Coming <span>{% if event['coming']==-1 %} N/A {% else %} {{event['coming']}} {% endif %} </span></li>
+                    <li>Interested <span>{% if event['interested']==-1 %} N/A {% else %} {{event['interested']}} {% endif %}</span></li>
                 </ul>
             </div>
         </div>

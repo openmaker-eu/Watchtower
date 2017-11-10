@@ -4,6 +4,7 @@ var isEventsOver = false;
 var topic_id = -1;
 
 var main = function () {
+      $("#spin").spinner();
       topic_id = $('.dropdown-menu > li.active > a').attr("data-id");
       updateReadMores();
 };
@@ -18,7 +19,7 @@ $(document).ready(function () {
     });
 
     $(window).scroll(function () {
-        if ((!isEventsOver) && ($(window).scrollTop() + $(window).height() == $(document).height()) && (isReadyForLoading)) {
+        if ($("#spin").css("display") == "none" && (!isEventsOver) && ($(window).scrollTop() + $(window).height() == $(document).height()) && (isReadyForLoading)) {
             isReadyForLoading = false;
             loadNewEvents();
         }
@@ -27,6 +28,7 @@ $(document).ready(function () {
 });
 
 function loadNewEvents() {
+    $("#spin").show();
     console.log("lead new events");
     filter = $('.btn-success').val();
     $(".loader").css("visibility", "visible");
@@ -41,9 +43,11 @@ function loadNewEvents() {
             $(".loader").css("visibility", "hidden");
             cursor += 10;
             $("#all-events").append(response);
+            $("#spin").hide();
         },
         error: function (response) {
             console.log("failed");
+            $("#spin").hide();
         }
     });
 }

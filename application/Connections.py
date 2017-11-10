@@ -50,6 +50,7 @@ class Connection:
             self.influencerDB = self.MongoDBClient.influencers_test # new db for influencers
             self.audienceDB = self.MongoDBClient.audience_test # new db for audience
             self.audience_samples_DB = self.MongoDBClient.audience_samples # new db for audience samples
+            self.local_influencers_DB = self.MongoDBClient.local_influencers # new db for local influencers
 
             self.filteredNewsPoolDB = self.MongoDBClient.filteredNewsPool
             self.infDB = self.MongoDBClient.influenceRanks
