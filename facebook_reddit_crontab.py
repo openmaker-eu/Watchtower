@@ -319,8 +319,8 @@ def startEvent(topic_id, topicList):
         ids = []
         for event in source['events']:
             ids.append(event['event_id'])
-        eventsWithIds = mineEventsFromFacebook(ids, False)
         eventsWithTopiclist = mineEventsFromEventBrite(topicList)
+        eventsWithIds = mineEventsFromFacebook(ids, False)
         insertEventsIntoDataBase(eventsWithTopiclist, topic_id)
         insertEventsIntoDataBase(eventsWithIds, topic_id)
 
@@ -455,6 +455,22 @@ def mineEventsFromEventBrite(topicList):
         response = response.json()
         result_events = []
         for event in response['events']:
+            try:
+                location = requests.get(
+                    "https://www.eventbriteapi.com/v3/venues/" + event['venue_id'],
+                    headers = {
+                        "Authorization": "Bearer " + my_token,
+                    },
+                    params = {
+                        'q' : topic
+                    },
+                    verify = True,  # Verify SSL certificate
+                ).json()
+                event['place'] = ''
+                if 'address' in location:
+                    event['place'] = location['address']['city'] + ", " + location['address']['country']
+            except:
+                event['place'] = ''
             if 'end' in event and 'utc' in event['end']:
                 event['end_time'] = time.mktime(datetime.strptime(event['end']['utc'][:10], "%Y-%m-%d").timetuple())
             else:
