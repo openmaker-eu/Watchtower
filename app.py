@@ -963,6 +963,7 @@ class EventHandler(BaseHandler, TemplateRendering):
         topic_id = self.get_argument('topic_id')
         filter = self.get_argument('filter')
         cursor = self.get_argument('cursor')
+        place = self.get_argument('place')
         document = apiv13.getEvents(topic_id, filter, place, cursor)
         self.write(self.render_template("single-event.html", {"document": document}))
 
