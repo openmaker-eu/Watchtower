@@ -59,7 +59,7 @@ function getEvents() {
     $.ajax({
         type: "GET",
         url: "/get_events",
-        data: {topic_id: topic_id, filter: filter, cursor: cursor},
+        data: {topic_id: topic_id, filter: filter, cursor: cursor, place: ''},
         success: function (response) {
             console.log("success");
             if (response.length < 200) isEventsOver = true;
