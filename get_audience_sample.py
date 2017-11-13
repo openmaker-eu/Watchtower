@@ -126,7 +126,8 @@ def main():
             print("Sampling audience for USER: " + str(userID) + " , LOCATION: " + location + ", TOPIC: " + topic_dict[topicID] + "(" + str(topicID) + ")")
             get_audience_sample_by_topic(userID=userID, topicID=topicID, location=location, sample_size=N)
 
-        if(getForAllLocations==0): return
+        if(getForAllLocations=="0"):
+            return
         locations = ['italy','slovakia','spain','uk'] # relevant locations
         for topicID, topicName in topics:
             for loc in locations:

@@ -67,6 +67,8 @@ def getLocationRegex(location):
         location_in_different_langs += "Britania|"
         location_in_different_langs += "England|"
         location_in_different_langs += "İngiltere)"
+    else:
+        location_in_different_langs = location
 
     print(location_in_different_langs)
     return re.compile("^.*\\b" + location_in_different_langs + "\\b.*$", re.IGNORECASE)
