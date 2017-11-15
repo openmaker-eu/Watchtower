@@ -440,21 +440,34 @@ def searchFacebookNews(topic_id, search_ids):
 
 
 def mineEventsFromEventBrite(topicList):
+    print("Getting events from Eventbrite...")
     my_token = Connection.Instance().redditFacebookDB['tokens'].find_one()["eventbrite"]["token"]
     for topic in topicList:
-        response = requests.get(
-            "https://www.eventbriteapi.com/v3/events/search/",
-            headers = {
-                "Authorization": "Bearer " + my_token,
-            },
-            params = {
-                'q' : topic
-            },
-            verify = True,  # Verify SSL certificate
-        )
-        response = response.json()
+        print("Processing topic: " + str(topic))
+        page_number = 1
+        events = []
+        while (1):
+            print("Fetching page " + str(page_number))
+            response = requests.get(
+                "https://www.eventbriteapi.com/v3/events/search/",
+                headers = {
+                    "Authorization": "Bearer " + my_token,
+                },
+                params = {
+                    'q' : topic,
+                    'page': page_number
+                },
+                verify = True,  # Verify SSL certificate
+            )
+            response = response.json()
+            events.extend(response['events'])
+            print("# EVENTS:" + str(len(events)))
+            if page_number == response['pagination']['page_count'] : # retrieved last page, break the loop.
+                break
+            page_number += 1
+
         result_events = []
-        for event in response['events']:
+        for event in events:
             try:
                 location = requests.get(
                     "https://www.eventbriteapi.com/v3/venues/" + event['venue_id'],
@@ -515,6 +528,7 @@ def triggerOneTopic(topic_id, topic_keyword_list, pages, subreddits):
 
 
 if __name__ == '__main__':
+
     with Connection.Instance().get_cursor() as cur:
         sql = (
             "SELECT topics.topic_id, topics.keywords, array_agg(topic_facebook_page.facebook_page_id), array_agg(topic_subreddit.subreddit) "
@@ -529,3 +543,4 @@ if __name__ == '__main__':
 
     for v in var:
         triggerOneTopic(v[0], v[1].split(","), list(set(v[2])), list(set(v[3])))
+    
