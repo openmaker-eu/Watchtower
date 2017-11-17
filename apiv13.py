@@ -50,42 +50,43 @@ def getAudienceSample(topic_id, location):
         result['audience_sample'] = "topic not found"
     return json.dumps(result, indent=4)
 
-def getEvents(topic_id, filterField, place, cursor):
+def getEvents(topic_id, sortedBy, date, place, cursor):
     now = time.time()
     cursor = int(cursor)
     result = {}
     events = []
-    if filterField == 'interested':
-        events = Connection.Instance().events[str(topic_id)].aggregate([
-            {'$match': {'end_time': {'$gte': now}}},
-            {'$project': {'_id': 0}},
-            {'$sort': {'interested': -1}},
-            {'$skip': int(cursor)},
-            {'$limit': 10}
-        ])
-    elif filterField == 'date':
-        events = Connection.Instance().events[str(topic_id)].aggregate([
-            {'$match': {'end_time': {'$gte': now}}},
-            {'$project': {'_id': 0}},
-            {'$sort': {'start_time': -1}},
-            {'$skip': int(cursor)},
-            {'$limit': 10}
-        ])
-    '''
-    elif filterField == 'place':
-        events = Connection.Instance().events[str(topic_id)].aggregate([
-            {'$match': {'end_time': {'$gte': now}}},
-            {'$project': {'_id': 0}},
-            {'$sort': {'start_time': -1}},
-            {'$skip': int(cursor)},
-            {'$limit': 10}
-        ])
-    '''
+
+    Connection.Instance().cur.execute("select topic_name from topics where topic_id = %s;", [topic_id])
+    var = Connection.Instance().cur.fetchall()
+    topic_name = var[0][0]
+
+    match = {'end_time': {'$gte': now}}
+    sort = {}
+
+    if place !="":
+        regx = re.compile("^.*\\b" + place + "\\b.*$", re.IGNORECASE)
+        match['place']= regx
+
+    if sortedBy == 'interested':
+        sort['interested']=-1
+    elif sortedBy == 'date' or sortedBy=='':
+        sort['start_time']=-1
+    else:
+        return {'error': "please enter a valid sortedBy value."}
+
+    events = Connection.Instance().events[str(topic_id)].aggregate([
+        {'$match': match},
+        {'$project': {'_id': 0}},
+        {'$sort': sort},
+        {'$skip': int(cursor)},
+        {'$limit': 10}
+    ])
+
     events = list(events)
     cursor = int(cursor) + 10
     if cursor >= 100 or len(events) == 0:
         cursor = 0
-
+    result['topic'] = topic_name
     result['next_cursor'] = cursor
     result['events']= events
     return result

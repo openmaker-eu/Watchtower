@@ -96,20 +96,25 @@ class Application(tornado.web.Application):
             (r"/saveTopicId", TopicHandler, {'mainT': mainT}),
             (r"/getPages", PagesHandler, {'mainT': mainT}),
 
+            # DOCUMENTATIONS
             (r"/api", DocumentationHandler, {'mainT': mainT}),
             (r"/api/v1\.1", Documentationv11Handler, {'mainT': mainT}),
             (r"/api/v1\.2", Documentationv12Handler, {'mainT': mainT}),
+            (r"/api/v1\.3", Documentationv13Handler, {'mainT': mainT}),
 
+            # API V1
             (r"/api/get_themes", ThemesHandler, {'mainT': mainT}),
             (r"/api/get_influencers/(.*)/(.*)", InfluencersHandler, {'mainT': mainT}),
             (r"/api/get_feeds/(.*)/(.*)", FeedsHandler, {'mainT': mainT}),
             (r"/api/get_influencers/(.*)", InfluencersHandler, {'mainT': mainT}),
             (r"/api/get_feeds/(.*)", FeedsHandler, {'mainT': mainT}),
 
+            # API V1.1
             (r"/api/v1.1/get_themes", ThemesV11Handler, {'mainT': mainT}),
             (r"/api/v1.1/get_feeds", FeedsV11Handler, {'mainT': mainT}),
             (r"/api/v1.1/get_influencers", InfluencersV11Handler, {'mainT': mainT}),
 
+            # API V1.2
             (r"/api/v1.2/get_topics", TopicsV12Handler, {'mainT': mainT}),
             (r"/api/v1.2/get_news", NewsFeedsV12Handler, {'mainT': mainT}),
             (r"/api/v1.2/get_audiences", AudiencesV12Handler, {'mainT': mainT}),
@@ -118,9 +123,16 @@ class Application(tornado.web.Application):
             (r"/api/v1.2/get_conversations", ConversationV12Handler, {'mainT': mainT}),
             (r"/api/v1.2/get_hashtags", HashtagsV12Handler, {'mainT': mainT}),
 
-            (r"/api/v1.3/get_local_influencers", LocalInfluencersV13Handler, {'mainT': mainT}),
-            (r"/api/v1.3/get_audience_sample", AudienceSampleV13Handler, {'mainT': mainT}),
-            (r"/api/v1.3/get_events", EventV13Handler, {'mainT': mainT}),
+            # API V1.3
+            # get_audiences deprecated
+            (r"/api/v1.3/get_topics", TopicsV12Handler, {'mainT': mainT}),
+            (r"/api/v1.3/get_news", NewsFeedsV12Handler, {'mainT': mainT}),
+            (r"/api/v1.3/search_news", NewsV12Handler, {'mainT': mainT}),
+            (r"/api/v1.3/get_events", EventV13Handler, {'mainT': mainT}), # changed
+            (r"/api/v1.3/get_conversations", ConversationV12Handler, {'mainT': mainT}),
+            (r"/api/v1.3/get_hashtags", HashtagsV12Handler, {'mainT': mainT}),
+            (r"/api/v1.3/get_local_influencers", LocalInfluencersV13Handler, {'mainT': mainT}), # new
+            (r"/api/v1.3/get_audience_sample", AudienceSampleV13Handler, {'mainT': mainT}), # new
 
             (r"/(.*)", tornado.web.StaticFileHandler, {'path': settings['static_path']}),
         ]
@@ -131,10 +143,11 @@ class EventV13Handler(BaseHandler, TemplateRendering):
         topic_id = self.get_argument('topic_id', None)
         if topic_id is None:
             self.write({})
-        date = self.get_argument('date', 'date')
-        place = self.get_argument('place','place')
+        sortedBy = self.get_argument('sortedBy', '')
+        date = self.get_argument('date', '')
+        place = self.get_argument('place','')
         cursor = self.get_argument('cursor', '0')
-        events = apiv13.getEvents(topic_id, date, place, cursor)
+        events = apiv13.getEvents(topic_id, sortedBy, date, place, int(cursor))
         self.set_header('Content-Type', 'application/json')
         self.write(json.dumps(events))
 
@@ -154,6 +167,14 @@ class LocalInfluencersV13Handler(BaseHandler, TemplateRendering):
         self.set_header('Content-Type', 'application/json')
         self.write(local_influencers)
 
+class Documentationv13Handler(BaseHandler, TemplateRendering):
+    def get(self):
+        template = 'apiv13.html'
+        variables = {
+            'title': "Watchtower Api v1.3"
+        }
+        content = self.render_template(template, variables)
+        self.write(content)
 
 class EventV12Handler(BaseHandler, TemplateRendering):
     def get(self):
@@ -959,12 +980,11 @@ class EventPageHandler(BaseHandler, TemplateRendering):
 class EventHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
     def get(self):
-        print("Entering variables!!!!")
         topic_id = self.get_argument('topic_id')
         filter = self.get_argument('filter')
         cursor = self.get_argument('cursor')
-        place = self.get_argument('place')
-        document = apiv13.getEvents(topic_id, filter, place, cursor)
+        place = self.get_argument('place', '')
+        document = apiv12.getEvents(topic_id, filter, place, cursor)
         self.write(self.render_template("single-event.html", {"document": document}))
 
 
