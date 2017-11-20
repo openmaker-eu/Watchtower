@@ -87,7 +87,7 @@ def getAudienceSample(topic_id, location, cursor):
         result['audience_sample'] = "topic not found"
     return json.dumps(result, indent=4)
 
-def getEvents(topic_id, sortedBy, date, location, cursor):
+def getEvents(topic_id, sortedBy, location, cursor):
     now = time.time()
     cursor = int(cursor)
     result = {}

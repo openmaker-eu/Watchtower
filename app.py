@@ -144,10 +144,9 @@ class EventV13Handler(BaseHandler, TemplateRendering):
         if topic_id is None:
             self.write({})
         sortedBy = self.get_argument('sortedBy', '')
-        date = self.get_argument('date', '')
         location = self.get_argument('location','')
         cursor = self.get_argument('cursor', '0')
-        events = apiv13.getEvents(topic_id, sortedBy, date, location, int(cursor))
+        events = apiv13.getEvents(topic_id, sortedBy, location, int(cursor))
         self.set_header('Content-Type', 'application/json')
         self.write(json.dumps(events))
 
@@ -972,7 +971,7 @@ class EventPageHandler(BaseHandler, TemplateRendering):
             'alerts': logic.getAlertList(user_id),
             'type': "events",
             'username': str(tornado.escape.xhtml_escape(self.get_current_username())),
-            "document": apiv12.getEvents(topic['topic_id'], "date","place", 0),
+            "document": apiv12.getEvents(topic['topic_id'], "date", 0),
             'topic': topic
         }
         content = self.render_template(template, variables)
@@ -985,8 +984,7 @@ class EventHandler(BaseHandler, TemplateRendering):
         topic_id = self.get_argument('topic_id')
         filter = self.get_argument('filter')
         cursor = self.get_argument('cursor')
-        place = self.get_argument('place', '')
-        document = apiv12.getEvents(topic_id, filter, place, cursor)
+        document = apiv12.getEvents(topic_id, filter, cursor)
         self.write(self.render_template("single-event.html", {"document": document}))
 
 
