@@ -155,7 +155,8 @@ class AudienceSampleV13Handler(BaseHandler, TemplateRendering):
     def get(self):
         topic_id = str(self.get_argument("topic_id", None))
         location = str(self.get_argument("location",None))
-        audience_sample = apiv13.getAudienceSample(topic_id,location)
+        cursor = self.get_argument('cursor', '0')
+        audience_sample = apiv13.getAudienceSample(topic_id,location, int(cursor))
         self.set_header('Content-Type', 'application/json')
         self.write(audience_sample)
 
@@ -163,7 +164,8 @@ class LocalInfluencersV13Handler(BaseHandler, TemplateRendering):
     def get(self):
         topic_id = str(self.get_argument("topic_id", None))
         location = str(self.get_argument("location",None))
-        local_influencers = apiv13.getLocalInfluencers(topic_id,location)
+        cursor = self.get_argument('cursor', '0')
+        local_influencers = apiv13.getLocalInfluencers(topic_id,location, int(cursor))
         self.set_header('Content-Type', 'application/json')
         self.write(local_influencers)
 

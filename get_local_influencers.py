@@ -20,8 +20,16 @@ def get_local_influencers_by_topic(topicID, location, size):
     print("Filtered audience in " + str(time.time()-start) + " seconds.")
     start = time.time()
 
-    audience = list(Connection.Instance().audienceDB['all_audience'].find({'id': {'$in':loc_filtered_audience_ids}}).sort([("followers_count", -1)]))
+    audience = Connection.Instance().audienceDB['all_audience'].aggregate(
+    [
+        {'$match': {'id':{'$in':loc_filtered_audience_ids}}},
+        {'$project': {'_id': 0}},
+        {'$sort': {'followers_count':-1}}
+    ],
+    allowDiskUse= True
+    )
 
+    audience = list(audience)
     local_influencers = audience[:size]
 
     print("Saving to MongoDB...")

@@ -4,7 +4,8 @@ import logic
 import time
 from application.Connections import Connection
 
-def getLocalInfluencers(topic_id, location):
+def getLocalInfluencers(topic_id, location, cursor):
+    cursor = int(cursor)
     try:
         topic_id = int(topic_id)
     except:
@@ -16,16 +17,24 @@ def getLocalInfluencers(topic_id, location):
         result = {}
         # error handling needed for location
         location = location.lower()
+
         local_influencers = list(
-            Connection.Instance().local_influencers_DB[str(topic_id)+"_"+str(location)].find({}, {'_id': False}))
+        Connection.Instance().local_influencers_DB[str(topic_id)+"_"+str(location)].find({}, {'_id': False})[cursor:cursor+10]
+        )
+
         result['topic'] = topic_name
         result['location'] = location
+        cursor = int(cursor) + 10
+        if cursor >= 100 or len(local_influencers) == 0:
+            cursor = 0
+        result['next_cursor'] = cursor
         result['local_influencers'] = local_influencers
     else:
         result['local_influencers'] = "topic not found"
     return json.dumps(result, indent=4)
 
-def getAudienceSample(topic_id, location):
+def getAudienceSample(topic_id, location, cursor):
+    cursor = int(cursor)
     try:
         topic_id = int(topic_id)
     except:
@@ -42,10 +51,17 @@ def getAudienceSample(topic_id, location):
         location = location.lower()
 
         audience_sample = list(
-            Connection.Instance().audience_samples_DB[str(location)+"_"+str(topic_id)].find({}, {'_id': False}))
+        Connection.Instance().audience_samples_DB[str(location)+"_"+str(topic_id)].find({}, {'_id': False})[cursor:cursor+10]
+        )
+    
         result['topic'] = topic_name
         result['location'] = location
+        cursor = int(cursor) + 10
+        if cursor >= 100 or len(audience_sample) == 0:
+            cursor = 0
+        result['next_cursor'] = cursor
         result['audience_sample'] = audience_sample
+
     else:
         result['audience_sample'] = "topic not found"
     return json.dumps(result, indent=4)
