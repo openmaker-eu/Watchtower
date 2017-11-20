@@ -1,8 +1,11 @@
+# Author: Kemal Berk Kocabagli
+
 import json
 import re
 import logic
 import time
 from application.Connections import Connection
+import location_regex # to get regular expressions for locations
 
 def getLocalInfluencers(topic_id, location, cursor):
     cursor = int(cursor)
@@ -19,7 +22,16 @@ def getLocalInfluencers(topic_id, location, cursor):
         location = location.lower()
 
         local_influencers = list(
-        Connection.Instance().local_influencers_DB[str(topic_id)+"_"+str(location)].find({}, {'_id': False})[cursor:cursor+10]
+        Connection.Instance().local_influencers_DB[str(topic_id)+"_"+str(location)].find({},
+         {'_id': False,
+         'name':1,
+         'screen_name':1,
+         'location':1,
+         'description':1,
+         'time-zone':1,
+         'lang':1,
+         'profile_image_url_https':1
+         })[cursor:cursor+10]
         )
 
         result['topic'] = topic_name
@@ -51,9 +63,18 @@ def getAudienceSample(topic_id, location, cursor):
         location = location.lower()
 
         audience_sample = list(
-        Connection.Instance().audience_samples_DB[str(location)+"_"+str(topic_id)].find({}, {'_id': False})[cursor:cursor+10]
+        Connection.Instance().audience_samples_DB[str(location)+"_"+str(topic_id)].find({},
+        {'_id': False,
+        'name':1,
+        'screen_name':1,
+        'location':1,
+        'description':1,
+        'time-zone':1,
+        'lang':1,
+        'profile_image_url_https':1
+        })[cursor:cursor+10]
         )
-    
+
         result['topic'] = topic_name
         result['location'] = location
         cursor = int(cursor) + 10
@@ -66,7 +87,7 @@ def getAudienceSample(topic_id, location, cursor):
         result['audience_sample'] = "topic not found"
     return json.dumps(result, indent=4)
 
-def getEvents(topic_id, sortedBy, date, place, cursor):
+def getEvents(topic_id, sortedBy, date, location, cursor):
     now = time.time()
     cursor = int(cursor)
     result = {}
@@ -79,9 +100,8 @@ def getEvents(topic_id, sortedBy, date, place, cursor):
     match = {'end_time': {'$gte': now}}
     sort = {}
 
-    if place !="":
-        regx = re.compile("^.*\\b" + place + "\\b.*$", re.IGNORECASE)
-        match['place']= regx
+    if location !="":
+        match['place']= location_regex.getLocationRegex(location)
 
     if sortedBy == 'interested':
         sort['interested']=-1

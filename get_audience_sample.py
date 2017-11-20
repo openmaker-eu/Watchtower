@@ -6,7 +6,7 @@ import re # for regex in location filtering
 import pymongo # for pymongo functions
 import numpy as np # for sampling
 import datetime # to print the date & time in the output log whenever this script is run
-import location_regex
+import location_regex # to get regular expressions for locations
 
 from application.Connections import Connection
 

@@ -3,7 +3,7 @@ import re # for regex in location filtering
 def getLocationRegex(location):
     location_in_different_langs ="("
     if location == 'italy': # source : wikipedia
-        location_in_different_langs += "italy|"
+        location_in_different_langs += "italy|IT|"
         location_in_different_langs += "an Eadailt|"
         location_in_different_langs += "yr Eidal|"
         location_in_different_langs += "Étalie|"
@@ -39,7 +39,7 @@ def getLocationRegex(location):
         location_in_different_langs += "Włochy|"
         location_in_different_langs += "Yìdàlì)"
     elif location == 'slovakia':
-        location_in_different_langs += "slovakia|"
+        location_in_different_langs += "slovakia|SK|"
         location_in_different_langs += "Eslovakia|"
         location_in_different_langs += "Eslovaquia|"
         location_in_different_langs += "Eslováquia|"
@@ -53,7 +53,7 @@ def getLocationRegex(location):
         location_in_different_langs += "Slovakiet|"
         location_in_different_langs += "Slovensko)"
     elif location == 'spain':
-        location_in_different_langs += "spain|"
+        location_in_different_langs += "spain|ES|"
         location_in_different_langs += "Espainia|"
         location_in_different_langs += "España|"
         location_in_different_langs += "Espanya|"
@@ -62,7 +62,7 @@ def getLocationRegex(location):
         location_in_different_langs += "Spagna|"
         location_in_different_langs += "Spanien)"
     elif location == 'uk':
-        location_in_different_langs += "uk|"
+        location_in_different_langs += "UK|"
         location_in_different_langs += "united\s*kingdom|"
         location_in_different_langs += "Britania|"
         location_in_different_langs += "England|"
@@ -70,5 +70,5 @@ def getLocationRegex(location):
     else:
         location_in_different_langs = location
 
-    print(location_in_different_langs)
+    #print(location_in_different_langs)
     return re.compile("^.*\\b" + location_in_different_langs + "\\b.*$", re.IGNORECASE)
