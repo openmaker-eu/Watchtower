@@ -5,7 +5,7 @@ import time # for debug
 import re # for regex in location filtering
 import pymongo # for pymongo functions
 import numpy as np # for sampling
-import datetime # to print the date & time in the output log whenever this script is run
+from datetime import datetime # to print the date & time in the output log whenever this script is run OR for time related checks
 from location_regex import *
 
 from application.Connections import Connection
@@ -47,7 +47,7 @@ def main():
         locations = ['italy','slovakia','spain','uk'] # relevant locations
         N = 20 # local influencers size
 
-        print("Script ran: " + str(datetime.datetime.now()))
+        print("Script ran: " + str(datetime.now()))
 
         with Connection.Instance().get_cursor() as cur:
             sql = (

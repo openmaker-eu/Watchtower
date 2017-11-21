@@ -4,8 +4,8 @@ import pprint # to print human readable dictionary
 import json
 from bson.json_util import dumps
 import numpy as np
-import time
-import pymongo
+import time # for debug
+import pymongo # for pymongo functions
 
 import sys
 

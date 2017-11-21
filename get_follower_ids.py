@@ -1,10 +1,12 @@
+# Author: Kemal Berk Kocabagli
+
 import tweepy  # Twitter API helper package
 from tweepy import OAuthHandler
 import pprint # to print human readable dictionary
 import pymongo
 
 import json
-from datetime import datetime
+from datetime import datetime # to print the date & time in the output log whenever this script is run OR for time related checks
 
 import sys
 
@@ -38,7 +40,7 @@ def get_follower_ids_by_influencer(influencer):
 	# starting from most recent follower
 	cursor = tweepy.Cursor(api.followers_ids, screen_name=influencer['screen_name'], cursor=-1)
 
-	page_count = 1
+	page_count = 0
 	followers_count = 0
 	STOP_FLAG= 0
 	THRESHOLD = 10
@@ -100,11 +102,16 @@ def get_follower_ids_by_influencer(influencer):
 				# Follower ids should be unique within a topic collection
 				Connection.Instance().audienceDB[str(topicID)].create_index("id", unique=True)
 				# max size of operations will be 5000 (page size).
-				if (len(operations)!=0):
-					Connection.Instance().audienceDB[str(topicID)].bulk_write(operations,ordered=False)
+				try:
+					if (len(operations)!=0):
+						Connection.Instance().audienceDB[str(topicID)].bulk_write(operations,ordered=False)
+				except Exception as e:
+		            print("Exception in bulk_write:" + str(e))
 
 			if STOP_FLAG == 1:
+				page_count +=1
 				print("Stopping at page " + str(page_count-1))
+				print("Followers that resulted in STOP: " + str (already_added_ids))
 				break
 
 			page_count +=1 # increment page count
@@ -114,7 +121,7 @@ def get_follower_ids_by_influencer(influencer):
 		print(twperr) # in case of errors due to protected accounts
 		pass
 
-	print("Processed " + str(page_count) + " pages.")
+	print("Processed " + str(page_count) + " page(s).")
 
 	Connection.Instance().influencerDB['all_influencers'].update(
 		{ 'id': influencer['id'] },
@@ -123,7 +130,6 @@ def get_follower_ids_by_influencer(influencer):
 	)
 
 	print("Processed influencer: " + influencer['screen_name'] + " : " + str(followers_count) + " new followers." ) # Processing DONE.
-	print("Followers that resulted in STOP: " + str (already_added_ids))
 	print("========================================")
 	return 1
 

@@ -126,13 +126,13 @@ class Application(tornado.web.Application):
             # API V1.3
             # get_audiences deprecated
             (r"/api/v1.3/get_topics", TopicsV12Handler, {'mainT': mainT}),
+            (r"/api/v1.3/get_audience_sample", AudienceSampleV13Handler, {'mainT': mainT}), # new
+            (r"/api/v1.3/get_local_influencers", LocalInfluencersV13Handler, {'mainT': mainT}), # new
             (r"/api/v1.3/get_news", NewsFeedsV12Handler, {'mainT': mainT}),
             (r"/api/v1.3/search_news", NewsV12Handler, {'mainT': mainT}),
             (r"/api/v1.3/get_events", EventV13Handler, {'mainT': mainT}), # changed
             (r"/api/v1.3/get_conversations", ConversationV12Handler, {'mainT': mainT}),
             (r"/api/v1.3/get_hashtags", HashtagsV12Handler, {'mainT': mainT}),
-            (r"/api/v1.3/get_local_influencers", LocalInfluencersV13Handler, {'mainT': mainT}), # new
-            (r"/api/v1.3/get_audience_sample", AudienceSampleV13Handler, {'mainT': mainT}), # new
 
             (r"/(.*)", tornado.web.StaticFileHandler, {'path': settings['static_path']}),
         ]

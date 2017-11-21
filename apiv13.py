@@ -112,7 +112,18 @@ def getEvents(topic_id, sortedBy, location, cursor):
 
     events = Connection.Instance().events[str(topic_id)].aggregate([
         {'$match': match},
-        {'$project': {'_id': 0}},
+        {'$project': {'_id': 0,
+            "updated_time": 1,
+            "cover": 1,
+            "end_time": 1,
+            "id": 1,
+            "name": 1,
+            "place": 1,
+            "start_time": 1,
+            "link": 1,
+            "interested": 1,
+            "coming":1
+        }},
         {'$sort': sort},
         {'$skip': int(cursor)},
         {'$limit': 10}
