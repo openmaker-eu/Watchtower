@@ -17,6 +17,7 @@ import apiv1
 
 import facebook_reddit_crontab
 import logic
+from application.Connections import Connection
 
 
 chars = ''.join([string.ascii_letters, string.digits, string.punctuation]).replace('\'', '').replace('"', '').replace(
@@ -172,7 +173,8 @@ class Documentationv13Handler(BaseHandler, TemplateRendering):
     def get(self):
         template = 'apiv13.html'
         variables = {
-            'title': "Watchtower Api v1.3"
+            'title': "Watchtower Api v1.3",
+            'host': Connection.Instance().machine_host
         }
         content = self.render_template(template, variables)
         self.write(content)
