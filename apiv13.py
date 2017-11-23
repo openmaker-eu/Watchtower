@@ -67,7 +67,6 @@ def getAudienceSample(topic_id, location, cursor):
         'name':1,
         'screen_name':1,
         'location':1,
-        'description':1,
         'time-zone':1,
         'lang':1,
         'profile_image_url_https':1
