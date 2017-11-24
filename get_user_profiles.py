@@ -191,6 +191,7 @@ def main():
             while(1):
                     for topic in topics:
                           get_all_user_profiles_by_topic(topicID=topic[0])
+                    time.sleep(3)
 if __name__ == "__main__":
     main()
 
