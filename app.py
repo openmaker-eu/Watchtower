@@ -9,6 +9,8 @@ import tornado.options
 import tornado.web
 from jinja2 import Environment, FileSystemLoader, TemplateNotFound
 
+from raven.contrib.tornado import AsyncSentryClient, SentryMixin
+
 # API VERSIONS
 import apiv13
 import apiv12
@@ -46,7 +48,7 @@ class TemplateRendering:
         return content
 
 
-class BaseHandler(tornado.web.RequestHandler):
+class BaseHandler(SentryMixin, tornado.web.RequestHandler):
     def initialize(self, mainT):
         self.mainT = mainT
 
@@ -55,6 +57,10 @@ class BaseHandler(tornado.web.RequestHandler):
 
     def get_current_username(self):
         return self.get_secure_cookie("username")
+
+class Api500ErrorHandler(tornado.web.RequestHandler):
+    def write_error(self, status_code, **kwargs):
+        self.write(json.dumps({'error': "Unexpected Error!"}))
 
 
 class Application(tornado.web.Application):
@@ -139,7 +145,7 @@ class Application(tornado.web.Application):
         ]
         super(Application, self).__init__(handlers, **settings)
 
-class EventV13Handler(BaseHandler, TemplateRendering):
+class EventV13Handler(BaseHandler, TemplateRendering, Api500ErrorHandler):
     def get(self):
         topic_id = self.get_argument('topic_id', None)
         if topic_id is None:
@@ -151,7 +157,7 @@ class EventV13Handler(BaseHandler, TemplateRendering):
         self.set_header('Content-Type', 'application/json')
         self.write(json.dumps(events))
 
-class AudienceSampleV13Handler(BaseHandler, TemplateRendering):
+class AudienceSampleV13Handler(BaseHandler, TemplateRendering, Api500ErrorHandler):
     def get(self):
         topic_id = str(self.get_argument("topic_id", None))
         location = str(self.get_argument("location",None))
@@ -160,7 +166,7 @@ class AudienceSampleV13Handler(BaseHandler, TemplateRendering):
         self.set_header('Content-Type', 'application/json')
         self.write(audience_sample)
 
-class LocalInfluencersV13Handler(BaseHandler, TemplateRendering):
+class LocalInfluencersV13Handler(BaseHandler, TemplateRendering, Api500ErrorHandler):
     def get(self):
         topic_id = str(self.get_argument("topic_id", None))
         location = str(self.get_argument("location",None))
@@ -179,7 +185,7 @@ class Documentationv13Handler(BaseHandler, TemplateRendering):
         content = self.render_template(template, variables)
         self.write(content)
 
-class EventV12Handler(BaseHandler, TemplateRendering):
+class EventV12Handler(BaseHandler, TemplateRendering, Api500ErrorHandler):
     def get(self):
         topic_id = self.get_argument('topic_id', None)
         if topic_id is None:
@@ -191,7 +197,7 @@ class EventV12Handler(BaseHandler, TemplateRendering):
         self.write(json.dumps(document))
 
 
-class ConversationV12Handler(BaseHandler, TemplateRendering):
+class ConversationV12Handler(BaseHandler, TemplateRendering, Api500ErrorHandler):
     def get(self):
         topic_id = self.get_argument("topic_id", None)
         if topic_id is None:
@@ -203,7 +209,7 @@ class ConversationV12Handler(BaseHandler, TemplateRendering):
         self.write(json.dumps({'conversations': docs}))
 
 
-class TopicsV12Handler(BaseHandler, TemplateRendering):
+class TopicsV12Handler(BaseHandler, TemplateRendering, Api500ErrorHandler):
     def get(self):
         keywords = self.get_argument('keywords', "").split(",")
         topics = apiv12.getTopics(keywords)
@@ -211,7 +217,7 @@ class TopicsV12Handler(BaseHandler, TemplateRendering):
         self.write(topics)
 
 
-class NewsFeedsV12Handler(BaseHandler, TemplateRendering):
+class NewsFeedsV12Handler(BaseHandler, TemplateRendering, Api500ErrorHandler):
     def get(self):
         forbidden_domain = self.get_argument("forbidden_domains", "").split(",")
         topics = self.get_argument('topic_ids', "").split(",")
@@ -228,7 +234,7 @@ class NewsFeedsV12Handler(BaseHandler, TemplateRendering):
         self.write(news)
 
 
-class AudiencesV12Handler(BaseHandler, TemplateRendering):
+class AudiencesV12Handler(BaseHandler, TemplateRendering, Api500ErrorHandler):
     def get(self):
         topic_id = self.get_argument("topic_id", None)
         audiences = apiv12.getAudiences(topic_id)
@@ -236,7 +242,7 @@ class AudiencesV12Handler(BaseHandler, TemplateRendering):
         self.write(audiences)
 
 
-class HashtagsV12Handler(BaseHandler, TemplateRendering):
+class HashtagsV12Handler(BaseHandler, TemplateRendering, Api500ErrorHandler):
     def get(self):
         topic_id = self.get_argument("topic_id", None)
         date = self.get_argument("date", "yesterday")
@@ -245,7 +251,7 @@ class HashtagsV12Handler(BaseHandler, TemplateRendering):
         self.write(hashtags)
 
 
-class NewsV12Handler(BaseHandler, TemplateRendering):
+class NewsV12Handler(BaseHandler, TemplateRendering, Api500ErrorHandler):
     def get(self):
         news_ids = self.get_argument('news_ids', "").split(",")
         keywords = self.get_argument('keywords', "").split(",")
@@ -280,14 +286,14 @@ class Documentationv12Handler(BaseHandler, TemplateRendering):
         self.write(content)
 
 
-class ThemesV11Handler(BaseHandler, TemplateRendering):
+class ThemesV11Handler(BaseHandler, TemplateRendering, Api500ErrorHandler):
     def get(self):
         themes = apiv11.getThemes(4)
         self.set_header('Content-Type', 'application/json')
         self.write(themes)
 
 
-class FeedsV11Handler(BaseHandler, TemplateRendering):
+class FeedsV11Handler(BaseHandler, TemplateRendering, Api500ErrorHandler):
     def get(self):
         themename = str(self.get_argument("themename", None))
         themeid = str(self.get_argument("themeid", None))
@@ -304,7 +310,7 @@ class FeedsV11Handler(BaseHandler, TemplateRendering):
         self.write(feeds)
 
 
-class InfluencersV11Handler(BaseHandler, TemplateRendering):
+class InfluencersV11Handler(BaseHandler, TemplateRendering, Api500ErrorHandler):
     def get(self):
         themename = str(self.get_argument("themename", None))
         themeid = str(self.get_argument("themeid", None))
@@ -323,21 +329,21 @@ class Documentationv11Handler(BaseHandler, TemplateRendering):
         self.write(content)
 
 
-class ThemesHandler(BaseHandler, TemplateRendering):
+class ThemesHandler(BaseHandler, TemplateRendering, Api500ErrorHandler):
     def get(self):
         themes = apiv1.getThemes()
         self.set_header('Content-Type', 'application/json')
         self.write(themes)
 
 
-class InfluencersHandler(BaseHandler, TemplateRendering):
+class InfluencersHandler(BaseHandler, TemplateRendering, Api500ErrorHandler):
     def get(self, themename, cursor=None):
         influencers = apiv1.getInfluencers(themename, cursor)
         self.set_header('Content-Type', 'application/json')
         self.write(influencers)
 
 
-class FeedsHandler(BaseHandler, TemplateRendering):
+class FeedsHandler(BaseHandler, TemplateRendering, Api500ErrorHandler):
     def get(self, themename, cursor=None):
         feeds = apiv1.getFeeds(themename, cursor)
         self.set_header('Content-Type', 'application/json')
@@ -1025,6 +1031,9 @@ class ConversationHandler(BaseHandler, TemplateRendering):
 def main(mainT):
     tornado.options.parse_command_line()
     app = Application(mainT)
+    app.sentry_client = AsyncSentryClient(
+        'https://ac7034cd7eca4931af72b3ee24fa2daa:9c548399be7f4d79a70cef1e0c08e6ca@sentry.io/250084'
+    )
     app.listen(8484)
     tornado.ioloop.IOLoop.current().start()
 

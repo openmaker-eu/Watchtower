@@ -8,3 +8,4 @@ facebook-sdk
 jellyfish
 rq
 pycountry
+raven
