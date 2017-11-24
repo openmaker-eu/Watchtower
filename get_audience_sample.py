@@ -31,10 +31,15 @@ def get_audience_sample_by_topic(userID, topicID, location, sample_size):
     start = time.time()
     location = location.lower() # cast location to lowercase
     # filter audience by location
-    # get location of the user from postgre.
     regx = location_regex.getLocationRegex(location)
-    loc_filtered_audience_ids = Connection.Instance().audienceDB[str(topicID)].distinct('id',{'location':regx})
-    print("Filtered audience in " + str(time.time()-start) + " seconds.")
+    loc_filtered_audience_ids =[]
+    try:
+        loc_filtered_audience_ids = Connection.Instance().audienceDB[str(topicID)].distinct('id',{'location':regx})
+    except:
+        for audience_member in Connection.Instance().audienceDB[str(topicID)].find({'location':regx},{'id':1}):
+            loc_filtered_audience_ids.append(audience_member['id'])
+
+    print("Filtered audience by location in " + str(time.time()-start) + " seconds.")
     start = time.time()
 
     audience = list(Connection.Instance().audienceDB['all_audience'].find({'id': {'$in':loc_filtered_audience_ids}}))
@@ -55,7 +60,7 @@ def get_audience_sample_by_topic(userID, topicID, location, sample_size):
     ### ! Normally, we will use userID to carry out this sampling. it will be personalized!
 
         # Sample
-        # 80% of the audience from a distribution weighed by number of influencers followerd within the topic
+        # 80% of the audience from a distribution weighed by number of influencers followed within the topic
         # 20% of the audience from a uniformly random distribution
         weighed_distribution_sample_size = int(0.8*min(sample_size,audience_size))
         uniform_distribution_sample_size = min(sample_size,audience_size) - weighed_distribution_sample_size
@@ -95,7 +100,7 @@ def get_audience_sample_by_topic(userID, topicID, location, sample_size):
 
 # find and store audience samples for all users, for all of their topics.
 def main():
-    if (len(sys.argv) >= 3):
+    if (len(sys.argv) >= 4):
 
         location = sys.argv[2] # get location from commandline.
         getForAllLocations = sys.argv[3] # should the sampling be done for all relevant locations

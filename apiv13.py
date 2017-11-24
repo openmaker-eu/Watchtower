@@ -27,7 +27,6 @@ def getLocalInfluencers(topic_id, location, cursor):
          'name':1,
          'screen_name':1,
          'location':1,
-         'description':1,
          'time-zone':1,
          'lang':1,
          'profile_image_url_https':1
@@ -37,7 +36,7 @@ def getLocalInfluencers(topic_id, location, cursor):
         result['topic'] = topic_name
         result['location'] = location
         cursor = int(cursor) + 10
-        if cursor >= 100 or len(local_influencers) == 0:
+        if cursor >= 20 or len(local_influencers) < 10:
             cursor = 0
         result['next_cursor'] = cursor
         result['local_influencers'] = local_influencers
@@ -68,7 +67,6 @@ def getAudienceSample(topic_id, location, cursor):
         'name':1,
         'screen_name':1,
         'location':1,
-        'description':1,
         'time-zone':1,
         'lang':1,
         'profile_image_url_https':1
@@ -78,7 +76,7 @@ def getAudienceSample(topic_id, location, cursor):
         result['topic'] = topic_name
         result['location'] = location
         cursor = int(cursor) + 10
-        if cursor >= 100 or len(audience_sample) == 0:
+        if cursor >= 100 or len(audience_sample) < 10:
             cursor = 0
         result['next_cursor'] = cursor
         result['audience_sample'] = audience_sample
@@ -106,7 +104,7 @@ def getEvents(topic_id, sortedBy, location, cursor):
     if sortedBy == 'interested':
         sort['interested']=-1
     elif sortedBy == 'date' or sortedBy=='':
-        sort['start_time']=-1
+        sort['start_time']=1
     else:
         return {'error': "please enter a valid sortedBy value."}
 
@@ -116,6 +114,7 @@ def getEvents(topic_id, sortedBy, location, cursor):
             "updated_time": 1,
             "cover": 1,
             "end_time": 1,
+            "description":1,
             "id": 1,
             "name": 1,
             "place": 1,
@@ -131,7 +130,7 @@ def getEvents(topic_id, sortedBy, location, cursor):
 
     events = list(events)
     cursor = int(cursor) + 10
-    if cursor >= 100 or len(events) == 0:
+    if cursor >= 100 or len(events) <10:
         cursor = 0
     result['topic'] = topic_name
     result['next_cursor'] = cursor
