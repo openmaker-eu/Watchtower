@@ -36,9 +36,17 @@ def get_follower_ids_by_influencer(influencer):
 		print("The account of this influencer is protected at the moment.")
 		return 0
 
-	# get all the follower ids page by page
-	# starting from most recent follower
-	cursor = tweepy.Cursor(api.followers_ids, screen_name=influencer['screen_name'], cursor=-1)
+	start_cursor=-1 #get all the follower ids page by page, starting from most recent follower (first page)
+	# if an influencer has not been processed until the end once, start from last cursor.
+	if 'finished_once' in influencer:
+		if influencer['finished_once'] == False:
+			if 	'last_cursor' in influencer:
+				start_cursor=influencer['last_cursor']
+
+	print("Start cursor value: " + str(start_cursor))
+
+	cursor = tweepy.Cursor(api.followers_ids, screen_name=influencer['screen_name'], cursor=start_cursor)
+	last_cursor = start_cursor
 
 	page_count = 0
 	followers_count = 0
@@ -48,6 +56,8 @@ def get_follower_ids_by_influencer(influencer):
 
 	try:
 		for page in cursor.pages():
+			if (cursor.iterator.next_cursor!=0):
+				last_cursor= cursor.iterator.next_cursor
 			#pprint.pprint(api.rate_limit_status()['resources']['followers'])
 			print("Page length: " + str(len(page)))
 
@@ -74,29 +84,39 @@ def get_follower_ids_by_influencer(influencer):
 			operations = []
 			for i in range(len(page)):
 				follower_id = page[i]
-				if Connection.Instance().audienceDB[str(influencer['topics'][0])].count({"$and":[ {"id":follower_id}, {"influencers":influencer['id']}]}) != 0:
-					already_added_ids.append(follower_id)
-					print("follower # " + str(i) + " was already added. Follower id: " + str(follower_id))
-				# uncomment if we want successive followers to be already added.
+				if influencer['finished_once']==True:
+					if Connection.Instance().audienceDB[str(influencer['topics'][0])].count({"$and":[ {"id":follower_id}, {"influencers":influencer['id']}]}) != 0:
+						already_added_ids.append(follower_id)
+						print("follower # " + str(i) + " was already added. Follower id: " + str(follower_id))
+					# uncomment if we want successive followers to be already added.
+					else:
+						already_added_ids=[]
+						print("ALREADY ADDED IDS EMTPIED at follower # " + str(i) + " with follower id: " + str(follower_id))
+						operations.append(
+					           pymongo.UpdateOne(
+					           { 'id': follower_id},
+					           { '$setOnInsert':{'processed': False}, # if the follower already exists, do not touch the 'processed' field
+							'$addToSet': {'influencers': influencer['id']}
+					           }, upsert=True)
+						)
+						followers_count +=1
+
+					if len(already_added_ids) == THRESHOLD:
+						STOP_FLAG=1
+						break
 				else:
-					already_added_ids=[]
-					print("ALREADY ADDED IDS EMTPIED at follower # " + str(i) + " with follower id: " + str(follower_id))
 					operations.append(
-				           pymongo.UpdateOne(
-				           { 'id': follower_id},
-				           { '$setOnInsert':{'processed': False}, # if the follower already exists, do not touch the 'processed' field
+						   pymongo.UpdateOne(
+						   { 'id': follower_id},
+						   { '$setOnInsert':{'processed': False}, # if the follower already exists, do not touch the 'processed' field
 						'$addToSet': {'influencers': influencer['id']}
-				           }, upsert=True)
+						   }, upsert=True)
 					)
 					followers_count +=1
 
-				if len(already_added_ids) == THRESHOLD:
-					STOP_FLAG=1
-					break
-
 			print("Saving audience gathered to topics of this influencer. # of updates: " + str(len(operations)))
-			print("first 10 opearations:")
-			print(operations[:10])
+			#print("first 10 opearations:")
+			#print(operations[:10])
 			for topicID in influencer['topics']:
 				# add follower ids under each topicID collection in MongoDB
 				# Follower ids should be unique within a topic collection
@@ -106,7 +126,7 @@ def get_follower_ids_by_influencer(influencer):
 					if (len(operations)!=0):
 						Connection.Instance().audienceDB[str(topicID)].bulk_write(operations,ordered=False)
 				except Exception as e:
-		            print("Exception in bulk_write:" + str(e))
+					print("Exception in bulk_write:" + str(e))
 
 			if STOP_FLAG == 1:
 				page_count +=1
@@ -114,8 +134,18 @@ def get_follower_ids_by_influencer(influencer):
 				print("Followers that resulted in STOP: " + str (already_added_ids))
 				break
 
-			page_count +=1 # increment page count
+			if influencer['finished_once']==False: # if we haven't finished processing an influencer, we need to update the last cursor.
+				Connection.Instance().influencerDB['all_influencers'].update(
+					{ 'id': influencer['id'] },
+					{ '$set':{'last_cursor':last_cursor}} # update last cursor of this influencer
+				)
 
+			page_count +=1 # increment page count
+			if cursor.iterator.next_cursor==0: # if true, we are at the end of the followers for this influencer.
+				Connection.Instance().influencerDB['all_influencers'].update(
+					{ 'id': influencer['id'] },
+					{ '$set':{'finished_once':True}}
+				)
 
 	except tweepy.TweepError as twperr:
 		print(twperr) # in case of errors due to protected accounts
@@ -140,9 +170,12 @@ def get_follower_ids():
 	INFLUENCER_COUNT = 0
 	INFLUENCER_NUMBER = 0
 	N=1000
-	for influencer in Connection.Instance().influencerDB['all_influencers'].find({}):
+
+	# sort influencers from most to least recently retrieved
+	influencers = list(Connection.Instance().influencerDB['all_influencers'].find({}).sort([('_id',pymongo.DESCENDING)]))
+	for influencer in influencers:
+		print("\nLooking at influencer no " + str(len(influencers)-INFLUENCER_NUMBER) + ":" + influencer['screen_name'])
 		INFLUENCER_NUMBER +=1
-		print("\nLooking at influencer no " + str(INFLUENCER_NUMBER) + ":" + influencer['screen_name'])
 		# if influencer['followers_count'] > 10000: continue
 		# if the influencer has been processed before, wait for at least a day to process him again.
 		# get_influencers will be run once per week. Therefore, no new topic can be added to the influencer throughout a day.
