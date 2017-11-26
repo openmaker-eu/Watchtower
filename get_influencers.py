@@ -49,6 +49,7 @@ def get_influencers(topicID):
 				else: # if not, add him to the collection
 					influencer_dict['topics']= [topicID]
 					influencer_dict['finished_once']=False
+					#print(influencer_dict)
 					Connection.Instance().influencerDB['all_influencers'].insert_one(influencer_dict)
 
 		print("Influencers of topic: " + topic_name + " found and inserted into database.")
