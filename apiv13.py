@@ -9,10 +9,12 @@ import location_regex # to get regular expressions for locations
 
 def getLocalInfluencers(topic_id, location, cursor):
     cursor = int(cursor)
+    result = {}
     try:
         topic_id = int(topic_id)
     except:
-        pass
+        result['local_influencers'] = "topic not found"
+        return json.dumps(result, indent=4)
     if (str(topic_id) != "None"):
         with Connection.Instance().get_cursor() as cur:
             sql = (
@@ -23,8 +25,7 @@ def getLocalInfluencers(topic_id, location, cursor):
             cur.execute(sql, [topic_id])
             var = cur.fetchall()
             topic_name = var[0][0]
-            
-            result = {}
+
             # error handling needed for location
             location = location.lower()
 
@@ -54,10 +55,12 @@ def getLocalInfluencers(topic_id, location, cursor):
 
 def getAudienceSample(topic_id, location, cursor):
     cursor = int(cursor)
+    result = {}
     try:
         topic_id = int(topic_id)
     except:
-        pass
+        result['audience_sample'] = "topic not found"
+        return json.dumps(result, indent=4)
     if (str(topic_id) != "None"):
         with Connection.Instance().get_cursor() as cur:
             sql = (
@@ -68,8 +71,6 @@ def getAudienceSample(topic_id, location, cursor):
             cur.execute(sql, [topic_id])
             var = cur.fetchall()
             topic_name = var[0][0]
-
-            result = {}
 
             # error handling needed for location
             print("Location: " + str(location))
@@ -105,6 +106,11 @@ def getEvents(topic_id, sortedBy, location, cursor):
     cursor = int(cursor)
     result = {}
     events = []
+    try:
+        topic_id = int(topic_id)
+    except:
+        result['event'] = "topic not found"
+        return json.dumps(result, indent=4)
     with Connection.Instance().get_cursor() as cur:
         sql = (
             "SELECT topic_name "
