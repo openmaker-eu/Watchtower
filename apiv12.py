@@ -237,9 +237,12 @@ def getHastags(topic_id, date):
     if topic_id is None:
         return json.dumps({})
 
-    hashtags = \
-        list(Connection.Instance().hashtags[str(topic_id)].find({'name': date}, {'_id': 0, 'modified_date': 0}))[0][
-            date]
+    hashtag_list = list(Connection.Instance().hashtags[str(topic_id)].find({'name': date}, {'_id': 0, 'modified_date': 0}))
+
+    hashtags = []
+
+    if len(hashtag_list) > 0:
+        hashtags = hashtag_list[0][date]
 
     return json.dumps({'hashtags': hashtags})
 
