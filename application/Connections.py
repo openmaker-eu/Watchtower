@@ -55,9 +55,6 @@ class Connection:
 
             self.filteredNewsPoolDB = self.MongoDBClient.filteredNewsPool
             self.infDB = self.MongoDBClient.influenceRanks
-            self.PostGreSQLConnect = psycopg2.connect(
-                "dbname='openmakerdb' user='openmakerpsql' host="+host+" password='smio1EUp'")
-            self.cur = self.PostGreSQLConnect.cursor()
 
             self.pg_pool = psycopg2.pool.ThreadedConnectionPool(
                 1, 15,
