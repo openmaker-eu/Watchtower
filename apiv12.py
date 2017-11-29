@@ -215,10 +215,10 @@ def getNews(news_ids, keywords, languages, cities, countries, user_location, use
             if len(news) >= cursor + 20:
                 break
             if topics_filter == []:
-                news = news + list(Connection.Instance().newsPoolDB[str(alertid)].aggregate(aggregate_dictionary))
+                news = news + list(Connection.Instance().newsPoolDB[str(alertid)].aggregate(aggregate_dictionary, allowDiskUse= True))
             else:
                 if int(alertid) in topics_filter:
-                    news = news + list(Connection.Instance().newsPoolDB[str(alertid)].aggregate(aggregate_dictionary))
+                    news = news + list(Connection.Instance().newsPoolDB[str(alertid)].aggregate(aggregate_dictionary, allowDiskUse= True))
 
     next_cursor = cursor + 20
     if len(news) < cursor + 20:

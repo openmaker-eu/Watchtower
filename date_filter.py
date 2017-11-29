@@ -56,7 +56,7 @@ def getDateList(alertid, date, forbidden_domain):
         }},
         {'$sort': {'popularity': -1}},
         {'$limit': 60}
-    ]))
+    ], allowDiskUse= True))
 
 
 def calculate_dates():
