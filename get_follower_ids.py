@@ -6,6 +6,7 @@ from datetime import \
 import pymongo
 import tweepy  # Twitter API helper package
 from tweepy import OAuthHandler
+import sys
 
 from application.Connections import Connection
 
@@ -176,16 +177,22 @@ def get_follower_ids():
     '''
     gets the follower ids for all topics. Will be run periodically.
     '''
+    if len(sys.argv) < 3:
+        print("Usage: python get_follower_ids.py <server_ip> <FOLLOWERS_LIMIT>")
+        return
     INFLUENCER_COUNT = 0
     INFLUENCER_NUMBER = 0
     N = 1000
+    FOLLOWERS_LIMIT = int(sys.argv[2]) # pass the influencers who have more followers than the limit
 
     # sort influencers from most to least recently retrieved
     influencers = list(
         Connection.Instance().influencerDB['all_influencers'].find({}).sort([('_id', pymongo.DESCENDING)]))
     for influencer in influencers:
-        print(
-            "\nLooking at influencer no " + str(len(influencers) - INFLUENCER_NUMBER) + ":" + influencer['screen_name'])
+        print("\nLooking at influencer no " + str(len(influencers) - INFLUENCER_NUMBER) + ":" + influencer['screen_name'])
+        if influencer['followers_count']> FOLLOWERS_LIMIT:
+            print("Passing this influencer as its followers count exceeds the limit.")
+            continue
         INFLUENCER_NUMBER += 1
         # if influencer['followers_count'] > 10000: continue
         # if the influencer has been processed before, wait for at least a day to process him again.
