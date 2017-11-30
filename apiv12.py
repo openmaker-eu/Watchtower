@@ -97,13 +97,16 @@ def getNewsFeeds(date, cursor, forbidden_domain, topics):
     # feeds = list(Connection.Instance().filteredNewsPoolDB[themeid].find({'name': date}, {date: 1}))
     # feeds = list(feeds[0][date][cursor:cursor+20])
 
-    date = general_utils.determine_date(date)
+    #date = general_utils.determine_date(date)
 
     news = []
     for topic_id in topics:
-        if len(news) >= cursor + 20:
-            break
-        news = news + date_filter.getDateList(topic_id, int(date), forbidden_domain)
+        #if len(news) >= cursor + 20:
+        #    break
+        #news = news + date_filter.getDateList(topic_id, int(date), forbidden_domain)
+        feeds = list(Connection.Instance().filteredNewsPoolDB[str(topic_id)].find({'name': date}, {date: 1}))
+        if len(feeds) > 0:
+            news = news + feeds[0][date]
 
     news = news[cursor:cursor + 20]
 
