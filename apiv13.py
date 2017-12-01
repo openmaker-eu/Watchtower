@@ -138,7 +138,7 @@ def getEvents(topic_id, sortedBy, location, cursor):
 
 
         if location !="":
-            EVENT_LIMIT = 100
+            EVENT_LIMIT = 50
             COUNTRY_LIMIT=50
             cdl = []
             with open('rank_countries.csv', 'r') as f:
@@ -181,7 +181,7 @@ def getEvents(topic_id, sortedBy, location, cursor):
             pprint.pprint([e['place'] for e in events])
             display_events= events[cursor:cursor+10]
             cursor = int(cursor) + 10
-            if cursor >= 100 or len(events) <cursor+10:
+            if cursor >= 100 or len(events) <10:
                 cursor = 0
             result['next_cursor'] = cursor
             result['events'] = display_events
