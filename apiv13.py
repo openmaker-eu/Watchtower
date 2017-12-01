@@ -206,10 +206,10 @@ def getEvents(topic_id, sortedBy, location, cursor):
                 {'$skip': int(cursor)},
                 {'$limit': 10}
             ]))
-            result['events']= events
             cursor = int(cursor) + 10
             if cursor >= 100 or len(events) <10:
                 cursor = 0
-                result['next_cursor'] = cursor
+            result['next_cursor'] = cursor
+            result['events']= events
 
         return result
