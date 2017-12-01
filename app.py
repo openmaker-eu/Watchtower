@@ -153,6 +153,8 @@ class EventV13Handler(BaseHandler, TemplateRendering, Api500ErrorHandler):
         sortedBy = self.get_argument('sortedBy', '')
         location = self.get_argument('location','')
         cursor = self.get_argument('cursor', '0')
+        if cursor == -1:
+            cursor=0
         events = apiv13.getEvents(topic_id, sortedBy, location, int(cursor))
         self.set_header('Content-Type', 'application/json')
         self.write(json.dumps(events))
@@ -162,6 +164,8 @@ class AudienceSampleV13Handler(BaseHandler, TemplateRendering, Api500ErrorHandle
         topic_id = str(self.get_argument("topic_id", None))
         location = str(self.get_argument("location",None))
         cursor = self.get_argument('cursor', '0')
+        if cursor == -1:
+            cursor=0
         audience_sample = apiv13.getAudienceSample(topic_id,location, int(cursor))
         self.set_header('Content-Type', 'application/json')
         self.write(audience_sample)
@@ -171,6 +175,8 @@ class LocalInfluencersV13Handler(BaseHandler, TemplateRendering, Api500ErrorHand
         topic_id = str(self.get_argument("topic_id", None))
         location = str(self.get_argument("location",None))
         cursor = self.get_argument('cursor', '0')
+        if cursor == -1:
+            cursor=0
         local_influencers = apiv13.getLocalInfluencers(topic_id,location, int(cursor))
         self.set_header('Content-Type', 'application/json')
         self.write(local_influencers)

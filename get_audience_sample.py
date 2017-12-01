@@ -39,7 +39,7 @@ def get_audience_sample_by_topic(userID, topicID, location, sample_size):
     regx = location_regex.getLocationRegex(location)
     loc_filtered_audience_ids = []
     try:
-        loc_filtered_audience_ids = Connection.Instance().audienceDB[str(topicID)].distinct('id', {'location': regx})
+        loc_filtered_audience_ids = Connection.Instance().audienceDB[str(topicID)].distinct('id', {'location': {'$regex':regx}})
     except:
         for audience_member in Connection.Instance().audienceDB[str(topicID)].find({'location': regx}, {'id': 1}):
             loc_filtered_audience_ids.append(audience_member['id'])

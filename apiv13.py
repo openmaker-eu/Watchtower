@@ -6,7 +6,8 @@ import logic
 import time
 from application.Connections import Connection
 import location_regex # to get regular expressions for locations
-
+import csv # for sort by location
+import pprint
 def getLocalInfluencers(topic_id, location, cursor):
     cursor = int(cursor)
     result = {}
@@ -121,12 +122,13 @@ def getEvents(topic_id, sortedBy, location, cursor):
         var = cur.fetchall()
         topic_name = var[0][0]
 
+        events = [] # all events to be returned
         match = {'end_time': {'$gte': now}}
         sort = {}
+        result['topic'] = topic_name
 
-        if location !="":
-            match['place']= location_regex.getLocationRegex(location)
 
+        # SORT CRITERIA
         if sortedBy == 'interested':
             sort['interested']=-1
         elif sortedBy == 'date' or sortedBy=='':
@@ -134,31 +136,80 @@ def getEvents(topic_id, sortedBy, location, cursor):
         else:
             return {'error': "please enter a valid sortedBy value."}
 
-        events = Connection.Instance().events[str(topic_id)].aggregate([
-            {'$match': match},
-            {'$project': {'_id': 0,
-                "updated_time": 1,
-                "cover": 1,
-                "end_time": 1,
-                "description":1,
-                "id": 1,
-                "name": 1,
-                "place": 1,
-                "start_time": 1,
-                "link": 1,
-                "interested": 1,
-                "coming":1
-            }},
-            {'$sort': sort},
-            {'$skip': int(cursor)},
-            {'$limit': 10}
-        ])
 
-        events = list(events)
-        cursor = int(cursor) + 10
-        if cursor >= 100 or len(events) <10:
-            cursor = 0
-        result['topic'] = topic_name
-        result['next_cursor'] = cursor
-        result['events']= events
+        if location !="":
+            EVENT_LIMIT = 100
+            COUNTRY_LIMIT=50
+            cdl = []
+            with open('rank_countries.csv', 'r') as f:
+              reader = csv.reader(f)
+              country_distance_lists = list(reader)
+              for i in range(len(country_distance_lists)):
+                  if country_distance_lists[i][0] == location:
+                      cdl = country_distance_lists[i]
+              print("Found cdl!")
+              count = 0
+              for country in cdl:
+                  print("Checking db for country (#" + str(count) + "): " + str(country))
+                  match['place']= location_regex.getLocationRegex(country)
+                  events += list(Connection.Instance().events[str(topic_id)].aggregate([
+                      {'$match': match},
+                      {'$project': {'_id': 0,
+                          "updated_time": 1,
+                          "cover": 1,
+                          "end_time": 1,
+                          "description":1,
+                          "id": 1,
+                          "name": 1,
+                          "place": 1,
+                          "start_time": 1,
+                          "link": 1,
+                          "interested": 1,
+                          "coming":1
+                      }},
+                      {'$sort': sort}
+                      #{'$skip': int(cursor)},
+                      #{'$limit': 10}
+                  ]))
+                  count+=1
+                  print("length:" + str(len(events)))
+                  if len(events) > min(cursor+10,EVENT_LIMIT):
+                      break
+                  if (count > COUNTRY_LIMIT):
+                      break
+
+            pprint.pprint([e['place'] for e in events])
+            display_events= events[cursor:cursor+10]
+            cursor = int(cursor) + 10
+            if cursor >= 100 or len(events) <cursor+10:
+                cursor = 0
+            result['next_cursor'] = cursor
+            result['events'] = display_events
+
+        else:
+            events = list(Connection.Instance().events[str(topic_id)].aggregate([
+                {'$match': match},
+                {'$project': {'_id': 0,
+                    "updated_time": 1,
+                    "cover": 1,
+                    "end_time": 1,
+                    "description":1,
+                    "id": 1,
+                    "name": 1,
+                    "place": 1,
+                    "start_time": 1,
+                    "link": 1,
+                    "interested": 1,
+                    "coming":1
+                }},
+                {'$sort': sort},
+                {'$skip': int(cursor)},
+                {'$limit': 10}
+            ]))
+            result['events']= events
+            cursor = int(cursor) + 10
+            if cursor >= 100 or len(events) <10:
+                cursor = 0
+                result['next_cursor'] = cursor
+
         return result
