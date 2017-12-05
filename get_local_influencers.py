@@ -11,12 +11,18 @@ from location_regex import *
 from application.Connections import Connection
 
 # gets the local influencers for a given topic and location
-def get_local_influencers_by_topic(topicID, location, size):
+def get_local_influencers_by_topic(topicID, location, size,signal_strength):
     start = time.time()
     # filter audience by location
     # get location of the user from postgre.
     regx = getLocationRegex(location)
-    loc_filtered_audience_ids = Connection.Instance().audienceDB[str(topicID)].distinct('id',{'location':regx})
+    loc_filtered_audience_ids = []
+    try:
+        loc_filtered_audience_ids = Connection.Instance().audienceDB[str(topicID)].distinct('id',{'location':regx, '$where':'this.influencers.length > ' + str(signal_strength)})
+    except:
+        for audience_member in Connection.Instance().audienceDB[str(topicID)].find({'location':regx, '$where':'this.influencers.length > ' + str(signal_strength)},{'_id':0,'id':1}):
+            loc_filtered_audience_ids.append(audience_member['id'])
+
     print("Filtered audience in " + str(time.time()-start) + " seconds.")
     start = time.time()
 
@@ -46,6 +52,7 @@ def main():
 
         locations = ['italy','slovakia','spain','uk'] # relevant locations
         N = 20 # local influencers size
+        signal_strength = 3
 
         print("Script ran: " + str(datetime.now()))
 
@@ -61,7 +68,7 @@ def main():
             for location in locations:
                 print("================================================================================================")
                 print("Getting local influencers...  " + " , LOCATION: " + location + ", TOPIC: " + topicName + "(" + str(topicID) + ")")
-                get_local_influencers_by_topic(topicID=topicID, location=location, size=N)
+                get_local_influencers_by_topic(topicID=topicID, location=location, size=N, signal_strength=signal_strength)
     else:
         print("Usage: python get_local_influencers.py <server_ip>")
 
