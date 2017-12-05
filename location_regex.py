@@ -71,4 +71,5 @@ def getLocationRegex(location):
         location_in_different_langs = location
 
     #print(location_in_different_langs)
+    # PROBLEM! Non-unicode characters are also counted as boundary values. Need to fix this.
     return re.compile("^.*\\b" + location_in_different_langs + "\\b.*$", re.IGNORECASE)

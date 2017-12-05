@@ -9,13 +9,12 @@ import location_regex # to get regular expressions for locations
 import csv # for sort by location
 import pprint
 def getLocalInfluencers(topic_id, location, cursor):
-    cursor = int(cursor)
+    '''
+    returns maximum 20 local influencers for the given topic and location; 10 in each page.
+    if next_cursor = 0, you are on the last page.
+    '''
     result = {}
-    try:
-        topic_id = int(topic_id)
-    except:
-        result['local_influencers'] = "topic not found"
-        return json.dumps(result, indent=4)
+
     if (str(topic_id) != "None"):
         with Connection.Instance().get_cursor() as cur:
             sql = (
@@ -23,9 +22,14 @@ def getLocalInfluencers(topic_id, location, cursor):
                 "FROM topics "
                 "WHERE topic_id = %s;"
             )
-            cur.execute(sql, [topic_id])
-            var = cur.fetchall()
-            topic_name = var[0][0]
+
+            try:
+                cur.execute(sql, [topic_id])
+                var = cur.fetchall()
+                topic_name = var[0][0]
+            except:
+                result['error'] = "Topic does not exist."
+                return json.dumps(result, indent=4)
 
             # error handling needed for location
             location = location.lower()
@@ -45,17 +49,27 @@ def getLocalInfluencers(topic_id, location, cursor):
 
             result['topic'] = topic_name
             result['location'] = location
-            cursor = int(cursor) + 10
-            if cursor >= 20 or len(local_influencers) < 10:
-                cursor = 0
-            result['next_cursor'] = cursor
+
+            cursor = int(cursor)
+            result['next_cursor'] = cursor + 10
+            if cursor!=0: result['previous_cursor'] = cursor - 10 # if we are on the first page, there is no previous cursor
+
+            # cursor boundary checks
+            if result['next_cursor']  >= 20 or len(local_influencers) < 10:
+                result['next_cursor'] = 0
+            if cursor <=10 and cursor !=0:
+                result['previous_cursor'] = -1
+
             result['local_influencers'] = local_influencers
     else:
-        result['local_influencers'] = "topic not found"
+        result['error'] = "Topic not found"
     return json.dumps(result, indent=4)
 
 def getAudienceSample(topic_id, location, cursor):
-    cursor = int(cursor)
+    '''
+    returns maximum 100 audience members for the given topic and location; 10 in each page.
+    if next_cursor = 0, you are on the last page.
+    '''
     result = {}
     try:
         topic_id = int(topic_id)
@@ -69,9 +83,13 @@ def getAudienceSample(topic_id, location, cursor):
                 "FROM topics "
                 "WHERE topic_id = %s;"
             )
-            cur.execute(sql, [topic_id])
-            var = cur.fetchall()
-            topic_name = var[0][0]
+            try:
+                cur.execute(sql, [topic_id])
+                var = cur.fetchall()
+                topic_name = var[0][0]
+            except:
+                result['error'] = "Topic cannot be retrieved."
+                return json.dumps(result, indent=4)
 
             # error handling needed for location
             print("Location: " + str(location))
@@ -92,19 +110,24 @@ def getAudienceSample(topic_id, location, cursor):
 
             result['topic'] = topic_name
             result['location'] = location
-            cursor = int(cursor) + 10
-            if cursor >= 100 or len(audience_sample) < 10:
-                cursor = 0
-            result['next_cursor'] = cursor
+
+            cursor = int(cursor)
+            result['next_cursor'] = cursor + 10
+            if cursor!=0: result['previous_cursor'] = cursor - 10 # if we are on the first page, there is no previous cursor
+
+            # cursor boundary checks
+            if result['next_cursor']  >= 100 or len(audience_sample) < 10:
+                result['next_cursor'] = 0
+            if cursor <=10 and cursor!=0:
+                result['previous_cursor'] = -1
+
             result['audience_sample'] = audience_sample
 
     else:
-        result['audience_sample'] = "topic not found"
+        result['error'] = "Topic not found."
     return json.dumps(result, indent=4)
 
 def getEvents(topic_id, sortedBy, location, cursor):
-    now = time.time()
-    cursor = int(cursor)
     result = {}
     events = []
     try:
@@ -118,15 +141,22 @@ def getEvents(topic_id, sortedBy, location, cursor):
             "FROM topics "
             "WHERE topic_id = %s;"
         )
-        cur.execute(sql, [topic_id])
-        var = cur.fetchall()
-        topic_name = var[0][0]
+        try:
+            cur.execute(sql, [topic_id])
+            var = cur.fetchall()
+            topic_name = var[0][0]
+        except:
+            result['error'] = "Topic does not exist."
+            return json.dumps(result, indent=4)
 
         events = [] # all events to be returned
-        match = {'end_time': {'$gte': now}}
+        match = {'end_time': {'$gte': time.time()}}
         sort = {}
-        result['topic'] = topic_name
 
+        result['topic'] = topic_name
+        result['location'] = location
+
+        cursor = int(cursor)
 
         # SORT CRITERIA
         if sortedBy == 'interested':
@@ -136,8 +166,7 @@ def getEvents(topic_id, sortedBy, location, cursor):
         else:
             return {'error': "please enter a valid sortedBy value."}
 
-
-        if location !="":
+        if location !="" and location.lower()!="global":
             EVENT_LIMIT = 50
             COUNTRY_LIMIT=50
             cdl = []
@@ -180,10 +209,16 @@ def getEvents(topic_id, sortedBy, location, cursor):
 
             pprint.pprint([e['place'] for e in events])
             display_events= events[cursor:cursor+10]
-            cursor = int(cursor) + 10
-            if cursor >= 100 or len(events) <10:
-                cursor = 0
-            result['next_cursor'] = cursor
+
+            result['next_cursor'] = cursor + 10
+            if cursor!=0: result['previous_cursor'] = cursor - 10 # if we are on the first page, there is no previous cursor
+
+            # cursor boundary checks
+            if result['next_cursor']  >= min(EVENT_LIMIT,100) or len(events) < 10:
+                result['next_cursor'] = 0
+            if cursor <=10 and cursor!=0:
+                result['previous_cursor'] = -1
+
             result['events'] = display_events
 
         else:
@@ -206,10 +241,17 @@ def getEvents(topic_id, sortedBy, location, cursor):
                 {'$skip': int(cursor)},
                 {'$limit': 10}
             ]))
-            cursor = int(cursor) + 10
-            if cursor >= 100 or len(events) <10:
-                cursor = 0
-            result['next_cursor'] = cursor
+
+            cursor = int(cursor)
+            result['next_cursor'] = cursor + 10
+            if cursor!=0: result['previous_cursor'] = cursor - 10 # if we are on the first page, there is no previous cursor
+
+            # cursor boundary checks
+            if result['next_cursor']  >= 100 or len(events) < 10:
+                result['next_cursor'] = 0
+            if cursor <=10 and cursor!=0:
+                result['previous_cursor'] = -1
+
             result['events']= events
 
         return result
