@@ -78,7 +78,7 @@ def getAudienceSample(topic_id, location, cursor):
     try:
         topic_id = int(topic_id)
     except:
-        result['audience_sample'] = "topic not found"
+        result['error'] = "Topic does not exist."
         return json.dumps(result, indent=4)
     if (str(topic_id) != "None"):
         with Connection.Instance().get_cursor() as cur:
@@ -92,7 +92,7 @@ def getAudienceSample(topic_id, location, cursor):
                 var = cur.fetchall()
                 topic_name = var[0][0]
             except:
-                result['error'] = "Topic cannot be retrieved."
+                result['error'] = "Topic does not exist."
                 return json.dumps(result, indent=4)
 
             # error handling needed for location
@@ -170,7 +170,9 @@ def getEvents(topic_id, sortedBy, location, cursor):
         else:
             return {'error': "please enter a valid sortedBy value."}
 
+        print("Location: " + str(location))
         if location !="" and location.lower()!="global":
+            print("Filtering and sorting by location")
             EVENT_LIMIT = 50
             COUNTRY_LIMIT=50
             cdl = []
@@ -226,6 +228,7 @@ def getEvents(topic_id, sortedBy, location, cursor):
             result['events'] = display_events
 
         else:
+            print("returning all events...")
             events = list(Connection.Instance().events[str(topic_id)].aggregate([
                 {'$match': match},
                 {'$project': {'_id': 0,

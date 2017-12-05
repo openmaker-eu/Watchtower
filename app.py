@@ -150,8 +150,8 @@ class EventV13Handler(BaseHandler, TemplateRendering, Api500ErrorHandler):
         topic_id = str(self.get_argument("topic_id", None))
         if topic_id is None:
             self.write({})
-        sortedBy = str(self.get_argument('sortedBy', ''))
-        location = str(self.get_argument("location",None))
+        sortedBy = str(self.get_argument('sortedBy', ""))
+        location = str(self.get_argument("location",""))
         try:
             cursor = int(self.get_argument('cursor', '0'))
             if cursor < 0:
@@ -166,7 +166,7 @@ class EventV13Handler(BaseHandler, TemplateRendering, Api500ErrorHandler):
 class AudienceSampleV13Handler(BaseHandler, TemplateRendering, Api500ErrorHandler):
     def get(self):
         topic_id = str(self.get_argument("topic_id", None))
-        location = str(self.get_argument("location",None))
+        location = str(self.get_argument("location",""))
         try:
             cursor = int(self.get_argument('cursor', '0'))
             if cursor < 0:
@@ -181,7 +181,7 @@ class AudienceSampleV13Handler(BaseHandler, TemplateRendering, Api500ErrorHandle
 class LocalInfluencersV13Handler(BaseHandler, TemplateRendering, Api500ErrorHandler):
     def get(self):
         topic_id = str(self.get_argument("topic_id", None))
-        location = str(self.get_argument("location",None))
+        location = str(self.get_argument("location",""))
         try:
             cursor = int(self.get_argument('cursor', '0'))
             if cursor < 0:
@@ -189,6 +189,7 @@ class LocalInfluencersV13Handler(BaseHandler, TemplateRendering, Api500ErrorHand
         except:
             cursor = 0
             pass
+
         local_influencers = apiv13.getLocalInfluencers(topic_id,location, int(cursor))
         self.set_header('Content-Type', 'application/json')
         self.write(local_influencers)
