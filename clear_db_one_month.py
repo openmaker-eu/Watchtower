@@ -46,6 +46,6 @@ def compress_audience_data():
     "profile_sidebar_fill_color":1,
     "profile_link_color":1
     }}, multi=True)
-    Connection.Instance().audienceDB.command('compact':'all_audience')
+    Connection.Instance().audienceDB.command({'compact':'all_audience'})
 
 compress_audience_data()
