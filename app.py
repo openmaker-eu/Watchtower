@@ -152,9 +152,13 @@ class EventV13Handler(BaseHandler, TemplateRendering, Api500ErrorHandler):
             self.write({})
         sortedBy = str(self.get_argument('sortedBy', ''))
         location = str(self.get_argument("location",None))
-        cursor = int(self.get_argument('cursor', '0'))
-        if cursor < 0:
-            cursor=0
+        try:
+            cursor = int(self.get_argument('cursor', '0'))
+            if cursor < 0:
+                cursor = 0
+        except:
+            cursor = 0
+            pass
         events = apiv13.getEvents(topic_id, sortedBy, location, int(cursor))
         self.set_header('Content-Type', 'application/json')
         self.write(json.dumps(events))
@@ -163,9 +167,13 @@ class AudienceSampleV13Handler(BaseHandler, TemplateRendering, Api500ErrorHandle
     def get(self):
         topic_id = str(self.get_argument("topic_id", None))
         location = str(self.get_argument("location",None))
-        cursor = int(self.get_argument('cursor', '0'))
-        if cursor < 0:
-            cursor=0
+        try:
+            cursor = int(self.get_argument('cursor', '0'))
+            if cursor < 0:
+                cursor = 0
+        except:
+            cursor = 0
+            pass
         audience_sample = apiv13.getAudienceSample(topic_id,location, int(cursor))
         self.set_header('Content-Type', 'application/json')
         self.write(audience_sample)
@@ -174,9 +182,13 @@ class LocalInfluencersV13Handler(BaseHandler, TemplateRendering, Api500ErrorHand
     def get(self):
         topic_id = str(self.get_argument("topic_id", None))
         location = str(self.get_argument("location",None))
-        cursor = int(self.get_argument('cursor', '0'))
-        if cursor < 0:
-            cursor=0
+        try:
+            cursor = int(self.get_argument('cursor', '0'))
+            if cursor < 0:
+                cursor = 0
+        except:
+            cursor = 0
+            pass
         local_influencers = apiv13.getLocalInfluencers(topic_id,location, int(cursor))
         self.set_header('Content-Type', 'application/json')
         self.write(local_influencers)

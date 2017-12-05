@@ -14,7 +14,6 @@ def getLocalInfluencers(topic_id, location, cursor):
     if next_cursor = 0, you are on the last page.
     '''
     result = {}
-
     if (str(topic_id) != "None"):
         with Connection.Instance().get_cursor() as cur:
             sql = (
@@ -34,18 +33,23 @@ def getLocalInfluencers(topic_id, location, cursor):
             # error handling needed for location
             location = location.lower()
 
+            collection = Connection.Instance().local_influencers_DB[str(topic_id)+"_"+str(location)]
+
+            if location == "global":
+                collection = Connection.Instance().influencerDB[str(topic_id)]
+
             local_influencers = list(
-            Connection.Instance().local_influencers_DB[str(topic_id)+"_"+str(location)].find({},
-             {'_id': False,
-             'name':1,
-             'screen_name':1,
-             'description':1,
-             'location':1,
-             'time-zone':1,
-             'lang':1,
-             'profile_image_url_https':1
-             })[cursor:cursor+10]
-            )
+                collection.find({},
+                 {'_id': False,
+                 'name':1,
+                 'screen_name':1,
+                 'description':1,
+                 'location':1,
+                 'time-zone':1,
+                 'lang':1,
+                 'profile_image_url_https':1
+                 })[cursor:cursor+10]
+                )
 
             result['topic'] = topic_name
             result['location'] = location
@@ -207,7 +211,7 @@ def getEvents(topic_id, sortedBy, location, cursor):
                   if (count > COUNTRY_LIMIT):
                       break
 
-            pprint.pprint([e['place'] for e in events])
+            #pprint.pprint([e['place'] for e in events])
             display_events= events[cursor:cursor+10]
 
             result['next_cursor'] = cursor + 10
