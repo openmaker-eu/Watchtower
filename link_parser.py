@@ -330,7 +330,7 @@ def calculateLinks(data, machine_host):
                         start_time = time.time()
 
                         newsPoolDB[str(topic_id)].find_one_and_update({'url': link}, {
-                            '$addToSet': {'mentions': {'$each': data['mentions']}}})
+                            '$addToSet': {'mentions': tweet_tuple}})
 
                         delta = time.time() - start_time
                         unshort_time = float(redisConnection.get('search_link_db_update'))
@@ -352,7 +352,7 @@ def calculateLinks(data, machine_host):
                         start_time = time.time()
 
                         newsPoolDB[str(topic_id)].find_one_and_update(
-                            {'short_links': short_link}, {'$addToSet': {'mentions': {'$each': data['mentions']}}})
+                            {'short_links': short_link}, {'$addToSet': {'mentions': tweet_tuple}})
 
                         delta = time.time() - start_time
                         unshort_time = float(redisConnection.get('search_shortlink_db_update'))
@@ -385,7 +385,6 @@ def calculateLinks(data, machine_host):
                                     .find_one_and_update(
                                     {'source': dic['source'], 'title': dic['title']},
                                     {'$addToSet': {'mentions': tweet_tuple},
-
                                      '$set': {'published_at': dic['published_at'], 'language': dic['language'],
                                      'author': dic['author']}, '$addToSet': {'short_links': short_link}})
 
