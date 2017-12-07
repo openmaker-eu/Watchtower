@@ -262,10 +262,10 @@ def calculateLinks(data, machine_host):
             print(e)
             pass
     else:
-        alertid = data['alertid']
+        topic_id = data['alertid']
         tweet = data['tweet']
         print("processing...")
-        alertid = int(alertid)
+        topic_id = int(topic_id)
         try:
             lang = None
             location = None
@@ -373,7 +373,7 @@ def calculateLinks(data, machine_host):
                                 dic['link_id'] = get_next_links_sequence(machine_host)
                                 dic['mentions'] = [tweet_tuple]
                                 dic['short_links'] = [short_link]
-                                newsPoolDB[str(alertid)].insert_one(dic)
+                                newsPoolDB[str(topic_id)].insert_one(dic)
                 except Exception as e:
                     print(e)
                     pass
