@@ -3,6 +3,7 @@ from urllib.parse import urlparse
 from newspaper import Article
 from requests import head
 from tldextract import extract
+import time, redis
 
 # import application.utils.location.get_locations as get_location
 import application.utils.dateExtractor as dateExtractor
@@ -82,6 +83,7 @@ def linkParser(link):
 
 
 def calculateLinks(data, machine_host):
+    redisConnection = redis.StrictRedis(host='localhost', port=6379, db=1)
     MongoDBClient = pymongo.MongoClient('mongodb://admin:smio1EUp@'+machine_host+':27017/', connect=False)
     newsPoolDB = MongoDBClient.newsPool
     if data['channel'] == 'reddit':
@@ -89,22 +91,71 @@ def calculateLinks(data, machine_host):
         topic_id = data['topic_id']
 
         try:
+            start_time = time.time()
+
             link = unshorten_url(link)
-            if len(list(newsPoolDB[str(topic_id)].find({'url': link}))) != 0:
-                print("found in db")
+
+            delta = time.time() - start_time
+            unshort_time = redisConnection.get('unshort')
+            unshort_time = unshort_time + delta
+            redisConnection.set('unshort', unshort_time)
+
+            start_time = time.time()
+
+            check = len(list(newsPoolDB[str(topic_id)].find({'url': link})))
+
+            delta = time.time() - start_time
+            unshort_time = redisConnection.get('search_link_db')
+            unshort_time = unshort_time + delta
+            redisConnection.set('search_link_db', unshort_time)
+
+            if check != 0:
+                start_time = time.time()
+
                 newsPoolDB[str(topic_id)].find_one_and_update({'url': link}, {
                     '$addToSet': {'mentions': {'$each': data['mentions']}}})
+
+                delta = time.time() - start_time
+                unshort_time = redisConnection.get('search_link_db_update')
+                unshort_time = unshort_time + delta
+                redisConnection.set('search_link_db_update', unshort_time)
             else:
+                start_time = time.time()
+
                 dic = linkParser(link)
+
+                delta = time.time() - start_time
+                unshort_time = redisConnection.get('link_parser')
+                unshort_time = unshort_time + delta
+                redisConnection.set('link_parser', unshort_time)
+
                 if dic is not None:
-                    if len(list(newsPoolDB[str(topic_id)].find(
-                            {'domain': dic['domain'], 'title': dic['title']}))) != 0:
+
+                    start_time = time.time()
+
+                    check = len(list(newsPoolDB[str(topic_id)].find(
+                            {'domain': dic['domain'], 'title': dic['title']})))
+
+                    delta = time.time() - start_time
+                    unshort_time = redisConnection.get('search_duplicate_link')
+                    unshort_time = unshort_time + delta
+                    redisConnection.set('search_duplicate_link', unshort_time)
+
+                    if check != 0:
+                        start_time = time.time()
+
                         newsPoolDB[str(topic_id)] \
                             .find_one_and_update(
                             {'source': dic['source'], 'title': dic['title']},
                             {'$addToSet': {'mentions': {'$each': data['mentions']}},
                              '$set': {'published_at': dic['published_at'], 'language': dic['language'],
                                       'author': dic['author']}})
+
+                        delta = time.time() - start_time
+                        unshort_time = redisConnection.get('search_duplicate_link_update')
+                        unshort_time = unshort_time + delta
+                        redisConnection.set('search_duplicate_link_update', unshort_time)
+
                     else:
                         dic['link_id'] = get_next_links_sequence(machine_host)
                         dic['mentions'] = data['mentions']
@@ -117,28 +168,91 @@ def calculateLinks(data, machine_host):
         topic_id = data['topic_id']
 
         try:
-            link = unshorten_url(short_link)
-            if len(list(newsPoolDB[str(topic_id)].find({'url': link}))) != 0:
+            start_time = time.time()
+
+            link = unshorten_url(link)
+
+            delta = time.time() - start_time
+            unshort_time = redisConnection.get('unshort')
+            unshort_time = unshort_time + delta
+            redisConnection.set('unshort', unshort_time)
+
+            start_time = time.time()
+
+            check = len(list(newsPoolDB[str(topic_id)].find({'url': link})))
+
+            delta = time.time() - start_time
+            unshort_time = redisConnection.get('search_link_db')
+            unshort_time = unshort_time + delta
+            redisConnection.set('search_link_db', unshort_time)
+
+            if check != 0:
+                start_time = time.time()
+
                 newsPoolDB[str(topic_id)].find_one_and_update({'url': link}, {
                     '$addToSet': {'mentions': {'$each': data['mentions']}}})
 
-            elif len(list(newsPoolDB[str(topic_id)].find(
-                    {'short_links': short_link}))) != 0:
+                delta = time.time() - start_time
+                unshort_time = redisConnection.get('search_link_db_update')
+                unshort_time = unshort_time + delta
+                redisConnection.set('search_link_db_update', unshort_time)
+                return
+
+            start_time = time.time()
+
+            check = len(list(newsPoolDB[str(topic_id)].find(
+                    {'short_links': short_link})))
+
+            delta = time.time() - start_time
+            unshort_time = redisConnection.get('search_shortlink_db')
+            unshort_time = unshort_time + delta
+            redisConnection.set('search_shortlink_db', unshort_time)
+
+            if check != 0:
+                start_time = time.time()
+
                 newsPoolDB[str(topic_id)].find_one_and_update(
                     {'short_links': short_link}, {'$addToSet': {'mentions': {'$each': data['mentions']}}})
-                print('short_link : ', short_link)
 
+                delta = time.time() - start_time
+                unshort_time = redisConnection.get('search_shortlink_db_update')
+                unshort_time = unshort_time + delta
+                redisConnection.set('search_shortlink_db_update', unshort_time)
             else:
+                start_time = time.time()
+
                 dic = linkParser(link)
+
+                delta = time.time() - start_time
+                unshort_time = redisConnection.get('link_parser')
+                unshort_time = unshort_time + delta
+                redisConnection.set('link_parser', unshort_time)
                 if dic is not None:
-                    if len(list(newsPoolDB[str(topic_id)].find(
-                            {'domain': dic['domain'], 'title': dic['title']}))) != 0:
+                    start_time = time.time()
+
+                    check = len(list(newsPoolDB[str(topic_id)].find(
+                            {'domain': dic['domain'], 'title': dic['title']})))
+
+                    delta = time.time() - start_time
+                    unshort_time = redisConnection.get('search_duplicate_link')
+                    unshort_time = unshort_time + delta
+                    redisConnection.set('search_duplicate_link', unshort_time)
+
+                    if check != 0:
+                        start_time = time.time()
+
                         newsPoolDB[str(topic_id)] \
                             .find_one_and_update(
                             {'source': dic['source'], 'title': dic['title']},
                             {'$addToSet': {'mentions': {'$each': data['mentions']}},
                              '$set': {'published_at': dic['published_at'], 'language': dic['language'],
-                                      'author': dic['author']}, '$addToSet': {'short_links': short_link}})
+                                      'author': dic['author']}})
+
+                        delta = time.time() - start_time
+                        unshort_time = redisConnection.get('search_duplicate_link_update')
+                        unshort_time = unshort_time + delta
+                        redisConnection.set('search_duplicate_link_update', unshort_time)
+
                     else:
                         dic['link_id'] = get_next_links_sequence(machine_host)
                         dic['mentions'] = data['mentions']
@@ -170,28 +284,91 @@ def calculateLinks(data, machine_host):
                     continue
                 try:
                     short_link = link
+
+                    start_time = time.time()
+
                     link = unshorten_url(link)
-                    if len(list(newsPoolDB[str(alertid)].find({'url': link}))) != 0:
-                        newsPoolDB[str(alertid)].find_one_and_update({'url': link}, {
-                            '$addToSet': {'mentions': tweet_tuple}})
-                        continue
-                    elif len(list(newsPoolDB[str(alertid)].find(
-                            {'short_links': short_link}))) != 0:
-                        newsPoolDB[str(alertid)].find_one_and_update(
-                            {'short_links': short_link}, {'$addToSet': {'mentions': tweet_tuple}})
-                        print('short_link : ', short_link)
-                        continue
+
+                    delta = time.time() - start_time
+                    unshort_time = redisConnection.get('unshort')
+                    unshort_time = unshort_time + delta
+                    redisConnection.set('unshort', unshort_time)
+
+                    start_time = time.time()
+
+                    check = len(list(newsPoolDB[str(topic_id)].find({'url': link})))
+
+                    delta = time.time() - start_time
+                    unshort_time = redisConnection.get('search_link_db')
+                    unshort_time = unshort_time + delta
+                    redisConnection.set('search_link_db', unshort_time)
+
+                    if check != 0:
+                        start_time = time.time()
+
+                        newsPoolDB[str(topic_id)].find_one_and_update({'url': link}, {
+                            '$addToSet': {'mentions': {'$each': data['mentions']}}})
+
+                        delta = time.time() - start_time
+                        unshort_time = redisConnection.get('search_link_db_update')
+                        unshort_time = unshort_time + delta
+                        redisConnection.set('search_link_db_update', unshort_time)
+                        return
+
+                    start_time = time.time()
+
+                    check = len(list(newsPoolDB[str(topic_id)].find(
+                            {'short_links': short_link})))
+
+                    delta = time.time() - start_time
+                    unshort_time = redisConnection.get('search_shortlink_db')
+                    unshort_time = unshort_time + delta
+                    redisConnection.set('search_shortlink_db', unshort_time)
+
+                    if check != 0:
+                        start_time = time.time()
+
+                        newsPoolDB[str(topic_id)].find_one_and_update(
+                            {'short_links': short_link}, {'$addToSet': {'mentions': {'$each': data['mentions']}}})
+
+                        delta = time.time() - start_time
+                        unshort_time = redisConnection.get('search_shortlink_db_update')
+                        unshort_time = unshort_time + delta
+                        redisConnection.set('search_shortlink_db_update', unshort_time)
                     else:
+                        start_time = time.time()
+
                         dic = linkParser(link)
+
+                        delta = time.time() - start_time
+                        unshort_time = redisConnection.get('link_parser')
+                        unshort_time = unshort_time + delta
+                        redisConnection.set('link_parser', unshort_time)
                         if dic is not None:
-                            if len(list(newsPoolDB[str(alertid)].find(
-                                    {'domain': dic['domain'], 'title': dic['title']}))) != 0:
-                                newsPoolDB[str(alertid)] \
+                            start_time = time.time()
+
+                            check = len(list(newsPoolDB[str(topic_id)].find(
+                                    {'domain': dic['domain'], 'title': dic['title']})))
+
+                            delta = time.time() - start_time
+                            unshort_time = redisConnection.get('search_duplicate_link')
+                            unshort_time = unshort_time + delta
+                            redisConnection.set('search_duplicate_link', unshort_time)
+
+                            if check != 0:
+                                start_time = time.time()
+
+                                newsPoolDB[str(topic_id)] \
                                     .find_one_and_update(
                                     {'source': dic['source'], 'title': dic['title']},
-                                    {'$addToSet': {'mentions': tweet_tuple},
+                                    {'$addToSet': {'mentions': {'$each': data['mentions']}},
                                      '$set': {'published_at': dic['published_at'], 'language': dic['language'],
-                                              'author': dic['author']}, '$addToSet': {'short_links': short_link}})
+                                              'author': dic['author']}})
+
+                                delta = time.time() - start_time
+                                unshort_time = redisConnection.get('search_duplicate_link_update')
+                                unshort_time = unshort_time + delta
+                                redisConnection.set('search_duplicate_link_update', unshort_time)
                             else:
                                 dic['link_id'] = get_next_links_sequence(machine_host)
                                 dic['mentions'] = [tweet_tuple]
