@@ -27,6 +27,7 @@ def unshorten_url(url):
 
 
 def linkParser(link):
+    redisConnection = redis.StrictRedis(host='localhost', port=6379, db=1)
     start_time = time.time()
 
     parsed_uri = urlparse(link)
