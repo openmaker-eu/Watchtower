@@ -96,7 +96,7 @@ def calculateLinks(data, machine_host):
             link = unshorten_url(link)
 
             delta = time.time() - start_time
-            unshort_time = redisConnection.get('unshort')
+            unshort_time = float(redisConnection.get('unshort'))
             unshort_time = unshort_time + delta
             redisConnection.set('unshort', unshort_time)
 
@@ -105,7 +105,7 @@ def calculateLinks(data, machine_host):
             check = len(list(newsPoolDB[str(topic_id)].find({'url': link})))
 
             delta = time.time() - start_time
-            unshort_time = redisConnection.get('search_link_db')
+            unshort_time = float(redisConnection.get('search_link_db'))
             unshort_time = unshort_time + delta
             redisConnection.set('search_link_db', unshort_time)
 
@@ -116,7 +116,7 @@ def calculateLinks(data, machine_host):
                     '$addToSet': {'mentions': {'$each': data['mentions']}}})
 
                 delta = time.time() - start_time
-                unshort_time = redisConnection.get('search_link_db_update')
+                unshort_time = float(redisConnection.get('search_link_db_update'))
                 unshort_time = unshort_time + delta
                 redisConnection.set('search_link_db_update', unshort_time)
             else:
@@ -125,7 +125,7 @@ def calculateLinks(data, machine_host):
                 dic = linkParser(link)
 
                 delta = time.time() - start_time
-                unshort_time = redisConnection.get('link_parser')
+                unshort_time = float(redisConnection.get('link_parser'))
                 unshort_time = unshort_time + delta
                 redisConnection.set('link_parser', unshort_time)
 
@@ -137,7 +137,7 @@ def calculateLinks(data, machine_host):
                             {'domain': dic['domain'], 'title': dic['title']})))
 
                     delta = time.time() - start_time
-                    unshort_time = redisConnection.get('search_duplicate_link')
+                    unshort_time = float(redisConnection.get('search_duplicate_link'))
                     unshort_time = unshort_time + delta
                     redisConnection.set('search_duplicate_link', unshort_time)
 
@@ -152,7 +152,7 @@ def calculateLinks(data, machine_host):
                                       'author': dic['author']}})
 
                         delta = time.time() - start_time
-                        unshort_time = redisConnection.get('search_duplicate_link_update')
+                        unshort_time = float(redisConnection.get('search_duplicate_link_update'))
                         unshort_time = unshort_time + delta
                         redisConnection.set('search_duplicate_link_update', unshort_time)
 
@@ -173,7 +173,7 @@ def calculateLinks(data, machine_host):
             link = unshorten_url(link)
 
             delta = time.time() - start_time
-            unshort_time = redisConnection.get('unshort')
+            unshort_time = float(redisConnection.get('unshort'))
             unshort_time = unshort_time + delta
             redisConnection.set('unshort', unshort_time)
 
@@ -182,7 +182,7 @@ def calculateLinks(data, machine_host):
             check = len(list(newsPoolDB[str(topic_id)].find({'url': link})))
 
             delta = time.time() - start_time
-            unshort_time = redisConnection.get('search_link_db')
+            unshort_time = float(redisConnection.get('search_link_db'))
             unshort_time = unshort_time + delta
             redisConnection.set('search_link_db', unshort_time)
 
@@ -193,7 +193,7 @@ def calculateLinks(data, machine_host):
                     '$addToSet': {'mentions': {'$each': data['mentions']}}})
 
                 delta = time.time() - start_time
-                unshort_time = redisConnection.get('search_link_db_update')
+                unshort_time = float(redisConnection.get('search_link_db_update'))
                 unshort_time = unshort_time + delta
                 redisConnection.set('search_link_db_update', unshort_time)
                 return
@@ -204,7 +204,7 @@ def calculateLinks(data, machine_host):
                     {'short_links': short_link})))
 
             delta = time.time() - start_time
-            unshort_time = redisConnection.get('search_shortlink_db')
+            unshort_time = float(redisConnection.get('search_shortlink_db'))
             unshort_time = unshort_time + delta
             redisConnection.set('search_shortlink_db', unshort_time)
 
@@ -215,7 +215,7 @@ def calculateLinks(data, machine_host):
                     {'short_links': short_link}, {'$addToSet': {'mentions': {'$each': data['mentions']}}})
 
                 delta = time.time() - start_time
-                unshort_time = redisConnection.get('search_shortlink_db_update')
+                unshort_time = float(redisConnection.get('search_shortlink_db_update'))
                 unshort_time = unshort_time + delta
                 redisConnection.set('search_shortlink_db_update', unshort_time)
             else:
@@ -224,7 +224,7 @@ def calculateLinks(data, machine_host):
                 dic = linkParser(link)
 
                 delta = time.time() - start_time
-                unshort_time = redisConnection.get('link_parser')
+                unshort_time = float(redisConnection.get('link_parser'))
                 unshort_time = unshort_time + delta
                 redisConnection.set('link_parser', unshort_time)
                 if dic is not None:
@@ -234,7 +234,7 @@ def calculateLinks(data, machine_host):
                             {'domain': dic['domain'], 'title': dic['title']})))
 
                     delta = time.time() - start_time
-                    unshort_time = redisConnection.get('search_duplicate_link')
+                    unshort_time = float(redisConnection.get('search_duplicate_link'))
                     unshort_time = unshort_time + delta
                     redisConnection.set('search_duplicate_link', unshort_time)
 
@@ -249,7 +249,7 @@ def calculateLinks(data, machine_host):
                                       'author': dic['author']}})
 
                         delta = time.time() - start_time
-                        unshort_time = redisConnection.get('search_duplicate_link_update')
+                        unshort_time = float(redisConnection.get('search_duplicate_link_update'))
                         unshort_time = unshort_time + delta
                         redisConnection.set('search_duplicate_link_update', unshort_time)
 
@@ -290,7 +290,7 @@ def calculateLinks(data, machine_host):
                     link = unshorten_url(link)
 
                     delta = time.time() - start_time
-                    unshort_time = redisConnection.get('unshort')
+                    unshort_time = float(redisConnection.get('unshort'))
                     unshort_time = unshort_time + delta
                     redisConnection.set('unshort', unshort_time)
 
@@ -299,7 +299,7 @@ def calculateLinks(data, machine_host):
                     check = len(list(newsPoolDB[str(topic_id)].find({'url': link})))
 
                     delta = time.time() - start_time
-                    unshort_time = redisConnection.get('search_link_db')
+                    unshort_time = float(redisConnection.get('search_link_db'))
                     unshort_time = unshort_time + delta
                     redisConnection.set('search_link_db', unshort_time)
 
@@ -310,7 +310,7 @@ def calculateLinks(data, machine_host):
                             '$addToSet': {'mentions': {'$each': data['mentions']}}})
 
                         delta = time.time() - start_time
-                        unshort_time = redisConnection.get('search_link_db_update')
+                        unshort_time = float(redisConnection.get('search_link_db_update'))
                         unshort_time = unshort_time + delta
                         redisConnection.set('search_link_db_update', unshort_time)
                         return
@@ -321,7 +321,7 @@ def calculateLinks(data, machine_host):
                             {'short_links': short_link})))
 
                     delta = time.time() - start_time
-                    unshort_time = redisConnection.get('search_shortlink_db')
+                    unshort_time = float(redisConnection.get('search_shortlink_db'))
                     unshort_time = unshort_time + delta
                     redisConnection.set('search_shortlink_db', unshort_time)
 
@@ -332,7 +332,7 @@ def calculateLinks(data, machine_host):
                             {'short_links': short_link}, {'$addToSet': {'mentions': {'$each': data['mentions']}}})
 
                         delta = time.time() - start_time
-                        unshort_time = redisConnection.get('search_shortlink_db_update')
+                        unshort_time = float(redisConnection.get('search_shortlink_db_update'))
                         unshort_time = unshort_time + delta
                         redisConnection.set('search_shortlink_db_update', unshort_time)
                     else:
@@ -341,7 +341,7 @@ def calculateLinks(data, machine_host):
                         dic = linkParser(link)
 
                         delta = time.time() - start_time
-                        unshort_time = redisConnection.get('link_parser')
+                        unshort_time = float(redisConnection.get('link_parser'))
                         unshort_time = unshort_time + delta
                         redisConnection.set('link_parser', unshort_time)
                         if dic is not None:
@@ -351,7 +351,7 @@ def calculateLinks(data, machine_host):
                                     {'domain': dic['domain'], 'title': dic['title']})))
 
                             delta = time.time() - start_time
-                            unshort_time = redisConnection.get('search_duplicate_link')
+                            unshort_time = float(redisConnection.get('search_duplicate_link'))
                             unshort_time = unshort_time + delta
                             redisConnection.set('search_duplicate_link', unshort_time)
 
@@ -366,7 +366,7 @@ def calculateLinks(data, machine_host):
                                               'author': dic['author']}})
 
                                 delta = time.time() - start_time
-                                unshort_time = redisConnection.get('search_duplicate_link_update')
+                                unshort_time = float(redisConnection.get('search_duplicate_link_update'))
                                 unshort_time = unshort_time + delta
                                 redisConnection.set('search_duplicate_link_update', unshort_time)
                             else:
