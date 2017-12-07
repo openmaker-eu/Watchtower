@@ -384,9 +384,11 @@ def calculateLinks(data, machine_host):
                                 newsPoolDB[str(topic_id)] \
                                     .find_one_and_update(
                                     {'source': dic['source'], 'title': dic['title']},
-                                    {'$addToSet': {'mentions': {'$each': data['mentions']}},
+                                    {'$addToSet': {'mentions': tweet_tuple},
+
                                      '$set': {'published_at': dic['published_at'], 'language': dic['language'],
-                                              'author': dic['author']}})
+                                     'author': dic['author']}, '$addToSet': {'short_links': short_link}})
+
 
                                 delta = time.time() - start_time
                                 unshort_time = float(redisConnection.get('search_duplicate_link_update'))
