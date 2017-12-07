@@ -27,9 +27,19 @@ def unshorten_url(url):
 
 
 def linkParser(link):
+    start_time = time.time()
+
     parsed_uri = urlparse(link)
     source = '{uri.netloc}'.format(uri=parsed_uri)
     domain = extract(link).domain
+
+    delta = time.time() - start_time
+    unshort_time = float(redisConnection.get('linkParser.getDomain'))
+    unshort_time = unshort_time + delta
+    redisConnection.set('linkParser.getDomain', unshort_time)
+
+    start_time = time.time()
+
     article = Article(link)
     article.build()
     try:
@@ -43,6 +53,13 @@ def linkParser(link):
     summary = article.summary
     title = article.title
 
+    delta = time.time() - start_time
+    unshort_time = float(redisConnection.get('linkParser.parseArticle'))
+    unshort_time = unshort_time + delta
+    redisConnection.set('linkParser.parseArticle', unshort_time)
+
+    start_time = time.time()
+
     try:
         published_at = dateExtractor.extractArticlePublishedDate(link)
     except Exception as e:
@@ -50,6 +67,11 @@ def linkParser(link):
         print(e)
         print("\n\n\n")
         pass
+
+    delta = time.time() - start_time
+    unshort_time = float(redisConnection.get('linkParser.getDate'))
+    unshort_time = unshort_time + delta
+    redisConnection.set('linkParser.getDate', unshort_time)
 
     try:
         language = article.meta_lang
