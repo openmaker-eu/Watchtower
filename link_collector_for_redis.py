@@ -18,6 +18,9 @@ redisConnection.set('search_duplicate_link', 0)
 redisConnection.set('search_duplicate_link_update', 0)
 redisConnection.set('search_shortlink_db', 0)
 redisConnection.set('search_shortlink_db_update', 0)
+redisConnection.set('linkParser.parseArticle', 0)
+redisConnection.set('linkParser.getDomain', 0)
+redisConnection.set('linkParser.getDate', 0)
 
 
 
