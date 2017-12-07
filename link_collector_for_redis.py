@@ -7,6 +7,19 @@ import link_parser
 import pymongo
 
 from application.Connections import Connection
+from redis import StrictRedis
+
+redisConnection = StrictRedis(host='localhost', port=6379, db=1)
+redisConnection.set('unshort', 0)
+redisConnection.set('search_link_db', 0)
+redisConnection.set('search_link_db_update', 0)
+redisConnection.set('link_parser', 0)
+redisConnection.set('search_duplicate_link', 0)
+redisConnection.set('search_duplicate_link_update', 0)
+redisConnection.set('search_shortlink_db', 0)
+redisConnection.set('search_shortlink_db_update', 0)
+
+
 
 redis_conn = Redis()
 q = Queue(connection=redis_conn)  # no args implies the default queue
