@@ -13,6 +13,8 @@ import date_filter
 import twitter_search_sample_tweets
 from application.Connections import Connection
 
+from pprint import pprint
+
 
 def setCurrentTopic(user_id):
     with Connection.Instance().get_cursor() as cur:
@@ -261,18 +263,52 @@ def getAllRunningAlertList():
 def getAlertList(user_id):
     with Connection.Instance().get_cursor() as cur:
         sql = (
-            "SELECT * FROM ( "
-            "SELECT * FROM ( "
-            "SELECT topic_id FROM user_topic WHERE user_id = %s "
-            ") AS ut "
-            "INNER JOIN topics AS t "
-            "ON t.topic_id = ut.topic_id) as a"
+            "SELECT topic_id FROM user_topic WHERE user_id = %s ;"
         )
         cur.execute(sql, [user_id])
         var = cur.fetchall()
-        alerts = [
-            {'alertid': i[1], 'name': i[2], 'description': i[3], 'keywords': i[4].split(","), 'lang': i[5].split(","), \
-             'creationTime': i[6], 'updatedTime': i[8], 'status': i[9], 'publish': i[10]} for i in var]
+
+        own_topic_ids = [i[0] for i in var]
+
+        sql = (
+            "SELECT topic_id FROM user_topic_subscribe WHERE user_id = %s ;"
+        )
+        cur.execute(sql, [user_id])
+        var = cur.fetchall()
+
+        subscribe_topic_ids = [i[0] for i in var]
+
+        sql = (
+            "SELECT topic_id FROM user_topic WHERE user_id != %s ;"
+        )
+        cur.execute(sql, [user_id])
+        var = cur.fetchall()
+
+        remaining_topics_topics = []
+        for i in var:
+            if i[0] not in subscribe_topic_ids:
+                remaining_topics_topics.append(i[0])
+
+        sql = (
+            "SELECT * "
+            "FROM topics;"
+        )
+        cur.execute(sql)
+        var = cur.fetchall()
+
+        alerts = []
+
+        for i in var:
+            temp_alert = {'alertid': i[0], 'name': i[1], 'description': i[2], 'keywords': i[3].split(","), 'lang': i[4].split(","), \
+             'creationTime': i[5], 'updatedTime': i[7], 'status': i[8], 'publish': i[9]}
+            if i[0] in own_topic_ids:
+                temp_alert['type'] = 'me'
+            elif i[0] in subscribe_topic_ids:
+                temp_alert['type'] = 'subscribed'
+            elif i[0] in remaining_topics_topics:
+                temp_alert['type'] = 'unsubscribed'
+            alerts.append(temp_alert)
+
         alerts = sorted(alerts, key=lambda k: k['alertid'])
         for alert in alerts:
             alert['tweetCount'] = Connection.Instance().db[str(alert['alertid'])].find().count()
@@ -785,3 +821,36 @@ def getAudiences(topic_id, user_id, cursor):
     result['cursor_length'] = 100
     result['audiences'] = audiences
     return result
+
+
+def subsribeTopic(topic_id, user_id):
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "SELECT EXISTS (SELECT 1 FROM user_topic_subscribe where user_id = %s and topic_id = %s)"
+        )
+        cur.execute(sql, [int(user_id), int(topic_id)])
+        fetched = cur.fetchone()
+
+        if not fetched[0]:
+            sql = (
+                "INSERT INTO user_topic_subscribe "
+                "(user_id, topic_id) "
+                "VALUES (%s, %s)"
+            )
+            cur.execute(sql, [int(user_id), int(topic_id)])
+
+
+def unsubsribeTopic(topic_id, user_id):
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "SELECT EXISTS (SELECT 1 FROM user_topic_subscribe where user_id = %s and topic_id = %s)"
+        )
+        cur.execute(sql, [int(user_id), int(topic_id)])
+        fetched = cur.fetchone()
+
+        if fetched[0]:
+            sql = (
+                "DELETE FROM user_topic_subscribe "
+                "WHERE user_id = %s and topic_id = %s;"
+            )
+            cur.execute(sql, [int(user_id), int(topic_id)])

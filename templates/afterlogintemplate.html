@@ -73,14 +73,14 @@
     {% endif %}
 
     {% if type == "news" %}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
-    <link rel="stylesheet" type="text/css" href="static/css/star-rating.css"/>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
+        <link rel="stylesheet" type="text/css" href="static/css/star-rating.css"/>
         <!--<link rel="stylesheet" type="text/css" href="static/css/news_card.css"/>-->
     {% endif %}
 
     {% if type == "audiences" %}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
-    <link rel="stylesheet" type="text/css" href="static/css/star-rating.css"/>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
+        <link rel="stylesheet" type="text/css" href="static/css/star-rating.css"/>
         <link rel="stylesheet" type="text/css" href="static/css/audience_card.css"/>
         <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
     {% endif %}
@@ -90,31 +90,31 @@
     {% endif %}
 
     {% if type == "profile" %}
-    <style type="text/css">
-      @import url("//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css");
+        <style type="text/css">
+            @import url("//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css");
 
-      .spinner {
-        display: inline-block;
-        opacity: 0;
-        max-width: 0;
+            .spinner {
+                display: inline-block;
+                opacity: 0;
+                max-width: 0;
 
-        -webkit-transition: opacity 0.25s, max-width 0.45s;
-        -moz-transition: opacity 0.25s, max-width 0.45s;
-        -o-transition: opacity 0.25s, max-width 0.45s;
-        transition: opacity 0.25s, max-width 0.45s;
-        /* Duration fixed since we animate additional hidden width */
-      }
+                -webkit-transition: opacity 0.25s, max-width 0.45s;
+                -moz-transition: opacity 0.25s, max-width 0.45s;
+                -o-transition: opacity 0.25s, max-width 0.45s;
+                transition: opacity 0.25s, max-width 0.45s;
+                /* Duration fixed since we animate additional hidden width */
+            }
 
-      .has-spinner.active {
-        cursor: progress;
-      }
+            .has-spinner.active {
+                cursor: progress;
+            }
 
-      .has-spinner.active .spinner {
-        opacity: 1;
-        max-width: 50px;
-        /* More than it will ever come, notice that this affects on animation duration */
-      }
-    </style>
+            .has-spinner.active .spinner {
+                opacity: 1;
+                max-width: 50px;
+                /* More than it will ever come, notice that this affects on animation duration */
+            }
+        </style>
     {% endif %}
 
 </head>
@@ -183,15 +183,8 @@
                                 class="selection pull-left">Select a Topic</span>
                             <span class="pull-right glyphiconglyphicon-chevron-down caret"
                                   style="float:right;margin-top:10px;"></span></a>
-                        <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
-                            {% for alert in alerts %}
-                                <li>
-                                    <a data-id="{{ alert['alertid'] }}" class="newsalerts">
-                                        <h4><span> {{ alert['name'] }}</span></h4>
-                                        <p>Keywords: {{ ", ".join(alert['keywords']) }} <br>
-                                            Languages: {{ ", ".join(alert['lang']) }} </p></a>
-                                </li>
-                            {% endfor %}
+                        <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1" id="alert_dropdown_menu">
+                            {% include'alertDropdownMenu.html' %}
                         </ul>
                     </div>
                 </li>
@@ -356,9 +349,9 @@
 {% endif %}
 
 {% if type == "profile" %}
-<script src="/js/jquery-1.11.1.min.js"></script>
-<script src="/js/bootstrap.min.js"></script>
-<script type="text/javascript" src="static/js/profile.js"></script>
+    <script src="/js/jquery-1.11.1.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="static/js/profile.js"></script>
 {% endif %}
 </body>
 

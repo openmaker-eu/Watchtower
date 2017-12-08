@@ -486,21 +486,24 @@ class TopicsHandler(BaseHandler, TemplateRendering):
         self.write(content)
 
     @tornado.web.authenticated
-    def post(self, alertid=None):
-        alertid = self.get_argument("alertid")
+    def post(self, topic_id=None):
+        topic_id = self.get_argument("alertid")
         posttype = self.get_argument("posttype")
         user_id = tornado.escape.xhtml_escape(self.current_user)
         if posttype == u'remove':
-            logic.deleteAlert(alertid, self.mainT, user_id)
+            logic.deleteAlert(topic_id, self.mainT, user_id)
         elif posttype == u'stop':
-            logic.stopAlert(alertid, self.mainT)
+            logic.stopAlert(topic_id, self.mainT)
         elif posttype == u'start':
-            logic.startAlert(alertid, self.mainT)
+            logic.startAlert(topic_id, self.mainT)
         elif posttype == u'publish':
-            logic.publishAlert(alertid)
+            logic.publishAlert(topic_id)
         elif posttype == u'unpublish':
-            logic.unpublishAlert(alertid)
-
+            logic.unpublishAlert(topic_id)
+        elif posttype == u'subscribe':
+            logic.subsribeTopic(topic_id, user_id)
+        elif posttype == u'unsubscribe':
+            logic.unsubsribeTopic(topic_id, user_id)
         template = "alerts.html"
         variables = {
             'title': "Topics",
@@ -511,7 +514,8 @@ class TopicsHandler(BaseHandler, TemplateRendering):
             'topic': logic.getCurrentTopic(tornado.escape.xhtml_escape(self.current_user))
         }
         content = self.render_template(template, variables)
-        self.write(content)
+        dropdown = self.render_template("alertDropdownMenu.html", variables)
+        self.write({'topic_list': content, 'dropdown_list': dropdown})
 
 
 class CreateEditTopicHandler(BaseHandler, TemplateRendering):

@@ -43,9 +43,11 @@ function alertbuttonclick(aid, ptype) {
             'alertid': aid,
             'posttype': ptype
         }
-    }).success(function (html) {
+    }).success(function (response) {
         $('#alerts').remove();
-        $("#alertspage").append(html);
+        $("#alertspage").append(response.topic_list);
+        $('#alert_dropdown_menu').empty();
+        $("#alert_dropdown_menu").append(response.dropdown_list);
         //console.log("notification :" + aid);
         //notification(aid);
     });
