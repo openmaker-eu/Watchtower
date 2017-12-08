@@ -3,11 +3,13 @@ from tweepy import OAuthHandler
 import link_parser
 from requests import head
 
-# Accessing Twitter API
-consumer_key = "utTM4qfuhmzeLUxRkBb1xb12P"  # API key
-consumer_secret = "XteCQjAZCVAu7Tk5ftgcjv0jJlII2o7b8BqZc3sfEdwn1R6Ic7"  # API secret
-access_token = "821415961467228161-iB85g0Lm8c4jLqIqxWcryWjE8nm6CPq"
-access_secret = "BrNaqN0BP2K3rYzIurlaTIaJeOk4MBP6mzBtR73ay5ulU"
+from decouple import config
+
+
+consumer_key = config("TWITTER_CONSUMER_KEY")  # API key
+consumer_secret = config("TWITTER_CONSUMER_SECRET")  # API secret
+access_token = config("TWITTER_ACCESS_TOKEN")
+access_secret = config("TWITTER_ACCESS_SECRET")
 
 auth = OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_secret)

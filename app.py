@@ -21,6 +21,8 @@ import facebook_reddit_crontab
 import logic
 from application.Connections import Connection
 
+from decouple import config
+
 
 chars = ''.join([string.ascii_letters, string.digits, string.punctuation]).replace('\'', '').replace('"', '').replace(
     '\\', '')
@@ -199,7 +201,7 @@ class Documentationv13Handler(BaseHandler, TemplateRendering):
         template = 'apiv13.html'
         variables = {
             'title': "Watchtower Api v1.3",
-            'host': Connection.Instance().machine_host
+            'host': config("HOST")
         }
         content = self.render_template(template, variables)
         self.write(content)

@@ -7,6 +7,7 @@ from psycopg2.pool import ThreadedConnectionPool
 import urllib.request
 import re
 import sys
+from decouple import config
 
 from application.utils.Singleton import Singleton
 
@@ -37,7 +38,7 @@ class Connection:
 
             self.machine_host = host
 
-            self.MongoDBClient = pymongo.MongoClient('mongodb://admin:smio1EUp@'+host+':27017/', connect=False)
+            self.MongoDBClient = pymongo.MongoClient('mongodb://'+config("MONGODB_USER")+":"+config("MONGODB_PASSWORD")+'@'+host+':27017/', connect=False)
             self.db = self.MongoDBClient.openMakerdB
             self.newsdB = self.MongoDBClient.newsdB
             self.feedDB = self.MongoDBClient.feedDB
@@ -60,9 +61,10 @@ class Connection:
                 1, 15,
                 host=host,
                 port='5432',
-                user='openmakerpsql',
-                password='smio1EUp',
-                database='openmakerdb')
+                user=config("POSTGRESQL_USER"),
+                password=config("POSTGRESQL_PASSWORD"),
+                database=config("POSTGRESQL_DB"))
+
 
             print("new connection")
         except Exception as e:
