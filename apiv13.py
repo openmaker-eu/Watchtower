@@ -190,9 +190,7 @@ def getEvents(topic_id, sortedBy, location, cursor):
                       continue
                   print("Checking db for country (#" + str(count) + "): " + str(country))
 
-                  #match['predicted_place']= country
-                  match['place'] = location_regex.getLocationRegex(country)
-
+                  match['$or'] = [{'place':location_regex.getLocationRegex(country)},{'predicted_place':country}]
                   events += list(Connection.Instance().events[str(topic_id)].aggregate([
                       {'$match': match},
                       {'$project': {'_id': 0,
