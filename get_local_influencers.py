@@ -11,7 +11,7 @@ from location_regex import *
 from application.Connections import Connection
 
 # gets the local influencers for a given topic and location
-def get_local_influencers_by_topic(topicID, location, size,signal_strength):
+def get_local_influencers_by_topic(topicID, location, size,signal_strength=5, FOLLOWING_LIMIT=20000):
     start = time.time()
     # filter audience by location
     # get location of the user from postgre.
@@ -28,7 +28,7 @@ def get_local_influencers_by_topic(topicID, location, size,signal_strength):
 
     audience = Connection.Instance().audienceDB['all_audience'].aggregate(
     [
-        {'$match': {'id':{'$in':loc_filtered_audience_ids}}},
+        {'$match': {'id':{'$in':loc_filtered_audience_ids}, 'friends_count':{'$lt':FOLLOWING_LIMIT}}},
         {'$project': {'_id': 0}},
         {'$sort': {'followers_count':-1}}
     ],
@@ -52,7 +52,8 @@ def main():
 
         locations = ['italy','slovakia','spain','uk'] # relevant locations
         N = 20 # local influencers size
-        signal_strength = 3
+        signal_strength = 5
+        FOLLOWING_LIMIT = 20000
 
         print("Script ran: " + str(datetime.now()))
 
