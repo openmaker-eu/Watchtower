@@ -173,8 +173,8 @@ def getEvents(topic_id, sortedBy, location, cursor):
         print("Location: " + str(location))
         if location !="" and location.lower()!="global":
             print("Filtering and sorting by location")
-            EVENT_LIMIT = 50
-            COUNTRY_LIMIT=50
+            EVENT_LIMIT = 70
+            COUNTRY_LIMIT=80
             cdl = []
             with open('rank_countries.csv', 'r') as f:
               reader = csv.reader(f)
@@ -185,8 +185,14 @@ def getEvents(topic_id, sortedBy, location, cursor):
               print("Found cdl!")
               count = 0
               for country in cdl:
+                  if count ==0:
+                      count+=1
+                      continue
                   print("Checking db for country (#" + str(count) + "): " + str(country))
-                  match['place']= location_regex.getLocationRegex(country)
+
+                  #match['predicted_place']= country
+                  match['place'] = location_regex.getLocationRegex(country)
+
                   events += list(Connection.Instance().events[str(topic_id)].aggregate([
                       {'$match': match},
                       {'$project': {'_id': 0,
@@ -220,7 +226,7 @@ def getEvents(topic_id, sortedBy, location, cursor):
             if cursor!=0: result['previous_cursor'] = cursor - 10 # if we are on the first page, there is no previous cursor
 
             # cursor boundary checks
-            if result['next_cursor']  >= min(EVENT_LIMIT,100) or len(events) < 10:
+            if result['next_cursor']  >= min(EVENT_LIMIT,100) or len(display_events) < 10:
                 result['next_cursor'] = 0
             if cursor <=10 and cursor!=0:
                 result['previous_cursor'] = -1

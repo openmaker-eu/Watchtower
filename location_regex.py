@@ -1,8 +1,9 @@
 import re # for regex in location filtering
 
 def getLocationRegex(location):
+    location = location.lower()
     location_in_different_langs ="("
-    if location == 'italy': # source : wikipedia
+    if location == 'italy' or location =='it': # source : wikipedia
         location_in_different_langs += "italy|IT|"
         location_in_different_langs += "an Eadailt|"
         location_in_different_langs += "yr Eidal|"
@@ -38,7 +39,7 @@ def getLocationRegex(location):
         location_in_different_langs += "Ṭālyān|"
         location_in_different_langs += "Włochy|"
         location_in_different_langs += "Yìdàlì)"
-    elif location == 'slovakia':
+    elif location == 'slovakia' or location =='sk':
         location_in_different_langs += "slovakia|SK|"
         location_in_different_langs += "Eslovakia|"
         location_in_different_langs += "Eslovaquia|"
@@ -52,7 +53,7 @@ def getLocationRegex(location):
         location_in_different_langs += "Slovakia|"
         location_in_different_langs += "Slovakiet|"
         location_in_different_langs += "Slovensko)"
-    elif location == 'spain':
+    elif location == 'spain' or location =='es':
         location_in_different_langs += "spain|ES|"
         location_in_different_langs += "Espainia|"
         location_in_different_langs += "España|"
@@ -61,8 +62,8 @@ def getLocationRegex(location):
         location_in_different_langs += "İspanya|"
         location_in_different_langs += "Spagna|"
         location_in_different_langs += "Spanien)"
-    elif location == 'uk':
-        location_in_different_langs += "UK|"
+    elif location == 'uk' or location =='gb':
+        location_in_different_langs += "UK|GB"
         location_in_different_langs += "united\s*kingdom|"
         location_in_different_langs += "Britania|"
         location_in_different_langs += "England|"
@@ -71,4 +72,5 @@ def getLocationRegex(location):
         location_in_different_langs = location
 
     #print(location_in_different_langs)
+    # PROBLEM! Non-unicode characters are also counted as boundary values. Need to fix this.
     return re.compile("^.*\\b" + location_in_different_langs + "\\b.*$", re.IGNORECASE)

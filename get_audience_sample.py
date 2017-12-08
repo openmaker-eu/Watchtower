@@ -36,13 +36,21 @@ def get_audience_sample_by_topic(userID, topicID, location, sample_size):
     start = time.time()
     location = location.lower()  # cast location to lowercase
     # filter audience by location
-    regx = location_regex.getLocationRegex(location)
-    loc_filtered_audience_ids = []
-    try:
-        loc_filtered_audience_ids = Connection.Instance().audienceDB[str(topicID)].distinct('id', {'location': regx})
-    except:
-        for audience_member in Connection.Instance().audienceDB[str(topicID)].find({'location': regx}, {'id': 1}):
-            loc_filtered_audience_ids.append(audience_member['id'])
+    if (location.lower() == 'global'): # do not filter by a specific location.
+        loc_filtered_audience_ids = []
+        try:
+            loc_filtered_audience_ids = Connection.Instance().audienceDB[str(topicID)].distinct('id', {'location':{'$ne':''},'$where': 'this.influencers.length > 3'})
+        except:
+            for audience_member in Connection.Instance().audienceDB[str(topicID)].find({'location':{'$ne':''},'$where': 'this.influencers.length > 3'},{'_id':0,'id':1}):
+                loc_filtered_audience_ids.append(audience_member['id'])
+    else:
+        regx = location_regex.getLocationRegex(location)
+        loc_filtered_audience_ids = []
+        try:
+            loc_filtered_audience_ids = Connection.Instance().audienceDB[str(topicID)].distinct('id', {'location': {'$regex':regx}})
+        except:
+            for audience_member in Connection.Instance().audienceDB[str(topicID)].find({'location': regx}, {'id': 1}):
+                loc_filtered_audience_ids.append(audience_member['id'])
 
     print("Filtered audience by location in " + str(time.time() - start) + " seconds.")
     start = time.time()
@@ -135,15 +143,15 @@ def main():
             cur.execute(sql)
             users_and_topics = cur.fetchall()  # list of all topics
 
-        for userID, topicID in users_and_topics:
-            print("================================================================================================")
-            print("Sampling audience for USER: " + str(userID) + " , LOCATION: " + location + ", TOPIC: " + topic_dict[
-                topicID] + "(" + str(topicID) + ")")
-            get_audience_sample_by_topic(userID=userID, topicID=topicID, location=location, sample_size=N)
+        # for userID, topicID in users_and_topics:
+        #     print("================================================================================================")
+        #     print("Sampling audience for USER: " + str(userID) + " , LOCATION: " + location + ", TOPIC: " + topic_dict[
+        #         topicID] + "(" + str(topicID) + ")")
+        #     get_audience_sample_by_topic(userID=userID, topicID=topicID, location=location, sample_size=N)
 
         if (getForAllLocations == "0"):
             return
-        locations = ['italy', 'slovakia', 'spain', 'uk']  # relevant locations
+        locations = ['italy', 'slovakia', 'spain', 'uk', 'global']  # relevant locations
         for topicID, topicName in topics:
             for loc in locations:
                 print("Sampling audience for LOCATION: " + loc + ", TOPIC: " + topicName + "(" + str(topicID) + ")")

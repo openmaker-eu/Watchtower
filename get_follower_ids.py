@@ -10,10 +10,15 @@ import sys
 
 from application.Connections import Connection
 
-consumer_key = "utTM4qfuhmzeLUxRkBb1xb12P"  # API key
-consumer_secret = "XteCQjAZCVAu7Tk5ftgcjv0jJlII2o7b8BqZc3sfEdwn1R6Ic7"  # API secret
-access_token = "821415961467228161-iB85g0Lm8c4jLqIqxWcryWjE8nm6CPq"
-access_secret = "BrNaqN0BP2K3rYzIurlaTIaJeOk4MBP6mzBtR73ay5ulU"
+# consumer_key = "utTM4qfuhmzeLUxRkBb1xb12P"  # API key
+# consumer_secret = "XteCQjAZCVAu7Tk5ftgcjv0jJlII2o7b8BqZc3sfEdwn1R6Ic7"  # API secret
+# access_token = "821415961467228161-iB85g0Lm8c4jLqIqxWcryWjE8nm6CPq"
+# access_secret = "BrNaqN0BP2K3rYzIurlaTIaJeOk4MBP6mzBtR73ay5ulU"
+
+consumer_key = "13sYRmQyD5jik98GnkDLohtxe"  # API key
+consumer_secret = "b0l4xLFrtyJhIXxPxZwarFbtkuITrNePFJa3DNjdaXaO4AmuIc"  # API secret
+access_token = "289364321-BMNwvvJJIFq0Vww1pqgnJuepRtffpBxlEKPS5FbT"
+access_secret = "kMfR2CoSImuH8i5fsiQlWYpdX9inYvM9y66zlEYuMhBdr"
 
 auth = OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_secret)
@@ -187,22 +192,32 @@ def get_follower_ids():
 
     # sort influencers from most to least recently retrieved
     influencers = list(
-        Connection.Instance().influencerDB['all_influencers'].find({}).sort([('_id', pymongo.DESCENDING)]))
+        #Connection.Instance().influencerDB['all_influencers'].find({}).sort([('_id', pymongo.DESCENDING)]))
+        Connection.Instance().influencerDB['all_influencers'].find({}).sort([('_id', pymongo.ASCENDING)]))
+
     for influencer in influencers:
-        print("\nLooking at influencer no " + str(len(influencers) - INFLUENCER_NUMBER) + ":" + influencer['screen_name'])
-        if influencer['followers_count']> FOLLOWERS_LIMIT:
-            print("Passing this influencer as its followers count exceeds the limit.")
-            continue
+        #print("\nLooking at influencer no " + str(len(influencers) - INFLUENCER_NUMBER) + ":" + influencer['screen_name'])
         INFLUENCER_NUMBER += 1
-        # if influencer['followers_count'] > 10000: continue
+        print("\nLooking at influencer no " + str(INFLUENCER_NUMBER) + ":" + influencer['screen_name'])
+        if influencer['followers_count']> FOLLOWERS_LIMIT:
+            print("Passing this influencer as his followers count exceeds the limit.")
+            continue
         # if the influencer has been processed before, wait for at least a day to process him again.
         # get_influencers will be run once per week. Therefore, no new topic can be added to the influencer throughout a day.
         if 'last_processed' in influencer:
-            if ((datetime.today() - influencer['last_processed']).days > 1):
-                result = get_follower_ids_by_influencer(influencer)
-                if result == 1: INFLUENCER_COUNT += 1  # successfully processed the influencer
-            else:
-                print(influencer['screen_name'] + " HAS ALREADY BEEN PROCESSED TODAY.")
+            if 'finished_once' in influencer:
+                if influencer['finished_once'] == True:
+                    if ((datetime.today() - influencer['last_processed']).days > 10):
+                        result = get_follower_ids_by_influencer(influencer)
+                        if result == 1: INFLUENCER_COUNT += 1  # successfully processed the influencer
+                    else:
+                        print(influencer['screen_name'] + "(finished once) HAS ALREADY BEEN PROCESSED IN LAST 10 DAYS.")
+                else:
+                    if ((datetime.today() - influencer['last_processed']).days > 1):
+                        result = get_follower_ids_by_influencer(influencer)
+                        if result == 1: INFLUENCER_COUNT += 1  # successfully processed the influencer
+                    else:
+                        print(influencer['screen_name'] + " HAS ALREADY BEEN PROCESSED TODAY.")
         else:
             result = get_follower_ids_by_influencer(influencer)
             if result == 1: INFLUENCER_COUNT += 1  # successfully processed the influencer
