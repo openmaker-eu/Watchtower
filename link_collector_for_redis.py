@@ -45,5 +45,6 @@ while True:
                 }
                 q.enqueue_call(func=link_parser.calculateLinks,
                                args=(data,Connection.Instance().machine_host,),
+                               at_front=True,
                                timeout=20)
     time.sleep(15)
