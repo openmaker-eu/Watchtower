@@ -5,14 +5,14 @@ var topic_id = -1;
 
 var main = function () {
       $("#spin").spinner();
-      topic_id = $('.dropdown-menu > li.active > a').attr("data-id");
+      topic_id = $('#topic_dropdown > li.active > a').attr("data-id");
       updateReadMores();
 };
 $(document).ready(main);
 
 $(document).ready(function () {
 
-    $(".dropdown-menu").on('click', 'li a', function () {
+    $("#topic_dropdown").on('click', 'li a', function () {
         topic_id = $(this).attr("data-id");
         isEventsOver = false;
         getEvents();

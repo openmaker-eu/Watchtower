@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    $(".dropdown-menu").on('click', 'li a', function () {
+    $("#topic_dropdown").on('click', 'li a', function () {
         var selText = $(this).children("h4").html();
         $(this).parent('li').siblings().removeClass('active');
         $(this).parents('.btn-group').find('.selection').html(selText);
@@ -34,7 +34,7 @@ $(document).ready(function () {
 
 $(document).ready(function () {
     $("#spin").spinner();
-    $(".dropdown-menu").on('click', 'li a', function () {
+    $("#topic_dropdown").on('click', 'li a', function () {
         $('#newscontainer').empty();
         $("#spin").show();
         $("#date_buttons").show();

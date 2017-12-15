@@ -183,8 +183,39 @@
                                 class="selection pull-left">Select a Topic</span>
                             <span class="pull-right glyphiconglyphicon-chevron-down caret"
                                   style="float:right;margin-top:10px;"></span></a>
-                        <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1" id="alert_dropdown_menu">
+                        <ul class="dropdown-menu" id="topic_dropdown" role="menu" aria-labelledby="dropdownMenu1">
                             {% include'alertDropdownMenu.html' %}
+                        </ul>
+                    </div>
+                </li>
+                <li>
+                    <div class="btn-group" style="margin:8px">
+                        <a class="btn btn-default dropdown-toggle btn-blog " data-toggle="dropdown" href="#"
+                           id="dropdownMenu1" style="width:200px;"><span
+                                class="selection pull-left">Select a Language</span>
+                            <span class="pull-right glyphiconglyphicon-chevron-down caret"
+                                  style="float:right;margin-top:10px;"></span></a>
+                        <ul class="dropdown-menu" id="location_dropdown" role="menu" aria-labelledby="dropdownMenu1">
+                              <li>
+                                  <a data-id="italy">
+                                      <h4><span>Italy</span></h4>
+                                  </a>
+                              </li>
+                              <li>
+                                  <a data-id="slovakia">
+                                      <h4><span>Slovakia</span></h4>
+                                  </a>
+                              </li>
+                              <li>
+                                  <a data-id="spain">
+                                      <h4><span>Spain</span></h4>
+                                  </a>
+                              </li>
+                              <li>
+                                  <a data-id="uk">
+                                      <h4><span>UK</span></h4>
+                                  </a>
+                              </li>
                         </ul>
                     </div>
                 </li>
@@ -268,7 +299,7 @@
 
 <script>
     $(document).ready(function () {
-        $(".dropdown-menu").on('click', 'li a', function () {
+        $("#topic_dropdown").on('click', 'li a', function () {
             if ($(this).attr("data-id") != undefined) {
                 var selText = $(this).children("h4").html();
                 console.log(selText);
@@ -285,6 +316,24 @@
                 });
             }
         });
+
+        $("#location_dropdown").on('click', 'li a', function () {
+            if ($(this).attr("data-id") != undefined) {
+                var selText = $(this).children("h4").html();
+                console.log(selText);
+                $(this).parent('li').siblings().removeClass('active');
+                $(this).parents('.btn-group').find('.selection').html(selText);
+                $(this).parents('li').addClass("active");
+                var location = $(this).attr("data-id");
+                $.ajax({
+                    url: '/saveLocation',
+                    method: 'POST',
+                    data: {
+                        'location': location
+                    }
+                });
+            }
+        });
     });
 </script>
 
@@ -296,6 +345,12 @@
             $("li a[data-id={{topic['topic_id']}}]").parent('li').siblings().removeClass('active');
             $("li a[data-id={{topic['topic_id']}}]").parents('.btn-group').find('.selection').html(selText);
             $("li a[data-id={{topic['topic_id']}}]").parents('li').addClass("active");
+
+            var selText = $("li a[data-id={{location}}]").children("h4").html();
+            console.log("{{location}}");
+            $("li a[data-id={{location}}]").parent('li').siblings().removeClass('active');
+            $("li a[data-id={{location}}]").parents('.btn-group').find('.selection').html(selText);
+            $("li a[data-id={{location}}]").parents('li').addClass("active");
         });
     </script>
 {% endif %}

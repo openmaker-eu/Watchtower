@@ -103,6 +103,7 @@ class Application(tornado.web.Application):
             (r"/newTweets", NewTweetsHandler, {'mainT': mainT}),
             (r"/newTweets/(.*)", NewTweetsHandler, {'mainT': mainT}),
             (r"/saveTopicId", TopicHandler, {'mainT': mainT}),
+            (r"/saveLocation", LocationHandler, {'mainT': mainT}),
             (r"/getPages", PagesHandler, {'mainT': mainT}),
 
             # DOCUMENTATIONS
@@ -446,6 +447,7 @@ class ProfileHandler(BaseHandler, TemplateRendering):
         user_id = tornado.escape.xhtml_escape(self.current_user)
         template = 'afterlogintemplate.html'
         topic = logic.getCurrentTopic(tornado.escape.xhtml_escape(self.current_user))
+        location = logic.getCurrentLocation(tornado.escape.xhtml_escape(self.current_user))
         user = logic.getUser(user_id)
         variables = {
             'title': "My Profile",
@@ -453,7 +455,8 @@ class ProfileHandler(BaseHandler, TemplateRendering):
             'username': user['username'],
             'country': user['country'],
             'alerts': logic.getAlertList(user_id),
-            'topic': topic
+            'topic': topic,
+            'location': location
         }
         content = self.render_template(template, variables)
         self.write(content)
@@ -476,13 +479,15 @@ class TopicsHandler(BaseHandler, TemplateRendering):
         user_id = tornado.escape.xhtml_escape(self.current_user)
         template = 'afterlogintemplate.html'
         topic = logic.getCurrentTopic(tornado.escape.xhtml_escape(self.current_user))
+        location = logic.getCurrentLocation(tornado.escape.xhtml_escape(self.current_user))
         variables = {
             'title': "Topics",
             'alerts': logic.getAlertList(user_id),
             'type': "alertlist",
             'alertlimit': logic.getAlertLimit(user_id),
             'username': str(tornado.escape.xhtml_escape(self.get_current_username())),
-            'topic': topic
+            'topic': topic,
+            'location': location
         }
         content = self.render_template(template, variables)
         self.write(content)
@@ -598,6 +603,7 @@ class BookmarkHandler(BaseHandler, TemplateRendering):
         user_id = tornado.escape.xhtml_escape(self.current_user)
         template = 'afterlogintemplate.html'
         topic = logic.getCurrentTopic(tornado.escape.xhtml_escape(self.current_user))
+        location = logic.getCurrentLocation(tornado.escape.xhtml_escape(self.current_user))
         if topic is None:
             self.redirect("/topicinfo")
 
@@ -609,7 +615,8 @@ class BookmarkHandler(BaseHandler, TemplateRendering):
             'alertname': topic['topic_name'],
             'type': "bookmark",
             'username': str(tornado.escape.xhtml_escape(self.get_current_username())),
-            'topic': topic
+            'topic': topic,
+            'location': location
         }
         content = self.render_template(template, variables)
         self.write(content)
@@ -667,6 +674,7 @@ class FeedHandler(BaseHandler, TemplateRendering):
         template = 'afterlogintemplate.html'
 
         topic = logic.getCurrentTopic(tornado.escape.xhtml_escape(self.current_user))
+        location = logic.getCurrentLocation(tornado.escape.xhtml_escape(self.current_user))
         if topic is None:
             self.redirect("/topicinfo")
 
@@ -677,7 +685,8 @@ class FeedHandler(BaseHandler, TemplateRendering):
             'type': "feed",
             'tweets': tweets,
             'username': str(tornado.escape.xhtml_escape(self.get_current_username())),
-            'topic': logic.getCurrentTopic(tornado.escape.xhtml_escape(self.current_user))
+            'topic': logic.getCurrentTopic(tornado.escape.xhtml_escape(self.current_user)),
+            'location': location
         }
 
         content = self.render_template(template, variables)
@@ -729,6 +738,7 @@ class NewsHandler(BaseHandler, TemplateRendering):
         user_id = tornado.escape.xhtml_escape(self.current_user)
         template = 'afterlogintemplate.html'
         topic = logic.getCurrentTopic(tornado.escape.xhtml_escape(self.current_user))
+        location = logic.getCurrentLocation(tornado.escape.xhtml_escape(self.current_user))
         if topic is None:
             self.redirect("/topicinfo")
 
@@ -742,7 +752,8 @@ class NewsHandler(BaseHandler, TemplateRendering):
             'alertname': topic['topic_name'],
             'type': "news",
             'username': str(tornado.escape.xhtml_escape(self.get_current_username())),
-            'topic': topic
+            'topic': topic,
+            'location': location
         }
         content = self.render_template(template, variables)
         self.write(content)
@@ -858,10 +869,11 @@ class AudienceHandler(BaseHandler, TemplateRendering):
         user_id = tornado.escape.xhtml_escape(self.current_user)
         template = 'afterlogintemplate.html'
         topic = logic.getCurrentTopic(tornado.escape.xhtml_escape(self.current_user))
+        location = logic.getCurrentLocation(tornado.escape.xhtml_escape(self.current_user))
         if topic is None:
             self.redirect("/topicinfo")
 
-        audiences = logic.getAudiences(topic['topic_id'], user_id, 0)
+        audiences = logic.getAudiences(topic['topic_id'], user_id, 0, location)
         variables = {
             'title': "Audience",
             'alertname': topic['topic_name'],
@@ -871,7 +883,8 @@ class AudienceHandler(BaseHandler, TemplateRendering):
             'alerts': logic.getAlertList(user_id),
             'type': "audiences",
             'username': str(tornado.escape.xhtml_escape(self.get_current_username())),
-            'topic': topic
+            'topic': topic,
+            'location': location
         }
 
         content = self.render_template(template, variables)
@@ -882,6 +895,7 @@ class AudienceHandler(BaseHandler, TemplateRendering):
         variables = {}
         topic = logic.getCurrentTopic(tornado.escape.xhtml_escape(self.current_user))
         user_id = tornado.escape.xhtml_escape(self.current_user)
+        location = logic.getCurrentLocation(tornado.escape.xhtml_escape(self.current_user))
         if argument is not None:
             template = 'audienceTemplate.html'
             alertid = self.get_argument('alertid')
@@ -891,7 +905,7 @@ class AudienceHandler(BaseHandler, TemplateRendering):
                 next_cursor = 0
                 pass
             try:
-                audiences = logic.getAudiences(topic['topic_id'], user_id, int(next_cursor))
+                audiences = logic.getAudiences(topic['topic_id'], user_id, int(next_cursor), location)
                 variables = {
                     'audiences': audiences['audiences'],
                     'cursor': audiences['next_cursor']
@@ -904,7 +918,7 @@ class AudienceHandler(BaseHandler, TemplateRendering):
             alertid = self.get_argument('alertid')
             user_id = tornado.escape.xhtml_escape(self.current_user)
             try:
-                audiences = logic.getAudiences(alertid, user_id, 0)
+                audiences = logic.getAudiences(alertid, user_id, 0, location)
                 variables = {
                     'audiences': audiences['audiences'],
                     'alertid': alertid,
@@ -942,6 +956,13 @@ class TopicHandler(BaseHandler, TemplateRendering):
     def post(self):
         user_id = tornado.escape.xhtml_escape(self.current_user)
         logic.saveTopicId(self.get_argument("topic_id"), user_id)
+
+
+class LocationHandler(BaseHandler, TemplateRendering):
+    @tornado.web.authenticated
+    def post(self):
+        user_id = tornado.escape.xhtml_escape(self.current_user)
+        logic.saveLocation(self.get_argument("location"), user_id)
 
 
 class PreviewEventHandler(BaseHandler, TemplateRendering):
@@ -997,6 +1018,7 @@ class EventPageHandler(BaseHandler, TemplateRendering):
         user_id = tornado.escape.xhtml_escape(self.current_user)
         template = 'afterlogintemplate.html'
         topic = logic.getCurrentTopic(tornado.escape.xhtml_escape(self.current_user))
+        location = logic.getCurrentLocation(tornado.escape.xhtml_escape(self.current_user))
         if topic is None:
             self.redirect("/topicinfo")
         variables = {
@@ -1005,7 +1027,8 @@ class EventPageHandler(BaseHandler, TemplateRendering):
             'type': "events",
             'username': str(tornado.escape.xhtml_escape(self.get_current_username())),
             "document": apiv12.getEvents(topic['topic_id'], "date", 0),
-            'topic': topic
+            'topic': topic,
+            'location': location
         }
         content = self.render_template(template, variables)
         self.write(content)
@@ -1027,6 +1050,7 @@ class ConversationPageHandler(BaseHandler, TemplateRendering):
         user_id = tornado.escape.xhtml_escape(self.current_user)
         template = 'afterlogintemplate.html'
         topic = logic.getCurrentTopic(tornado.escape.xhtml_escape(self.current_user))
+        location = logic.getCurrentLocation(tornado.escape.xhtml_escape(self.current_user))
         if topic is None:
             self.redirect("/topicinfo")
         variables = {
@@ -1035,7 +1059,8 @@ class ConversationPageHandler(BaseHandler, TemplateRendering):
             'type': "conversation",
             'username': str(tornado.escape.xhtml_escape(self.get_current_username())),
             "docs": apiv12.getConversations(topic['topic_id'], "day", 0),
-            'topic': topic
+            'topic': topic,
+            'location': location
         }
         content = self.render_template(template, variables)
         self.write(content)

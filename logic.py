@@ -47,6 +47,25 @@ def setCurrentTopic(user_id):
             )
             cur.execute(sql, [None, int(user_id)])
 
+def getCurrentLocation(user_id):
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "SELECT current_location "
+            "FROM users "
+            "WHERE user_id = %s"
+        )
+        cur.execute(sql, [int(user_id)])
+        user_location = cur.fetchone()
+        if user_location[0] is None:
+            sql = (
+                "UPDATE users "
+                "SET current_location = %s "
+                "WHERE user_id = %s"
+            )
+            cur.execute(sql, ['italy', int(user_id)])
+            return 'italy'
+        return user_location[0]
+
 
 def saveTopicId(topic_id, user_id):
     with Connection.Instance().get_cursor() as cur:
@@ -56,6 +75,15 @@ def saveTopicId(topic_id, user_id):
             "WHERE user_id = %s"
         )
         cur.execute(sql, [int(topic_id), int(user_id)])
+
+def saveLocation(location, user_id):
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "UPDATE users "
+            "SET current_location = %s "
+            "WHERE user_id = %s"
+        )
+        cur.execute(sql, [location, int(user_id)])
 
 
 def getCurrentTopic(user_id):
@@ -299,8 +327,18 @@ def getAlertList(user_id):
         alerts = []
 
         for i in var:
+            sql = (
+                "SELECT user_id FROM user_topic WHERE topic_id = %s ;"
+            )
+            cur.execute(sql, [i[0]])
+            var = cur.fetchone()
+            sql = (
+                "SELECT username FROM users WHERE user_id = %s ;"
+            )
+            cur.execute(sql, [var[0]])
+            var = cur.fetchone()
             temp_alert = {'alertid': i[0], 'name': i[1], 'description': i[2], 'keywords': i[3].split(","), 'lang': i[4].split(","), \
-             'creationTime': i[5], 'updatedTime': i[7], 'status': i[8], 'publish': i[9]}
+             'creationTime': i[5], 'updatedTime': i[7], 'status': i[8], 'publish': i[9], 'created_by': var[0]}
             if i[0] in own_topic_ids:
                 temp_alert['type'] = 'me'
             elif i[0] in subscribe_topic_ids:
@@ -311,6 +349,9 @@ def getAlertList(user_id):
 
         alerts = sorted(alerts, key=lambda k: k['alertid'])
         for alert in alerts:
+            alert['newsCount'] = Connection.Instance().newsPoolDB[str(alert['alertid'])].find().count()
+            alert['audienceCount'] = Connection.Instance().audienceDB[str(alert['alertid'])].find().count()
+            alert['eventCount'] = Connection.Instance().events[str(alert['alertid'])].find().count()
             alert['tweetCount'] = Connection.Instance().db[str(alert['alertid'])].find().count()
             try:
                 hashtags = \
@@ -461,10 +502,22 @@ def deleteAlert(alertid, mainT, user_id):
     alert = getAlertAllOfThemList(alertid)
     setUserAlertLimit(user_id, 'increment')
     mainT.delAlert(alert)
-    Connection.Instance().db[str(alertid)].drop()
-    Connection.Instance().newsPoolDB[str(alertid)].drop()
-    Connection.Instance().filteredNewsPoolDB[str(alertid)].drop()
     with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "SELECT * "
+            "FROM topics "
+            "WHERE topic_id = %s"
+        )
+        cur.execute(sql, [alertid])
+        topic = cur.fetchone()
+        topic = list(topic)
+        topic.append(int(user_id))
+        sql = (
+            "INSERT INTO public.archived_topics "
+            "(topic_id, topic_name, topic_description, keywords, languages, creation_time, keyword_limit, last_tweet_date, is_running, is_publish, user_id) "
+            "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
+        )
+        cur.execute(sql, topic)
         sql = (
             "DELETE FROM topics "
             "WHERE topic_id = %s"
@@ -786,9 +839,9 @@ def getNews(user_id, alertid, date, cursor):
     return result
 
 
-def getAudiences(topic_id, user_id, cursor):
+def getAudiences(topic_id, user_id, cursor, location):
     result = {}
-    audiences = list(Connection.Instance().audience_samples_DB[str(user_id)+"_"+str(topic_id)].find({}))[cursor:cursor + 20]
+    audiences = list(Connection.Instance().audience_samples_DB[str(location)+"_"+str(topic_id)].find({}))[cursor:cursor + 20]
     audience_ids = []
     if len(audiences) != 0:
         audience_ids = [audience['id'] for audience in audiences]
