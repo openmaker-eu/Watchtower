@@ -509,8 +509,10 @@ class TopicsHandler(BaseHandler, TemplateRendering):
             logic.unpublishAlert(topic_id)
         elif posttype == u'subscribe':
             logic.subsribeTopic(topic_id, user_id)
+            logic.setCurrentTopic(user_id)
         elif posttype == u'unsubscribe':
             logic.unsubsribeTopic(topic_id, user_id)
+            logic.setCurrentTopic(user_id)
         template = "alerts.html"
         variables = {
             'title': "Topics",

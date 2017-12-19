@@ -28,6 +28,14 @@ def setCurrentTopic(user_id):
         cur.execute(sql, [int(user_id)])
         topics = cur.fetchall()
         sql = (
+            "SELECT topic_id "
+            "FROM user_topic_subscribe "
+            "WHERE user_id = %s"
+        )
+        cur.execute(sql, [int(user_id)])
+        subscribed_topics = cur.fetchall()
+        topics = topics + subscribed_topics
+        sql = (
             "SELECT current_topic_id "
             "FROM users "
             "WHERE user_id = %s"
@@ -907,11 +915,15 @@ def unsubsribeTopic(topic_id, user_id):
         )
         cur.execute(sql, [int(user_id), int(topic_id)])
         fetched = cur.fetchone()
-
         if fetched[0]:
             sql = (
                 "DELETE FROM user_topic_subscribe "
                 "WHERE user_id = %s and topic_id = %s;"
             )
             cur.execute(sql, [int(user_id), int(topic_id)])
-            setCurrentTopic(user_id)
+            sql = (
+                "UPDATE users "
+                "SET current_topic_id = %s "
+                "WHERE user_id = %s"
+            )
+            cur.execute(sql, [None, int(user_id)])
