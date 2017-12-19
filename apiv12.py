@@ -266,7 +266,7 @@ def getEvents(topic_id, filterField, cursor):
         ret = Connection.Instance().events[str(topic_id)].aggregate([
             {'$match': {'end_time': {'$gte': now}}},
             {'$project': {'_id': 0}},
-            {'$sort': {'start_time': -1}},
+            {'$sort': {'start_time': 1}},
             {'$skip': int(cursor)},
             {'$limit': 10}
         ])
