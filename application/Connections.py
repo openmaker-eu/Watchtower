@@ -45,7 +45,6 @@ class Connection:
             self.conversations = self.MongoDBClient.conversations
             self.events = self.MongoDBClient.events
             self.hashtags = self.MongoDBClient.hashtags
-            self.redditFacebookDB = self.MongoDBClient.redditFacebookDB
             self.newsPoolDB = self.MongoDBClient.newsPool
 
             self.influencerDB = self.MongoDBClient.influencers_test # new db for influencers

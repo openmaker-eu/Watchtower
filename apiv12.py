@@ -253,6 +253,7 @@ def getHastags(topic_id, date):
 def getEvents(topic_id, filterField, cursor):
     now = time.time()
     cursor = int(cursor)
+    print(now)
     ret = []
     if filterField == 'interested':
         ret = Connection.Instance().events[str(topic_id)].aggregate([

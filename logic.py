@@ -15,6 +15,8 @@ from application.Connections import Connection
 
 from pprint import pprint
 
+from decouple import config
+
 
 def setCurrentTopic(user_id):
     with Connection.Instance().get_cursor() as cur:
@@ -139,7 +141,7 @@ def sourceSelection(topicList):
 
 
 def sourceSelectionFromFacebook(topicList):
-    my_token = Connection.Instance().redditFacebookDB['tokens'].find_one()["facebook"]["token"]
+    my_token = config("FACEBOOK_TOKEN")
     graph = facebook.GraphAPI(access_token=my_token, version="2.7")
     pages = []
     for topic in topicList:
@@ -154,7 +156,12 @@ def sourceSelectionFromFacebook(topicList):
 
 
 def sourceSelectionFromReddit(topicList):
-    keys = Connection.Instance().redditFacebookDB['tokens'].find_one()["reddit"]
+    keys = {
+        'client_id': config("REDDIT_CLIENT_ID"),
+        'client_secret': config("REDDIT_CLIENT_SECRET"),
+        'user_agent': config("REDDIT_USER_AGENT"),
+        'api_type': config("REDDIT_API_TYPE")
+    }
     reddit = praw.Reddit(client_id=keys["client_id"],
                          client_secret=keys["client_secret"],
                          user_agent=keys["user_agent"],
@@ -907,3 +914,4 @@ def unsubsribeTopic(topic_id, user_id):
                 "WHERE user_id = %s and topic_id = %s;"
             )
             cur.execute(sql, [int(user_id), int(topic_id)])
+            setCurrentTopic(user_id)

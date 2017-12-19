@@ -10,9 +10,11 @@ import pprint, json
 import link_parser
 from application.Connections import Connection
 
+from decouple import config
+
 
 def mineFacebookConversations(search_ids, isPreview, timeFilter="day"):
-    my_token = Connection.Instance().redditFacebookDB['tokens'].find_one()["facebook"]["token"]
+    my_token = config("FACEBOOK_TOKEN")
     graph = facebook.GraphAPI(access_token=my_token, version="2.7")
 
     if timeFilter == "day":
@@ -137,7 +139,12 @@ def getComments(submission):
 
 
 def mineRedditConversation(subreddits, isPreview, timeFilter='day'):
-    keys = Connection.Instance().redditFacebookDB['tokens'].find_one()["reddit"]
+    keys = {
+        'client_id': config("REDDIT_CLIENT_ID"),
+        'client_secret': config("REDDIT_CLIENT_SECRET"),
+        'user_agent': config("REDDIT_USER_AGENT"),
+        'api_type': config("REDDIT_API_TYPE")
+    }
     reddit = praw.Reddit(client_id=keys["client_id"],
                          client_secret=keys["client_secret"],
                          user_agent=keys["user_agent"],
@@ -259,7 +266,12 @@ def getCommentsOfSubmission(submission):
 
 def searchSubredditNews(topic_id, subredditNames):
     try:
-        keys = Connection.Instance().redditFacebookDB['tokens'].find_one()["reddit"]
+        keys = {
+            'client_id': config("REDDIT_CLIENT_ID"),
+            'client_secret': config("REDDIT_CLIENT_SECRET"),
+            'user_agent': config("REDDIT_USER_AGENT"),
+            'api_type': config("REDDIT_API_TYPE")
+        }
         reddit = praw.Reddit(client_id=keys["client_id"],
                              client_secret=keys["client_secret"],
                              user_agent=keys["user_agent"],
@@ -292,7 +304,7 @@ def searchSubredditNews(topic_id, subredditNames):
 
 # day filter can be 'day', 'week', 'month'; default is 'day'
 def searchFacebookNews(topic_id, search_ids):
-    my_token = Connection.Instance().redditFacebookDB['tokens'].find_one()["facebook"]["token"]
+    my_token = config("FACEBOOK_TOKEN")
     graph = facebook.GraphAPI(access_token=my_token, version="2.7")
 
     dayAgo = (int(round(time.time())) - 86400000) * 1000
@@ -349,12 +361,11 @@ def triggerOneTopic(topic_id, topic_keyword_list, pages, subreddits):
     print("pages: ", pages)
     print("subreddits: ", subreddits)
 
-    startEvent(topic_id, topic_keyword_list)
+    if pages is not None and len(pages) and pages[0] is not None and pages[0] != "":
+        searchFacebookNews(topic_id, pages)
 
     if subreddits is not None and len(subreddits) and subreddits[0] is not None and subreddits[0] != "":
         searchSubredditNews(topic_id, subreddits)
-    if pages is not None and len(pages) and pages[0] is not None and pages[0] != "":
-        searchFacebookNews(topic_id, pages)
 
     for date in dates:
         posts = []

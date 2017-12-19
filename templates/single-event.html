@@ -7,7 +7,15 @@
             <div class="details">
                 <a href='{{ event['link'] }}' target='_blank'><span id="title"><b>{{ event['name'] }}</b></span></a>
                 <span id="place">{{ event['place'] }}</span>
-                <span id="date">{{ event['start_time'] }}</span>
+                {% if 'start_date' not in event %}
+                  <span id="date">{{ event['start_time'] }}</span>
+                {% else %}
+                  {% if event['start_date'] == event['end_date'] %}
+                    <span id="date">{{ event['start_date'] }}</span>
+                  {% else %}
+                    <span id="date">{{ event['start_date'] }} -- {{ event['end_date'] }}</span>
+                  {% endif %}
+                {% endif %}
                 <ul>
                     <li>Coming <span>{% if event['coming']==-1 %} N/A {% else %} {{event['coming']}} {% endif %} </span></li>
                     <li>Interested <span>{% if event['interested']==-1 %} N/A {% else %} {{event['interested']}} {% endif %}</span></li>

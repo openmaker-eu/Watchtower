@@ -6,10 +6,12 @@ import requests
 
 from application.Connections import Connection
 
+from decouple import config
+
 
 def mineEventsFromEventBrite(topicList):
     print("Getting events from Eventbrite...")
-    my_token = Connection.Instance().redditFacebookDB['tokens'].find_one()["eventbrite"]["token"]
+    my_token = config("EVENT_BRITE_TOKEN")
     for topic in topicList:
         print("Processing topic: " + str(topic))
         page_number = 1
@@ -57,6 +59,9 @@ def mineEventsFromEventBrite(topicList):
             else:
                 event['end_time'] = time.mktime(datetime.strptime(event['created'][:10], "%Y-%m-%d").timetuple())
             event['start_time'] = event['start']['utc'][:10]
+            start_time = time.mktime(datetime.strptime(event['start']['utc'][:10], "%Y-%m-%d").timetuple())
+            event['start_date'] = datetime.fromtimestamp(start_time).strftime('%d-%m-%Y')
+            event['end_date'] = datetime.fromtimestamp(event['end_time']).strftime('%d-%m-%Y')
             event['link'] = event['url']
             event['name'] = event['name']['text']
             event['cover'] = None
@@ -71,7 +76,7 @@ def mineEventsFromEventBrite(topicList):
 
 
 def mineEventsFromFacebook(search_id_list, isPreview):
-    my_token = Connection.Instance().redditFacebookDB['tokens'].find_one()["facebook"]["token"]
+    my_token = config("FACEBOOK_TOKEN")
     graph = facebook.GraphAPI(access_token=my_token, version="2.7")
     t = []
     c = 0
@@ -95,6 +100,9 @@ def mineEventsFromFacebook(search_id_list, isPreview):
             event['place'] = ''
         event['link'] = 'https://www.facebook.com/events/' + event['id']
         event['start_time'] = event['start_time'][:10]
+        start_time = time.mktime(datetime.strptime(event['start_time'][:10], "%Y-%m-%d").timetuple())
+        event['start_date'] = datetime.fromtimestamp(start_time).strftime('%d-%m-%Y')
+        event['end_date'] = datetime.fromtimestamp(event['end_time']).strftime('%d-%m-%Y')
         event['interested'] = event.pop('interested_count')
         event['coming'] = event.pop('attending_count')
         if 'cover' in event:
@@ -133,7 +141,7 @@ def insertEventsIntoDataBase(eventsWithIds, topic_id):
 
 
 def sourceSelection(topicList):
-    my_token = Connection.Instance().redditFacebookDB['tokens'].find_one()["facebook"]["token"]
+    my_token = config("FACEBOOK_TOKEN")
     graph = facebook.GraphAPI(access_token=my_token, version="2.7")
 
     allSearches = []
@@ -177,4 +185,5 @@ if __name__ == '__main__':
         var = cur.fetchall()
 
     for v in var:
+        print(v[0])
         startEvent(v[0], v[1].split(","))
