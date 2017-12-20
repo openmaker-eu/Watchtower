@@ -31,11 +31,11 @@ def update_field_db(host, database_name, field_name):
     update_field_name = "predicted_" + field_name
 
     for collection_name in collection_names:
-        if collection_name in include:
+        if collection_name  not in exclude:
             print("Now processing collection :", collection_name)
 
             collection = database.get_collection(collection_name)
-            bulk = collection.initialize_ordered_bulk_op()
+            bulk = collection.initialize_unordered_bulk_op()
         
             t_start = time.time()        
 
