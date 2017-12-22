@@ -712,19 +712,27 @@ def rateAudience(topic_id, user_id, audience_id, rating):
         fetched = cur.fetchone()
 
         if fetched[0]:
-            sql = (
-                "UPDATE user_audience_rating "
-                "SET rating = %s "
-                "WHERE user_id = %s and audience_id = %s and topic_id = %s"
-            )
-            cur.execute(sql, [float(rating), int(user_id), int(audience_id), int(topic_id)])
+            if rating != 0:
+                sql = (
+                    "UPDATE user_audience_rating "
+                    "SET rating = %s "
+                    "WHERE user_id = %s and audience_id = %s and topic_id = %s"
+                )
+                cur.execute(sql, [float(rating), int(user_id), int(audience_id), int(topic_id)])
+            else:
+                sql = (
+                    "DELETE FROM user_audience_rating "
+                    "WHERE user_id = %s and audience_id = %s and topic_id = %s"
+                )
+                cur.execute(sql, [int(user_id), int(audience_id), int(topic_id)])
         else:
-            sql = (
-                "INSERT INTO user_audience_rating "
-                "(user_id, audience_id, topic_id, rating) "
-                "VALUES (%s, %s, %s, %s)"
-            )
-            cur.execute(sql, [int(user_id), int(audience_id), int(topic_id), float(rating)])
+            if rating != 0:
+                sql = (
+                    "INSERT INTO user_audience_rating "
+                    "(user_id, audience_id, topic_id, rating) "
+                    "VALUES (%s, %s, %s, %s)"
+                )
+                cur.execute(sql, [int(user_id), int(audience_id), int(topic_id), float(rating)])
 
 
 def getTweets(alertid):
