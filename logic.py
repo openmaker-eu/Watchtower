@@ -712,7 +712,7 @@ def rateAudience(topic_id, user_id, audience_id, rating):
         fetched = cur.fetchone()
 
         if fetched[0]:
-            if rating != 0:
+            if float(rating) != 0.0:
                 sql = (
                     "UPDATE user_audience_rating "
                     "SET rating = %s "
@@ -726,7 +726,7 @@ def rateAudience(topic_id, user_id, audience_id, rating):
                 )
                 cur.execute(sql, [int(user_id), int(audience_id), int(topic_id)])
         else:
-            if rating != 0:
+            if float(rating) != 0.0:
                 sql = (
                     "INSERT INTO user_audience_rating "
                     "(user_id, audience_id, topic_id, rating) "
