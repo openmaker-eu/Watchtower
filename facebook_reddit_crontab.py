@@ -13,6 +13,27 @@ from application.Connections import Connection
 from decouple import config
 
 
+def sourceSelection(topicList):
+    my_token = config("FACEBOOK_TOKEN")
+    graph = facebook.GraphAPI(access_token=my_token, version="2.7")
+
+    allSearches = []
+    for topic in topicList:
+        events = []
+        s = graph.get_object('search?q=' + topic + '&type=event&limit=100')
+        while True:
+            try:
+                for search in s['data']:
+                    events.append({'event_id': search['id'], 'event_name': search['name']})
+                s = requests.get(s['paging']['next']).json()
+            except:
+                break
+        allSearches.append({
+            'events': events
+        })
+    return allSearches
+
+
 def mineFacebookConversations(search_ids, isPreview, timeFilter="day"):
     my_token = config("FACEBOOK_TOKEN")
     graph = facebook.GraphAPI(access_token=my_token, version="2.7")
