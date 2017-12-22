@@ -83,6 +83,27 @@
         <link rel="stylesheet" type="text/css" href="static/css/star-rating.css"/>
         <link rel="stylesheet" type="text/css" href="static/css/audience_card.css"/>
         <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
+
+        <style type="text/css">
+        .audience_card:nth-child(3n+1) {
+            clear: left;
+        }
+        </style>
+
+    {% endif %}
+
+    {% if type == "recommendations" %}
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
+        <link rel="stylesheet" type="text/css" href="static/css/star-rating.css"/>
+        <link rel="stylesheet" type="text/css" href="static/css/audience_card.css"/>
+        <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
+
+        <style type="text/css">
+        .audience_card:nth-child(3n+1) {
+            clear: left;
+        }
+        </style>
+
     {% endif %}
 
     {% if type == "editAlert" or type == "createAlert" %}
@@ -152,6 +173,7 @@
                         <span class="caret"></span></a>
                     <ul class="dropdown-menu">
                         <li><a href="/profile">My Profile</a></li>
+                        <li><a href="/Recommendations">Recommendations</a></li> <!-- Added for recommendations -->
                         <li><a href="/bookmark">Bookmarks</a></li>
                         <li><a href="/logout">Logout</a></li>
                     </ul>
@@ -199,6 +221,10 @@
                 {% if type == "events" %}
                     {% include 'eventDateButtons.html' %}
                 {% endif %}
+                {% if type == "recommendations" %}
+                    {% include 'selectLocation.html' %}
+                    {% include 'recommendationRatedButton.html' %}
+                {% endif %}
                 {% if type == "audiences" %}
                     {% include 'selectLocation.html' %}
                 {% endif %}
@@ -243,6 +269,9 @@
 {% endif %}
 {% if type == "audiences" %}
     {% include 'audience.html' %}
+{% endif %}
+{% if type == "recommendations" %}
+    {% include 'recommendations.html' %}
 {% endif %}
 {% if type == "search" %}
     {% include 'search.html' %}
@@ -373,6 +402,10 @@
 
 {% if type == "audiences" %}
     <script src="/js/audiences.js"></script>
+{% endif %}
+
+{% if type == "recommendations" %}
+    <script src="/js/recommendations.js"></script>
 {% endif %}
 
 {% if type == "profile" %}
