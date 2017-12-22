@@ -46,16 +46,16 @@ class Connection:
             self.events = self.MongoDBClient.events
             self.hashtags = self.MongoDBClient.hashtags
             self.newsPoolDB = self.MongoDBClient.newsPool
-
-            self.influencerDB = self.MongoDBClient.influencers_test # new db for influencers
-            self.audienceDB = self.MongoDBClient.audience_test # new db for audience
-            self.audience_samples_DB = self.MongoDBClient.audience_samples # new db for audience samples
-            self.audience_networks_DB = self.MongoDBClient.audience_networks # new db for audience networks
-            self.local_influencers_DB = self.MongoDBClient.local_influencers # new db for local influencers
-
             self.filteredNewsPoolDB = self.MongoDBClient.filteredNewsPool
-            self.infDB = self.MongoDBClient.influenceRanks
 
+            # AUDIENCE
+            self.influencerDB = self.MongoDBClient.influencers_test # db for influencers
+            self.audienceDB = self.MongoDBClient.audience_test # db for audience
+            self.audience_samples_DB = self.MongoDBClient.audience_samples # db for audience samples
+            self.local_influencers_DB = self.MongoDBClient.local_influencers # db for local influencers
+            self.audience_networks_DB = self.MongoDBClient.audience_networks # db for audience networks
+
+            # POSTGRE - INFO ABOUT TOPICS IS HELD HERE.
             self.pg_pool = psycopg2.pool.ThreadedConnectionPool(
                 1, 15,
                 host=host,
