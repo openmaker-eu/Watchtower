@@ -13,10 +13,6 @@
     box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
 }
 
-.audience_card:nth-child(3n+1) {
-    clear: left;
-}
-
 .details {
     padding: 0 0 10px 0;
     border-top: 4px solid #FFF;

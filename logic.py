@@ -853,7 +853,6 @@ def getNews(user_id, alertid, date, cursor):
     result['feeds'] = feeds
     return result
 
-
 def getAudiences(topic_id, user_id, cursor, location):
     result = {}
     audiences = list(Connection.Instance().audience_samples_DB[str(location)+"_"+str(topic_id)].find({}))[cursor:cursor + 20]
@@ -883,11 +882,67 @@ def getAudiences(topic_id, user_id, cursor, location):
             pass
 
     cursor = int(cursor) + 20
-    if cursor >= 100 or len(audiences) == 0:
+    if cursor >= 500 or len(audiences) == 0:
         cursor = 0
     result['next_cursor'] = cursor
-    result['cursor_length'] = 100
+    result['cursor_length'] = 500
     result['audiences'] = audiences
+    return result
+
+def getRecommendedAudience(topic_id, location, filter, user_id, cursor):
+    result = {}
+    if filter == "rated":
+        # fetch rated audience
+        with Connection.Instance().get_cursor() as cur:
+            sql = (
+                "SELECT audience_id "
+                "FROM user_audience_rating "
+                "WHERE user_id = %s and topic_id = %s ;"
+            )
+            cur.execute(sql, [int(user_id), int(topic_id)])
+            rated_audience = cur.fetchall()
+            rated_audience = [aud_member[0] for aud_member in rated_audience]
+            audience = Connection.Instance().audienceDB['all_audience'].find({'id':{'$in':rated_audience}})
+
+    elif filter == "recommended":
+        # fetch recommended audience
+        audience = Connection.Instance().audience_samples_DB[str(location)+ '_'+str(topic_id)].find({})
+
+    else:
+        print("Please provide a valid filter. \"rated\" or \"recommended\"")
+        return
+    audience = list(audience)[cursor:cursor + 20]
+
+    audience_ids = []
+    if len(audience) != 0:
+        audience_ids = [aud_member['id'] for aud_member in audience]
+
+    if len(audience_ids) == 0:
+        audience_ids = [-1]
+
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "SELECT audience_id, rating "
+            "FROM user_audience_rating "
+            "WHERE user_id = %s and topic_id = %s and audience_id IN %s"
+        )
+        cur.execute(sql, [int(user_id), int(topic_id), tuple(audience_ids)])
+        rating_list = cur.fetchall()
+        ratings = {str(rating[0]): rating[1] for rating in rating_list}
+
+    for aud_member in audience:
+        aud_member['rate'] = 0
+        try:
+            aud_member['rate'] = ratings[str(aud_member['id'])]
+        except KeyError:
+            pass
+
+    cursor = int(cursor) + 20
+    if cursor >= 500 or len(audience) == 0:
+        cursor = 0
+    result['next_cursor'] = cursor
+    result['cursor_length'] = 500
+    result['audience'] = audience
     return result
 
 
