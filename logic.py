@@ -863,7 +863,7 @@ def getNews(user_id, alertid, date, cursor):
 
 def getAudiences(topic_id, user_id, cursor, location):
     result = {}
-    audiences = list(Connection.Instance().audience_samples_DB[str(location)+"_"+str(topic_id)].find({}))[cursor:cursor + 20]
+    audiences = list(Connection.Instance().audience_samples_DB[str(location)+"_"+str(topic_id)].find({}))[cursor:cursor + 21]
     audience_ids = []
     if len(audiences) != 0:
         audience_ids = [audience['id'] for audience in audiences]
@@ -889,7 +889,7 @@ def getAudiences(topic_id, user_id, cursor, location):
         except KeyError:
             pass
 
-    cursor = int(cursor) + 20
+    cursor = int(cursor) + 21
     if cursor >= 500 or len(audiences) == 0:
         cursor = 0
     result['next_cursor'] = cursor
@@ -919,7 +919,7 @@ def getRecommendedAudience(topic_id, location, filter, user_id, cursor):
     else:
         print("Please provide a valid filter. \"rated\" or \"recommended\"")
         return
-    audience = list(audience)[cursor:cursor + 20]
+    audience = list(audience)[cursor:cursor + 21]
 
     audience_ids = []
     if len(audience) != 0:
@@ -945,7 +945,7 @@ def getRecommendedAudience(topic_id, location, filter, user_id, cursor):
         except KeyError:
             pass
 
-    cursor = int(cursor) + 20
+    cursor = int(cursor) + 21
     if cursor >= 500 or len(audience) == 0:
         cursor = 0
     result['next_cursor'] = cursor
