@@ -72,7 +72,7 @@
         <link rel="stylesheet" type="text/css" href="static/css/topic_card.css"/>
     {% endif %}
 
-    {% if type == "news" %}
+    {% if type == "news" or type=="bookmark" %}
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
         <link rel="stylesheet" type="text/css" href="static/css/star-rating.css"/>
         <!--<link rel="stylesheet" type="text/css" href="static/css/news_card.css"/>-->
@@ -156,8 +156,7 @@
                 </li>
                 <li class="dropdown">
                     <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span
-                            class="glyphicon glyphicon-user"></span> {{ username }}
-                        <span class="caret"></span></a>
+                            class="glyphicon glyphicon-user"></span> {{ username }} <span class="caret"></span></a>
                     <ul class="dropdown-menu">
                         <li><a href="/profile">My Profile</a></li>
                         <li><a href="/Recommendations">Recommendations</a></li> <!-- Added for recommendations -->
@@ -283,6 +282,7 @@
 <script src="/js/ie10-viewport-bug-workaround.js"></script>
 
 <script src="/js/jquery.babypaunch.spinner.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
 
 
 <script>
@@ -397,8 +397,7 @@
 
 {% if type == "profile" %}
     <script src="/js/jquery-1.11.1.min.js"></script>
-    <script src="/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="static/js/profile.js"></script>
+    <script type="text/javascript" src="/js/profile.js"></script>
 {% endif %}
 </body>
 
