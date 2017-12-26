@@ -32,16 +32,16 @@ def print_sample_audience(sample_audience_weighted, sample_audience_exploration)
 
 # gets a sample from the audience for a given topic
 # applies location filtering first
-def get_audience_sample_by_topic(userID, topicID, location, sample_size):
+def get_audience_sample_by_topic(userID, topicID, location, sample_size, signal_strength):
     start = time.time()
     location = location.lower()  # cast location to lowercase
     # filter audience by location
     if (location.lower() == 'global'): # do not filter by a specific location.
         loc_filtered_audience_ids = []
         try:
-            loc_filtered_audience_ids = Connection.Instance().audienceDB[str(topicID)].distinct('id', {'location':{'$ne':''},'$where': 'this.influencers.length > 3'})
+            loc_filtered_audience_ids = Connection.Instance().audienceDB[str(topicID)].distinct('id', {'processed':True,'location':{'$ne':''},'$where': 'this.influencers.length > ' + str(signal_strength)})
         except:
-            for audience_member in Connection.Instance().audienceDB[str(topicID)].find({'location':{'$ne':''},'$where': 'this.influencers.length > 3'},{'_id':0,'id':1}):
+            for audience_member in Connection.Instance().audienceDB[str(topicID)].find({'processed':True,'location':{'$ne':''},'$where': 'this.influencers.length > '+ str(signal_strength)},{'_id':0,'id':1}):
                 loc_filtered_audience_ids.append(audience_member['id'])
     else:
         regx = location_regex.getLocationRegex(location)
@@ -71,13 +71,16 @@ def get_audience_sample_by_topic(userID, topicID, location, sample_size):
     if (audience_size == 0):
         print("No audience to be sampled.")
     else:
+        size = min(sample_size,audience_size)
         ### ! Normally, we will use userID to carry out this sampling. it will be personalized!
 
         # Sample
         # 80% of the audience from a distribution weighed by number of influencers followed within the topic
         # 20% of the audience from a uniformly random distribution
-        weighed_distribution_sample_size = int(0.8 * min(sample_size, audience_size))
-        uniform_distribution_sample_size = min(sample_size, audience_size) - weighed_distribution_sample_size
+        weighed_distribution_sample_size = int(0.8 * size)
+        uniform_distribution_sample_size = size - weighed_distribution_sample_size
+        print(str(len(audience)))
+        print(str(len(influencer_counts)))
 
         sample_audience_weighted = np.random.choice(audience, size=weighed_distribution_sample_size, replace=False,
                                                     p=(influencer_counts ** 2) / sum(influencer_counts ** 2))
@@ -121,7 +124,8 @@ def main():
 
         location = sys.argv[2]  # get location from commandline.
         getForAllLocations = sys.argv[3]  # should the sampling be done for all relevant locations
-        N = 100  # audience sample size
+        N = 500  # audience sample size
+        signal_strength = 3
 
         print("Script ran: " + str(datetime.datetime.now()))
 
@@ -147,15 +151,15 @@ def main():
         #     print("================================================================================================")
         #     print("Sampling audience for USER: " + str(userID) + " , LOCATION: " + location + ", TOPIC: " + topic_dict[
         #         topicID] + "(" + str(topicID) + ")")
-        #     get_audience_sample_by_topic(userID=userID, topicID=topicID, location=location, sample_size=N)
+        #     get_audience_sample_by_topic(userID=userID, topicID=topicID, location=location, sample_size=N, signal_strength=signal_strength)
 
         if (getForAllLocations == "0"):
             return
-        locations = ['italy', 'slovakia', 'spain', 'uk', 'global']  # relevant locations
+        locations = ['italy', 'slovakia', 'spain', 'uk', 'global', 'turkey']  # relevant locations
         for topicID, topicName in topics:
             for loc in locations:
                 print("Sampling audience for LOCATION: " + loc + ", TOPIC: " + topicName + "(" + str(topicID) + ")")
-                get_audience_sample_by_topic(userID=-1, topicID=topicID, location=loc, sample_size=N)
+                get_audience_sample_by_topic(userID=-1, topicID=topicID, location=loc, sample_size=N, signal_strength=signal_strength)
 
     else:
         print("Usage: python get_audience_sample.py <server_ip> <location>")
