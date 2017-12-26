@@ -1,60 +1,150 @@
 <div id="alerts">
 
     <div class="wrapper">
-        {% for alert in alerts %}
+      <h2>Topics You Have Created</h2>
+        <div class="grid">
+            {% for alert in alerts %} {% if alert['type'] == 'me' %}
             <div class="topic_card">
                 <div class="container" style="padding: 16px 16px;width: 100%;">
-                    <h3><b>{{ alert['name'] }}</b></h3>
+                    <h3><b>{% if alert['type'] == 'subscribed' %}
+                        <span style="color:#50AE54" title="You subscribe to this topic."
+                              class="glyphicon glyphicon-certificate"></span> {% endif %}{{ alert['name'] }}</b></h3>
                     <div class="dropdown" style="float:right">
                         <button class="dropbtn">More</button>
                         <div class="dropdown-content">
-                            <a href="/topicinfo/{{ alert['alertid'] }}">Edit</button></a>
-                            <a href="#" onclick="alertbuttonclick({{ alert['alertid'] }}, 'remove');" posttype="remove"
-                               alertid="{{ alert['alertid'] }}">Remove</a>
-                            {% if not alert['status'] %}
-                                <a href="#" onclick="alertbuttonclick({{ alert['alertid'] }}, 'start');"
-                                   posttype="start" alertid="{{ alert['alertid'] }}">Start</a>
-                            {% else %}
-                                <a href="#" onclick="alertbuttonclick({{ alert['alertid'] }}, 'stop');" posttype="stop"
-                                   alertid="{{ alert['alertid'] }}">Stop</a>
-                            {% endif %}
-                            {% if not alert['publish'] %}
-                                <a href="#" onclick="alertbuttonclick({{ alert['alertid'] }}, 'publish');"
-                                   posttype="publish" alertid="{{ alert['alertid'] }}">Publish</a>
-                            {% else %}
-                                <a href="#" onclick="alertbuttonclick({{ alert['alertid'] }}, 'unpublish');"
-                                   posttype="unpublish" alertid="{{ alert['alertid'] }}">Unpublish</a>
-                            {% endif %}
+                            {% if alert['type'] == 'me' %}
+                                <a href="/topicinfo/{{ alert['alertid'] }}">Edit</a>
+                                <a href="#" onclick="alertbuttonclick({{ alert['alertid'] }}, 'remove');"
+                                   posttype="remove" alertid="{{ alert['alertid'] }}">Remove</a>
+                                {% if not alert['status'] %}
+                                    <a href="#" onclick="alertbuttonclick({{ alert['alertid'] }}, 'start');"
+                                       posttype="start" alertid="{{ alert['alertid'] }}">Start</a> {% else %}
+                                    <a href="#" onclick="alertbuttonclick({{ alert['alertid'] }}, 'stop');"
+                                       posttype="stop" alertid="{{ alert['alertid'] }}">Stop</a> {% endif %}
+                                {% if not alert['publish'] %}
+                                    <a href="#" onclick="alertbuttonclick({{ alert['alertid'] }}, 'publish');"
+                                       posttype="publish" alertid="{{ alert['alertid'] }}">Publish</a> {% else %}
+                                    <a href="#" onclick="alertbuttonclick({{ alert['alertid'] }}, 'unpublish');"
+                                       posttype="unpublish" alertid="{{ alert['alertid'] }}">Unpublish</a>
+                                {% endif %} {% elif alert['type'] == 'subscribed' %}
+                                <a href="#" onclick="alertbuttonclick({{ alert['alertid'] }}, 'unsubscribe');"
+                                   posttype="unsubscribe" alertid="{{ alert['alertid'] }}">Unsubscribe</a> {% endif %}
                         </div>
                     </div>
                     <hr>
                     <p style="font-size:15px"><b>Keywords:</b> {{ ", ".join(alert['keywords']) }} <br>
                         <b>Languages:</b> {{ ", ".join(alert['lang']) }}</p>
-                    <p style="font-size:14px"><b>Tweet Count:</b> {{ alert['tweetCount'] }} <br> <b>Top Five
+                    <p style="font-size:14px"><b>News Count:</b> {{ alert['newsCount'] }} <br>
+                      <b>Audience Count:</b> {{ alert['audienceCount'] }} <br>
+                      <b>Event Count:</b> {{ alert['eventCount'] }} <br>
+                      <b>Tweet Count:</b> {{ alert['tweetCount'] }} <br> <b>Top Five
                         Hashtags:</b> {{ alert['hashtags'] }} <br> <br>
                         <span style="font-size:13px;float:right"><b>Created at:</b> {{ alert['creationTime'] }} <br>
-              <b>Last updated date:</b> {{ alert['updatedTime'] }} </span>
+                  <b>Last updated date:</b> {{ alert['updatedTime'] }} </span>
                     </p>
                 </div>
             </div>
-        {% endfor %}
+        {% endif %} {% endfor %}
 
-        <div class="topic_card" style="margin-top:2.5%">
-            {% if alertlimit != 0 %}
-                <div onclick="location.href='/topicinfo';"
-                     style="padding: 30%;width: 100%;height: 100%;cursor: pointer; background-color:rgba(157,157,157,0.8);">
-                    <p style="font-size:16px;color:white">Create a new topic</p>
+            <div class="topic_card" style="margin-top:2.5%">
+                {% if alertlimit != 0 %}
+                    <div onclick="location.href='/topicinfo';"
+                         style="padding: 30%;width: 100%;height: 100%;cursor: pointer; background-color:rgba(157,157,157,0.8);">
+                        <p style="font-size:16px;color:white">Create a new topic</p>
+                    </div>
+                {% else %}
+                    <div class="container"
+                         style="padding:18%;width: 100%;height: 100%; background-color:rgba(157,157,157,0.8)">
+                    <p style="color: red; font-size: 15px"><b>You cannot create a new topic because your limit is
+                        full.
+                        If
+                        you
+                        want create a new topic, please remove old ones.</b></p>
+                {% endif %}
                 </div>
-            {% else %}
-                <div class="container"
-                     style="padding:18%;width: 100%;height: 100%; background-color:rgba(157,157,157,0.8)">
-                <p style="color: red; font-size: 15px"><b>You cannot create a new topic because your limit is full. If
-                    you
-                    want create a new topic, please remove old ones.</b></p>
-            {% endif %}
             </div>
         </div>
 
-    </div>
+        <hr>
 
+        <h2>Topics You Have Subscribed</h2>
+        <div class="grid">
+             {% for alert in alerts %} {% if alert['type'] == 'subscribed' %}
+            <div class="topic_card">
+                <div class="container" style="padding: 16px 16px;width: 100%;">
+                    <h3><b>{% if alert['type'] == 'subscribed' %}
+                        <span style="color:#50AE54" title="You subscribe to this topic."
+                              class="glyphicon glyphicon-certificate"></span> {% endif %}{{ alert['name'] }}</b></h3>
+                    <div class="dropdown" style="float:right">
+                        <button class="dropbtn">More</button>
+                        <div class="dropdown-content">
+                            {% if alert['type'] == 'me' %}
+                                <a href="/topicinfo/{{ alert['alertid'] }}">Edit</a>
+                                <a href="#" onclick="alertbuttonclick({{ alert['alertid'] }}, 'remove');"
+                                   posttype="remove" alertid="{{ alert['alertid'] }}">Remove</a>
+                                {% if not alert['status'] %}
+                                    <a href="#" onclick="alertbuttonclick({{ alert['alertid'] }}, 'start');"
+                                       posttype="start" alertid="{{ alert['alertid'] }}">Start</a> {% else %}
+                                    <a href="#" onclick="alertbuttonclick({{ alert['alertid'] }}, 'stop');"
+                                       posttype="stop" alertid="{{ alert['alertid'] }}">Stop</a> {% endif %}
+                                {% if not alert['publish'] %}
+                                    <a href="#" onclick="alertbuttonclick({{ alert['alertid'] }}, 'publish');"
+                                       posttype="publish" alertid="{{ alert['alertid'] }}">Publish</a> {% else %}
+                                    <a href="#" onclick="alertbuttonclick({{ alert['alertid'] }}, 'unpublish');"
+                                       posttype="unpublish" alertid="{{ alert['alertid'] }}">Unpublish</a>
+                                {% endif %} {% elif alert['type'] == 'subscribed' %}
+                                <a href="#" onclick="alertbuttonclick({{ alert['alertid'] }}, 'unsubscribe');"
+                                   posttype="unsubscribe" alertid="{{ alert['alertid'] }}">Unsubscribe</a> {% endif %}
+                        </div>
+                    </div>
+                    <hr>
+                    <p style="font-size:15px"><b>Keywords:</b> {{ ", ".join(alert['keywords']) }} <br>
+                        <b>Languages:</b> {{ ", ".join(alert['lang']) }}</p>
+                    <p style="font-size:14px"><b>News Count:</b> {{ alert['newsCount'] }} <br>
+                      <b>Audience Count:</b> {{ alert['audienceCount'] }} <br>
+                      <b>Event Count:</b> {{ alert['eventCount'] }} <br>
+                      <b>Tweet Count:</b> {{ alert['tweetCount'] }} <br> <b>Top Five
+                        Hashtags:</b> {{ alert['hashtags'] }} <br> <br>
+                        <span style="font-size:13px;float:right"><b>Created by:</b> {{ alert['created_by'] }} <br>
+                          <b>Created at:</b> {{ alert['creationTime'] }} <br>
+                    <b>Last updated date:</b> {{ alert['updatedTime'] }} </span>
+                    </p>
+                </div>
+            </div>
+        {% endif %} {% endfor %}
+
+        </div>
+        <hr>
+        <h2>Topics You Can Subscribe</h2>
+        <div class="grid">
+          {% for alert in alerts %} {% if alert['type'] == 'unsubscribed' %}
+            <div class="topic_card">
+                <div class="container" style="padding: 16px 16px;width: 100%;">
+                    <h3><b>{% if alert['type'] == 'unsubscribed' %}
+                        <span style="color:#D32F2F" title="You do not subscribe to this topic."
+                              class="glyphicon glyphicon-certificate"></span> {% endif %}{{ alert['name'] }}</b></h3>
+                    <div class="dropdown" style="float:right">
+                        <button class="dropbtn">More</button>
+                        <div class="dropdown-content">
+                            <a href="#" onclick="alertbuttonclick({{ alert['alertid'] }}, 'subscribe');"
+                               posttype="subscribe" alertid="{{ alert['alertid'] }}">Subscribe</a>
+                        </div>
+                    </div>
+                    <hr>
+                    <p style="font-size:15px"><b>Keywords:</b> {{ ", ".join(alert['keywords']) }} <br>
+                        <b>Languages:</b> {{ ", ".join(alert['lang']) }}</p>
+                    <p style="font-size:14px"><b>News Count:</b> {{ alert['newsCount'] }} <br>
+                      <b>Audience Count:</b> {{ alert['audienceCount'] }} <br>
+                      <b>Event Count:</b> {{ alert['eventCount'] }} <br>
+                      <b>Tweet Count:</b> {{ alert['tweetCount'] }} <br> <b>Top Five
+                        Hashtags:</b> {{ alert['hashtags'] }} <br> <br>
+                        <span style="font-size:13px;float:right"><b>Created by:</b> {{ alert['created_by'] }} <br>
+                          <b>Created at:</b> {{ alert['creationTime'] }} <br>
+                  <b>Last updated date:</b> {{ alert['updatedTime'] }} </span>
+                    </p>
+                </div>
+            </div>
+        {% endif %} {% endfor %}
+        </div>
+    </div>
 </div>

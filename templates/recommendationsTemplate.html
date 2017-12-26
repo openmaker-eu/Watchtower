@@ -1,0 +1,27 @@
+{% for audience_member in audience %}
+
+    <div class="audience_card" cursor="{{ cursor }}">
+        <div class="bg" style="background-image:url({{ audience_member['profile_banner_url'] }})"></div>
+        <div class="pp" align="center">
+            <img src="{{ (audience_member['profile_image_url_https'][:4] + audience_member['profile_image_url_https'][5:]).replace('normal', '400x400') }}" alt=""/>
+        </div>
+        <div class="details">
+            <span id="name">{{ audience_member['name'] }}</span>
+            <a href="http://twitter.com/{{ audience_member['screen_name'] }}" target="_blank"><span
+                    id="nick"> @{{ audience_member['screen_name'] }} </span></a>
+            <span id="description">{{ audience_member['description'] }}</span>
+            <ul>
+                <li>Tweets <span>{{ audience_member['statuses_count'] }}</span></li>
+                <li>Follow <span>{{ audience_member['friends_count'] }}</span></li>
+                <li>Followers <span>{{ audience_member['followers_count'] }}</span></li>
+            </ul>
+        </div>
+
+        <div class="vote_audience" style="font-size:0.7em;text-align:right">
+          <input id="rate_{{ audience_member['id'] }}" data-show-caption="false" {% if recom_filter != 'recommended' %} disabled {% endif %} onchange="rateAudience('{{ audience_member['id'] }}')" class="rating rating-loading" data-size="xs" data-min="0" data-max="5" data-step="0.5" value="{{ audience_member['rate'] }}">
+        </div>
+    </div>
+
+{% endfor %}
+
+<script type="text/javascript" src="static/js/star-rating.js"/>

@@ -13,6 +13,10 @@ import date_filter
 import twitter_search_sample_tweets
 from application.Connections import Connection
 
+from pprint import pprint
+
+from decouple import config
+
 
 def setCurrentTopic(user_id):
     with Connection.Instance().get_cursor() as cur:
@@ -23,6 +27,14 @@ def setCurrentTopic(user_id):
         )
         cur.execute(sql, [int(user_id)])
         topics = cur.fetchall()
+        sql = (
+            "SELECT topic_id "
+            "FROM user_topic_subscribe "
+            "WHERE user_id = %s"
+        )
+        cur.execute(sql, [int(user_id)])
+        subscribed_topics = cur.fetchall()
+        topics = topics + subscribed_topics
         sql = (
             "SELECT current_topic_id "
             "FROM users "
@@ -45,6 +57,25 @@ def setCurrentTopic(user_id):
             )
             cur.execute(sql, [None, int(user_id)])
 
+def getCurrentLocation(user_id):
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "SELECT current_location "
+            "FROM users "
+            "WHERE user_id = %s"
+        )
+        cur.execute(sql, [int(user_id)])
+        user_location = cur.fetchone()
+        if user_location[0] is None:
+            sql = (
+                "UPDATE users "
+                "SET current_location = %s "
+                "WHERE user_id = %s"
+            )
+            cur.execute(sql, ['italy', int(user_id)])
+            return 'italy'
+        return user_location[0]
+
 
 def saveTopicId(topic_id, user_id):
     with Connection.Instance().get_cursor() as cur:
@@ -54,6 +85,15 @@ def saveTopicId(topic_id, user_id):
             "WHERE user_id = %s"
         )
         cur.execute(sql, [int(topic_id), int(user_id)])
+
+def saveLocation(location, user_id):
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "UPDATE users "
+            "SET current_location = %s "
+            "WHERE user_id = %s"
+        )
+        cur.execute(sql, [location, int(user_id)])
 
 
 def getCurrentTopic(user_id):
@@ -109,7 +149,7 @@ def sourceSelection(topicList):
 
 
 def sourceSelectionFromFacebook(topicList):
-    my_token = Connection.Instance().redditFacebookDB['tokens'].find_one()["facebook"]["token"]
+    my_token = config("FACEBOOK_TOKEN")
     graph = facebook.GraphAPI(access_token=my_token, version="2.7")
     pages = []
     for topic in topicList:
@@ -124,7 +164,12 @@ def sourceSelectionFromFacebook(topicList):
 
 
 def sourceSelectionFromReddit(topicList):
-    keys = Connection.Instance().redditFacebookDB['tokens'].find_one()["reddit"]
+    keys = {
+        'client_id': config("REDDIT_CLIENT_ID"),
+        'client_secret': config("REDDIT_CLIENT_SECRET"),
+        'user_agent': config("REDDIT_USER_AGENT"),
+        'api_type': config("REDDIT_API_TYPE")
+    }
     reddit = praw.Reddit(client_id=keys["client_id"],
                          client_secret=keys["client_secret"],
                          user_agent=keys["user_agent"],
@@ -261,20 +306,67 @@ def getAllRunningAlertList():
 def getAlertList(user_id):
     with Connection.Instance().get_cursor() as cur:
         sql = (
-            "SELECT * FROM ( "
-            "SELECT * FROM ( "
-            "SELECT topic_id FROM user_topic WHERE user_id = %s "
-            ") AS ut "
-            "INNER JOIN topics AS t "
-            "ON t.topic_id = ut.topic_id) as a"
+            "SELECT topic_id FROM user_topic WHERE user_id = %s ;"
         )
         cur.execute(sql, [user_id])
         var = cur.fetchall()
-        alerts = [
-            {'alertid': i[1], 'name': i[2], 'description': i[3], 'keywords': i[4].split(","), 'lang': i[5].split(","), \
-             'creationTime': i[6], 'updatedTime': i[8], 'status': i[9], 'publish': i[10]} for i in var]
+
+        own_topic_ids = [i[0] for i in var]
+
+        sql = (
+            "SELECT topic_id FROM user_topic_subscribe WHERE user_id = %s ;"
+        )
+        cur.execute(sql, [user_id])
+        var = cur.fetchall()
+
+        subscribe_topic_ids = [i[0] for i in var]
+
+        sql = (
+            "SELECT topic_id FROM user_topic WHERE user_id != %s ;"
+        )
+        cur.execute(sql, [user_id])
+        var = cur.fetchall()
+
+        remaining_topics_topics = []
+        for i in var:
+            if i[0] not in subscribe_topic_ids:
+                remaining_topics_topics.append(i[0])
+
+        sql = (
+            "SELECT * "
+            "FROM topics;"
+        )
+        cur.execute(sql)
+        var = cur.fetchall()
+
+        alerts = []
+
+        for i in var:
+            sql = (
+                "SELECT user_id FROM user_topic WHERE topic_id = %s ;"
+            )
+            cur.execute(sql, [i[0]])
+            var = cur.fetchone()
+            sql = (
+                "SELECT username FROM users WHERE user_id = %s ;"
+            )
+            cur.execute(sql, [var[0]])
+            var = cur.fetchone()
+            temp_alert = {'alertid': i[0], 'name': i[1], 'description': i[2], 'keywords': i[3].split(","), 'lang': i[4].split(","), \
+             'creationTime': i[5], 'updatedTime': i[7], 'status': i[8], 'publish': i[9], 'created_by': var[0]}
+            if i[0] in own_topic_ids:
+                temp_alert['type'] = 'me'
+            elif i[0] in subscribe_topic_ids:
+                temp_alert['type'] = 'subscribed'
+            elif i[0] in remaining_topics_topics:
+                temp_alert['type'] = 'unsubscribed'
+            alerts.append(temp_alert)
+
         alerts = sorted(alerts, key=lambda k: k['alertid'])
         for alert in alerts:
+            alert['newsCount'] = Connection.Instance().newsPoolDB[str(alert['alertid'])].find().count()
+            alert['audienceCount'] = Connection.Instance().audienceDB[str(alert['alertid'])].find().count()
+            alert['eventCount'] = Connection.Instance().events[str(alert['alertid'])].find().count()
             alert['tweetCount'] = Connection.Instance().db[str(alert['alertid'])].find().count()
             try:
                 hashtags = \
@@ -425,10 +517,22 @@ def deleteAlert(alertid, mainT, user_id):
     alert = getAlertAllOfThemList(alertid)
     setUserAlertLimit(user_id, 'increment')
     mainT.delAlert(alert)
-    Connection.Instance().db[str(alertid)].drop()
-    Connection.Instance().newsPoolDB[str(alertid)].drop()
-    Connection.Instance().filteredNewsPoolDB[str(alertid)].drop()
     with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "SELECT * "
+            "FROM topics "
+            "WHERE topic_id = %s"
+        )
+        cur.execute(sql, [alertid])
+        topic = cur.fetchone()
+        topic = list(topic)
+        topic.append(int(user_id))
+        sql = (
+            "INSERT INTO public.archived_topics "
+            "(topic_id, topic_name, topic_description, keywords, languages, creation_time, keyword_limit, last_tweet_date, is_running, is_publish, user_id) "
+            "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
+        )
+        cur.execute(sql, topic)
         sql = (
             "DELETE FROM topics "
             "WHERE topic_id = %s"
@@ -608,19 +712,27 @@ def rateAudience(topic_id, user_id, audience_id, rating):
         fetched = cur.fetchone()
 
         if fetched[0]:
-            sql = (
-                "UPDATE user_audience_rating "
-                "SET rating = %s "
-                "WHERE user_id = %s and audience_id = %s and topic_id = %s"
-            )
-            cur.execute(sql, [float(rating), int(user_id), int(audience_id), int(topic_id)])
+            if float(rating) != 0.0:
+                sql = (
+                    "UPDATE user_audience_rating "
+                    "SET rating = %s "
+                    "WHERE user_id = %s and audience_id = %s and topic_id = %s"
+                )
+                cur.execute(sql, [float(rating), int(user_id), int(audience_id), int(topic_id)])
+            else:
+                sql = (
+                    "DELETE FROM user_audience_rating "
+                    "WHERE user_id = %s and audience_id = %s and topic_id = %s"
+                )
+                cur.execute(sql, [int(user_id), int(audience_id), int(topic_id)])
         else:
-            sql = (
-                "INSERT INTO user_audience_rating "
-                "(user_id, audience_id, topic_id, rating) "
-                "VALUES (%s, %s, %s, %s)"
-            )
-            cur.execute(sql, [int(user_id), int(audience_id), int(topic_id), float(rating)])
+            if float(rating) != 0.0:
+                sql = (
+                    "INSERT INTO user_audience_rating "
+                    "(user_id, audience_id, topic_id, rating) "
+                    "VALUES (%s, %s, %s, %s)"
+                )
+                cur.execute(sql, [int(user_id), int(audience_id), int(topic_id), float(rating)])
 
 
 def getTweets(alertid):
@@ -749,10 +861,9 @@ def getNews(user_id, alertid, date, cursor):
     result['feeds'] = feeds
     return result
 
-
-def getAudiences(topic_id, user_id, cursor):
+def getAudiences(topic_id, user_id, cursor, location):
     result = {}
-    audiences = list(Connection.Instance().audience_samples_DB[str(user_id)+"_"+str(topic_id)].find({}))[cursor:cursor + 20]
+    audiences = list(Connection.Instance().audience_samples_DB[str(location)+"_"+str(topic_id)].find({}))[cursor:cursor + 21]
     audience_ids = []
     if len(audiences) != 0:
         audience_ids = [audience['id'] for audience in audiences]
@@ -778,10 +889,104 @@ def getAudiences(topic_id, user_id, cursor):
         except KeyError:
             pass
 
-    cursor = int(cursor) + 20
-    if cursor >= 100 or len(audiences) == 0:
+    cursor = int(cursor) + 21
+    if cursor >= 500 or len(audiences) == 0:
         cursor = 0
     result['next_cursor'] = cursor
-    result['cursor_length'] = 100
+    result['cursor_length'] = 500
     result['audiences'] = audiences
     return result
+
+def getRecommendedAudience(topic_id, location, filter, user_id, cursor):
+    result = {}
+    if filter == "rated":
+        # fetch rated audience
+        with Connection.Instance().get_cursor() as cur:
+            sql = (
+                "SELECT audience_id "
+                "FROM user_audience_rating "
+                "WHERE user_id = %s and topic_id = %s ;"
+            )
+            cur.execute(sql, [int(user_id), int(topic_id)])
+            rated_audience = cur.fetchall()
+            rated_audience = [aud_member[0] for aud_member in rated_audience]
+            audience = Connection.Instance().audienceDB['all_audience'].find({'id':{'$in':rated_audience}})
+
+    elif filter == "recommended":
+        # fetch recommended audience
+        audience = Connection.Instance().audience_samples_DB[str(location)+ '_'+str(topic_id)].find({})
+
+    else:
+        print("Please provide a valid filter. \"rated\" or \"recommended\"")
+        return
+    audience = list(audience)[cursor:cursor + 21]
+
+    audience_ids = []
+    if len(audience) != 0:
+        audience_ids = [aud_member['id'] for aud_member in audience]
+
+    if len(audience_ids) == 0:
+        audience_ids = [-1]
+
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "SELECT audience_id, rating "
+            "FROM user_audience_rating "
+            "WHERE user_id = %s and topic_id = %s and audience_id IN %s"
+        )
+        cur.execute(sql, [int(user_id), int(topic_id), tuple(audience_ids)])
+        rating_list = cur.fetchall()
+        ratings = {str(rating[0]): rating[1] for rating in rating_list}
+
+    for aud_member in audience:
+        aud_member['rate'] = 0
+        try:
+            aud_member['rate'] = ratings[str(aud_member['id'])]
+        except KeyError:
+            pass
+
+    cursor = int(cursor) + 21
+    if cursor >= 500 or len(audience) == 0:
+        cursor = 0
+    result['next_cursor'] = cursor
+    result['cursor_length'] = 500
+    result['audience'] = audience
+    return result
+
+
+def subsribeTopic(topic_id, user_id):
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "SELECT EXISTS (SELECT 1 FROM user_topic_subscribe where user_id = %s and topic_id = %s)"
+        )
+        cur.execute(sql, [int(user_id), int(topic_id)])
+        fetched = cur.fetchone()
+
+        if not fetched[0]:
+            sql = (
+                "INSERT INTO user_topic_subscribe "
+                "(user_id, topic_id) "
+                "VALUES (%s, %s)"
+            )
+            cur.execute(sql, [int(user_id), int(topic_id)])
+
+
+def unsubsribeTopic(topic_id, user_id):
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "SELECT EXISTS (SELECT 1 FROM user_topic_subscribe where user_id = %s and topic_id = %s)"
+        )
+        cur.execute(sql, [int(user_id), int(topic_id)])
+        fetched = cur.fetchone()
+        if fetched[0]:
+            sql = (
+                "DELETE FROM user_topic_subscribe "
+                "WHERE user_id = %s and topic_id = %s;"
+            )
+            cur.execute(sql, [int(user_id), int(topic_id)])
+            sql = (
+                "UPDATE users "
+                "SET current_topic_id = %s "
+                "WHERE user_id = %s"
+            )
+            cur.execute(sql, [None, int(user_id)])

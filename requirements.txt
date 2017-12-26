@@ -9,3 +9,4 @@ jellyfish
 rq
 pycountry
 raven
+python-decouple

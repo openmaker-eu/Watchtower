@@ -7,6 +7,7 @@ from psycopg2.pool import ThreadedConnectionPool
 import urllib.request
 import re
 import sys
+from decouple import config
 
 from application.utils.Singleton import Singleton
 
@@ -37,32 +38,32 @@ class Connection:
 
             self.machine_host = host
 
-            self.MongoDBClient = pymongo.MongoClient('mongodb://admin:smio1EUp@'+host+':27017/', connect=False)
+            self.MongoDBClient = pymongo.MongoClient('mongodb://'+config("MONGODB_USER")+":"+config("MONGODB_PASSWORD")+'@'+host+':27017/', connect=False)
             self.db = self.MongoDBClient.openMakerdB
             self.newsdB = self.MongoDBClient.newsdB
             self.feedDB = self.MongoDBClient.feedDB
             self.conversations = self.MongoDBClient.conversations
             self.events = self.MongoDBClient.events
             self.hashtags = self.MongoDBClient.hashtags
-            self.redditFacebookDB = self.MongoDBClient.redditFacebookDB
             self.newsPoolDB = self.MongoDBClient.newsPool
-
-            self.influencerDB = self.MongoDBClient.influencers_test # new db for influencers
-            self.audienceDB = self.MongoDBClient.audience_test # new db for audience
-            self.audience_samples_DB = self.MongoDBClient.audience_samples # new db for audience samples
-            self.audience_networks_DB = self.MongoDBClient.audience_networks # new db for audience networks
-            self.local_influencers_DB = self.MongoDBClient.local_influencers # new db for local influencers
-
             self.filteredNewsPoolDB = self.MongoDBClient.filteredNewsPool
-            self.infDB = self.MongoDBClient.influenceRanks
 
+            # AUDIENCE
+            self.influencerDB = self.MongoDBClient.influencers_test # db for influencers
+            self.audienceDB = self.MongoDBClient.audience_test # db for audience
+            self.audience_samples_DB = self.MongoDBClient.audience_samples # db for audience samples
+            self.local_influencers_DB = self.MongoDBClient.local_influencers # db for local influencers
+            self.audience_networks_DB = self.MongoDBClient.audience_networks # db for audience networks
+
+            # POSTGRE - INFO ABOUT TOPICS IS HELD HERE.
             self.pg_pool = psycopg2.pool.ThreadedConnectionPool(
                 1, 15,
                 host=host,
                 port='5432',
-                user='openmakerpsql',
-                password='smio1EUp',
-                database='openmakerdb')
+                user=config("POSTGRESQL_USER"),
+                password=config("POSTGRESQL_PASSWORD"),
+                database=config("POSTGRESQL_DB"))
+
 
             print("new connection")
         except Exception as e:

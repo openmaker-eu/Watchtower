@@ -72,17 +72,25 @@
         <link rel="stylesheet" type="text/css" href="static/css/topic_card.css"/>
     {% endif %}
 
-    {% if type == "news" %}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
-    <link rel="stylesheet" type="text/css" href="static/css/star-rating.css"/>
+    {% if type == "news" or type=="bookmark" %}
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
+        <link rel="stylesheet" type="text/css" href="static/css/star-rating.css"/>
         <!--<link rel="stylesheet" type="text/css" href="static/css/news_card.css"/>-->
     {% endif %}
 
     {% if type == "audiences" %}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
-    <link rel="stylesheet" type="text/css" href="static/css/star-rating.css"/>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
+        <link rel="stylesheet" type="text/css" href="static/css/star-rating.css"/>
         <link rel="stylesheet" type="text/css" href="static/css/audience_card.css"/>
         <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
+    {% endif %}
+
+    {% if type == "recommendations" %}
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
+        <link rel="stylesheet" type="text/css" href="static/css/star-rating.css"/>
+        <link rel="stylesheet" type="text/css" href="static/css/audience_card.css"/>
+        <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
+
     {% endif %}
 
     {% if type == "editAlert" or type == "createAlert" %}
@@ -90,31 +98,31 @@
     {% endif %}
 
     {% if type == "profile" %}
-    <style type="text/css">
-      @import url("//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css");
+        <style type="text/css">
+            @import url("//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css");
 
-      .spinner {
-        display: inline-block;
-        opacity: 0;
-        max-width: 0;
+            .spinner {
+                display: inline-block;
+                opacity: 0;
+                max-width: 0;
 
-        -webkit-transition: opacity 0.25s, max-width 0.45s;
-        -moz-transition: opacity 0.25s, max-width 0.45s;
-        -o-transition: opacity 0.25s, max-width 0.45s;
-        transition: opacity 0.25s, max-width 0.45s;
-        /* Duration fixed since we animate additional hidden width */
-      }
+                -webkit-transition: opacity 0.25s, max-width 0.45s;
+                -moz-transition: opacity 0.25s, max-width 0.45s;
+                -o-transition: opacity 0.25s, max-width 0.45s;
+                transition: opacity 0.25s, max-width 0.45s;
+                /* Duration fixed since we animate additional hidden width */
+            }
 
-      .has-spinner.active {
-        cursor: progress;
-      }
+            .has-spinner.active {
+                cursor: progress;
+            }
 
-      .has-spinner.active .spinner {
-        opacity: 1;
-        max-width: 50px;
-        /* More than it will ever come, notice that this affects on animation duration */
-      }
-    </style>
+            .has-spinner.active .spinner {
+                opacity: 1;
+                max-width: 50px;
+                /* More than it will ever come, notice that this affects on animation duration */
+            }
+        </style>
     {% endif %}
 
 </head>
@@ -146,12 +154,12 @@
                 <li {% if type=="events" %} class="active" {% endif %}>
                     <a href="/Events">Events</a>
                 </li>
-                <li {% if type=="bookmark" %} class="active" {% endif %} class="dropdown">
+                <li class="dropdown">
                     <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span
-                            class="glyphicon glyphicon-user"></span> {{ username }}
-                        <span class="caret"></span></a>
+                            class="glyphicon glyphicon-user"></span> {{ username }} <span class="caret"></span></a>
                     <ul class="dropdown-menu">
                         <li><a href="/profile">My Profile</a></li>
+                        <li><a href="/Recommendations">Recommendations</a></li> <!-- Added for recommendations -->
                         <li><a href="/bookmark">Bookmarks</a></li>
                         <li><a href="/logout">Logout</a></li>
                     </ul>
@@ -183,15 +191,8 @@
                                 class="selection pull-left">Select a Topic</span>
                             <span class="pull-right glyphiconglyphicon-chevron-down caret"
                                   style="float:right;margin-top:10px;"></span></a>
-                        <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
-                            {% for alert in alerts %}
-                                <li>
-                                    <a data-id="{{ alert['alertid'] }}" class="newsalerts">
-                                        <h4><span> {{ alert['name'] }}</span></h4>
-                                        <p>Keywords: {{ ", ".join(alert['keywords']) }} <br>
-                                            Languages: {{ ", ".join(alert['lang']) }} </p></a>
-                                </li>
-                            {% endfor %}
+                        <ul class="dropdown-menu" id="topic_dropdown" role="menu" aria-labelledby="dropdownMenu1">
+                            {% include'alertDropdownMenu.html' %}
                         </ul>
                     </div>
                 </li>
@@ -205,6 +206,13 @@
                 {% endif %}
                 {% if type == "events" %}
                     {% include 'eventDateButtons.html' %}
+                {% endif %}
+                {% if type == "recommendations" %}
+                    {% include 'selectLocation.html' %}
+                    {% include 'recommendationRatedButton.html' %}
+                {% endif %}
+                {% if type == "audiences" %}
+                    {% include 'selectLocation.html' %}
                 {% endif %}
                 <!--
                   <form class="navbar-form" role="search">
@@ -248,6 +256,9 @@
 {% if type == "audiences" %}
     {% include 'audience.html' %}
 {% endif %}
+{% if type == "recommendations" %}
+    {% include 'recommendations.html' %}
+{% endif %}
 {% if type == "search" %}
     {% include 'search.html' %}
 {% endif %}
@@ -265,6 +276,7 @@
 ================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->
 
+<script src="/js/jquery.3.2.1.js"></script>
 <script src="/js/jquery.min.js"></script>
 <script src="/js/bootstrap.min.js"></script>
 <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
@@ -275,7 +287,7 @@
 
 <script>
     $(document).ready(function () {
-        $(".dropdown-menu").on('click', 'li a', function () {
+        $("#topic_dropdown").on('click', 'li a', function () {
             if ($(this).attr("data-id") != undefined) {
                 var selText = $(this).children("h4").html();
                 console.log(selText);
@@ -292,6 +304,24 @@
                 });
             }
         });
+
+        $("#location_dropdown").on('click', 'li a', function () {
+            if ($(this).attr("data-id") != undefined) {
+                var selText = $(this).children("h4").html();
+                console.log(selText);
+                $(this).parent('li').siblings().removeClass('active');
+                $(this).parents('.btn-group').find('.selection').html(selText);
+                $(this).parents('li').addClass("active");
+                var location = $(this).attr("data-id");
+                $.ajax({
+                    url: '/saveLocation',
+                    method: 'POST',
+                    data: {
+                        'location': location
+                    }
+                });
+            }
+        });
     });
 </script>
 
@@ -303,6 +333,12 @@
             $("li a[data-id={{topic['topic_id']}}]").parent('li').siblings().removeClass('active');
             $("li a[data-id={{topic['topic_id']}}]").parents('.btn-group').find('.selection').html(selText);
             $("li a[data-id={{topic['topic_id']}}]").parents('li').addClass("active");
+
+            var selText = $("li a[data-id={{location}}]").children("h4").html();
+            console.log("{{location}}");
+            $("li a[data-id={{location}}]").parent('li').siblings().removeClass('active');
+            $("li a[data-id={{location}}]").parents('.btn-group').find('.selection').html(selText);
+            $("li a[data-id={{location}}]").parents('li').addClass("active");
         });
     </script>
 {% endif %}
@@ -355,10 +391,13 @@
     <script src="/js/audiences.js"></script>
 {% endif %}
 
+{% if type == "recommendations" %}
+    <script src="/js/recommendations.js"></script>
+{% endif %}
+
 {% if type == "profile" %}
-<script src="/js/jquery-1.11.1.min.js"></script>
-<script src="/js/bootstrap.min.js"></script>
-<script type="text/javascript" src="static/js/profile.js"></script>
+    <script src="/js/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="/js/profile.js"></script>
 {% endif %}
 </body>
 
