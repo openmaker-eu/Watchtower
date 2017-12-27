@@ -1,4 +1,3 @@
-from predictor import Predictor
 import pymongo
 import time
 from pdb import set_trace
@@ -9,6 +8,31 @@ MONGO_USERNAME_PASS = 'mongodb://admin:smio1EUp@'
 MONGO_PORT = ':27017/'
 ###
 
+def update_field_collection(host, collection_name, database, field_name, predictor):
+    print("Now processing collection :", collection_name)
+
+    # Set the update field
+    update_field_name = "predicted_" + field_name
+
+    collection = database.get_collection(collection_name)
+    bulk = collection.initialize_unordered_bulk_op()
+
+    t_start = time.time()
+
+    for record in collection.find():
+        if field_name in record:
+            bulk.find({'_id':record['_id']}).update({'$set' : {update_field_name : predictor.predict_location(record[field_name])}})
+        else:
+            bulk.find({'_id':record['_id']}).update({'$set' : {update_field_name : ""}})
+
+    try:
+        bulk.execute()
+        t_end = time.time()
+        print("     It took {} seconds ...".format(t_end - t_start))
+    except pymongo.errors.InvalidOperation:
+        print("     NO RECORD WITH {} FIELD".format(field_name.upper()))
+
+
 def update_field_db(host, database_name, field_name):
     # Connect to server
     mongoDBClient = pymongo.MongoClient(MONGO_USERNAME_PASS+host+MONGO_PORT, connect=False)
@@ -18,36 +42,14 @@ def update_field_db(host, database_name, field_name):
 
     database = mongoDBClient.get_database(database_name)
 
-    # Create predictor object
-    predictor = Predictor(LOC_DATABASE_PATH, COUNTRY_DATABASE_PATH)
-
     # Which collections to pass
     exclude = ["all_audience"]
 
     # Get names of all collections in the database
     collection_names = database.collection_names()
 
-    # Set the update field
-    update_field_name = "predicted_" + field_name
+    # Create predictor object
+    predictor = Predictor(LOC_DATABASE_PATH, COUNTRY_DATABASE_PATH)
 
     for collection_name in collection_names:
-        if collection_name  not in exclude:
-            print("Now processing collection :", collection_name)
-
-            collection = database.get_collection(collection_name)
-            bulk = collection.initialize_unordered_bulk_op()
-        
-            t_start = time.time()        
-
-            for record in collection.find():
-                if field_name in record:
-                    bulk.find({'_id':record['_id']}).update({'$set' : {update_field_name : predictor.predict_location(record[field_name])}})
-                else:
-                    bulk.find({'_id':record['_id']}).update({'$set' : {update_field_name : ""}})
-
-            try:
-                bulk.execute()
-                t_end = time.time()
-                print("     It took {} seconds ...".format(t_end - t_start))
-            except pymongo.errors.InvalidOperation:
-                print("     NO RECORD WITH {} FIELD".format(field_name.upper()))
+        update_field_collection(host, collection_name, database, field_name,predictor)
