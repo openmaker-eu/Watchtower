@@ -47,6 +47,8 @@ class Connection:
             self.hashtags = self.MongoDBClient.hashtags
             self.newsPoolDB = self.MongoDBClient.newsPool
             self.filteredNewsPoolDB = self.MongoDBClient.filteredNewsPool
+            self.infDB = self.MongoDBClient.influenceRanks
+
 
             # AUDIENCE
             self.influencerDB = self.MongoDBClient.influencers_test # db for influencers

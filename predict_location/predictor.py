@@ -1,4 +1,3 @@
-from utils import country_code_for_location, country_code_for_country
 from enum import Enum
 from pdb import set_trace
 
@@ -27,10 +26,10 @@ class Predictor(object):
                 z.split() for z in countries[1:-1].split(",")]]
                 database[city] = countries
         return database
-        
+
     def fetch_country_code_database(self, location_database_path):
         database = {}
-        with open("country_code.txt", "r") as source:
+        with open(location_database_path, "r") as source:
             for line in source:
                 country, code = [x.strip() for x in line.split("-")]
                 database[country] = code
