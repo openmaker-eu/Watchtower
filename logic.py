@@ -990,3 +990,13 @@ def unsubsribeTopic(topic_id, user_id):
                 "WHERE user_id = %s"
             )
             cur.execute(sql, [None, int(user_id)])
+
+def getRelatedLocations():
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "SELECT * "
+            "FROM related_locations;"
+        )
+        cur.execute(sql, [])
+        locations = cur.fetchall()
+        return [{'location_name': i[0], 'location_code': i[1]} for i in locations]
