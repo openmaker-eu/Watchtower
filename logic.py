@@ -995,7 +995,7 @@ def getRelatedLocations():
     with Connection.Instance().get_cursor() as cur:
         sql = (
             "SELECT * "
-            "FROM related_locations;"
+            "FROM relevant_locations;"
         )
         cur.execute(sql, [])
         locations = cur.fetchall()
