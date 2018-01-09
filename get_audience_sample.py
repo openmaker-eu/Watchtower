@@ -7,8 +7,13 @@ import time  # for debug
 import numpy as np  # for sampling
 
 import location_regex  # to get regular expressions for locations
-from application.Connections import Connection
 
+from predict_location.predictor import Predictor # for location
+from predict_location.update_field_db import update_field_collection as findPredictedLocation
+
+from application.Connections import Connection
+import os
+from bson.json_util import dumps
 
 def print_sample_audience(sample_audience_weighted, sample_audience_exploration):
     print('{:>1}{:>20}{:>40}{:>20}'.format("", "Screen name", "Location", "Followers count, Influencers count"))
@@ -35,21 +40,35 @@ def print_sample_audience(sample_audience_weighted, sample_audience_exploration)
 def get_audience_sample_by_topic(userID, topicID, location, sample_size, signal_strength):
     start = time.time()
     location = location.lower()  # cast location to lowercase
+    loc_filtered_audience_ids = []
+
     # filter audience by location
     if (location.lower() == 'global'): # do not filter by a specific location.
-        loc_filtered_audience_ids = []
         try:
             loc_filtered_audience_ids = Connection.Instance().audienceDB[str(topicID)].distinct('id', {'processed':True,'location':{'$ne':''},'$where': 'this.influencers.length > ' + str(signal_strength)})
         except:
             for audience_member in Connection.Instance().audienceDB[str(topicID)].find({'processed':True,'location':{'$ne':''},'$where': 'this.influencers.length > '+ str(signal_strength)},{'_id':0,'id':1}):
                 loc_filtered_audience_ids.append(audience_member['id'])
     else:
-        regx = location_regex.getLocationRegex(location)
-        loc_filtered_audience_ids = []
+        location_predictor = Predictor()
+        location = location_predictor.predict_location(location)
+        # regx = location_regex.getLocationRegex(location)
+        # loc_filtered_audience_ids = []
+        # try:
+        #     loc_filtered_audience_ids = Connection.Instance().audienceDB[str(topicID)].distinct('id', {'location': {'$regex':regx}})
+        # except:
+        #     for audience_member in Connection.Instance().audienceDB[str(topicID)].find({'location': regx}, {'id': 1}):
+        #         loc_filtered_audience_ids.append(audience_member['id'])
+
+        # if 'predicted_location' not in dumps(Connection.Instance().audienceDB[str(topicID)].find({}).sort([('_id',-1)]).limit(1)):
+        #     print("running predict location...")
+        #     # call predicted_location function on current topic
+        #     findPredictedLocation(Connection.Instance().machine_host, str(topicID), Connection.Instance().audienceDB, "location", location_predictor)
+
         try:
-            loc_filtered_audience_ids = Connection.Instance().audienceDB[str(topicID)].distinct('id', {'location': {'$regex':regx}})
+            loc_filtered_audience_ids = Connection.Instance().audienceDB[str(topicID)].distinct('id',{'predicted_location':{'$exists':True}, 'predicted_location':location, '$where':'this.influencers.length > ' + str(signal_strength)})
         except:
-            for audience_member in Connection.Instance().audienceDB[str(topicID)].find({'location': regx}, {'id': 1}):
+            for audience_member in Connection.Instance().audienceDB[str(topicID)].find({'predicted_location':{'$exists':True}, 'predicted_location':location, '$where':'this.influencers.length > ' + str(signal_strength)},{'_id':0,'id':1}):
                 loc_filtered_audience_ids.append(audience_member['id'])
 
     print("Filtered audience by location in " + str(time.time() - start) + " seconds.")
@@ -81,14 +100,19 @@ def get_audience_sample_by_topic(userID, topicID, location, sample_size, signal_
         uniform_distribution_sample_size = size - weighed_distribution_sample_size
         print(str(len(audience)))
         print(str(len(influencer_counts)))
+        try:
+            sample_audience_weighted = np.random.choice(audience, size=weighed_distribution_sample_size, replace=False,
+                                                        p=(influencer_counts ** 2) / sum(influencer_counts ** 2))
+        except:
+            print("The list lengths were not equal. Topic: " + str(topicID) + " , location: " + location + ". Sampling uniformly...")
+            sample_audience_weighted = np.random.choice(audience, size=weighed_distribution_sample_size,
+                                                       replace=False)
 
-        sample_audience_weighted = np.random.choice(audience, size=weighed_distribution_sample_size, replace=False,
-                                                    p=(influencer_counts ** 2) / sum(influencer_counts ** 2))
         # deterministic, sorted by influencers count.
         # sample_audience_weighted = sorted(audience, key=lambda x: x['influencers_count'], reverse=True)[0:weighed_distribution_sample_size]
         audience_left = [user for user in audience if user not in sample_audience_weighted]
         sample_audience_exploration = np.random.choice(audience_left, size=uniform_distribution_sample_size,
-                                                       replace=False)
+                                                   replace=False)
         print("Finished sampling in " + str(time.time() - start) + " seconds.")
 
         sample_audience = []
@@ -155,14 +179,24 @@ def main():
 
         if (getForAllLocations == "0"):
             return
-        locations = ['italy', 'slovakia', 'spain', 'uk', 'global', 'turkey']  # relevant locations
+
+        with Connection.Instance().get_cursor() as cur:
+            sql = (
+                "SELECT location_name, location_code "
+                "FROM relevant_locations "
+            )
+            cur.execute(sql)
+            location_dict = dict()
+            for location_name, location_code in cur.fetchall():
+                location_dict[location_code] = location_name
+
         for topicID, topicName in topics:
-            for loc in locations:
-                print("Sampling audience for LOCATION: " + loc + ", TOPIC: " + topicName + "(" + str(topicID) + ")")
+            for loc in list(location_dict.keys()):
+                print("Sampling audience for LOCATION: " + location_dict[loc] + ", TOPIC: " + topicName + "(" + str(topicID) + ")")
                 get_audience_sample_by_topic(userID=-1, topicID=topicID, location=loc, sample_size=N, signal_strength=signal_strength)
 
     else:
-        print("Usage: python get_audience_sample.py <server_ip> <location>")
+        print("Usage: python get_audience_sample.py <server_ip> <location> <fetch_for_all_relevant_locations>")
 
 
 if __name__ == "__main__":

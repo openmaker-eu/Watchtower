@@ -1,5 +1,6 @@
 from enum import Enum
 from pdb import set_trace
+import os
 
 class Code(Enum):
     USASTATECODE = 1
@@ -7,8 +8,8 @@ class Code(Enum):
     BOTH = 3
     NOTACODE = 4
 
-LOC_DATABASE_PATH = "city_location.txt"
-COUNTRY_DATABASE_PATH = "country_code.txt"
+LOC_DATABASE_PATH = os.getcwd() + "/predict_location/city_location.txt"
+COUNTRY_DATABASE_PATH = os.getcwd() + "/predict_location/country_code.txt"
 
 UsaStateCodes = ["al","ak","az","ar","ca","co","ct","de","dc","fl","ga","hi","id","il","in","ia","ks","ky","la",
 "me","md","ma","mi","mn","ms","mo","mt","ne","nv","nh","nj","nm","ny","nc","nd","oh","ok","or","pa","ri","sc","sd",
