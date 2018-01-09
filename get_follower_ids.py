@@ -22,6 +22,40 @@ auth = OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_secret)
 api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
 
+def copy_follower_ids_to_new_topics(influencer):
+    print("Checking for new topics...")
+    topics = influencer['topics']
+    if (len(topics)==1):
+        return
+
+    first_topic_follower_id_count = Connection.Instance().audienceDB[str(influencer['topics'][0])].count(
+        {'influencers': influencer['id']})
+
+    new_topics = []
+    for idx in range(1,len(topics)):
+        topicID = topics[idx]
+        if (Connection.Instance().audienceDB[str(topicID)].count(
+                {'influencers': influencer['id']}) < first_topic_follower_id_count):
+            new_topics.append(topicID)
+
+    if len(new_topics) != 0:
+        print("New topics added to the influencer: " + influencer['screen_name'])
+        for topicID in new_topics:
+            # for all topics that have been newly added to the infuencer,
+            # insert all the follower ids to the table of that topic using the first topic of the influencer.
+            print("Copying follower ids to topic: " + str(topicID))
+            Connection.Instance().audienceDB[str(topicID)].create_index("id", unique=True)
+            try:
+                Connection.Instance().audienceDB[str(topicID)].insert_many(list(
+                    Connection.Instance().audienceDB[str(influencer['topics'][0])].find(
+                        {'influencers': influencer['id']})), ordered=False)
+            except:
+                print("Exception in insert_many.")
+            try:
+                Connection.Instance().influencerDB['all_influencers'].update({"id":influencer['id']},{'$inc':{'processed_topic_count':1}})
+                print("Incremented processed topic count.")
+            except:
+                print("Error in updating processed_topic_count.")
 
 def get_follower_ids_by_influencer(influencer):
     '''
@@ -62,28 +96,6 @@ def get_follower_ids_by_influencer(influencer):
                 last_cursor = cursor.iterator.next_cursor
                 # pprint.pprint(api.rate_limit_status()['resources']['followers'])
             print("Page length: " + str(len(page)))
-
-            first_topic_follower_id_count = Connection.Instance().audienceDB[str(influencer['topics'][0])].count(
-                {'influencers': influencer['id']})
-            new_topics = []
-            for topicID in influencer['topics']:
-                if (Connection.Instance().audienceDB[str(topicID)].count(
-                        {'influencers': influencer['id']}) < first_topic_follower_id_count):
-                    new_topics.append(topicID)
-
-            if len(new_topics) != 0:
-                print("New topics added to this influencer!")
-            for topicID in new_topics:
-                # for all topics that have been newly added to the infuencer,
-                # insert all the follower ids to the table of that topic using the first topic of the influencer.
-                print("Copying follower ids to topic: " + str(topicID))
-                Connection.Instance().audienceDB[str(topicID)].create_index("id", unique=True)
-                try:
-                    Connection.Instance().audienceDB[str(topicID)].insert_many(list(
-                        Connection.Instance().audienceDB[str(influencer['topics'][0])].find(
-                            {'influencers': influencer['id']})), ordered=False)
-                except:
-                    print("Exception in insert_many.")
 
             # upsert many
             print("UPSERTING")
@@ -144,8 +156,7 @@ def get_follower_ids_by_influencer(influencer):
                 print("Followers that resulted in STOP: " + str(already_added_ids))
                 break
 
-            if influencer[
-                'finished_once'] == False:  # if we haven't finished processing an influencer, we need to update the last cursor.
+            if influencer['finished_once'] == False:  # if we haven't finished processing an influencer, we need to update the last cursor.
                 Connection.Instance().influencerDB['all_influencers'].update(
                     {'id': influencer['id']},
                     {'$set': {'last_cursor': last_cursor}}  # update last cursor of this influencer
@@ -185,18 +196,20 @@ def get_follower_ids():
         return
     INFLUENCER_COUNT = 0
     INFLUENCER_NUMBER = 0
-    N = 1000
+    N = 1500
     FOLLOWERS_LIMIT = int(sys.argv[2]) # pass the influencers who have more followers than the limit
 
     # sort influencers from most to least recently retrieved
     influencers = list(
-        #Connection.Instance().influencerDB['all_influencers'].find({}).sort([('_id', pymongo.DESCENDING)]))
-        Connection.Instance().influencerDB['all_influencers'].find({}).sort([('_id', pymongo.ASCENDING)]))
+        Connection.Instance().influencerDB['all_influencers'].find({}).sort([('_id', pymongo.DESCENDING)])
+        #Connection.Instance().influencerDB['all_influencers'].find({}).sort([('_id', pymongo.ASCENDING)])
+        )
 
     for influencer in influencers:
         #print("\nLooking at influencer no " + str(len(influencers) - INFLUENCER_NUMBER) + ":" + influencer['screen_name'])
         INFLUENCER_NUMBER += 1
         print("\nLooking at influencer no " + str(INFLUENCER_NUMBER) + ":" + influencer['screen_name'])
+        copy_follower_ids_to_new_topics(influencer)
         if influencer['followers_count']> FOLLOWERS_LIMIT:
             print("Passing this influencer as his followers count exceeds the limit.")
             continue
