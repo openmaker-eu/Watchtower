@@ -30,9 +30,22 @@ def getLocalInfluencers(topic_id, location, cursor):
                 result['error'] = "Topic does not exist."
                 return json.dumps(result, indent=4)
 
-            # error handling needed for location
             location = location.lower()
-
+            # error handling needed for location
+            with Connection.Instance().get_cursor() as cur:
+                sql = (
+                    "SELECT location_code "
+                    "FROM relevant_locations "
+                    "WHERE location_name = %s "
+                    "OR location_code = %s;"
+                )
+                try:
+                    cur.execute(sql, [location, location])
+                    location = cur.fetchall()[0][0]
+                except:
+                    result['error'] = "Location does not exist."
+                    return json.dumps(result, indent=4)
+                
             collection = Connection.Instance().local_influencers_DB[str(topic_id)+"_"+str(location)]
 
             if location == "global":
@@ -98,6 +111,21 @@ def getAudienceSample(topic_id, location, cursor):
             # error handling needed for location
             print("Location: " + str(location))
             location = location.lower()
+
+            # error handling needed for location
+            with Connection.Instance().get_cursor() as cur:
+                sql = (
+                    "SELECT location_code "
+                    "FROM relevant_locations "
+                    "WHERE location_name = %s "
+                    "OR location_code = %s;"
+                )
+                try:
+                    cur.execute(sql, [location, location])
+                    location = cur.fetchall()[0][0]
+                except:
+                    result['error'] = "Location does not exist."
+                    return json.dumps(result, indent=4)
 
             audience_sample = list(
             Connection.Instance().audience_samples_DB[str(location)+"_"+str(topic_id)].find({},

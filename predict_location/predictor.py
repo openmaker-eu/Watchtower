@@ -1,5 +1,6 @@
 from enum import Enum
 from pdb import set_trace
+import os
 
 class Code(Enum):
     USASTATECODE = 1
@@ -7,15 +8,18 @@ class Code(Enum):
     BOTH = 3
     NOTACODE = 4
 
+LOC_DATABASE_PATH = os.getcwd() + "/predict_location/city_location.txt"
+COUNTRY_DATABASE_PATH = os.getcwd() + "/predict_location/country_code.txt"
+
 UsaStateCodes = ["al","ak","az","ar","ca","co","ct","de","dc","fl","ga","hi","id","il","in","ia","ks","ky","la",
 "me","md","ma","mi","mn","ms","mo","mt","ne","nv","nh","nj","nm","ny","nc","nd","oh","ok","or","pa","ri","sc","sd",
 "tn","tx","ut","vt","va","wa","wv","wi","wy"]
 
 class Predictor(object):
     """Predict location from given location string"""
-    def __init__(self, location_database_path, country_code_database_path):
-        self.location_database = self.fetch_location_database(location_database_path)
-        self.country_code_database = self.fetch_country_code_database(country_code_database_path)
+    def __init__(self):
+        self.location_database = self.fetch_location_database(LOC_DATABASE_PATH)
+        self.country_code_database = self.fetch_country_code_database(COUNTRY_DATABASE_PATH)
 
     def fetch_location_database(self, location_database_path):
         database = {}

@@ -80,8 +80,11 @@ def get_all_user_profiles_by_topic(topicID):
             'processed': False})
     except:
         print("Size of the unprocessed audience list for current topic exceeds 16MB. Appending one by one.")
-        for userProfile in Connection.Instance().audienceDB[str(topicID)].find({'processed': False}, {'id': 1}):
-            userID_list_unprocessed_for_current_topic.append(userProfile['id'])
+        try:
+            for userProfile in Connection.Instance().audienceDB[str(topicID)].find({'processed': False}, {'id': 1}):
+                userID_list_unprocessed_for_current_topic.append(userProfile['id'])
+        except:
+            pass
     print("Unprocessed user ids for current topic found in " + str(time.time() - start) + " seconds.")
     start = time.time()
 
@@ -198,10 +201,11 @@ def main():
             "FROM topics "
         )
         cur.execute(sql)
-        topics = cur.fetchall()  # list of all topics
+        topics = [e[0] for e in cur.fetchall()]  # list of all topics
+
         while (1):
             for topic in topics:
-                get_all_user_profiles_by_topic(topicID=topic[0])
+                get_all_user_profiles_by_topic(topicID=topic)
             time.sleep(3)
 
 
