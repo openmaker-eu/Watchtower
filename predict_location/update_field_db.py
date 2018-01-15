@@ -14,12 +14,11 @@ def update_field_collection(host, collection_name, database, field_name, predict
 
     collection = database.get_collection(collection_name)
     bulk = collection.initialize_unordered_bulk_op()
-    
+
     cursor = collection.find({update_field_name : {"$exists" : False}}).limit(BATCH_SIZE)
     n = 1
     while cursor.count(with_limit_and_skip=True):
         print("...Processing batch " + str(n))
-
         for record in cursor:
             if update_field_name in record:
                 continue
@@ -27,8 +26,6 @@ def update_field_collection(host, collection_name, database, field_name, predict
                 bulk.find({'_id':record['_id']}).update({'$set' : {update_field_name : predictor.predict_location(record[field_name])}})
             else:
                 bulk.find({'_id':record['_id']}).update({'$set' : {update_field_name : ""}})
-
-
         try:
             bulk.execute()
         except pymongo.errors.InvalidOperation:

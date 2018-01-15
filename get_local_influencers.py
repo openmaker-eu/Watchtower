@@ -33,11 +33,22 @@ def get_local_influencers_by_topic(topicID, location, size,signal_strength=5, FO
     #     print("running predict location...")
     #     # call predicted_location function on current topic
     #     findPredictedLocation(Connection.Instance().machine_host, str(topicID), Connection.Instance().audienceDB, "location", location_predictor)
-    try:
-        loc_filtered_audience_ids = Connection.Instance().audienceDB[str(topicID)].distinct('id',{'predicted_location':{'$exists':True}, 'predicted_location':location, '$where':'this.influencers.length > ' + str(signal_strength)})
-    except:
-        for audience_member in Connection.Instance().audienceDB[str(topicID)].find({'predicted_location':{'$exists':True}, 'predicted_location':location, '$where':'this.influencers.length > ' + str(signal_strength)},{'_id':0,'id':1}):
-            loc_filtered_audience_ids.append(audience_member['id'])
+    if 'predicted_location' not in dumps(Connection.Instance().audienceDB[str(topicID)].find({}).sort([('_id',-1)]).limit(1)):
+        print("Using regex for location...")
+        regx = getLocationRegex(location)
+        loc_filtered_audience_ids = []
+        try:
+            loc_filtered_audience_ids = Connection.Instance().audienceDB[str(topicID)].distinct('id', {'location': {'$regex':regx}})
+        except:
+            for audience_member in Connection.Instance().audienceDB[str(topicID)].find({'location': regx}, {'id': 1}):
+                loc_filtered_audience_ids.append(audience_member['id'])
+    else:
+        print("Using predictions for location...")
+        try:
+            loc_filtered_audience_ids = Connection.Instance().audienceDB[str(topicID)].distinct('id',{'predicted_location':{'$exists':True}, 'predicted_location':location, '$where':'this.influencers.length > ' + str(signal_strength)})
+        except:
+            for audience_member in Connection.Instance().audienceDB[str(topicID)].find({'predicted_location':{'$exists':True}, 'predicted_location':location, '$where':'this.influencers.length > ' + str(signal_strength)},{'_id':0,'id':1}):
+                loc_filtered_audience_ids.append(audience_member['id'])
 
     print("Filtered audience in " + str(time.time()-start) + " seconds. Audience size: " +str(len(loc_filtered_audience_ids)) )
     start = time.time()
