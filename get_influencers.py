@@ -33,29 +33,34 @@ def get_influencers(topicID):
 
         keywords = topic[0][1]
         topic_name = topic[0][0]
+        important_topics = [2,3,4]
+
 
         for keyword in keywords.split(','):
             print("Retrieving for keyword: " + str(keyword.strip()))
+            a=1
+            if topicID in important_topics: a=2
+            print("A " + str(a))
+            for pageNo in range(1,a+1): # retrieve first two pages.
+                print("Influencers for page " + str(pageNo))
+                for influencer in api.search_users(q=keyword.strip(), page=pageNo): #retrieves 20 influencers per page
+                    # get influencer from Twitter
+                    influencer_dict = influencer._json
+                    # check if he already exists in the database
+                    inf = Connection.Instance().influencerDB['all_influencers'].find_one({'id': influencer_dict['id']})
+                    # if he exists,
+                    if (inf is not None):  # update his topics list
+                        Connection.Instance().influencerDB['all_influencers'].update(
+                            {'id': inf['id']},
+                            {'$addToSet': {
+                                'topics': topicID}})  # add current topic to his topics list if it has not been added before.
 
-            for influencer in api.search_users(
-                    q=keyword.strip()):  # !!!: retrieves 20 influencers per request (first page only)
-                # get influencer from Twitter
-                influencer_dict = influencer._json
-                # check if he already exists in the database
-                inf = Connection.Instance().influencerDB['all_influencers'].find_one({'id': influencer_dict['id']})
-                # if he exists,
-                if (inf is not None):  # update his topics list
-                    Connection.Instance().influencerDB['all_influencers'].update(
-                        {'id': inf['id']},
-                        {'$addToSet': {
-                            'topics': topicID}})  # add current topic to his topics list if it has not been added before.
-
-                    pprint.pprint("influencer already in the list: " + inf['screen_name'])
-                else:  # if not, add him to the collection
-                    influencer_dict['topics'] = [topicID]
-                    influencer_dict['finished_once'] = False
-                    # print(influencer_dict)
-                    Connection.Instance().influencerDB['all_influencers'].insert_one(influencer_dict)
+                        pprint.pprint("influencer already in the list: " + inf['screen_name'])
+                    else:  # if not, add him to the collection
+                        influencer_dict['topics'] = [topicID]
+                        influencer_dict['finished_once'] = False
+                        # print(influencer_dict)
+                        Connection.Instance().influencerDB['all_influencers'].insert_one(influencer_dict)
 
         print("Influencers of topic: " + topic_name + " found and inserted into database.")
 
@@ -80,7 +85,7 @@ def get_all_influencers():
         count = 1
         insertcount = 1
         for influencer in Connection.Instance().influencerDB.all_influencers.find({}):
-            print("influencer # " + str(count) + " topics: " + str(influencer['topics']))
+            #print("influencer # " + str(count) + " topics: " + str(influencer['topics']))
             count += 1
             for topicID in influencer['topics']:
                 inf = Connection.Instance().influencerDB[str(topicID)].find_one({'id': influencer['id']})
