@@ -1219,9 +1219,7 @@ class ConversationHandler(BaseHandler, TemplateRendering):
 def main(mainT):
     tornado.options.parse_command_line()
     app = Application(mainT)
-    app.sentry_client = AsyncSentryClient(
-        'https://ac7034cd7eca4931af72b3ee24fa2daa:9c548399be7f4d79a70cef1e0c08e6ca@sentry.io/250084'
-    )
+    app.sentry_client = AsyncSentryClient(config("SENTRY_TOKEN"))
     app.listen(8484)
     tornado.ioloop.IOLoop.current().start()
 
