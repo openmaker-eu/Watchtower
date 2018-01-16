@@ -8,12 +8,22 @@ from application.Connections import Connection
 import location_regex # to get regular expressions for locations
 import csv # for sort by location
 import pprint
+from application.utils import general_utils
+from predict_location.predictor import Predictor # for location
+
 def getLocalInfluencers(topic_id, location, cursor):
     '''
     returns maximum 20 local influencers for the given topic and location; 10 in each page.
     if next_cursor = 0, you are on the last page.
     '''
     result = {}
+    cursor_range = 10
+    max_cursor = 20
+    cursor = int(cursor)
+    if cursor >= max_cursor:
+        result['local_influencers']=[]
+        result['error'] = "Cannot exceed max cursor = " + str(max_cursor) + "."
+        return json.dumps(result, indent=4)
     if (str(topic_id) != "None"):
         with Connection.Instance().get_cursor() as cur:
             sql = (
@@ -45,7 +55,7 @@ def getLocalInfluencers(topic_id, location, cursor):
                 except:
                     result['error'] = "Location does not exist."
                     return json.dumps(result, indent=4)
-                
+
             collection = Connection.Instance().local_influencers_DB[str(topic_id)+"_"+str(location)]
 
             if location == "global":
@@ -61,21 +71,22 @@ def getLocalInfluencers(topic_id, location, cursor):
                  'time-zone':1,
                  'lang':1,
                  'profile_image_url_https':1
-                 })[cursor:cursor+10]
+                 })[cursor:min(cursor+cursor_range,max_cursor)]
                 )
 
             result['topic'] = topic_name
             result['location'] = location
 
-            cursor = int(cursor)
-            result['next_cursor'] = cursor + 10
-            if cursor!=0: result['previous_cursor'] = cursor - 10 # if we are on the first page, there is no previous cursor
+            result['next_cursor'] = cursor + (cursor_range-cursor%cursor_range)
+            if cursor!=0: result['previous_cursor'] = cursor - cursor_range if cursor%cursor_range == 0 else cursor - cursor%cursor_range # if we are on the first page, there is no previous cursor
 
             # cursor boundary checks
-            if result['next_cursor']  >= 20 or len(local_influencers) < 10:
+            if result['next_cursor']  >= max_cursor or len(local_influencers) < cursor_range:
                 result['next_cursor'] = 0
-            if cursor <=10 and cursor !=0:
-                result['previous_cursor'] = -1
+            if 'previous_cursor' in result:
+                if result['previous_cursor']  == 0:
+                    result['previous_cursor']  = -1
+            result['next_cursor_str'] = str(result['next_cursor'])
 
             result['local_influencers'] = local_influencers
     else:
@@ -88,6 +99,12 @@ def getAudienceSample(topic_id, location, cursor):
     if next_cursor = 0, you are on the last page.
     '''
     result = {}
+    cursor_range = 10
+    max_cursor = 100
+    if cursor >= max_cursor:
+        result['audience_sample']=[]
+        result['error'] = "Cannot exceed max cursor = " + str(max_cursor) + "."
+        return json.dumps(result, indent=4)
     try:
         topic_id = int(topic_id)
     except:
@@ -137,21 +154,23 @@ def getAudienceSample(topic_id, location, cursor):
             'time-zone':1,
             'lang':1,
             'profile_image_url_https':1
-            })[cursor:cursor+10]
+            })[cursor:min(cursor+cursor_range,max_cursor)]
             )
 
             result['topic'] = topic_name
             result['location'] = location
 
             cursor = int(cursor)
-            result['next_cursor'] = cursor + 10
-            if cursor!=0: result['previous_cursor'] = cursor - 10 # if we are on the first page, there is no previous cursor
+            result['next_cursor'] = cursor + (cursor_range-cursor%cursor_range)
+            if cursor!=0: result['previous_cursor'] = cursor - cursor_range if cursor%cursor_range == 0 else cursor - cursor%cursor_range # if we are on the first page, there is no previous cursor
 
             # cursor boundary checks
-            if result['next_cursor']  >= 100 or len(audience_sample) < 10:
+            if result['next_cursor']  >= max_cursor or len(audience_sample) < cursor_range:
                 result['next_cursor'] = 0
-            if cursor <=10 and cursor!=0:
-                result['previous_cursor'] = -1
+            if 'previous_cursor' in result:
+                if result['previous_cursor']  == 0:
+                    result['previous_cursor']  = -1
+            result['next_cursor_str'] = str(result['next_cursor'])
 
             result['audience_sample'] = audience_sample
 
@@ -160,8 +179,15 @@ def getAudienceSample(topic_id, location, cursor):
     return json.dumps(result, indent=4)
 
 def getEvents(topic_id, sortedBy, location, cursor):
+    cursor_range = 10
+    max_cursor = 100
     result = {}
     events = []
+    location = location.lower()
+    if cursor >= max_cursor:
+        result['events']=[]
+        result['error'] = "Cannot exceed max cursor = " + str(max_cursor) + "."
+        return json.dumps(result, indent=4)
     try:
         topic_id = int(topic_id)
     except:
@@ -200,7 +226,15 @@ def getEvents(topic_id, sortedBy, location, cursor):
 
         print("Location: " + str(location))
         if location !="" and location.lower()!="global":
-            print("Filtering and sorting by location")
+            #location_predictor = Predictor()
+            #location = location_predictor.predict_location(location)
+            if location == "italy": location = "it"
+            elif location == "spain": location = "es"
+            elif location == "slovakia": location = "sk"
+            elif location == "uk": location = "gb"
+            elif location == "turkey": location = "tr"
+
+            print("Filtering and sorting by location: " + location)
             EVENT_LIMIT = 70
             COUNTRY_LIMIT=80
             cdl = []
@@ -240,23 +274,25 @@ def getEvents(topic_id, sortedBy, location, cursor):
                   ]))
                   count+=1
                   print("length:" + str(len(events)))
-                  if len(events) > min(cursor+10,EVENT_LIMIT):
+                  if len(events) > min(cursor+cursor_range,EVENT_LIMIT):
                       break
                   if (count > COUNTRY_LIMIT):
                       break
 
             #pprint.pprint([e['place'] for e in events])
-            display_events= events[cursor:cursor+10]
+            display_events= events[cursor:min(cursor+cursor_range,max_cursor)]
 
-            result['next_cursor'] = cursor + 10
-            if cursor!=0: result['previous_cursor'] = cursor - 10 # if we are on the first page, there is no previous cursor
+            result['next_cursor'] = cursor + (cursor_range-cursor%cursor_range)
+            if cursor!=0: result['previous_cursor'] = cursor - cursor_range if cursor%cursor_range == 0 else cursor - cursor%cursor_range # if we are on the first page, there is no previous cursor
 
             # cursor boundary checks
-            if result['next_cursor']  >= min(EVENT_LIMIT,100) or len(display_events) < 10:
+            if result['next_cursor']  >= min(EVENT_LIMIT,max_cursor) or len(display_events) < cursor_range:
                 result['next_cursor'] = 0
-            if cursor <=10 and cursor!=0:
-                result['previous_cursor'] = -1
+            if 'previous_cursor' in result:
+                if result['previous_cursor']  == 0:
+                    result['previous_cursor']  = -1
 
+            result['next_cursor_str'] = str(result['next_cursor'])
             result['events'] = display_events
 
         else:
@@ -278,19 +314,187 @@ def getEvents(topic_id, sortedBy, location, cursor):
                 }},
                 {'$sort': sort},
                 {'$skip': int(cursor)},
-                {'$limit': 10}
+                {'$limit': min(cursor_range,max_cursor-cursor)}
             ]))
-
             cursor = int(cursor)
-            result['next_cursor'] = cursor + 10
-            if cursor!=0: result['previous_cursor'] = cursor - 10 # if we are on the first page, there is no previous cursor
+            result['next_cursor'] = cursor + (cursor_range-cursor%cursor_range)
+            if cursor!=0: result['previous_cursor'] = cursor - cursor_range if cursor%cursor_range == 0 else cursor - cursor%cursor_range # if we are on the first page, there is no previous cursor
 
             # cursor boundary checks
-            if result['next_cursor']  >= 100 or len(events) < 10:
+            if result['next_cursor']  >= max_cursor or len(events) < cursor_range:
                 result['next_cursor'] = 0
-            if cursor <=10 and cursor!=0:
-                result['previous_cursor'] = -1
+            if 'previous_cursor' in result:
+                if result['previous_cursor']  == 0:
+                    result['previous_cursor']  = -1
+
+            result['next_cursor_str'] = str(result['next_cursor'])
 
             result['events']= events
 
-        return result
+        return json.dumps(result, indent=4)
+
+
+def getNewsFeeds(date, cursor, forbidden_domain, topics):
+    result = {}
+    cursor_range = 20
+    max_cursor = 100
+    if topics == [""]:
+        return json.dumps({})
+
+    cursor = int(cursor)
+    if cursor >= max_cursor:
+        result['news']=[]
+        result['error'] = "Cannot exceed max cursor = " + str(max_cursor) + "."
+        return json.dumps(result, indent=4)
+
+    dates = ['yesterday', 'week', 'month']
+    if date not in dates:
+        result['Error'] = 'invalid date'
+        return json.dumps(result)
+
+    # feeds = list(Connection.Instance().filteredNewsPoolDB[themeid].find({'name': date}, {date: 1}))
+    # feeds = list(feeds[0][date][cursor:cursor+20])
+
+    #date = general_utils.determine_date(date)
+
+    news = []
+    for topic_id in topics:
+        #if len(news) >= cursor + 20:
+        #    break
+        #news = news + date_filter.getDateList(topic_id, int(date), forbidden_domain)
+        feeds = list(Connection.Instance().filteredNewsPoolDB[str(topic_id)].find({'name': date}, {date: 1}))
+        if len(feeds) > 0:
+            news = news + feeds[0][date]
+
+    news = news[cursor:min(cursor+cursor_range,max_cursor)]
+    result['next_cursor'] = cursor + (cursor_range-cursor%cursor_range)
+
+    if cursor!=0: result['previous_cursor'] = cursor - cursor_range if cursor%cursor_range == 0 else cursor - cursor%cursor_range # if we are on the first page, there is no previous cursor
+
+    # cursor boundary checks
+    if result['next_cursor']  >= max_cursor or len(news) < cursor_range:
+        result['next_cursor'] = 0
+    if 'previous_cursor' in result:
+        if result['previous_cursor']  == 0:
+            result['previous_cursor']  = -1
+
+    result['next_cursor_str'] = str(result['next_cursor'])
+    result['news'] = news
+
+    return json.dumps(result, indent=4)
+
+
+def getNews(news_ids, keywords, languages, cities, countries, user_location, user_language, cursor, since, until,
+            domains, topics):
+    result = {}
+    cursor = int(cursor)
+    cursor_range = 20
+    max_cursor = 100
+    if cursor >= max_cursor:
+        result['news']=[]
+        result['error'] = "Cannot exceed max cursor = " + str(max_cursor) + "."
+        return json.dumps(result, indent=4)
+    if topics ==[""] and news_ids == [""] and keywords == [""] and since == "" and until == "" and \
+                    languages == [""] and cities == [""] and countries == [""] and user_location == [""] \
+            and user_language == [""] and domains == [""]:
+        return json.dumps({'news': [], 'next_cursor': 0, 'next_cursor_str': "0"})
+
+    aggregate_dictionary = []
+    find_dictionary = {}
+    date_dictionary = {}
+
+    if news_ids != [""]:
+        news_ids_in_dictionary = [int(one_id) for one_id in news_ids]
+        find_dictionary['link_id'] = {'$in': news_ids_in_dictionary}
+
+    if keywords != [""]:
+        keywords_in_dictionary = [re.compile(key, re.IGNORECASE) for key in keywords]
+        find_dictionary['$or'] = [{'title': {'$in': keywords_in_dictionary}},
+                                  {'summary': {'$in': keywords_in_dictionary}},
+                                  {'full_text': {'$in': keywords_in_dictionary}}]
+
+    if domains != [""]:
+        domains_in_dictionary = [re.compile(key, re.IGNORECASE) for key in domains]
+        find_dictionary['domain'] = {'$nin': domains_in_dictionary}
+
+    if languages != [""]:
+        language_dictionary = [lang for lang in languages]
+        find_dictionary['language'] = {'$in': language_dictionary}
+
+    if cities != [""]:
+        city_dictionary = [re.compile(city, re.IGNORECASE) for city in cities]
+        find_dictionary['location.cities'] = {'$in': city_dictionary}
+        aggregate_dictionary.append({'$unwind': '$location.cities'})
+
+    if countries != [""]:
+        country_dictionary = [re.compile(country, re.IGNORECASE) for country in countries]
+        find_dictionary['location.countries'] = {'$in': country_dictionary}
+        aggregate_dictionary.append({'$unwind': '$location.countries'})
+
+    if user_location != [""]:
+        user_location_dictionary = [re.compile(city, re.IGNORECASE) for city in user_location]
+        find_dictionary['mentions.location'] = {'$in': user_location_dictionary}
+        aggregate_dictionary.append({'$unwind': '$mentions'})
+
+    if user_language != [""]:
+        user_language_dictionary = [re.compile(country, re.IGNORECASE) for country in user_language]
+        find_dictionary['mentions.language'] = {'$in': user_language_dictionary}
+        aggregate_dictionary.append({'$unwind': '$mentions'})
+
+    if since != "":
+        try:
+            since_in_dictionary = datetime.strptime(since, "%d-%m-%Y")
+            date_dictionary['$gte'] = since_in_dictionary
+        except ValueError:
+            return json.dumps({'error': "please, enter a valid since day. DAY-MONTH-YEAR"})
+
+    if until != "":
+        try:
+            until_in_dictionary = datetime.strptime(until, "%d-%m-%Y")
+            date_dictionary['$lte'] = until_in_dictionary
+        except ValueError:
+            return json.dumps({'error': "please, enter a valid since day. DAY-MONTH-YEAR"})
+
+    if date_dictionary != {}:
+        find_dictionary['published_at'] = date_dictionary
+
+    aggregate_dictionary.append({'$match': find_dictionary})
+    if user_language == [""] and user_location == [""]:
+        aggregate_dictionary.append({'$project': {'mentions': 0}})
+    aggregate_dictionary.append({'$project': {'_id': 0, 'bookmark': 0, 'bookmark_date': 0, 'location': 0}})
+
+    aggregate_dictionary.append({'$sort': {'link_id': -1}})
+
+    print(aggregate_dictionary)
+
+    topics_filter = []
+    if topics != [""]:
+        topics_filter = [int(one_id) for one_id in topics]
+
+    news = []
+    for alertid in Connection.Instance().newsPoolDB.collection_names():
+        if alertid != "counters":
+            if len(news) >= cursor + cursor_range:
+                break
+            if topics_filter == []:
+                news = news + list(Connection.Instance().newsPoolDB[str(alertid)].aggregate(aggregate_dictionary, allowDiskUse= True))
+            else:
+                if int(alertid) in topics_filter:
+                    news = news + list(Connection.Instance().newsPoolDB[str(alertid)].aggregate(aggregate_dictionary, allowDiskUse= True))
+
+    news = news[cursor:min(cursor+cursor_range,max_cursor)]
+
+    result['next_cursor'] = cursor + (cursor_range-cursor%cursor_range)
+    if cursor!=0: result['previous_cursor'] = cursor - cursor_range if cursor%cursor_range == 0 else cursor - cursor%cursor_range # if we are on the first page, there is no previous cursor
+
+    # cursor boundary checks
+    if result['next_cursor']  >= max_cursor or len(news) < cursor_range:
+        result['next_cursor'] = 0
+    if 'previous_cursor' in result:
+        if result['previous_cursor']  == 0:
+            result['previous_cursor']  = -1
+
+    result['next_cursor_str'] = str(result['next_cursor'])
+    result['news'] = news
+
+    return json.dumps(result, default=general_utils.date_formatter, indent=4)
