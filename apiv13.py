@@ -9,6 +9,7 @@ import location_regex # to get regular expressions for locations
 import csv # for sort by location
 import pprint
 from application.utils import general_utils
+from predict_location.predictor import Predictor # for location
 
 def getLocalInfluencers(topic_id, location, cursor):
     '''
@@ -182,6 +183,7 @@ def getEvents(topic_id, sortedBy, location, cursor):
     max_cursor = 100
     result = {}
     events = []
+    location = location.lower()
     if cursor >= max_cursor:
         result['events']=[]
         result['error'] = "Cannot exceed max cursor = " + str(max_cursor) + "."
@@ -224,6 +226,8 @@ def getEvents(topic_id, sortedBy, location, cursor):
 
         print("Location: " + str(location))
         if location !="" and location.lower()!="global":
+            location_predictor = Predictor()
+            location = location_predictor.predict_location(location)
             print("Filtering and sorting by location")
             EVENT_LIMIT = 70
             COUNTRY_LIMIT=80

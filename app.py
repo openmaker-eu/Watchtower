@@ -209,7 +209,7 @@ class EventV13Handler(BaseHandler, TemplateRendering, Api500ErrorHandler):
             pass
         events = apiv13.getEvents(topic_id, sortedBy, location, int(cursor))
         self.set_header('Content-Type', 'application/json')
-        self.write(json.dumps(events))
+        self.write(events)
 
 class AudienceSampleV13Handler(BaseHandler, TemplateRendering, Api500ErrorHandler):
     def get(self):
