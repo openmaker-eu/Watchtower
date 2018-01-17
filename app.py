@@ -142,8 +142,8 @@ class Application(tornado.web.Application):
             (r"/api/v1.3/get_topics", TopicsV12Handler, {'mainT': mainT}),
             (r"/api/v1.3/get_audience_sample", AudienceSampleV13Handler, {'mainT': mainT}), # new
             (r"/api/v1.3/get_local_influencers", LocalInfluencersV13Handler, {'mainT': mainT}), # new
-            (r"/api/v1.3/get_news", NewsFeedsV12Handler, {'mainT': mainT}),
-            (r"/api/v1.3/search_news", NewsV12Handler, {'mainT': mainT}),
+            (r"/api/v1.3/get_news", NewsFeedsV13Handler, {'mainT': mainT}), # changed
+            (r"/api/v1.3/search_news", NewsV13Handler, {'mainT': mainT}), # changed
             (r"/api/v1.3/get_events", EventV13Handler, {'mainT': mainT}), # changed
             (r"/api/v1.3/get_conversations", ConversationV12Handler, {'mainT': mainT}),
             (r"/api/v1.3/get_hashtags", HashtagsV12Handler, {'mainT': mainT}),
@@ -151,6 +151,47 @@ class Application(tornado.web.Application):
             (r"/(.*)", tornado.web.StaticFileHandler, {'path': settings['static_path']}),
         ]
         super(Application, self).__init__(handlers, **settings)
+
+class NewsFeedsV13Handler(BaseHandler, TemplateRendering, Api500ErrorHandler):
+    def get(self):
+        forbidden_domain = self.get_argument("forbidden_domains", "").split(",")
+        topics = self.get_argument('topic_ids', "").split(",")
+        try:
+            cursor = int(self.get_argument("cursor"))
+            if cursor < 0:
+                cursor = 0
+        except:
+            cursor = 0
+            pass
+        date = str(self.get_argument("date", "month"))
+        news = apiv13.getNewsFeeds(date, cursor, forbidden_domain, topics)
+        self.set_header('Content-Type', 'application/json')
+        self.write(news)
+
+class NewsV13Handler(BaseHandler, TemplateRendering, Api500ErrorHandler):
+    def get(self):
+        news_ids = self.get_argument('news_ids', "").split(",")
+        keywords = self.get_argument('keywords', "").split(",")
+        languages = self.get_argument('languages', "").split(",")
+        countries = self.get_argument('countries', "").split(",")
+        cities = self.get_argument('cities', "").split(",")
+        user_location = self.get_argument('mention_location', "").split(",")
+        user_language = self.get_argument('mention_language', "").split(",")
+        since = self.get_argument('since', "")
+        until = self.get_argument('until', "")
+        topics = self.get_argument('topic_ids', "").split(",")
+        try:
+            cursor = int(self.get_argument("cursor"))
+            if cursor < 0:
+                cursor = 0
+        except:
+            cursor = 0
+            pass
+        news = apiv13.getNews(news_ids, keywords, languages, cities, countries, user_location, user_language, cursor,
+                              since, until, [""], topics)
+        self.set_header('Content-Type', 'application/json')
+        self.write(news)
+
 
 class EventV13Handler(BaseHandler, TemplateRendering, Api500ErrorHandler):
     def get(self):
@@ -168,7 +209,7 @@ class EventV13Handler(BaseHandler, TemplateRendering, Api500ErrorHandler):
             pass
         events = apiv13.getEvents(topic_id, sortedBy, location, int(cursor))
         self.set_header('Content-Type', 'application/json')
-        self.write(json.dumps(events))
+        self.write(events)
 
 class AudienceSampleV13Handler(BaseHandler, TemplateRendering, Api500ErrorHandler):
     def get(self):
@@ -1178,9 +1219,7 @@ class ConversationHandler(BaseHandler, TemplateRendering):
 def main(mainT):
     tornado.options.parse_command_line()
     app = Application(mainT)
-    app.sentry_client = AsyncSentryClient(
-        'https://ac7034cd7eca4931af72b3ee24fa2daa:9c548399be7f4d79a70cef1e0c08e6ca@sentry.io/250084'
-    )
+    app.sentry_client = AsyncSentryClient(config("SENTRY_TOKEN"))
     app.listen(8484)
     tornado.ioloop.IOLoop.current().start()
 
