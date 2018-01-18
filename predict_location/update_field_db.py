@@ -1,4 +1,5 @@
 import time
+import pymongo
 ###
 MONGO_USERNAME_PASS = 'mongodb://admin:smio1EUp@'
 MONGO_PORT = ':27017/'
@@ -13,14 +14,16 @@ def update_field_collection(host, collection_name, database, field_name, predict
     update_field_name = "predicted_" + field_name
 
     collection = database.get_collection(collection_name)
-    bulk = collection.initialize_unordered_bulk_op()
 
     cursor = collection.find({update_field_name : {"$exists" : False}}).limit(BATCH_SIZE)
     n = 1
     while cursor.count(with_limit_and_skip=True):
         print("...Processing batch " + str(n))
+
+        bulk = collection.initialize_unordered_bulk_op()
+
         for record in cursor:
-            if update_field_name in record:
+            if update_field_name in record: # This is redundant ?
                 continue
             elif field_name in record:
                 bulk.find({'_id':record['_id']}).update({'$set' : {update_field_name : predictor.predict_location(record[field_name])}})
