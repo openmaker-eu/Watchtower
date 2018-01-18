@@ -337,7 +337,7 @@ def getEvents(topic_id, sortedBy, location, cursor):
 def getNewsFeeds(date, cursor, forbidden_domain, topics):
     result = {}
     cursor_range = 20
-    max_cursor = 100
+    max_cursor = 60
     if topics == [""]:
         return json.dumps({})
 
@@ -389,7 +389,7 @@ def getNews(news_ids, keywords, languages, cities, countries, user_location, use
     result = {}
     cursor = int(cursor)
     cursor_range = 20
-    max_cursor = 100
+    max_cursor = 60
     if cursor >= max_cursor:
         result['news']=[]
         result['error'] = "Cannot exceed max cursor = " + str(max_cursor) + "."
