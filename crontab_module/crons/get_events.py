@@ -1,5 +1,8 @@
+import sys
 import time
 from datetime import datetime
+
+sys.path.append('../..')
 
 import facebook
 import requests

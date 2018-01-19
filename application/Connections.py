@@ -15,28 +15,7 @@ from application.utils.Singleton import Singleton
 class Connection:
     def __init__(self):
         try:
-            hosts = ['138.68.92.181', '194.116.76.78']
-
-            with urllib.request.urlopen('http://ipinfo.io/ip') as response:
-                html = response.read()
-
-            a = re.findall("\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}", str(html))
-
-            h = a[0]
-
-            if h in hosts:
-                host = h
-            else:
-                if len(sys.argv) > 1:
-                    host = sys.argv[1]
-                else:
-                    print("Please select a host: ")
-                    for i in range(0, len(hosts)):
-                        print(str(i+1) + "->" + hosts[i])
-
-                    host = hosts[int(input())-1]
-
-            self.machine_host = host
+            host = config("HOST_IP")
 
             self.MongoDBClient = pymongo.MongoClient('mongodb://'+config("MONGODB_USER")+":"+config("MONGODB_PASSWORD")+'@'+host+':27017/', connect=False)
             self.db = self.MongoDBClient.openMakerdB

@@ -1,30 +1,18 @@
+import sys
 import time
 
-from redis import Redis
+sys.path.append('./')
+
+from redis import Redis, ConnectionPool
 from rq import Queue
 
-import link_parser
-import pymongo
-
+from application.utils import link_parser
 from application.Connections import Connection
-from redis import StrictRedis
 
-redisConnection = StrictRedis(host='localhost', port=6379, db=1)
-redisConnection.set('unshort', 0)
-redisConnection.set('search_link_db', 0)
-redisConnection.set('search_link_db_update', 0)
-redisConnection.set('link_parser', 0)
-redisConnection.set('search_duplicate_link', 0)
-redisConnection.set('search_duplicate_link_update', 0)
-redisConnection.set('search_shortlink_db', 0)
-redisConnection.set('search_shortlink_db_update', 0)
-redisConnection.set('linkParser.parseArticle', 0)
-redisConnection.set('linkParser.getDomain', 0)
-redisConnection.set('linkParser.getDate', 0)
+from decouple import config
 
-
-
-redis_conn = Redis()
+pool = ConnectionPool(host='db', port=6379, db=0)
+redis_conn = Redis(connection_pool=pool)
 q = Queue(connection=redis_conn)  # no args implies the default queue
 
 while True:
@@ -43,8 +31,8 @@ while True:
                     'tweet': tweet,
                     'channel': 'twitter'
                 }
-                q.enqueue_call(func=link_parser.calculateLinks,
-                               args=(data,Connection.Instance().machine_host,),
+                q.enqueue_call(func='link_parser.calculate_links',
+                               args=(data, config("HOST_IP"),),
                                at_front=True,
                                timeout=20)
     time.sleep(15)

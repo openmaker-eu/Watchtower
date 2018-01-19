@@ -2,7 +2,6 @@ import json
 import os
 import random
 import string
-from threading import Thread
 
 import tornado.ioloop
 import tornado.options
@@ -12,14 +11,10 @@ from jinja2 import Environment, FileSystemLoader, TemplateNotFound
 from raven.contrib.tornado import AsyncSentryClient, SentryMixin
 
 # API VERSIONS
-import apiv13
-import apiv12
-import apiv11
-import apiv1
+from apis import apiv12, apiv13, apiv1, apiv11
 
-import facebook_reddit_crontab
+from crontab_module.crons import facebook_reddit_crontab
 import logic
-from application.Connections import Connection
 
 from decouple import config
 
@@ -51,9 +46,6 @@ class TemplateRendering:
 
 
 class BaseHandler(SentryMixin, tornado.web.RequestHandler):
-    def initialize(self, mainT):
-        self.mainT = mainT
-
     def get_current_user(self):
         return self.get_secure_cookie("user_id")
 
@@ -66,87 +58,87 @@ class Api500ErrorHandler(tornado.web.RequestHandler):
 
 
 class Application(tornado.web.Application):
-    def __init__(self, mainT):
+    def __init__(self):
         handlers = [
-            (r"/", MainHandler, {'mainT': mainT}),
-            (r"/logout", LogoutHandler, {'mainT': mainT}),
-            (r"/login", LoginHandler, {'mainT': mainT}),
-            (r"/register", RegisterHandler, {'mainT': mainT}),
-            (r"/profile", ProfileHandler, {'mainT': mainT}),
-            (r"/Topics", TopicsHandler, {'mainT': mainT}),
-            (r"/topicinfo", CreateEditTopicHandler, {'mainT': mainT}),
-            (r"/topicinfo/([0-9]*)", CreateEditTopicHandler, {'mainT': mainT}),
-            (r"/Feed/(.*)", FeedHandler, {'mainT': mainT}),
-            (r"/Feed", FeedHandler, {'mainT': mainT}),
-            (r"/Conversations/(.*)", ConversationPageHandler, {'mainT': mainT}),
-            (r"/Conversations", ConversationPageHandler, {'mainT': mainT}),
-            (r"/Comments/(.*)", ConversationHandler, {'mainT': mainT}),
-            (r"/Comments", ConversationHandler, {'mainT': mainT}),
-            (r"/Events/(.*)", EventPageHandler, {'mainT': mainT}),
-            (r"/Events", EventPageHandler, {'mainT': mainT}),
-            (r"/get_events/(.*)", EventHandler, {'mainT': mainT}),
-            (r"/get_events", EventHandler, {'mainT': mainT}),
-            (r"/News/(.*)", NewsHandler, {'mainT': mainT}),
-            (r"/News", NewsHandler, {'mainT': mainT}),
-            (r"/Search", SearchHandler, {'mainT': mainT}),
-            (r"/get_news", SearchNewsHandler, {'mainT': mainT}),
-            (r"/get_news/(.*)", SearchNewsHandler, {'mainT': mainT}),
-            (r"/Audience/(.*)", AudienceHandler, {'mainT': mainT}),
-            (r"/Audience", AudienceHandler, {'mainT': mainT}),
+            (r"/", MainHandler),
+            (r"/logout", LogoutHandler),
+            (r"/login", LoginHandler),
+            (r"/register", RegisterHandler),
+            (r"/profile", ProfileHandler),
+            (r"/Topics", TopicsHandler),
+            (r"/topicinfo", CreateEditTopicHandler),
+            (r"/topicinfo/([0-9]*)", CreateEditTopicHandler),
+            (r"/Feed/(.*)", FeedHandler),
+            (r"/Feed", FeedHandler),
+            (r"/Conversations/(.*)", ConversationPageHandler),
+            (r"/Conversations", ConversationPageHandler),
+            (r"/Comments/(.*)", ConversationHandler),
+            (r"/Comments", ConversationHandler),
+            (r"/Events/(.*)", EventPageHandler),
+            (r"/Events", EventPageHandler),
+            (r"/get_events/(.*)", EventHandler),
+            (r"/get_events", EventHandler),
+            (r"/News/(.*)", NewsHandler),
+            (r"/News", NewsHandler),
+            (r"/Search", SearchHandler),
+            (r"/get_news", SearchNewsHandler),
+            (r"/get_news/(.*)", SearchNewsHandler),
+            (r"/Audience/(.*)", AudienceHandler),
+            (r"/Audience", AudienceHandler),
 
-            (r"/Recommendations/(.*)", RecommendationsHandler, {'mainT': mainT}), # added for recommendations
-            (r"/Recommendations", RecommendationsHandler, {'mainT': mainT}),
+            (r"/Recommendations/(.*)", RecommendationsHandler), # added for recommendations
+            (r"/Recommendations", RecommendationsHandler),
 
-            (r"/previewNews", PreviewNewsHandler, {'mainT': mainT}),
-            (r"/previewConversations", PreviewConversationHandler, {'mainT': mainT}),
-            (r"/previewEvents", PreviewEventHandler, {'mainT': mainT}),
-            (r"/rate_audience", RateAudienceHandler, {'mainT': mainT}),
-            (r"/sentiment", SentimentHandler, {'mainT': mainT}),
-            (r"/bookmark", BookmarkHandler, {'mainT': mainT}),
-            (r"/domain", DomainHandler, {'mainT': mainT}),
-            (r"/newTweets", NewTweetsHandler, {'mainT': mainT}),
-            (r"/newTweets/(.*)", NewTweetsHandler, {'mainT': mainT}),
-            (r"/saveTopicId", TopicHandler, {'mainT': mainT}),
-            (r"/saveLocation", LocationHandler, {'mainT': mainT}),
-            (r"/getPages", PagesHandler, {'mainT': mainT}),
+            (r"/previewNews", PreviewNewsHandler),
+            (r"/previewConversations", PreviewConversationHandler),
+            (r"/previewEvents", PreviewEventHandler),
+            (r"/rate_audience", RateAudienceHandler),
+            (r"/sentiment", SentimentHandler),
+            (r"/bookmark", BookmarkHandler),
+            (r"/domain", DomainHandler),
+            (r"/newTweets", NewTweetsHandler),
+            (r"/newTweets/(.*)", NewTweetsHandler),
+            (r"/saveTopicId", TopicHandler),
+            (r"/saveLocation", LocationHandler),
+            (r"/getPages", PagesHandler),
 
             # DOCUMENTATIONS
-            (r"/api", DocumentationHandler, {'mainT': mainT}),
-            (r"/api/v1\.1", Documentationv11Handler, {'mainT': mainT}),
-            (r"/api/v1\.2", Documentationv12Handler, {'mainT': mainT}),
-            (r"/api/v1\.3", Documentationv13Handler, {'mainT': mainT}),
+            (r"/api", DocumentationHandler),
+            (r"/api/v1\.1", Documentationv11Handler),
+            (r"/api/v1\.2", Documentationv12Handler),
+            (r"/api/v1\.3", Documentationv13Handler),
 
             # API V1
-            (r"/api/get_themes", ThemesHandler, {'mainT': mainT}),
-            (r"/api/get_influencers/(.*)/(.*)", InfluencersHandler, {'mainT': mainT}),
-            (r"/api/get_feeds/(.*)/(.*)", FeedsHandler, {'mainT': mainT}),
-            (r"/api/get_influencers/(.*)", InfluencersHandler, {'mainT': mainT}),
-            (r"/api/get_feeds/(.*)", FeedsHandler, {'mainT': mainT}),
+            (r"/api/get_themes", ThemesHandler),
+            (r"/api/get_influencers/(.*)/(.*)", InfluencersHandler),
+            (r"/api/get_feeds/(.*)/(.*)", FeedsHandler),
+            (r"/api/get_influencers/(.*)", InfluencersHandler),
+            (r"/api/get_feeds/(.*)", FeedsHandler),
 
             # API V1.1
-            (r"/api/v1.1/get_themes", ThemesV11Handler, {'mainT': mainT}),
-            (r"/api/v1.1/get_feeds", FeedsV11Handler, {'mainT': mainT}),
-            (r"/api/v1.1/get_influencers", InfluencersV11Handler, {'mainT': mainT}),
+            (r"/api/v1.1/get_themes", ThemesV11Handler),
+            (r"/api/v1.1/get_feeds", FeedsV11Handler),
+            (r"/api/v1.1/get_influencers", InfluencersV11Handler),
 
             # API V1.2
-            (r"/api/v1.2/get_topics", TopicsV12Handler, {'mainT': mainT}),
-            (r"/api/v1.2/get_news", NewsFeedsV12Handler, {'mainT': mainT}),
-            (r"/api/v1.2/get_audiences", AudiencesV12Handler, {'mainT': mainT}),
-            (r"/api/v1.2/search_news", NewsV12Handler, {'mainT': mainT}),
-            (r"/api/v1.2/get_events", EventV12Handler, {'mainT': mainT}),
-            (r"/api/v1.2/get_conversations", ConversationV12Handler, {'mainT': mainT}),
-            (r"/api/v1.2/get_hashtags", HashtagsV12Handler, {'mainT': mainT}),
+            (r"/api/v1.2/get_topics", TopicsV12Handler),
+            (r"/api/v1.2/get_news", NewsFeedsV12Handler),
+            (r"/api/v1.2/get_audiences", AudiencesV12Handler),
+            (r"/api/v1.2/search_news", NewsV12Handler),
+            (r"/api/v1.2/get_events", EventV12Handler),
+            (r"/api/v1.2/get_conversations", ConversationV12Handler),
+            (r"/api/v1.2/get_hashtags", HashtagsV12Handler),
 
             # API V1.3
             # get_audiences deprecated
-            (r"/api/v1.3/get_topics", TopicsV12Handler, {'mainT': mainT}),
-            (r"/api/v1.3/get_audience_sample", AudienceSampleV13Handler, {'mainT': mainT}), # new
-            (r"/api/v1.3/get_local_influencers", LocalInfluencersV13Handler, {'mainT': mainT}), # new
-            (r"/api/v1.3/get_news", NewsFeedsV13Handler, {'mainT': mainT}), # changed
-            (r"/api/v1.3/search_news", NewsV13Handler, {'mainT': mainT}), # changed
-            (r"/api/v1.3/get_events", EventV13Handler, {'mainT': mainT}), # changed
-            (r"/api/v1.3/get_conversations", ConversationV12Handler, {'mainT': mainT}),
-            (r"/api/v1.3/get_hashtags", HashtagsV12Handler, {'mainT': mainT}),
+            (r"/api/v1.3/get_topics", TopicsV12Handler),
+            (r"/api/v1.3/get_audience_sample", AudienceSampleV13Handler), # new
+            (r"/api/v1.3/get_local_influencers", LocalInfluencersV13Handler), # new
+            (r"/api/v1.3/get_news", NewsFeedsV13Handler), # changed
+            (r"/api/v1.3/search_news", NewsV13Handler), # changed
+            (r"/api/v1.3/get_events", EventV13Handler), # changed
+            (r"/api/v1.3/get_conversations", ConversationV12Handler),
+            (r"/api/v1.3/get_hashtags", HashtagsV12Handler),
 
             (r"/(.*)", tornado.web.StaticFileHandler, {'path': settings['static_path']}),
         ]
@@ -222,7 +214,7 @@ class AudienceSampleV13Handler(BaseHandler, TemplateRendering, Api500ErrorHandle
         except:
             cursor = 0
             pass
-        audience_sample = apiv13.getAudienceSample(topic_id,location, int(cursor))
+        audience_sample = apiv13.getAudienceSample(topic_id, location, int(cursor))
         self.set_header('Content-Type', 'application/json')
         self.write(audience_sample)
 
@@ -238,7 +230,7 @@ class LocalInfluencersV13Handler(BaseHandler, TemplateRendering, Api500ErrorHand
             cursor = 0
             pass
 
-        local_influencers = apiv13.getLocalInfluencers(topic_id,location, int(cursor))
+        local_influencers = apiv13.getLocalInfluencers(topic_id, location, int(cursor))
         self.set_header('Content-Type', 'application/json')
         self.write(local_influencers)
 
@@ -247,7 +239,7 @@ class Documentationv13Handler(BaseHandler, TemplateRendering):
         template = 'apiv13.html'
         variables = {
             'title': "Watchtower Api v1.3",
-            'host': config("HOST")
+            'host': config("HOST_NAME")
         }
         content = self.render_template(template, variables)
         self.write(content)
@@ -547,11 +539,11 @@ class TopicsHandler(BaseHandler, TemplateRendering):
         posttype = self.get_argument("posttype")
         user_id = tornado.escape.xhtml_escape(self.current_user)
         if posttype == u'remove':
-            logic.deleteAlert(topic_id, self.mainT, user_id)
+            logic.deleteAlert(topic_id, user_id)
         elif posttype == u'stop':
-            logic.stopAlert(topic_id, self.mainT)
+            logic.stopAlert(topic_id)
         elif posttype == u'start':
-            logic.startAlert(topic_id, self.mainT)
+            logic.startAlert(topic_id)
         elif posttype == u'publish':
             logic.publishAlert(topic_id)
         elif posttype == u'unpublish':
@@ -625,10 +617,10 @@ class CreateEditTopicHandler(BaseHandler, TemplateRendering):
 
         if alertid != None:
             alert['alertid'] = alertid
-            logic.updateAlert(alert, self.mainT, user_id)
+            logic.updateAlert(alert, user_id)
         else:
             alert['name'] = self.get_argument('alertname')
-            logic.addAlert(alert, self.mainT, user_id)
+            logic.addAlert(alert, user_id)
         self.redirect("/Topics")
 
 
@@ -1216,19 +1208,12 @@ class ConversationHandler(BaseHandler, TemplateRendering):
         self.write(self.render_template("submission.html", {"docs": docs}))
 
 
-def main(mainT):
+def main():
     tornado.options.parse_command_line()
-    app = Application(mainT)
+    app = Application()
     app.sentry_client = AsyncSentryClient(config("SENTRY_TOKEN"))
     app.listen(8484)
     tornado.ioloop.IOLoop.current().start()
-
-
-def webserverInit(mainT):
-    thr = Thread(target=main, args=[mainT])
-    thr.daemon = True
-    thr.start()
-    thr.join()
 
 
 if __name__ == "__main__":

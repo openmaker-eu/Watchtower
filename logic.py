@@ -1,19 +1,13 @@
 import json
-import re
-from datetime import datetime
-from time import gmtime, strftime, strptime
 from threading import Thread
-import facebook_reddit_crontab
+from crontab_module.crons import facebook_reddit_crontab
 
 import facebook
 import praw
 import pymongo
 
-import date_filter
-import twitter_search_sample_tweets
+from application.utils import twitter_search_sample_tweets
 from application.Connections import Connection
-
-from pprint import pprint
 
 from decouple import config
 
@@ -297,9 +291,9 @@ def getAllRunningAlertList():
         cur.execute(sql, [True])
         var = cur.fetchall()
         alerts = [
-            {'alertid': i[0], 'name': i[1], 'description': i[2], 'keywords': i[3].split(","), 'lang': i[4].split(",")}
+            {'alertid': i[0], 'name': i[1], 'description': i[2], 'keywords': sorted(i[3].split(",")), 'lang': sorted(i[4].split(","))}
             for i in var]
-        return alerts
+        return sorted(alerts, key=lambda k: k['alertid'])
 
 
 # Gives alerts as lists
@@ -479,7 +473,7 @@ def banDomain(user_id, topic_id, domain):
 
 
 # Take alert information, give an id and add it DB
-def addAlert(alert, mainT, user_id):
+def addAlert(alert, user_id):
     with Connection.Instance().get_cursor() as cur:
         sql = (
             "INSERT INTO topics "
@@ -506,17 +500,15 @@ def addAlert(alert, mainT, user_id):
         cur.execute(sql, [int(user_id), int(topic[0])])
         alert = getAlertAllOfThemList(int(topic[0]))
         setUserAlertLimit(user_id, 'decrement')
-        mainT.addAlert(alert)
         setCurrentTopic(user_id)
         t = Thread(target=addFacebookPagesAndSubreddits, args=(alert['alertid'], alert['keywords'],))
         t.start()
 
 
 # Deletes alert and terminate its thread
-def deleteAlert(alertid, mainT, user_id):
+def deleteAlert(alertid, user_id):
     alert = getAlertAllOfThemList(alertid)
     setUserAlertLimit(user_id, 'increment')
-    mainT.delAlert(alert)
     with Connection.Instance().get_cursor() as cur:
         sql = (
             "SELECT * "
@@ -557,7 +549,7 @@ def deleteAlert(alertid, mainT, user_id):
 
 
 # Updates given alert information and kill its thread, then again start its thread.
-def updateAlert(alert, mainT, user_id):
+def updateAlert(alert, user_id):
     with Connection.Instance().get_cursor() as cur:
         sql = (
             "UPDATE topics "
@@ -568,11 +560,10 @@ def updateAlert(alert, mainT, user_id):
     alert = getAlertAllOfThemList(alert['alertid'])
     t = Thread(target=addFacebookPagesAndSubreddits, args=(alert['alertid'], alert['keywords'],))
     t.start()
-    mainT.updateAlert(alert)
 
 
 # Starts alert streaming.
-def startAlert(alertid, mainT):
+def startAlert(alertid):
     with Connection.Instance().get_cursor() as cur:
         sql = (
             "UPDATE topics "
@@ -581,11 +572,10 @@ def startAlert(alertid, mainT):
         )
         cur.execute(sql, [True, alertid])
         alert = getAlertAllOfThemList(alertid)
-        mainT.addAlert(alert)
 
 
 # Stops alert streaming.
-def stopAlert(alertid, mainT):
+def stopAlert(alertid):
     with Connection.Instance().get_cursor() as cur:
         sql = (
             "UPDATE topics "
@@ -594,7 +584,6 @@ def stopAlert(alertid, mainT):
         )
         cur.execute(sql, [False, alertid])
         alert = getAlertAllOfThemList(alertid)
-        mainT.delAlert(alert)
 
 
 # Publishs the given alert

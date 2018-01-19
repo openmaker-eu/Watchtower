@@ -1,4 +1,7 @@
 import json
+import sys
+
+sys.path.append('../')
 
 from application.Connections import Connection
 

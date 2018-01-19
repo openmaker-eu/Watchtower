@@ -1,10 +1,9 @@
 import tweepy
-from tweepy import OAuthHandler
-import link_parser
-from requests import head
-
 from decouple import config
+from requests import head
+from tweepy import OAuthHandler
 
+from application.utils import link_parser
 
 consumer_key = config("TWITTER_CONSUMER_KEY")  # API key
 consumer_secret = config("TWITTER_CONSUMER_SECRET")  # API secret
@@ -19,6 +18,7 @@ api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
 def unshorten_url(url):
     return head(url, allow_redirects=True).url
 
+
 def getNewsFromTweets(keywords, languages):
     news = []
     data = tweepy.Cursor(api.search, q=keywords, lang=languages).items(25)
@@ -28,7 +28,7 @@ def getNewsFromTweets(keywords, languages):
             if temp['entities']['urls'] != []:
                 link = temp['entities']['urls'][0]['expanded_url']
                 if link is not None:
-                    parsed_link = link_parser.linkParser(unshorten_url(link))
+                    parsed_link = link_parser.link_parser(unshorten_url(link))
                     if parsed_link is not None:
                         news.append(parsed_link)
                         if len(news) >= 3:

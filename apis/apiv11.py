@@ -1,6 +1,8 @@
 import json
+import sys
 
-import logic
+sys.path.append('../')
+
 from application.Connections import Connection
 
 

@@ -1,13 +1,16 @@
+import datetime
 import re
+import sys
 import time
 from datetime import datetime, timedelta
+
+sys.path.append('../..')
 
 import facebook
 import praw
 import requests
-import pprint, json
 
-import link_parser
+from application.utils import link_parser
 from application.Connections import Connection
 
 from decouple import config
@@ -302,9 +305,9 @@ def searchSubredditNews(topic_id, subredditNames):
         for subredditName in subredditNames:
             for submission in reddit.subreddit(subredditName).top(time_filter='month'):
                 if not (re.search(r"^https://www.reddit.com", submission.url) or
-                            re.search(r"^https://i.redd.it", submission.url) or
-                            re.search(r"imgur.com", submission.url) or
-                            re.search(r".mp4$", submission.url)):
+                        re.search(r"^https://i.redd.it", submission.url) or
+                        re.search(r"imgur.com", submission.url) or
+                        re.search(r".mp4$", submission.url)):
                     submissions.append(submission)
 
         for submission in submissions:
@@ -317,7 +320,7 @@ def searchSubredditNews(topic_id, subredditNames):
             }
 
             if len(mentions) != 0:
-                link_parser.calculateLinks(s, Connection.Instance().machine_host)
+                link_parser.calculate_links(s, Connection.Instance().machine_host)
     except:
         print(subredditName)
         pass
@@ -367,7 +370,7 @@ def searchFacebookNews(topic_id, search_ids):
                                     'timestamp_ms': int(created_comment_time)
                                 })
                         if len(listOfMention) != 0:
-                            link_parser.calculateLinks({
+                            link_parser.calculate_links({
                                 'channel': 'facebook',
                                 'url': post['link'],
                                 'topic_id': topic_id,
@@ -375,6 +378,7 @@ def searchFacebookNews(topic_id, search_ids):
                             }, Connection.Instance().machine_host)
                 else:
                     break
+
 
 def triggerOneTopic(topic_id, topic_keyword_list, pages, subreddits):
     dates = ["day", "week", "month"]

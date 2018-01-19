@@ -1,4 +1,7 @@
+import sys
 from time import gmtime, strftime, time
+
+sys.path.append('../..')
 
 from application.Connections import Connection
 
@@ -13,7 +16,7 @@ def getDateList(alertid, date, forbidden_domain):
             'sentiment': 1,
             'im': 1,
             'url': 1,
-            'full_text':1,
+            'full_text': 1,
             'summary': 1,
             'title': 1,
             'keywords': 1,
@@ -42,7 +45,7 @@ def getDateList(alertid, date, forbidden_domain):
             '_id': 0,
             'im': 1,
             'url': 1,
-            'full_text':1,
+            'full_text': 1,
             'summary': 1,
             'title': 1,
             'keywords': 1,
@@ -56,7 +59,7 @@ def getDateList(alertid, date, forbidden_domain):
         }},
         {'$sort': {'popularity': -1}},
         {'$limit': 60}
-    ], allowDiskUse= True))
+    ], allowDiskUse=True))
 
 
 def calculate_dates():

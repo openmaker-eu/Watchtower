@@ -1,4 +1,7 @@
+import sys
 import time  # for debug
+
+sys.path.append('../..')
 
 import numpy as np
 import pymongo  # for pymongo functions
@@ -175,7 +178,7 @@ def get_all_user_profiles_by_topic(topicID):
         # Send once every 1000 in batch
         if (len(operations) == 1000 or (
                 batch_count == int(np.ceil(len(processedProfiles) / 1000)) - 1 and len(operations) == len(
-                processedProfiles) - batch_count * 1000)):
+            processedProfiles) - batch_count * 1000)):
             batch_count += 1
             Connection.Instance().audienceDB[str(topicID)].bulk_write(operations, ordered=False)
             operations = []

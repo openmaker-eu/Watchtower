@@ -1,13 +1,16 @@
 # Author: Kemal Berk Kocabagli
 
 import json
-import re
-import logic
+import sys
 import time
-from application.Connections import Connection
-import location_regex # to get regular expressions for locations
-import csv # for sort by location
+import re
 import pprint
+
+sys.path.append('../')
+
+from application.Connections import Connection
+import location_regex  # to get regular expressions for locations
+import csv  # for sort by location
 from application.utils import general_utils
 from predict_location.predictor import Predictor # for location
 

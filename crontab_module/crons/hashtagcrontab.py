@@ -1,4 +1,7 @@
+import sys
 from time import gmtime, strftime, time
+
+sys.path.append('../..')
 
 from application.Connections import Connection
 

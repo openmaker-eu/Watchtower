@@ -1,17 +1,19 @@
 # Import the necessary methods from tweepy library
 import json
 import re
+import sys
 import threading
 from datetime import datetime
 
+sys.path.append('./')
+
 from bson.objectid import ObjectId
+from decouple import config
 from tweepy import OAuthHandler
 from tweepy import Stream
 from tweepy.streaming import StreamListener
 
 from application.Connections import Connection
-
-from decouple import config
 
 
 def get_info(alertDic):

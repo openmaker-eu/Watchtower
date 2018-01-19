@@ -1,11 +1,14 @@
 import json
+import operator
 import re
+import sys
 import time
 from datetime import datetime
-import operator
+
 import pymongo
 
-import date_filter
+sys.path.append('../')
+
 from application.Connections import Connection
 from application.utils import general_utils
 
@@ -30,23 +33,23 @@ def getTopics(keywords):
                 if topic_id != "counters" and int(topic_id) in published_topics:
                     try:
                         count = list(Connection.Instance().hashtags[str(topic_id)].aggregate([
-                            { '$unwind': "$month" },
-                            { '$project': {
-                                    'hashtag': '$month.hashtag', 'count': '$month.count'
-                                }
+                            {'$unwind': "$month"},
+                            {'$project': {
+                                'hashtag': '$month.hashtag', 'count': '$month.count'
+                            }
                             },
                             {
                                 '$match': {
-                                    'hashtag': { '$in': keywords_in_dictionary }
+                                    'hashtag': {'$in': keywords_in_dictionary}
                                 }
                             },
                             {
-                               '$group':
-                                 {
-                                   '_id': {},
-                                   'count': { '$sum': "$count" }
-                                 }
-                             }]))[0]['count']
+                                '$group':
+                                    {
+                                        '_id': {},
+                                        'count': {'$sum': "$count"}
+                                    }
+                            }]))[0]['count']
                         topic_list[str(topic_id)] = count
                     except:
                         pass
@@ -97,13 +100,12 @@ def getNewsFeeds(date, cursor, forbidden_domain, topics):
     # feeds = list(Connection.Instance().filteredNewsPoolDB[themeid].find({'name': date}, {date: 1}))
     # feeds = list(feeds[0][date][cursor:cursor+20])
 
-    #date = general_utils.determine_date(date)
+    # date = general_utils.determine_date(date)
 
     news = []
     for topic_id in topics:
-        #if len(news) >= cursor + 20:
+        # if len(news) >= cursor + 20:
         #    break
-        #news = news + date_filter.getDateList(topic_id, int(date), forbidden_domain)
         feeds = list(Connection.Instance().filteredNewsPoolDB[str(topic_id)].find({'name': date}, {date: 1}))
         if len(feeds) > 0:
             news = news + feeds[0][date]
@@ -126,7 +128,8 @@ def getAudiences(topic_id):
 
     audiences = list(Connection.Instance().infDB[str(topic_id)].find({}, {'_id': 0, 'screen_name': 1, 'location': 1,
                                                                           'name': 1, 'profile_image_url': 1, 'lang': 1,
-                                                                          'summary': 1, 'full_text': 1, 'time_zone': 1}).sort(
+                                                                          'summary': 1, 'full_text': 1,
+                                                                          'time_zone': 1}).sort(
         [('rank', pymongo.ASCENDING)]))
 
     return json.dumps({'audiences': audiences})
@@ -136,7 +139,7 @@ def getNews(news_ids, keywords, languages, cities, countries, user_location, use
             domains, topics):
     cursor = int(cursor)
     if news_ids == [""] and keywords == [""] and since == "" and until == "" and \
-                    languages == [""] and cities == [""] and countries == [""] and user_location == [""] \
+            languages == [""] and cities == [""] and countries == [""] and user_location == [""] \
             and user_language == [""] and domains == [""]:
         return json.dumps({'news': [], 'next_cursor': 0, 'next_cursor_str': "0"})
 
@@ -218,10 +221,12 @@ def getNews(news_ids, keywords, languages, cities, countries, user_location, use
             if len(news) >= cursor + 20:
                 break
             if topics_filter == []:
-                news = news + list(Connection.Instance().newsPoolDB[str(alertid)].aggregate(aggregate_dictionary, allowDiskUse= True))
+                news = news + list(
+                    Connection.Instance().newsPoolDB[str(alertid)].aggregate(aggregate_dictionary, allowDiskUse=True))
             else:
                 if int(alertid) in topics_filter:
-                    news = news + list(Connection.Instance().newsPoolDB[str(alertid)].aggregate(aggregate_dictionary, allowDiskUse= True))
+                    news = news + list(Connection.Instance().newsPoolDB[str(alertid)].aggregate(aggregate_dictionary,
+                                                                                                allowDiskUse=True))
 
     next_cursor = cursor + 20
     if len(news) < cursor + 20:
@@ -240,7 +245,8 @@ def getHastags(topic_id, date):
     if topic_id is None:
         return json.dumps({})
 
-    hashtag_list = list(Connection.Instance().hashtags[str(topic_id)].find({'name': date}, {'_id': 0, 'modified_date': 0}))
+    hashtag_list = list(
+        Connection.Instance().hashtags[str(topic_id)].find({'name': date}, {'_id': 0, 'modified_date': 0}))
 
     hashtags = []
 

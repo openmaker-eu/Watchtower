@@ -1,4 +1,7 @@
 import pprint  # to print human readable dictionary
+import sys
+
+sys.path.append('../..')
 
 import tweepy  # Twitter API helper package
 from tweepy import OAuthHandler
@@ -24,9 +27,9 @@ def get_influencers(topicID):
     '''
     with Connection.Instance().get_cursor() as cur:
         sql = (
-            "SELECT topic_name, keywords "
-            "FROM topics "
-            "WHERE topic_id= " + str(topicID)
+                "SELECT topic_name, keywords "
+                "FROM topics "
+                "WHERE topic_id= " + str(topicID)
         )
         cur.execute(sql)
         topic = cur.fetchall()

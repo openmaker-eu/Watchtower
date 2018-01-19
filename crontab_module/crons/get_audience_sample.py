@@ -1,19 +1,16 @@
 # Author: Kemal Berk Kocabagli
 
-import datetime  # to print the date & time in the output log whenever this script is run
-import sys  # to get system arguments
+import datetime
+import sys
 import time  # for debug
 
+sys.path.append('../..')
 import numpy as np  # for sampling
 
-import location_regex  # to get regular expressions for locations
-
-from predict_location.predictor import Predictor # for location
-from predict_location.update_field_db import update_field_collection as findPredictedLocation
+from predict_location.predictor import Predictor  # for location
 
 from application.Connections import Connection
-import os
-from bson.json_util import dumps
+
 
 def print_sample_audience(sample_audience_weighted, sample_audience_exploration):
     print('{:>1}{:>20}{:>40}{:>20}'.format("", "Screen name", "Location", "Followers count, Influencers count"))
@@ -148,8 +145,8 @@ def get_audience_sample_by_topic(userID, topicID, location, sample_size, signal_
 def main():
     if (len(sys.argv) >= 4):
 
-        location = sys.argv[2]  # get location from commandline.
-        getForAllLocations = sys.argv[3]  # should the sampling be done for all relevant locations
+        location = sys.argv[1]  # get location from commandline.
+        getForAllLocations = sys.argv[2]  # should the sampling be done for all relevant locations
         N = 500  # audience sample size
         signal_strength = 3
 

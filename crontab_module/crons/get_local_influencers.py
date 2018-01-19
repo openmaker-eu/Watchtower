@@ -1,22 +1,19 @@
 # Author: Kemal Berk Kocabagli
 
-import sys # to get system arguments
-import time # for debug
-import re # for regex in location filtering
-import pymongo # for pymongo functions
-import numpy as np # for sampling
-from datetime import datetime # to print the date & time in the output log whenever this script is run OR for time related checks
-from location_regex import *
+import sys  # to get system arguments
+import time  # for debug
+from datetime import \
+    datetime  # to print the date & time in the output log whenever this script is run OR for time related checks
 
-from predict_location.predictor import Predictor # for location
-from predict_location.update_field_db import update_field_collection as findPredictedLocation
-from bson.json_util import dumps
+sys.path.append('../..')
 
-import os
+from predict_location.predictor import Predictor  # for location
+
 from application.Connections import Connection
 
+
 # gets the local influencers for a given topic and location
-def get_local_influencers_by_topic(topicID, location, size,signal_strength=5, FOLLOWING_LIMIT=20000):
+def get_local_influencers_by_topic(topicID, location, size, signal_strength=5, FOLLOWING_LIMIT=20000):
     location = location.lower()
     if location == "global":
         return
