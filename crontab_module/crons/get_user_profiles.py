@@ -1,7 +1,8 @@
 import sys
 import time  # for debug
 
-sys.path.append('../..')
+sys.path.insert(0,'/root/cloud')
+sys.path.insert(0,'/root/.local/share/virtualenvs/cloud-rP5jkfQF/lib/python3.5/site-packages/')
 
 import numpy as np
 import pymongo  # for pymongo functions

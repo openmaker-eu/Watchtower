@@ -5,7 +5,8 @@ import time  # for debug
 from datetime import \
     datetime  # to print the date & time in the output log whenever this script is run OR for time related checks
 
-sys.path.append('../..')
+sys.path.insert(0,'/root/cloud')
+sys.path.insert(0,'/root/.local/share/virtualenvs/cloud-rP5jkfQF/lib/python3.5/site-packages/')
 
 from predict_location.predictor import Predictor  # for location
 

@@ -4,7 +4,8 @@ import sys
 import time
 from datetime import datetime, timedelta
 
-sys.path.append('../..')
+sys.path.insert(0,'/root/cloud')
+sys.path.insert(0,'/root/.local/share/virtualenvs/cloud-rP5jkfQF/lib/python3.5/site-packages/')
 
 import facebook
 import praw
