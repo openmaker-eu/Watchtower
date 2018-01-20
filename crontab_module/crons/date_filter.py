@@ -1,7 +1,8 @@
 import sys
 from time import gmtime, strftime, time
 
-sys.path.append('../..')
+sys.path.append('../../')
+sys.path.insert(0,'/path/to/venv/lib/python3.3/site-packages');
 
 from application.Connections import Connection
 
