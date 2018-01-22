@@ -2,7 +2,7 @@ import sys
 import time
 from datetime import datetime
 
-sys.path.insert(0,'/root/.local/share/virtualenvs/cloud-rP5jkfQF/lib/python3.5/site-packages/')
+sys.path.insert(0,'/root/cloud')
 
 import facebook
 import requests

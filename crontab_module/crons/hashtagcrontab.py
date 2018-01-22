@@ -2,7 +2,6 @@ import sys
 from time import gmtime, strftime, time
 
 sys.path.insert(0,'/root/cloud')
-sys.path.insert(0,'/root/.local/share/virtualenvs/cloud-rP5jkfQF/lib/python3.5/site-packages/')
 
 from application.Connections import Connection
 

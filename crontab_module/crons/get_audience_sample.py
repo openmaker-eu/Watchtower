@@ -5,7 +5,6 @@ import sys
 import time  # for debug
 
 sys.path.insert(0,'/root/cloud')
-sys.path.insert(0,'/root/.local/share/virtualenvs/cloud-rP5jkfQF/lib/python3.5/site-packages/')
 import numpy as np  # for sampling
 
 from predict_location.predictor import Predictor  # for location

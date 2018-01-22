@@ -15,8 +15,6 @@ try:
 except ImportError:
     from BeautifulSoup import BeautifulSoup
 
-sys.path.append("./")
-
 import pymongo
 
 
