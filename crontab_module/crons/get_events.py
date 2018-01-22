@@ -12,11 +12,41 @@ from application.Connections import Connection
 
 from decouple import config
 
+def mineEventsFromMeetUp(topicList):
+    mtup_token = config("MEET_UP_TOKEN")
+    for topic in topicList:
+        url_mtup = "https://api.meetup.com/"
+        auth = {"sign":"true", "key":mtup_token}
+        mtup_params = {"order":"time", "text":topic, "only":"events", "fields":"featured_photo"}
+        mtup_params.update(auth)
+        
+        response = requests.get(url_mtup + "find/upcoming_events", params = mtup_params)
+        response = response.json()
+        
+        mtup_result_events = []
+        mtup_response_events = response["events"]
+        
+        for event in mtup_response_events:
+            event["place"] = event.get("venue",{}).get("city","-") + ", " + event.get("venue",{}).get("country","")
+            event["link"] = event.get("link","")
+            event["name"] = event.get("name","")
+            event["cover"] = event.get("featured_photo",{}).get("photo_link",None)
+            event["interested"] = -1
+            event["coming"] = event.get("yes_rsvp_count","")
+            event["start_time"] = time.mktime(datetime.strptime(event["local_date"] + event["local_time"], "%Y-%m-%d%H:%M").timetuple())
+            event["start_date"] = datetime.fromtimestamp(event["start_time"]).strftime("%d-%m-%Y")
+            event["end_time"] = event["start_time"] + (event.get("duration",0) / 1e3)
+            event["end_date"] = datetime.fromtimestamp(event["end_time"]).strftime("%d-%m-%Y")
+            event["updated_time"] = event["created"] / 1e3
+            mtup_result_events.append((event, event["id"]))
+        
+    return mtup_result_events
 
 def mineEventsFromEventBrite(topicList):
     print("Getting events from Eventbrite...")
     my_token = config("EVENT_BRITE_TOKEN")
-    for topic in topicList:
+    result_events = []
+	for topic in topicList:
         print("Processing topic: " + str(topic))
         page_number = 1
         events = []
@@ -40,7 +70,6 @@ def mineEventsFromEventBrite(topicList):
                 break
             page_number += 1
 
-        result_events = []
         for event in events:
             try:
                 location = requests.get(
@@ -76,7 +105,8 @@ def mineEventsFromEventBrite(topicList):
                 event['cover'] = event['logo']['original']['url']
 
             result_events.append((event, event['id']))
-        return result_events
+        
+    return result_events
 
 
 def mineEventsFromFacebook(search_id_list, isPreview):
