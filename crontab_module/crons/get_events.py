@@ -2,7 +2,6 @@ import sys
 import time
 from datetime import datetime
 
-sys.path.insert(0,'/root/cloud')
 sys.path.insert(0,'/root/.local/share/virtualenvs/cloud-rP5jkfQF/lib/python3.5/site-packages/')
 
 import facebook
@@ -14,6 +13,7 @@ from decouple import config
 
 def mineEventsFromMeetUp(topicList):
     mtup_token = config("MEET_UP_TOKEN")
+    mtup_result_events = []
     for topic in topicList:
         url_mtup = "https://api.meetup.com/"
         auth = {"sign":"true", "key":mtup_token}
@@ -23,7 +23,6 @@ def mineEventsFromMeetUp(topicList):
         response = requests.get(url_mtup + "find/upcoming_events", params = mtup_params)
         response = response.json()
         
-        mtup_result_events = []
         mtup_response_events = response["events"]
         
         for event in mtup_response_events:
@@ -37,7 +36,7 @@ def mineEventsFromMeetUp(topicList):
             event["start_date"] = datetime.fromtimestamp(event["start_time"]).strftime("%d-%m-%Y")
             event["end_time"] = event["start_time"] + (event.get("duration",0) / 1e3)
             event["end_date"] = datetime.fromtimestamp(event["end_time"]).strftime("%d-%m-%Y")
-            event["updated_time"] = event["created"] / 1e3
+            event["updated_time"] = str(datetime.fromtimestamp(event["created"] / 1e3).strftime("%Y-%m-%dT%H:%M:%S")) + "00000"
             mtup_result_events.append((event, event["id"]))
         
     return mtup_result_events
@@ -46,7 +45,7 @@ def mineEventsFromEventBrite(topicList):
     print("Getting events from Eventbrite...")
     my_token = config("EVENT_BRITE_TOKEN")
     result_events = []
-	for topic in topicList:
+    for topic in topicList:
         print("Processing topic: " + str(topic))
         page_number = 1
         events = []
@@ -204,8 +203,10 @@ def startEvent(topic_id, topicList):
 
     eventsWithTopiclist = mineEventsFromEventBrite(topicList)
     eventsWithIds = mineEventsFromFacebook(ids, False)
+    eventsFromMeetUp = mineEventsFromMeetUp(topicList)
     insertEventsIntoDataBase(eventsWithTopiclist, topic_id)
     insertEventsIntoDataBase(eventsWithIds, topic_id)
+    insertEventsIntoDataBase(eventsFromMeetUp, topic_id)
 
 
 if __name__ == '__main__':
