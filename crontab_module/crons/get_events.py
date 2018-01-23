@@ -32,11 +32,12 @@ def mineEventsFromMeetUp(topicList):
             event["cover"] = event.get("featured_photo",{}).get("photo_link",None)
             event["interested"] = -1
             event["coming"] = event.get("yes_rsvp_count","")
-            event["start_time"] = time.mktime(datetime.strptime(event["local_date"] + event["local_time"], "%Y-%m-%d%H:%M").timetuple())
+            event["start_time"] = time.mktime(datetime.strptime(event.get("local_date","0000-00-00") + event.get("local_time","00:00"), "%Y-%m-%d%H:%M").timetuple())
             event["start_date"] = datetime.fromtimestamp(event["start_time"]).strftime("%d-%m-%Y")
             event["end_time"] = event["start_time"] + (event.get("duration",0) / 1e3)
             event["end_date"] = datetime.fromtimestamp(event["end_time"]).strftime("%d-%m-%Y")
-            event["updated_time"] = str(datetime.fromtimestamp(event["created"] / 1e3).strftime("%Y-%m-%dT%H:%M:%S")) + "00000"
+            #adding '+0000' to time to be compatible with facebook results
+            event["updated_time"] = str(datetime.fromtimestamp(event["created"] / 1e3).strftime("%Y-%m-%dT%H:%M:%S")) + "+0000"
             mtup_result_events.append((event, event["id"]))
         
     return mtup_result_events
@@ -107,6 +108,113 @@ def mineEventsFromEventBrite(topicList):
         
     return result_events
 
+def mineEventsFromFacebook(topicList):
+    my_token = config("FACEBOOK_TOKEN")
+    graph = facebook.GraphAPI(access_token=my_token, version="2.7")
+    fb_result_events = []
+    for topic in topicList:
+    
+        response = graph.get_object('search?q=' + topic +
+                                    '&type=event&limit=100&fields=attending_count,updated_time,cover,end_time,id,interested_count,name,place,start_time')
+        
+        #traverse pagination of response
+        while True:
+            try:
+                for event in response['data']:
+                    event["place"] = event.get("place",{}).get("location",{}).get("city","-") + ", " + event.get("place",{}).get("location",{}).get("country","-")
+                    event["link"] = 'https://www.facebook.com/events/' + event['id']
+                    event["name"] = event.get("name","")
+                    event["cover"] = event.get("cover",{}).get("source",None)
+                    event["interested"] = event.get("interested_count", -1)
+                    event["coming"] = event.get("attending_count","")
+                    event["start_time"] = time.mktime(datetime.strptime(event.get("start_time","0000-00-00")[:10], "%Y-%m-%d").timetuple())
+                    event["start_date"] = datetime.fromtimestamp(event["start_time"]).strftime('%d-%m-%Y')
+                    event["end_time"] = time.mktime(datetime.strptime(event.get("end_time","0000-00-00")[:10], "%Y-%m-%d").timetuple())
+                    event["end_date"] = datetime.fromtimestamp(event["end_time"]).strftime('%d-%m-%Y')
+                    fb_result_events.append((event, event["id"]))
+                response = requests.get(response['paging']['next']).json()
+            except:
+                break
+    return fb_result_events
+
+def insertEventsIntoDataBase(eventsWithIds, topic_id):
+    for event, ids in eventsWithIds:
+        ret = Connection.Instance().events[str(topic_id)].aggregate([
+            {'$match': {'id': ids}},
+            {'$limit': 1}
+        ])
+
+        if ret.alive:
+            for elem in ret:
+                newEventUpdateTime = datetime.strptime(event['updated_time'][:-5], "%Y-%m-%dT%H:%M:%S")
+                oldEventUpdateTime = datetime.strptime(elem['updated_time'][:-5], "%Y-%m-%dT%H:%M:%S")
+                if newEventUpdateTime != oldEventUpdateTime:
+                    print(newEventUpdateTime)
+                    print(oldEventUpdateTime)
+                if newEventUpdateTime > oldEventUpdateTime:
+                    Connection.Instance().events[str(topic_id)].remove({'id': ids})
+                    Connection.Instance().events[str(topic_id)].insert_one(event)
+                    print('updated')
+                else:
+                    print('existing')
+        else:
+            Connection.Instance().events[str(topic_id)].insert_one(event)
+            print('added new')
+
+def startEvent(topic_id, topicList):
+
+    eventsFromEventBrite = mineEventsFromEventBrite(topicList)
+    eventsFromFacebook = mineEventsFromFacebook(topicList)
+    eventsFromMeetUp = mineEventsFromMeetUp(topicList)
+    
+    insertEventsIntoDataBase(eventsFromEventBrite, topic_id)
+    insertEventsIntoDataBase(eventsFromFacebook, topic_id)
+    insertEventsIntoDataBase(eventsFromMeetUp, topic_id)
+
+
+if __name__ == '__main__':
+
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "SELECT topics.topic_id, topics.keywords "
+            "FROM topics;"
+        )
+        cur.execute(sql)
+        var = cur.fetchall()
+
+    for v in var:
+        print(v[0])
+        startEvent(v[0], v[1].split(","))
+
+
+"""
+  _____  ______ _______     _______ _      ______ 
+ |  __ \|  ____/ ____\ \   / / ____| |    |  ____|
+ | |__) | |__ | |     \ \_/ / |    | |    | |__   
+ |  _  /|  __|| |      \   /| |    | |    |  __|  
+ | | \ \| |___| |____   | | | |____| |____| |____ 
+ |_|  \_\______\_____|  |_|  \_____|______|______|
+                                                  
+                                                  
+def idsFromFacebook(topicList):
+    my_token = config("FACEBOOK_TOKEN")
+    graph = facebook.GraphAPI(access_token=my_token, version="2.7")
+
+    allSearches = []
+    for topic in topicList:
+        events = []
+        s = graph.get_object('search?q=' + topic + '&type=event&limit=100')
+        while True:
+            try:
+                for search in s['data']:
+                    allSearches.append(search['id'])
+                s = requests.get(s['paging']['next']).json()
+            except:
+                break
+        allSearches.append({
+            'events': events
+        })
+    return allSearches
 
 def mineEventsFromFacebook(search_id_list, isPreview):
     my_token = config("FACEBOOK_TOKEN")
@@ -145,80 +253,7 @@ def mineEventsFromFacebook(search_id_list, isPreview):
         if c == 5:
             break
 
-    return t
+    return t    
 
 
-def insertEventsIntoDataBase(eventsWithIds, topic_id):
-    for event, ids in eventsWithIds:
-        ret = Connection.Instance().events[str(topic_id)].aggregate([
-            {'$match': {'id': ids}},
-            {'$limit': 1}
-        ])
-
-        if ret.alive:
-            for elem in ret:
-                newEventUpdateTime = datetime.strptime(event['updated_time'][:-5], "%Y-%m-%dT%H:%M:%S")
-                oldEventUpdateTime = datetime.strptime(elem['updated_time'][:-5], "%Y-%m-%dT%H:%M:%S")
-                if newEventUpdateTime != oldEventUpdateTime:
-                    print(newEventUpdateTime)
-                    print(oldEventUpdateTime)
-                if newEventUpdateTime > oldEventUpdateTime:
-                    Connection.Instance().events[str(topic_id)].remove({'id': ids})
-                    Connection.Instance().events[str(topic_id)].insert_one(event)
-                    print('updated')
-                else:
-                    print('existing')
-        else:
-            Connection.Instance().events[str(topic_id)].insert_one(event)
-            print('added new')
-
-
-def sourceSelection(topicList):
-    my_token = config("FACEBOOK_TOKEN")
-    graph = facebook.GraphAPI(access_token=my_token, version="2.7")
-
-    allSearches = []
-    for topic in topicList:
-        events = []
-        s = graph.get_object('search?q=' + topic + '&type=event&limit=100')
-        while True:
-            try:
-                for search in s['data']:
-                    events.append({'event_id': search['id'], 'event_name': search['name']})
-                s = requests.get(s['paging']['next']).json()
-            except:
-                break
-        allSearches.append({
-            'events': events
-        })
-    return allSearches
-
-
-def startEvent(topic_id, topicList):
-    sources = sourceSelection(topicList)
-    for source in sources:
-        ids = []
-        for event in source['events']:
-            ids.append(event['event_id'])
-
-    eventsWithTopiclist = mineEventsFromEventBrite(topicList)
-    eventsWithIds = mineEventsFromFacebook(ids, False)
-    eventsFromMeetUp = mineEventsFromMeetUp(topicList)
-    insertEventsIntoDataBase(eventsWithTopiclist, topic_id)
-    insertEventsIntoDataBase(eventsWithIds, topic_id)
-    insertEventsIntoDataBase(eventsFromMeetUp, topic_id)
-
-
-if __name__ == '__main__':
-
-    with Connection.Instance().get_cursor() as cur:
-        sql = (
-            "SELECT topics.topic_id, topics.keywords "
-            "FROM topics;"
-        )
-        cur.execute(sql)
-        var = cur.fetchall()
-
-    for v in var:
-        print(v[0])
-        startEvent(v[0], v[1].split(","))
+"""
