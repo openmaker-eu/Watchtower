@@ -1,0 +1,97 @@
+version: '3'
+services:
+    mongodb:
+        container_name: mongodb
+        build:
+            context: ./
+            dockerfile: ./.docker/mongodb.docker
+        volumes:
+            - "${MONGODB_PATH}:/data/db"
+        ports:
+            - "27017:27017"
+        command: --auth
+        restart: always
+
+    postgres:
+        container_name: postgres
+        build:
+            context: ./
+            dockerfile: ./.docker/postgres.docker
+        ports:
+            - "5432:5432"
+        restart: always
+        environment:
+          POSTGRES_PASSWORD: ${POSTGRESQL_PASSWORD}
+          POSTGRES_USER: ${POSTGRESQL_USER}
+          POSTGRES_DB: ${POSTGRESQL_DB}
+          PGDATA: /var/lib/postgresql/data/pgdata
+        volumes:
+            - "${POSTGRESQL_PATH}:/var/lib/postgresql/data/pgdata"
+
+    server:
+        container_name: server
+        tty: true
+        volumes:
+            - "./:/root/cloud"
+        build:
+            context: ./
+            dockerfile: ./.docker/server.docker
+        ports:
+          - "8484:8484"
+
+    listen_module:
+        container_name: listen_module
+        tty: true
+        volumes:
+            - "./:/root/cloud"
+        build:
+            context: ./
+            dockerfile: ./.docker/listen_module.docker
+
+    crontab_module:
+        container_name: crontab_module
+        tty: true
+        volumes:
+            - "./:/root/cloud"
+        build:
+            context: ./
+            dockerfile: ./.docker/crontab_module.docker
+
+    rq-server:
+        container_name: rq-server
+        build:
+            context: ./
+            dockerfile: ./.docker/rq-server.docker
+        ports:
+            - "6379:6379"
+
+    collector_module:
+        container_name: collector_module
+        tty: true
+        volumes:
+            - "./:/root/cloud"
+        build:
+            context: ./
+            dockerfile: ./.docker/collector_module.docker
+        links:
+            - rq-server:db
+
+    rq-dashboard:
+        container_name: rq-dashboard
+        build:
+            context: ./
+            dockerfile: ./.docker/rq-dashboard.docker
+        ports:
+            - "9181:9181"
+        links:
+            - rq-server:db
+
+    rq-worker:
+        container_name: rq-worker
+        volumes:
+            - "./:/root/cloud"
+        build:
+            context: ./
+            dockerfile: ./.docker/rq-worker.docker
+        links:
+            - rq-server:db

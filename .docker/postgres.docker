@@ -1,0 +1,13 @@
+FROM postgres:9.6
+
+RUN apt-get update && apt-get install -y vim
+
+RUN rm -rf /data
+RUN mkdir /data
+
+RUN mkdir -p /var/lib/postgresql/9.6
+
+
+COPY ./.data/postgresql/schemas.sql /data
+COPY ./.data/postgresql/relevant_locations_data.sql /data
+COPY ./.data/postgresql/country_code_data.sql /data

@@ -31,7 +31,7 @@ while True:
                     'tweet': tweet,
                     'channel': 'twitter'
                 }
-                q.enqueue_call(func='link_parser.calculate_links',
+                q.enqueue_call(func=link_parser.calculate_links,
                                args=(data, config("HOST_IP"),),
                                at_front=True,
                                timeout=20)

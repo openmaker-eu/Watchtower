@@ -28,25 +28,37 @@ def delete_audience(topic_id):
             multi=True
         )
     except:
-        audienceDB['all_audience'].update({},
+        audienceDB['all_audience'].update(
+            {},
             {'$pull':{'topics': int(topic_id)}},
             multi=True
         )
+
     print("Deleted the topic from topics.")
 
-    try:
-        result = audienceDB['all_audience'].delete_many(
-            {
-            'id': {'$in':Connection.Instance().audienceDB[str(topic_id)].distinct('id')},
-            '$where':'this.topics.length<1'
-            }
-        )
-    except:
-        result = audienceDB['all_audience'].delete_many(
-            {'$where':'this.topics.length<1'}
-        )
+    BATCH_SIZE = 50000
+    cursor = Connection.Instance().audienceDB['all_audience'].find({'$where':'this.topics.length<1'}).limit(BATCH_SIZE)
+    BATCH_NO = 1
+    deleted_count = 0
 
-    print("Deleted " + str(result.deleted_count) + " audience members from all_audience.")
+    while cursor.count(with_limit_and_skip=True):
+        print("...Processing batch " + str(BATCH_NO))
+        bulk = Connection.Instance().audienceDB['all_audience'].initialize_unordered_bulk_op()
+        d=0
+        for record in cursor:
+            bulk.find({'_id':record['_id']}).remove()
+            d +=1
+        try:
+            bulk.execute()
+            deleted_count += d
+        except:
+            print("Error in bulk execute.")
+
+        cursor = Connection.Instance().audienceDB['all_audience'].find({'$where':'this.topics.length<1'}).skip(BATCH_NO*BATCH_SIZE).limit(BATCH_SIZE)
+        BATCH_NO += 1
+
+    print("Deleted " + str(deleted_count) + " audience members from all_audience.")
+
 
 def delete_local_influencers(topic_id):
     cn = localInfluencersDB.collection_names()
@@ -110,7 +122,7 @@ def main():
             topic_to_delete = str(input('Which topic would you like to delete (enter the ID)? '))
 
         start = time.time()
-        print("Do not forget to inactivate the topic in PostgreSQL DB!!!")
+        #print("Do not forget to inactivate the topic in PostgreSQL DB!!!")
 
         print("Deleting influencers...")
         delete_influencers(topic_to_delete)
