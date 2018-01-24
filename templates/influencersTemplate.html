@@ -1,0 +1,30 @@
+{% for influencer in local_influencers %}
+    <div class="influencer_card" cursor="{{ cursor }}" {% if influencer['hidden'] == True %} style="opacity:0.3" {% endif %} id="{{influencer['id']}}">
+        <div class="bg" style="background-image:url({{ influencer['profile_banner_url'] }})"></div>
+        <div class="pp" align="center">
+            <img src="{{ (influencer['profile_image_url_https'][:4] + influencer['profile_image_url_https'][5:]).replace('normal', '400x400') }}" alt=""/>
+        </div>
+        <div class="details">
+            <span id="name">{{ influencer['name'] }}</span>
+            <a href="http://twitter.com/{{ influencer['screen_name'] }}" target="_blank"><span
+                    id="nick"> @{{ influencer['screen_name'] }} </span></a>
+            <span id="description">{{ influencer['description'] }}</span>
+            <ul>
+                <li>Tweets <span>{{ influencer['statuses_count'] }}</span></li>
+                <li>Follow <span>{{ influencer['friends_count'] }}</span></li>
+                <li>Followers <span>{{ influencer['followers_count'] }}</span></li>
+            </ul>
+        </div>
+
+        <button class="hidebtn" onclick="document.getElementById('{{influencer['id'] ~ influencer['hidden']}}').click()">
+          {% if influencer['hidden'] == False %}
+              <a id="{{influencer['id'] ~ influencer['hidden']}}" class="text" hiddenflag=false href="javascript:void(0)" onclick="hideInfluencer('{{influencer['id']}}', '',this);">Hide</a>
+          {% endif %}
+          {% if influencer['hidden'] == True %}
+              <a id="{{influencer['id'] ~ influencer['hidden']}}" class="text" hiddenflag=true href="javascript:void(0)" onclick="hideInfluencer('{{influencer['id']}}', '',this);">Unhide</a>
+          {% endif %}
+        </button>
+
+    </div>
+
+{% endfor %}

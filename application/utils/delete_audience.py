@@ -102,64 +102,57 @@ def delete_audience_members(topic_id):
 
     print("Deleted " + str(result.deleted_count) + " audience members from all_audience_members.")
 
-def main():
-    if (len(sys.argv) == 2):
-        with Connection.Instance().get_cursor() as cur:
-            sql = (
-                "SELECT topic_id, topic_name "
-                "FROM archived_topics "
-                "WHERE audience_deleted=false "
-            )
-            cur.execute(sql)
-            topics = cur.fetchall()  # list of all topics
-            topic_ids=[]
-            print('topic ID    topic name')
-        for topic in topics:
-            topic_ids.append(str(topic[0]))
-            print(str(topic[0]) + " " + str(topic[1]))
-        topic_to_delete = -1
-        while(topic_to_delete not in topic_ids):
-            topic_to_delete = str(input('Which topic would you like to delete (enter the ID)? '))
+def main(topic_to_delete):
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "SELECT topic_id, topic_name "
+            "FROM archived_topics "
+            "WHERE audience_deleted=false "
+        )
+        cur.execute(sql)
+        topics = cur.fetchall()  # list of all topics
+        topic_ids=[]
+        print('topic ID    topic name')
+    for topic in topics:
+        topic_ids.append(str(topic[0]))
+        print(str(topic[0]) + " " + str(topic[1]))
 
-        start = time.time()
-        #print("Do not forget to inactivate the topic in PostgreSQL DB!!!")
+    topic_to_delete = int(topic_to_delete)
+    if topic_to_delete not in topic_ids:
+        print("Audience already deleted.")
+        return
 
-        print("Deleting influencers...")
-        delete_influencers(topic_to_delete)
-        print("Complete in " + str(time.time()-start) + " seconds.")
-        start = time.time()
+    start = time.time()
 
-        print("Deleting audience...")
-        delete_audience(topic_to_delete)
-        print("Complete in " + str(time.time()-start) + " seconds.")
-        start = time.time()
+    print("Deleting influencers...")
+    delete_influencers(topic_to_delete)
+    print("Complete in " + str(time.time()-start) + " seconds.")
+    start = time.time()
 
-        print("Deleting local influencers...")
-        delete_local_influencers(topic_to_delete)
-        print("Complete in " + str(time.time()-start) + " seconds.")
-        start = time.time()
+    print("Deleting audience...")
+    delete_audience(topic_to_delete)
+    print("Complete in " + str(time.time()-start) + " seconds.")
+    start = time.time()
 
-        print("Deleting audience samples...")
-        delete_audience_samples(topic_to_delete)
-        print("Complete in " + str(time.time()-start) + " seconds.")
-        start = time.time()
+    print("Deleting local influencers...")
+    delete_local_influencers(topic_to_delete)
+    print("Complete in " + str(time.time()-start) + " seconds.")
+    start = time.time()
 
-        print("Deleting audience members...")
-        delete_audience_members(topic_to_delete)
-        print("Complete in " + str(time.time()-start) + " seconds.")
-        start = time.time()
+    print("Deleting audience samples...")
+    delete_audience_samples(topic_to_delete)
+    print("Complete in " + str(time.time()-start) + " seconds.")
+    start = time.time()
 
-        with Connection.Instance().get_cursor() as cur:
-            sql = (
-                "UPDATE archived_topics "
-                "SET audience_deleted = %s "
-                "WHERE topic_id = %s"
-            )
-            cur.execute(sql, [True, int(topic_to_delete)])
-            print("Updated PostgreSQL DB.")
+    print("Deleting audience members...")
+    delete_audience_members(topic_to_delete)
+    print("Complete in " + str(time.time()-start) + " seconds.")
+    start = time.time()
 
-    else:
-        print("Usage: delete_topic.py <server_ip> \n staging: 138.68.92.181\n production: 194.116.76.78")
-
-if __name__ == "__main__":
-    main()
+    sql = (
+        "UPDATE archived_topics "
+        "SET audience_deleted = %s "
+        "WHERE topic_id = %s"
+    )
+    cur.execute(sql, [True, int(topic_to_delete)])
+    print("Updated PostgreSQL DB.")

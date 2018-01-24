@@ -85,6 +85,12 @@
         <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
     {% endif %}
 
+    {% if type == "influencers" %}
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
+        <link rel="stylesheet" type="text/css" href="static/css/influencer_card.css"/>
+        <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
+    {% endif %}
+
     {% if type == "recommendations" %}
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
         <link rel="stylesheet" type="text/css" href="static/css/star-rating.css"/>
@@ -145,15 +151,32 @@
                 <li {% if type=="news" %} class="active" {% endif %}>
                     <a href="/News">News</a>
                 </li>
+
+
                 <li {% if type=="conversation" %} class="active" {% endif %}>
                     <a href="/Conversations">Conversations</a>
                 </li>
-                <li {% if type=="audiences" %} class="active" {% endif %}>
-                    <a href="/Audience">Audience</a>
+
+
+                <li class="dropdown" {% if type=="audiences" or type=="influencers"%} class="active" {% endif %}>
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                       Community  <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                      <li >
+                          <a href="/Audience">Audience</a>
+                      </li>
+                      <li>
+                          <a href="/Influencers">Influencers</a>
+                      </li>
+                    </ul>
                 </li>
+
+
                 <li {% if type=="events" %} class="active" {% endif %}>
                     <a href="/Events">Events</a>
                 </li>
+
+
                 <li class="dropdown">
                     <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span
                             class="glyphicon glyphicon-user"></span> {{ username }} <span class="caret"></span></a>
@@ -197,6 +220,15 @@
                     </div>
                 </li>
             </ul>
+
+            <div class="navbar-brand" style="margin-left:30">
+              <p>
+                {% if type == "influencers" %}
+                  Influencers
+                {% endif %}
+              </p>
+            </div>
+
             <div class="pull-right" style="margin:8px">
                 {% if type == "news" %}
                     {% include 'newsDateButtons.html' %}
@@ -212,6 +244,9 @@
                     {% include 'recommendationRatedButton.html' %}
                 {% endif %}
                 {% if type == "audiences" %}
+                    {% include 'selectLocation.html' %}
+                {% endif %}
+                {% if type == "influencers" %}
                     {% include 'selectLocation.html' %}
                 {% endif %}
                 <!--
@@ -255,6 +290,9 @@
 {% endif %}
 {% if type == "audiences" %}
     {% include 'audience.html' %}
+{% endif %}
+{% if type == "influencers" %}
+    {% include 'influencers.html' %}
 {% endif %}
 {% if type == "recommendations" %}
     {% include 'recommendations.html' %}
@@ -389,6 +427,10 @@
 
 {% if type == "audiences" %}
     <script src="/js/audiences.js"></script>
+{% endif %}
+
+{% if type == "influencers" %}
+    <script src="/js/influencers.js"></script>
 {% endif %}
 
 {% if type == "recommendations" %}

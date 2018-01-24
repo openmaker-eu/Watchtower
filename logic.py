@@ -5,8 +5,11 @@ from crontab_module.crons import facebook_reddit_crontab
 import facebook
 import praw
 import pymongo
+import pprint
 
 from application.utils import twitter_search_sample_tweets
+from application.utils import delete_audience
+
 from application.Connections import Connection
 
 from decouple import config
@@ -547,6 +550,9 @@ def deleteAlert(alertid, user_id):
         cur.execute(sql, [alertid])
     setCurrentTopic(user_id)
 
+    t = Thread(target=delete_audience.main, args=(alert['alertid'],))
+    t.start()
+
 
 # Updates given alert information and kill its thread, then again start its thread.
 def updateAlert(alert, user_id):
@@ -723,6 +729,31 @@ def rateAudience(topic_id, user_id, audience_id, rating):
                 )
                 cur.execute(sql, [int(user_id), int(audience_id), int(topic_id), float(rating)])
 
+def hideInfluencer(topic_id, user_id, influencer_id, description, is_hide, location):
+    #print("in hide influencer:")
+    #print(influencer_id)
+    print("In hide influencer")
+    print("Topic id:" + str(topic_id))
+    print("Location:" + location)
+    influencer_id = int(influencer_id)
+    print(influencer_id)
+    if is_hide == True:
+        print("Hiding influencer with ID:" + str(influencer_id))
+        with Connection.Instance().get_cursor() as cur:
+            sql = (
+                "INSERT INTO hidden_influencers "
+                "(topic_id, country_code, influencer_id, description) "
+                "VALUES (%s, %s, %s, %s)"
+            )
+            cur.execute(sql, [int(topic_id), str(location), str(influencer_id), ""])
+    else:
+        print("Unhiding influencer with ID:" + str(influencer_id))
+        with Connection.Instance().get_cursor() as cur:
+            sql = (
+                "DELETE FROM hidden_influencers "
+                "WHERE topic_id = %s and country_code = %s and influencer_id = %s "
+            )
+            cur.execute(sql, [int(topic_id), str(location), str(influencer_id)])
 
 def getTweets(alertid):
     tweets = Connection.Instance().db[str(alertid)].find({}, {'tweetDBId': 1, "text": 1, "id": 1, "user": 1,
@@ -886,6 +917,42 @@ def getAudiences(topic_id, user_id, cursor, location):
     result['audiences'] = audiences
     return result
 
+def getLocalInfluencers(topic_id, cursor, location):
+    print("In get local infs")
+    print("Topic id:" + str(topic_id))
+    print("Location:" + location)
+    result = {}
+    local_influencers = list(Connection.Instance().local_influencers_DB[str(topic_id)+"_"+str(location)].find({}))[cursor:cursor + 21]
+
+    for inf in local_influencers:
+        inf['id'] = str(inf['id'])
+
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "SELECT influencer_id "
+            "FROM hidden_influencers "
+            "WHERE country_code = %s and topic_id = %s "
+        )
+        cur.execute(sql, [str(location), int(topic_id)])
+        hidden_ids = [str(influencer_id[0]) for influencer_id in cur.fetchall()]
+        #print("Hidden ids:")
+        #print(hidden_ids)
+        for influencer in local_influencers:
+            if str(influencer['id']) in hidden_ids:
+                #print(str(influencer['id']) + " is hidden")
+                influencer['hidden']=True
+            else:
+                influencer['hidden']=False
+                #print(str(influencer['id']) + " not hidden")
+
+    cursor = int(cursor) + 21
+    if cursor >= 500 or len(local_influencers) == 0:
+        cursor = 0
+    result['next_cursor'] = cursor
+    result['cursor_length'] = 500
+    result['local_influencers'] = local_influencers
+    return result
+
 def getRecommendedAudience(topic_id, location, filter, user_id, cursor):
     result = {}
     if filter == "rated":
@@ -980,7 +1047,7 @@ def unsubsribeTopic(topic_id, user_id):
             )
             cur.execute(sql, [None, int(user_id)])
 
-def getRelatedLocations():
+def getRelevantLocations():
     with Connection.Instance().get_cursor() as cur:
         sql = (
             "SELECT * "

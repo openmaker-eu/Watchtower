@@ -29,6 +29,7 @@ def getLocalInfluencers(topic_id, location, cursor):
         return json.dumps(result, indent=4)
     if (str(topic_id) != "None"):
         with Connection.Instance().get_cursor() as cur:
+            # CHECK TOPIC
             sql = (
                 "SELECT topic_name "
                 "FROM topics "
@@ -46,6 +47,7 @@ def getLocalInfluencers(topic_id, location, cursor):
             location = location.lower()
             # error handling needed for location
             with Connection.Instance().get_cursor() as cur:
+                # GET LOCATION
                 sql = (
                     "SELECT location_code "
                     "FROM relevant_locations "
@@ -59,13 +61,26 @@ def getLocalInfluencers(topic_id, location, cursor):
                     result['error'] = "Location does not exist."
                     return json.dumps(result, indent=4)
 
+                # GET HIDDEN INFLUENCERS
+                sql = (
+                    "SELECT influencer_id "
+                    "FROM hidden_influencers "
+                    "WHERE country_code = %s and topic_id = %s "
+                )
+                try:
+                    cur.execute(sql, [str(location), int(topic_id)])
+                    hidden_ids = [int(influencer_id[0]) for influencer_id in cur.fetchall()]
+                except:
+                    result['error'] = "Problem in fetching hidden influencers for current topic and location."
+                    return json.dumps(result, indent=4)
+
             collection = Connection.Instance().local_influencers_DB[str(topic_id)+"_"+str(location)]
 
             if location == "global":
                 collection = Connection.Instance().influencerDB[str(topic_id)]
 
             local_influencers = list(
-                collection.find({},
+                collection.find({'id': {'$nin':hidden_ids}},
                  {'_id': False,
                  'name':1,
                  'screen_name':1,
