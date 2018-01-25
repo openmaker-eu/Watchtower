@@ -43,70 +43,35 @@ def mineEventsFromMeetUp(topicList):
     return mtup_result_events
 
 def mineEventsFromEventBrite(topicList):
-    print("Getting events from Eventbrite...")
-    my_token = config("EVENT_BRITE_TOKEN")
-    result_events = []
+    evbr_token = config("EVENT_BRITE_TOKEN")
     for topic in topicList:
-        print("Processing topic: " + str(topic))
+        evbr_result_events = []
         page_number = 1
-        events = []
-        while (1):
-            print("Fetching page " + str(page_number))
-            response = requests.get(
-                "https://www.eventbriteapi.com/v3/events/search/",
-                headers={
-                    "Authorization": "Bearer " + my_token,
-                },
-                params={
-                    'q': topic,
-                    'page': page_number
-                },
-                verify=True,  # Verify SSL certificate
-            )
-            response = response.json()
-            events.extend(response['events'])
-            print("# EVENTS:" + str(len(events)))
-            if page_number == response['pagination']['page_count']:  # retrieved last page, break the loop.
-                break
-            page_number += 1
-
-        for event in events:
+        while True:
             try:
-                location = requests.get(
-                    "https://www.eventbriteapi.com/v3/venues/" + event['venue_id'],
-                    headers={
-                        "Authorization": "Bearer " + my_token,
-                    },
-                    params={
-                        'q': topic
-                    },
-                    verify=True,  # Verify SSL certificate
-                ).json()
-                event['place'] = ''
-                if 'address' in location:
-                    event['place'] = location['address']['city'] + ", " + location['address']['country']
+                response = requests.get("https://www.eventbriteapi.com/v3/events/search/",
+                                        headers = {"Authorization": "Bearer " + evbr_token,},
+                                        params = {"q":topic, "expand":"venue", "page":page_number},
+                                        verify=True)
+                response = response.json()
+                
+                for event in response["events"]:
+                    event["place"] = event.get("venue",{}).get("address",{}).get("city","-") + ", " + event.get("venue",{}).get("address",{}).get("country","-")
+                    event["link"] = event.get("url","")
+                    event["name"] = event.get("name",{}).get("text","")
+                    event["cover"] = event.get("logo",{}).get("original",{}).get("url",None)
+                    event["interested"] = -1
+                    event["coming"] = -1
+                    event["start_time"] = time.mktime(datetime.strptime(event.get("start",{}).get("utc","0000-00-00")[:10], "%Y-%m-%d").timetuple())
+                    event["start_date"] = datetime.fromtimestamp(event["start_time"]).strftime('%d-%m-%Y')
+                    event["end_time"] = time.mktime(datetime.strptime(event.get("end",{}).get("utc","0000-00-00")[:10], "%Y-%m-%d").timetuple())
+                    event["end_date"] = datetime.fromtimestamp(event["end_time"]).strftime('%d-%m-%Y')
+                    evbr_result_events.append((event, event["id"]))
+                
+                page_number += 1
             except:
-                event['place'] = ''
-            if 'end' in event and 'utc' in event['end']:
-                event['end_time'] = time.mktime(datetime.strptime(event['end']['utc'][:10], "%Y-%m-%d").timetuple())
-            else:
-                event['end_time'] = time.mktime(datetime.strptime(event['created'][:10], "%Y-%m-%d").timetuple())
-            event['start_time'] = event['start']['utc'][:10]
-            start_time = time.mktime(datetime.strptime(event['start']['utc'][:10], "%Y-%m-%d").timetuple())
-            event['start_date'] = datetime.fromtimestamp(start_time).strftime('%d-%m-%Y')
-            event['end_date'] = datetime.fromtimestamp(event['end_time']).strftime('%d-%m-%Y')
-            event['link'] = event['url']
-            event['name'] = event['name']['text']
-            event['cover'] = None
-            event['updated_time'] = str(event['changed'])[:-1] + "+0000"
-            event['interested'] = -1
-            event['coming'] = -1
-            if event['logo'] is not None:
-                event['cover'] = event['logo']['original']['url']
-
-            result_events.append((event, event['id']))
-        
-    return result_events
+                break
+    return evbr_result_events
 
 def mineEventsFromFacebook(topicList):
     my_token = config("FACEBOOK_TOKEN")
@@ -255,5 +220,70 @@ def mineEventsFromFacebook(search_id_list, isPreview):
 
     return t    
 
+def mineEventsFromEventBrite(topicList):
+    print("Getting events from Eventbrite...")
+    my_token = config("EVENT_BRITE_TOKEN")
+    result_events = []
+    for topic in topicList:
+        print("Processing topic: " + str(topic))
+        page_number = 1
+        events = []
+        while (1):
+            print("Fetching page " + str(page_number))
+            response = requests.get(
+                "https://www.eventbriteapi.com/v3/events/search/",
+                headers={
+                    "Authorization": "Bearer " + my_token,
+                },
+                params={
+                    'q': topic,
+                    'page': page_number
+                },
+                verify=True,  # Verify SSL certificate
+            )
+            response = response.json()
+            events.extend(response['events'])
+            print("# EVENTS:" + str(len(events)))
+            if page_number == response['pagination']['page_count']:  # retrieved last page, break the loop.
+                break
+            page_number += 1
+
+        for event in events:
+            try:
+                location = requests.get(
+                    "https://www.eventbriteapi.com/v3/venues/" + event['venue_id'],
+                    headers={
+                        "Authorization": "Bearer " + my_token,
+                    },
+                    params={
+                        'q': topic
+                    },
+                    verify=True,  # Verify SSL certificate
+                ).json()
+                event['place'] = ''
+                if 'address' in location:
+                    event['place'] = location['address']['city'] + ", " + location['address']['country']
+            except:
+                event['place'] = ''
+            if 'end' in event and 'utc' in event['end']:
+                event['end_time'] = time.mktime(datetime.strptime(event['end']['utc'][:10], "%Y-%m-%d").timetuple())
+            else:
+                event['end_time'] = time.mktime(datetime.strptime(event['created'][:10], "%Y-%m-%d").timetuple())
+            event['start_time'] = event['start']['utc'][:10]
+            start_time = time.mktime(datetime.strptime(event['start']['utc'][:10], "%Y-%m-%d").timetuple())
+            event['start_date'] = datetime.fromtimestamp(start_time).strftime('%d-%m-%Y')
+            event['end_date'] = datetime.fromtimestamp(event['end_time']).strftime('%d-%m-%Y')
+            event['link'] = event['url']
+            event['name'] = event['name']['text']
+            event['cover'] = None
+            event['updated_time'] = str(event['changed'])[:-1] + "+0000"
+            event['interested'] = -1
+            event['coming'] = -1
+            if event['logo'] is not None:
+                event['cover'] = event['logo']['original']['url']
+
+            result_events.append((event, event['id']))
+        
+    return result_events
 
 """
