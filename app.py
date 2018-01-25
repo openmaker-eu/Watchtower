@@ -52,6 +52,7 @@ class BaseHandler(SentryMixin, tornado.web.RequestHandler):
     def get_current_username(self):
         return self.get_secure_cookie("username")
 
+
 class Api500ErrorHandler(tornado.web.RequestHandler):
     def write_error(self, status_code, **kwargs):
         self.write(json.dumps({'error': "Unexpected Error!"}))
@@ -492,6 +493,7 @@ class ProfileHandler(BaseHandler, TemplateRendering):
         location = logic.getCurrentLocation(tornado.escape.xhtml_escape(self.current_user))
         relevant_locations = logic.getRelevantLocations()
         user = logic.getUser(user_id)
+        auth_url = logic.getTwitterAuthUrl()
         variables = {
             'title': "My Profile",
             'type': "profile",
@@ -500,8 +502,10 @@ class ProfileHandler(BaseHandler, TemplateRendering):
             'alerts': logic.getAlertList(user_id),
             'topic': topic,
             'location': location,
-            'relevant_locations': relevant_locations
+            'relevant_locations': relevant_locations,
+            'auth_url': auth_url[0]
         }
+        self.set_secure_cookie("request_token", str(auth_url[1]))
         content = self.render_template(template, variables)
         self.write(content)
 
@@ -509,8 +513,11 @@ class ProfileHandler(BaseHandler, TemplateRendering):
     def post(self):
         password = str(self.get_argument("password"))
         country = str(self.get_argument("country"))
+        twitter_pin = self.get_argument("twitter_pin", "")
         user_id = tornado.escape.xhtml_escape(self.current_user)
-        update_info = logic.updateUser(user_id, password, country.upper())
+        auth_token = self.get_secure_cookie("request_token")
+        self.clear_cookie("request_token")
+        update_info = logic.updateUser(user_id, password, country.upper(), auth_token, twitter_pin)
         if update_info['response']:
             self.write({'response': True, 'redirectUrl': '/Topics'})
         else:
@@ -1296,7 +1303,10 @@ class ConversationHandler(BaseHandler, TemplateRendering):
 def main():
     tornado.options.parse_command_line()
     app = Application()
-    app.sentry_client = AsyncSentryClient(config("SENTRY_TOKEN"))
+    try:
+        app.sentry_client = AsyncSentryClient(config("SENTRY_TOKEN"))
+    except:
+        pass
     app.listen(8484)
     tornado.ioloop.IOLoop.current().start()
 

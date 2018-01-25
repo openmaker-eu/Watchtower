@@ -6,6 +6,7 @@ import facebook
 import praw
 import pymongo
 import pprint
+import tweepy
 
 from application.utils import twitter_search_sample_tweets
 from application.utils import delete_audience
@@ -246,7 +247,7 @@ def getUser(user_id):
 
         return {'username': fetched[0], 'country': country}
 
-def updateUser(user_id, password, country_code):
+def updateUser(user_id, password, country_code,auth_token, twitter_pin):
     with Connection.Instance().get_cursor() as cur:
         sql = (
             "SELECT NOT EXISTS (SELECT 1 FROM country_code where country_code = %s)"
@@ -257,12 +258,27 @@ def updateUser(user_id, password, country_code):
         if fetched[0]:
             return {'response': False, 'error_type': 1, 'message': 'Invalid country code.'}
 
-        sql = (
-            "UPDATE users "
-            "SET password = %s, country_code = %s "
-            "WHERE user_id = %s"
-        )
-        cur.execute(sql, [password, country_code, user_id])
+        consumerKey = config("TWITTER_CONSUMER_KEY")
+        consumerSecret = config("TWITTER_CONSUMER_SECRET")
+        auth = tweepy.OAuthHandler(consumerKey,consumerSecret)
+        auth.request_token = eval(auth_token)
+        auth.secure=True
+        token = auth.get_access_token(verifier=twitter_pin)
+
+        if twitter_pin != '' and len(token) == 2:
+            sql = (
+                "UPDATE users "
+                "SET password = %s, country_code = %s, twitter_access_token = %s, twitter_access_secret = %s "
+                "WHERE user_id = %s"
+            )
+            cur.execute(sql, [password, country_code, token[0], token[1], user_id])
+        else:
+            sql = (
+                "UPDATE users "
+                "SET password = %s, country_code = %s "
+                "WHERE user_id = %s"
+            )
+            cur.execute(sql, [password, country_code, user_id])
 
         return {'response': True}
 
@@ -1056,3 +1072,12 @@ def getRelevantLocations():
         cur.execute(sql, [])
         locations = cur.fetchall()
         return [{'location_name': i[0], 'location_code': i[1]} for i in locations]
+
+def getTwitterAuthUrl():
+    consumerKey = config("TWITTER_CONSUMER_KEY")
+    consumerSecret = config("TWITTER_CONSUMER_SECRET")
+
+    #authenticating twitter consumer key
+    auth = tweepy.OAuthHandler(consumerKey,consumerSecret)
+    auth.secure=True
+    return (auth.get_authorization_url(), auth.request_token)

@@ -51,6 +51,7 @@
       var password = $("#form-password").val();
       var repassword = $("#form-repassword").val();
       var country = $("#form-country").val();
+      var twitterPin = $("#form-twitter-pin").val();
 
       if (password != repassword && $("#form-repassword").parent().next(".validation").length == 0) // only add if not added
       {
@@ -63,7 +64,8 @@
           method: 'POST',
           data: {
             'password': password,
-            'country': country
+            'country': country,
+            'twitter_pin': twitterPin
           },
           timeout: 10000,
           error: function() {
