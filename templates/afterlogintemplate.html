@@ -477,38 +477,7 @@
 {% if type == "news" or type == "bookmark" %}
 <script src="/js/bootstrap-datetimepicker.min.js"></script>
 <script src="/js/moment.js"></script>
-<script type="text/javascript">
-  $(".form_datetime").datetimepicker({
-    startDate: new Date(),
-    showMeridian: true,
-    pickDate: true,
-    pickTime: true,
-    autoclose: true,
-    todayBtn: true,
-    startView: 2,
-    format:"HH:ii P - M dd, yyyy",
-    pickerPosition: "bottom-left"}).on('changeDate', function(ev){
-      swal({
-          title: "Are you sure?",
-          text: "News with id:{0} will be published on {1}.".format(this.getAttribute('link_id'), this.getAttribute('value')),
-          type: "warning",
-          showCancelButton: true,
-          confirmButtonClass: "btn-success",
-          confirmButtonText: "Yes, go and edit tweet!",
-          cancelButtonText: "No, cancel!",
-          closeOnConfirm: false,
-          closeOnCancel: false
-        },
-        function(isConfirm) {
-          if (isConfirm) {
-            window.location.replace('/Tweets/-1?news_id={0}&date={1}'.format(this.getAttribute('link_id'), this.getAttribute('value')));
-          } else {
-            swal("Cancelled", "Your tweet is not stored", "error");
-          }
-        }.bind(this));
-  });
-</script>
-    <script src="/js/news.js"></script>
+<script src="/js/news.js"></script>
 {% endif %}
 
 
