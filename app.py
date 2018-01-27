@@ -1155,11 +1155,12 @@ class TweetsHandler(BaseHandler, TemplateRendering):
     def get(self, tweet_id=None):
         user_id = tornado.escape.xhtml_escape(self.current_user)
         template = 'afterlogintemplate.html'
-        changing_topic = int(self.get_argument("change", -1))
-        if changing_topic != -1:
-            template = 'renderTweets.html'
+        changing_topic = int(self.get_argument("topic_id", -1))
         topic = logic.get_current_topic(tornado.escape.xhtml_escape(self.current_user))
         location = logic.get_current_location(tornado.escape.xhtml_escape(self.current_user))
+        if changing_topic != -1:
+            topic['topic_id'] = changing_topic
+            template = 'renderTweets.html'
         relevant_locations = logic.get_relevant_locations()
         new_tweet = False
         if tweet_id is not None:

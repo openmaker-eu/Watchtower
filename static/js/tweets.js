@@ -8,11 +8,12 @@ $(document).ready(function () {
     $("#spin").spinner();
     $("#topic_dropdown").on('click', 'li a', function () {
         $("#spin").show();
+        var topic_id = $(this).attr("data-id");
         $.ajax({
             url: '/Tweets',
             method: 'GET',
             data: {
-              'change': 1
+              'topic_id': topic_id
             },
             timeout: 10000,
             success: function (html) {
