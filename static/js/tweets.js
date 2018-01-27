@@ -1,3 +1,29 @@
+$(document).ready(function () {
+    $("#topic_dropdown").on('click', 'li a', function () {
+        var selText = $(this).children("h4").html();
+        $(this).parent('li').siblings().removeClass('active');
+        $(this).parents('.btn-group').find('.selection').html(selText);
+        $(this).parents('li').addClass("active");
+    });
+    $("#spin").spinner();
+    $("#topic_dropdown").on('click', 'li a', function () {
+        $("#spin").show();
+        $.ajax({
+            url: '/Tweets',
+            method: 'GET',
+            data: {
+              'change': 1
+            },
+            timeout: 10000,
+            success: function (html) {
+                $('#tweetscontainer').empty();
+                $('#tweetscontainer').append(html);
+                $("#spin").hide();
+            }
+        });
+    });
+});
+
 function saveTweet(tweet_id) {
     var text = $('#tweet_'.concat(tweet_id)).find("#description").text();
     var date = $('#tweet_'.concat(tweet_id)).find("#date").val();

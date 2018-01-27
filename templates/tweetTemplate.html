@@ -1,31 +1,7 @@
 <div class="container">
     <legend>
         <h1>Tweets</h1></legend>
-      <div class="grid">
-
-        {% if tweets %} {% for tweet in tweets %}
-        <div class="tweet_card" id='tweet_{{ tweet["tweet_id"] }}'>
-            <div class="bg" style="background-image:url({{ tweet['image_url'] }})"></div>
-            <div class="pp" align="left">
-                <div align="center">
-                  <img src="http://pbs.twimg.com/profile_images/685273086896128001/iOdUqMRL_400x400.jpg" alt=""/>
-                </div>
-                <div style="margin-top: 8px;">
-                  <span id="name"><b>Enis Simsar</b></span> <br>
-                  <a href="http://twitter.com/enisimsar" style="text-decoration: none;" target="_blank"><span
-                          id="nick"> @enisimsar </span></a>
-                </div>
-                <div class="buttons" style="padding-top:12px" align="right">
-                  <button type="button" onclick="saveTweet({{ tweet["tweet_id"] }})" class="btn btn-primary btn-save" {% if not new_tweet %} disabled {% endif %}>Save</button>
-                  {% if not new_tweet %}<button type="button" onclick="removeTweet({{ tweet["tweet_id"] }})" class="btn btn-danger btn-remove">Remove</button>{% endif %}
-                </div>
-            </div>
-            <div class="details">
-                <div id="description" class="textarea" maxlength="257" contenteditable="true">{{ tweet['body'] }}</div>
-                <a style="font-size:16px" href="{{ tweet['url'] }}" target="_blank">https://t.co/WatchTower</a><br>
-                <input id="date" size="23" type="text" value="{{ tweet['published_at'] }}" readonly class="form_datetime">
-            </div>
-        </div>
-        {% endfor %} {% endif %}
+      <div class="grid" id="tweetscontainer">
+          {% include 'renderTweets.html' %}
       </div>
 </div>
