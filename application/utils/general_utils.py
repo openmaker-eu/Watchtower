@@ -23,3 +23,9 @@ def date_formatter(x):
         return str(x)
     else:
         raise TypeError(x)
+
+def tweet_date_to_string(x):
+    if isinstance(x, datetime):
+        return x.strftime("%I:%M %p - %b %d, %Y")
+    elif isinstance(x, str):
+        return datetime.strptime(x, "%I:%M %p - %b %d, %Y")

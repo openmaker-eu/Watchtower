@@ -591,12 +591,12 @@
      * Convert automatically inputs with class 'rating' into Krajee's star rating control.
      */
     $(document).ready(function () {
-        var $input = $('.sentiment input.rating');
+        var $input = $('.sentiment > input.rating');
         if ($input.length) {
             $input.removeClass('rating-loading').addClass('rating-loading').rating();
         }
 
-        var $input = $('.vote_audience input.rating');
+        var $input = $('.vote_audience > input.rating');
         if ($input.length) {
             $input.removeClass('rating-loading').addClass('rating-loading').rating();
         }

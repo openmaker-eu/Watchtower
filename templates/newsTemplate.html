@@ -1,61 +1,69 @@
 {% for feed in feeds %}
     <div class="margin-bottom-15" cursor="{{ cursor }}" domain="{{ feed['domain'] }}">
-       <div class="col-md-3">
-           <img src="{{ feed['im'] }}" onerror="this.src='/images/image-not-found.png'"
-                class="img-responsive feed_img">
-       </div>
-       <div class="col-md-9">
-           <p></p>
-           <h4 style="margin-bottom:4px;">
-               <div class="ban-domain">
-                   <a href="javascript:;" onclick="ban_domain('{{ feed['domain'] }}')"
-                      style="color: #000000;text-decoration: none;">
-                       <span style="float:right;font-size:24px" align="right"
-                             class="glyphicon glyphicon-ban-circle"></span>
-                   </a>
-               </div>
-               <div class="bookmark" id="{{ feed['link_id'] }}">
-                   {% if not feed['bookmark'] %}
-                       <a href="javascript:;" onclick="dummy('add', '{{ feed['link_id'] }}')"
-                          style="color: #000000;text-decoration: none;">
-                           <span style="float:right;color:#D70000;font-size:24px" align="right"
-                                 class="glyphicon glyphicon-bookmark"></span>
-                       </a>
-                   {% else %}
-                       <a href="javascript:;" onclick="dummy('remove', '{{ feed['link_id'] }}')"
-                          style="color: #000000;text-decoration: none;">
-                           <span style="float:right;color:#808080;font-size:24px" align="right"
-                                 class="glyphicon glyphicon-bookmark"></span>
-                       </a>
-                   {% endif %}
-               </div>
-               <a href="{{ feed['url'] }}" target="_blank"
-                  style="color: #000000;text-decoration: none;"><span> <strong>{{ feed['title'] }}</strong></span></a>
-           </h4>
-           <a style="margin-bottom:3px;color:#666666;text-decoration: none;" href="http://{{ feed['source'] }}"
-              target="_blank">{{ feed['source'] }}</a><br>
-           <p style="margin-top:-3px">
-               <small>{% if feed['published_at'] %} {{ feed['published_at'] }} {% endif %}</small>
-           </p>
-           <p></p>
-           <p>
-           </p>
-           <p>{{ feed['summary'] }}</p>
-           <p></p>
+        <div class="col-md-3">
+            <img src="{{ feed['im'] }}" onerror="this.src='/images/image-not-found.png'"
+                 class="img-responsive feed_img">
+        </div>
+        <div class="col-md-9">
+            <p></p>
+            <h4 style="margin-bottom:4px;">
+                <div class="tweet-news">
+                    <input style="color: #00aced;margin-top:2px;margin-left:5px;float:right;width:24px" align="right"
+                           link_id="{{ feed['link_id'] }}" class="form_datetime"
+                           type="image" src="/static/images/twitter-logo.png" readonly>
 
-           <div class="sentiment" style="font-size:0.8em;text-align:right">
-             <input id="sentiment_{{ feed['link_id'] }}" data-show-caption="false" onchange="sentiment('{{ feed['link_id']}}')" class="rating rating-loading" data-size="xs" data-min="0" data-max="5" data-step="0.5" value="{{ feed['sentiment'] }}">
+                </div>
+                <div class="ban-domain">
+                    <a href="javascript:;" onclick="ban_domain('{{ feed['domain'] }}')"
+                       style="color: #000000;text-decoration: none;">
+                       <span style="margin-left:5px;float:right;font-size:24px" align="right"
+                             class="glyphicon glyphicon-ban-circle"></span>
+                    </a>
+                </div>
+                <div class="bookmark" id="{{ feed['link_id'] }}">
+                    {% if not feed['bookmark'] %}
+                        <a href="javascript:;" onclick="dummy('add', '{{ feed['link_id'] }}')"
+                           style="color: #000000;text-decoration: none;">
+                           <span style="margin-left:5px;float:right;color:#D70000;font-size:24px" align="right"
+                                 class="glyphicon glyphicon-bookmark"></span>
+                        </a>
+                    {% else %}
+                        <a href="javascript:;" onclick="dummy('remove', '{{ feed['link_id'] }}')"
+                           style="color: #000000;text-decoration: none;">
+                           <span style="margin-left:5px;float:right;color:#808080;font-size:24px" align="right"
+                                 class="glyphicon glyphicon-bookmark"></span>
+                        </a>
+                    {% endif %}
+                </div>
+                <a href="{{ feed['url'] }}" target="_blank"
+                   style="color: #000000;text-decoration: none;"><span> <strong>{{ feed['title'] }}</strong></span></a>
+            </h4>
+            <a style="margin-bottom:3px;color:#666666;text-decoration: none;" href="http://{{ feed['source'] }}"
+               target="_blank">{{ feed['source'] }}</a><br>
+            <p style="margin-top:-3px">
+                <small>{% if feed['published_at'] %} {{ feed['published_at'] }} {% endif %}</small>
+            </p>
+            <p></p>
+            <p>
+            </p>
+            <p>{{ feed['summary'] }}</p>
+            <p></p>
+
+            <div class="sentiment" style="font-size:0.8em;text-align:right">
+                <input id="sentiment_{{ feed['link_id'] }}" data-show-caption="false"
+                       onchange="sentiment('{{ feed['link_id'] }}')" class="rating rating-loading" data-size="xs"
+                       data-min="0" data-max="5" data-step="0.5" value="{{ feed['sentiment'] }}">
             </div>
 
-           <br>
+            <br>
 
-       </div>
+        </div>
 
-       <div class="col-md-12 margin-top-15">
-           <hr>
-       </div>
-   </div>
- {% endfor %}
+        <div class="col-md-12 margin-top-15">
+            <hr>
+        </div>
+    </div>
+{% endfor %}
 
 
 <script type="text/javascript" src="static/js/star-rating.js"/>
@@ -71,7 +79,8 @@
                 <span id="title"> <strong>{{ feed['title'] }}</strong></span>
                 </a>
     <a href="http://{{ feed['source'] }}" target="_blank"><span
-                        id="source"> {{ feed['source'] }}  {% if feed['published_at'] %} {{ feed['published_at'] }} {% endif %}</span></a>
+                        id="source"> {{ feed['source'] }}  {% if feed['published_at'] %} {{ feed['published_at'] }}
+{% endif %}</span></a>
     <br>
     <span id="description">{{ feed['summary'] }}</span> <br>
     <ul>
@@ -88,11 +97,13 @@
       </li>
       <li class="sentiment" id="sentiment_{{ feed['link_id'] }}" style="float:center">
         <a href="javascript:;" onclick="sentiment('negative', '{{ feed['link_id'] }}')">
-                        <span style="display:inline;{% if feed['sentiment'] == -1 %}color:#66BB6A{% else %}color:#BDBDBD{% endif %}"
+                        <span style="display:inline;{% if feed['sentiment'] == -1 %}color:#66BB6A{% else %}color:#BDBDBD
+{% endif %}"
                               class="glyphicon glyphicon-remove-sign"></span>
                     </a>
         <a href="javascript:;" onclick="sentiment('positive', '{{ feed['link_id'] }}')">
-                        <span style="display:inline;{% if feed['sentiment'] == 1 %}color:#66BB6A{% else %}color:#BDBDBD{% endif %}"
+                        <span style="display:inline;{% if feed['sentiment'] == 1 %}color:#66BB6A{% else %}color:#BDBDBD
+{% endif %}"
                             class="glyphicon glyphicon-ok-sign"></span>
                     </a>
       </li>

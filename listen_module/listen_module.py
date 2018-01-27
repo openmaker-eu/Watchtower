@@ -5,7 +5,7 @@ from time import sleep
 sys.path.append('./')
 
 from application.Connections import Connection
-from logic import getAllRunningAlertList
+from logic import get_all_running_topics_list
 from twitter_stream_thread import StreamCreator
 
 
@@ -40,14 +40,14 @@ class TwitterListen():
 
 
 def main():
-    running_topic_list = getAllRunningAlertList()
+    running_topic_list = get_all_running_topics_list()
     twitter_module = TwitterListen()
     twitter_module.setup(running_topic_list)
     current_hour = datetime.now().hour
     last_sequence_id = Connection.Instance().db["counters"].find_one({'_id': "tweetDBId"})['seq']
 
     while True:
-        new_running_topic_list = getAllRunningAlertList()
+        new_running_topic_list = get_all_running_topics_list()
 
         if new_running_topic_list != running_topic_list:
             running_topic_list = new_running_topic_list

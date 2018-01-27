@@ -1,0 +1,95 @@
+@import url(//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css);
+
+.grid {
+  display: grid;
+   grid-template-areas: "a a";
+   grid-auto-columns: 1fr 1fr;
+}
+
+textarea {
+    resize:none;
+    overflow: hidden;
+    border: none;
+    width: 100%;
+    height:auto;
+}
+
+input {
+    background-color: transparent;
+    border: 0px solid;
+}
+
+.tweet_card {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    transition: 0.3s;
+    float: left;
+    margin: 16px 0 0 16px;
+    padding-bottom: 16px;
+    border-radius: 5px; /* 5px rounded corners */
+}
+
+.tweet_card:hover {
+    box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+}
+
+.details {
+    padding-left: 24px;
+    padding-right: 24px;
+    border-top: 4px solid #FFF;
+    background-color: #FFF;
+}
+
+.details a {
+    text-decoration: none;
+}
+
+.details span {
+    color: #000;
+    display: block;
+}
+
+.details #description {
+    font-size: 16px;
+}
+
+.details #date {
+    padding: 8px 0px 4px 0px;
+    font-size: 14px;
+    color: #697882;
+}
+
+.pp {
+    display: grid;
+    grid-template-areas: "a a a";
+    grid-auto-columns: 70px 1fr 150px;
+    padding: 12px 16px 4px 16px;
+}
+
+.pp img {
+    border-radius: 50%;
+    min-width: 60px;
+    max-width: 60px;
+    border: 4px solid #FFF;
+}
+
+.pp #name {
+    font-size: 18px;
+}
+
+.pp #nick {
+    font-size: 15px;
+    color: #697882;
+}
+
+.bg {
+    border-radius: 5px 5px 0 0;
+    background-repeat: no-repeat;
+    background-color: rgba(29, 161, 242, 1);
+    background-size: cover;
+    background-position: center;
+    width: 100%;
+    height: 250px;
+}
+
+fieldset, label { margin: 0; padding: 0; }
+h1 { font-size: 1.5em; margin: 10px; }

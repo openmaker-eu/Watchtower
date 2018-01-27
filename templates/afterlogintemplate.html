@@ -11,6 +11,7 @@
 
     <!-- Bootstrap core CSS -->
     <link href="/css/bootstrap.css" rel="stylesheet">
+    <link href="/css/sweetalert.css" rel="stylesheet">
     <!-- Custom styles for this template -->
     <link href="/css/starter-template.css" rel="stylesheet">
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -52,9 +53,9 @@
 
         <link rel="stylesheet" type="text/css"
               href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css">
-        <link rel="stylesheet" type="text/css" href="static/css/conversation.css"/>
-        <script type="text/javascript" src="static/js/jquery-3.2.1.min.js"></script>
-        <script type="text/javascript" src="static/js/conversation.js"></script>
+        <link rel="stylesheet" type="text/css" href="/css/conversation.css"/>
+        <script type="text/javascript" src="/js/jquery-3.2.1.min.js"></script>
+        <script type="text/javascript" src="/js/conversation.js"></script>
     {% endif %}
 
     {% if type == "events" %}
@@ -62,45 +63,54 @@
 
         <link rel="stylesheet" type="text/css"
               href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css">
-        <link rel="stylesheet" type="text/css" href="static/css/event.css"/>
-        <link rel="stylesheet" type="text/css" href="static/css/event_card.css"/>
-        <script type="text/javascript" src="static/js/jquery-3.2.1.min.js"></script>
-        <script type="text/javascript" src="static/js/event.js"></script>
+        <link rel="stylesheet" type="text/css" href="/css/event.css"/>
+        <link rel="stylesheet" type="text/css" href="/css/event_card.css"/>
+        <script type="text/javascript" src="/js/jquery-3.2.1.min.js"></script>
+        <script type="text/javascript" src="/js/event.js"></script>
     {% endif %}
 
     {% if type == "alertlist" %}
-        <link rel="stylesheet" type="text/css" href="static/css/topic_card.css"/>
+        <link rel="stylesheet" type="text/css" href="/css/topic_card.css"/>
     {% endif %}
 
     {% if type == "news" or type=="bookmark" %}
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
-        <link rel="stylesheet" type="text/css" href="static/css/star-rating.css"/>
-        <!--<link rel="stylesheet" type="text/css" href="static/css/news_card.css"/>-->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+        <link rel="stylesheet" type="text/css" href="/css/star-rating.css"/>
+        <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="/css/bootstrap-datetimepicker.min.css"/>
+        <!--<link rel="stylesheet" type="text/css" href="/css/news_card.css"/>-->
     {% endif %}
 
     {% if type == "audiences" %}
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
-        <link rel="stylesheet" type="text/css" href="static/css/star-rating.css"/>
-        <link rel="stylesheet" type="text/css" href="static/css/audience_card.css"/>
+        <link rel="stylesheet" type="text/css" href="/css/star-rating.css"/>
+        <link rel="stylesheet" type="text/css" href="/css/audience_card.css"/>
         <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
+    {% endif %}
+
+    {% if type == "tweets"%}
+        <link rel="stylesheet" type="text/css" href="/css/tweet_card.css"/>
+        <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="/css/bootstrap-datetimepicker.min.css"/>
     {% endif %}
 
     {% if type == "influencers" %}
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
-        <link rel="stylesheet" type="text/css" href="static/css/influencer_card.css"/>
+        <link rel="stylesheet" type="text/css" href="/css/influencer_card.css"/>
         <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
     {% endif %}
 
     {% if type == "recommendations" %}
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
-        <link rel="stylesheet" type="text/css" href="static/css/star-rating.css"/>
-        <link rel="stylesheet" type="text/css" href="static/css/audience_card.css"/>
+        <link rel="stylesheet" type="text/css" href="/css/star-rating.css"/>
+        <link rel="stylesheet" type="text/css" href="/css/audience_card.css"/>
         <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
 
     {% endif %}
 
     {% if type == "editAlert" or type == "createAlert" %}
-        <link rel="stylesheet" type="text/css" href="/static/css/event_card.css"/>
+        <link rel="stylesheet" type="text/css" href="//css/event_card.css"/>
     {% endif %}
 
     {% if type == "profile" %}
@@ -309,12 +319,17 @@
 {% if type == "profile" %}
     {% include 'profile.html' %}
 {% endif %}
+{% if type == "tweets"%}
+    {% include 'tweetTemplate.html' %}
+{% endif %}
 <!-- /.container -->
 <!-- Bootstrap core JavaScript
 ================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->
 
-<script src="/js/jquery.3.2.1.js"></script>
+<script src="/js/jquery-3.2.1.min.js"></script>
+<script src="/js/sweetalert.min.js"></script>
+<script src="/js/helpers.js"></script>
 <script src="/js/jquery.min.js"></script>
 <script src="/js/bootstrap.min.js"></script>
 <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
@@ -381,6 +396,52 @@
     </script>
 {% endif %}
 
+{% if type == "tweets" %}
+
+    <script src="/js/bootstrap-datetimepicker.min.js"></script>
+    <script src="/js/moment.js"></script>
+    <script src="/js/tweets.js"></script>
+
+    <script type="text/javascript">
+      $(".form_datetime").datetimepicker({
+        startDate: new Date(),
+        showMeridian: true,
+        pickDate: true,
+        pickTime: true,
+        autoclose: true,
+        todayBtn: true,
+        startView: 2,
+        format:"HH:ii P - M dd, yyyy",
+        pickerPosition: "bottom-left"}).on('changeDate', function(ev){
+          this.closest('.tweet_card').querySelector('.btn-save').removeAttribute("disabled");
+      });
+      $(".textarea").on('input selectionchange propertychange', function() {
+          this.closest('.tweet_card').querySelector('.btn-save').removeAttribute("disabled");
+      });
+      $(document).ready(function(){
+      	// Excempt keys(arrows, del, backspace, home, end);
+      	var excempt = [37,38,39,40,46,8,36,35];
+      	// Loop through every editiable thing
+      	$("[contenteditable='true']").each(function(index,elem) {
+      	    var $elem = $(elem);
+      	    // Check for a property called data-input-length="value" (<div contenteditiable="true" data-input-length="100">)
+      	    var length = $elem.attr('maxlength');
+      	    // Validation of value
+      	    if(!isNaN(length)) {
+      	    	// Register keydown handler
+      	        $elem.on('keydown',function(evt){
+      	        	// If the key isn't excempt AND the text is longer than length stop the action.
+      	            if(excempt.indexOf(evt.which) === -1 && $elem.text().length > length) {
+      	               evt.preventDefault();
+      	               return false;
+      	            }
+      	        });
+      	    }
+      	});
+      });
+    </script>
+
+{% endif %}
 <!-- for alerts -->
 {% if type == "alertlist" %}
 
@@ -410,6 +471,39 @@
 {% endif %}
 
 {% if type == "news" or type == "bookmark" %}
+<script src="/js/bootstrap-datetimepicker.min.js"></script>
+<script src="/js/moment.js"></script>
+<script type="text/javascript">
+  $(".form_datetime").datetimepicker({
+    startDate: new Date(),
+    showMeridian: true,
+    pickDate: true,
+    pickTime: true,
+    autoclose: true,
+    todayBtn: true,
+    startView: 2,
+    format:"HH:ii P - M dd, yyyy",
+    pickerPosition: "bottom-left"}).on('changeDate', function(ev){
+      swal({
+          title: "Are you sure?",
+          text: "News with id:{0} will be published on {1}.".format(this.getAttribute('link_id'), this.getAttribute('value')),
+          type: "warning",
+          showCancelButton: true,
+          confirmButtonClass: "btn-success",
+          confirmButtonText: "Yes, go and edit tweet!",
+          cancelButtonText: "No, cancel!",
+          closeOnConfirm: false,
+          closeOnCancel: false
+        },
+        function(isConfirm) {
+          if (isConfirm) {
+            window.location.replace('/Tweets/-1?news_id={0}&date={1}'.format(this.getAttribute('link_id'), this.getAttribute('value')));
+          } else {
+            swal("Cancelled", "Your tweet is not stored", "error");
+          }
+        }.bind(this));
+  });
+</script>
     <script src="/js/news.js"></script>
 {% endif %}
 
