@@ -44,18 +44,19 @@ def main():
     twitter_module = TwitterListen()
     twitter_module.setup(running_topic_list)
     current_hour = datetime.now().hour
-    last_sequence_id = Connection.Instance().db["counters"].find_one({'_id': "tweetDBId"})['seq']
+    last_sequence_id = str(Connection.Instance().db["counters"].find_one({'_id': "tweetDBId"})['seq'])
 
     while True:
+        print("Loop is continuing")
         new_running_topic_list = get_all_running_topics_list()
-
         if new_running_topic_list != running_topic_list:
             running_topic_list = new_running_topic_list
             print("Restarting Twitter Module!")
             twitter_module.restart(new_running_topic_list)
         if current_hour != datetime.now().hour:
             current_hour = datetime.now().hour
-            if last_sequence_id == Connection.Instance().db["counters"].find_one({'_id': "tweetDBId"})['seq']:
+            new_last_sequence_id = str(Connection.Instance().db["counters"].find_one({'_id': "tweetDBId"})['seq'])
+            if last_sequence_id == new_last_sequence_id:
                 running_topic_list = new_running_topic_list
                 print("Unexpectedly Stopped Module, Restarting...")
                 twitter_module.restart(new_running_topic_list)
