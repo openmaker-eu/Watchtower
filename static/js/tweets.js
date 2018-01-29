@@ -33,8 +33,8 @@ function saveTweet(tweet_id) {
         swal("Tweet Length!", message , "error");
     } else {
         var date = $('#tweet_'.concat(tweet_id)).find("#date").val();
-        var title = $('#tweet_'.concat(tweet_id)).find("#title").val();
-        var tweet_link_description = $('#tweet_'.concat(tweet_id)).find("#tweet_link_description").val();
+        var title = $('#tweet_'.concat(tweet_id)).find("#title").text();
+        var tweet_link_description = $('#tweet_'.concat(tweet_id)).find("#tweet_link_description").text();
         var bg_url = $('#tweet_'.concat(tweet_id)).find("#image").css('background-image');
         bg_url = /^url\((['"]?)(.*)\1\)$/.exec(bg_url);
         bg_url = bg_url ? bg_url[2] : "";

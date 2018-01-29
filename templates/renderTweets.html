@@ -22,12 +22,8 @@
         	<div id="image" style="background-image:url({{ tweet['image_url'] }})" value="{{ tweet['image_url'] }}">
         	</div>
         	<div id="content">
-        			<h2 id="title">
-        				{{ tweet['title'] }}
-        			</h2>
-        			<p id="tweet_link_description">
-        				{{ tweet['description'] }}
-        			</p>
+        			<h2 id="title">{{ tweet['title'] }}</h2>
+        			<p id="tweet_link_description">{{ tweet['description'] }}</p>
               <span id="source">{{ tweet['source'] }}</span>
         		</div>
           </a>

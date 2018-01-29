@@ -1213,7 +1213,7 @@ class TweetsHandler(BaseHandler, TemplateRendering):
             title = self.get_argument("title")
             description = self.get_argument("tweet_link_description")
             text = self.get_argument("text")
-            text = self.get_argument("image_url")
+            image_url = self.get_argument("image_url")
             logic.update_publish_tweet(topic['topic_id'], user_id, tweet_id, date, text, news_id, title, description,
                                        image_url)
         if tweet_id is not None:
