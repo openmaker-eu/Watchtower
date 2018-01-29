@@ -48,6 +48,7 @@ def main():
 
     while True:
         print("Loop is continuing")
+        sleep(450)
         new_running_topic_list = get_all_running_topics_list()
         if new_running_topic_list != running_topic_list:
             running_topic_list = new_running_topic_list
@@ -60,8 +61,6 @@ def main():
                 running_topic_list = new_running_topic_list
                 print("Unexpectedly Stopped Module, Restarting...")
                 twitter_module.restart(new_running_topic_list)
-
-        sleep(450)
 
 
 if __name__ == "__main__":
