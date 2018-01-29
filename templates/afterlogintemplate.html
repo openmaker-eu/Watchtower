@@ -89,7 +89,7 @@
         <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
     {% endif %}
 
-    {% if type == "tweets"%}
+    {% if type == "tweets" %}
         <link rel="stylesheet" type="text/css" href="/css/tweet_card.css"/>
         <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
         <link rel="stylesheet" type="text/css" href="/css/bootstrap-datetimepicker.min.css"/>
@@ -172,16 +172,16 @@
                 </li>
 
 
-                <li class="dropdown" {% if type=="audiences" or type=="influencers"%} class="active" {% endif %}>
+                <li class="dropdown" {% if type=="audiences" or type=="influencers" %} class="active" {% endif %}>
                     <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                       Community  <span class="caret"></span></a>
+                        Community <span class="caret"></span></a>
                     <ul class="dropdown-menu">
-                      <li >
-                          <a href="/Audience">Audience</a>
-                      </li>
-                      <li>
-                          <a href="/Influencers">Influencers</a>
-                      </li>
+                        <li>
+                            <a href="/Audience">Audience</a>
+                        </li>
+                        <li>
+                            <a href="/Influencers">Influencers</a>
+                        </li>
                     </ul>
                 </li>
 
@@ -236,11 +236,11 @@
             </ul>
 
             <div class="navbar-brand" style="margin-left:30">
-              <p>
-                {% if type == "influencers" %}
-                  Influencers
-                {% endif %}
-              </p>
+                <p>
+                    {% if type == "influencers" %}
+                        Influencers
+                    {% endif %}
+                </p>
             </div>
 
             <div class="pull-right" style="margin:8px">
@@ -323,7 +323,7 @@
 {% if type == "profile" %}
     {% include 'profile.html' %}
 {% endif %}
-{% if type == "tweets"%}
+{% if type == "tweets" %}
     {% include 'tweetTemplate.html' %}
 {% endif %}
 <!-- /.container -->
@@ -404,45 +404,50 @@
 
     <script src="/js/bootstrap-datetimepicker.min.js"></script>
     <script src="/js/moment.js"></script>
+    <script src="/js/moment-timezone.js"></script>
     <script src="/js/tweets.js"></script>
 
     <script type="text/javascript">
-      $(".form_datetime").datetimepicker({
-        startDate: new Date(),
-        showMeridian: true,
-        pickDate: true,
-        pickTime: true,
-        autoclose: true,
-        todayBtn: true,
-        startView: 2,
-        format:"HH:ii P - M dd, yyyy",
-        pickerPosition: "bottom-left"}).on('changeDate', function(ev){
-          this.closest('.tweet_card').querySelector('.btn-save').removeAttribute("disabled");
-      });
-      $(".textarea").on('input selectionchange propertychange', function() {
-          this.closest('.tweet_card').querySelector('.btn-save').removeAttribute("disabled");
-      });
-      $(document).ready(function(){
-      	// Excempt keys(arrows, del, backspace, home, end);
-      	var excempt = [37,38,39,40,46,8,36,35];
-      	// Loop through every editiable thing
-      	$("[contenteditable='true']").each(function(index,elem) {
-      	    var $elem = $(elem);
-      	    // Check for a property called data-input-length="value" (<div contenteditiable="true" data-input-length="100">)
-      	    var length = $elem.attr('maxlength');
-      	    // Validation of value
-      	    if(!isNaN(length)) {
-      	    	// Register keydown handler
-      	        $elem.on('keydown',function(evt){
-      	        	// If the key isn't excempt AND the text is longer than length stop the action.
-      	            if(excempt.indexOf(evt.which) === -1 && $elem.text().length > length) {
-      	               evt.preventDefault();
-      	               return false;
-      	            }
-      	        });
-      	    }
-      	});
-      });
+        var now = new Date();
+        var now_utc = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(),  now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds());
+        $(".form_datetime").datetimepicker({
+            startDate: now_utc,
+            showMeridian: true,
+            pickDate: true,
+            pickTime: true,
+            autoclose: true,
+            todayBtn: true,
+            startView: 2,
+            format: "HH:ii P - M dd, yyyy Z",
+            timezone: 'GMT',
+            pickerPosition: "bottom-left"
+        }).on('changeDate', function (ev) {
+            this.closest('.tweet_card').querySelector('.btn-save').removeAttribute("disabled");
+        });
+        $(".textarea").on('input selectionchange propertychange', function () {
+            this.closest('.tweet_card').querySelector('.btn-save').removeAttribute("disabled");
+        });
+        $(document).ready(function () {
+            // Excempt keys(arrows, del, backspace, home, end);
+            var excempt = [37, 38, 39, 40, 46, 8, 36, 35];
+            // Loop through every editiable thing
+            $("[contenteditable='true']").each(function (index, elem) {
+                var $elem = $(elem);
+                // Check for a property called data-input-length="value" (<div contenteditiable="true" data-input-length="100">)
+                var length = $elem.attr('maxlength');
+                // Validation of value
+                if (!isNaN(length)) {
+                    // Register keydown handler
+                    $elem.on('keydown', function (evt) {
+                        // If the key isn't excempt AND the text is longer than length stop the action.
+                        if (excempt.indexOf(evt.which) === -1 && $elem.text().length > length) {
+                            evt.preventDefault();
+                            return false;
+                        }
+                    });
+                }
+            });
+        });
     </script>
 
 {% endif %}
@@ -475,9 +480,10 @@
 {% endif %}
 
 {% if type == "news" or type == "bookmark" %}
-<script src="/js/bootstrap-datetimepicker.min.js"></script>
-<script src="/js/moment.js"></script>
-<script src="/js/news.js"></script>
+    <script src="/js/bootstrap-datetimepicker.min.js"></script>
+    <script src="/js/moment.js"></script>
+    <script src="/js/moment-timezone.js"></script>
+    <script src="/js/news.js"></script>
 {% endif %}
 
 

@@ -16,7 +16,7 @@
     </div>
     <div class="details">
         <div id="description" class="textarea" contenteditable="true">{{ tweet['body'] }}</div>
-        <input id="date" size="23" type="text" value="{{ tweet['published_at'] }}" readonly class="form_datetime">
+        <input id="date" size="27" type="text" value="{{ tweet['published_at'] }}" readonly class="form_datetime">
         <div id="tweet_link">
         	<a href="{{ tweet['url'] }}" target="_blank" rel="noopener" id="ref">
         	<div id="image" style="background-image:url({{ tweet['image_url'] }})" value="{{ tweet['image_url'] }}">

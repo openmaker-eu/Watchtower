@@ -69,15 +69,18 @@
 <script src="/js/star-rating.js"></script>
 
 <script type="text/javascript">
+  var now = new Date();
+  var now_utc = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(),  now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds());
   $(".form_datetime").datetimepicker({
-    startDate: new Date(),
+    startDate: new now_utc,
     showMeridian: true,
     pickDate: true,
     pickTime: true,
     autoclose: true,
     todayBtn: true,
     startView: 2,
-    format:"HH:ii P - M dd, yyyy",
+    format:"HH:ii P - M dd, yyyy Z",
+    timezone: 'GMT',
     pickerPosition: "bottom-left"}).on('changeDate', function(ev){
       swal({
           title: "Are you sure?",

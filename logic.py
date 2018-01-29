@@ -1134,7 +1134,6 @@ def get_publish_tweet(topic_id, user_id, tweet_id, news_id, date):
         image_url = news['im']
         description = news['summary']
         title = news['title']
-        print(result)
         if result['response']:
             data = result['data']
             if 'image' in data and 'url' in data['image'][0]:
@@ -1153,7 +1152,6 @@ def get_publish_tweet(topic_id, user_id, tweet_id, news_id, date):
             'url': news['url'],
             'published_at': date
         }
-        print(general_utils.tweet_date_to_string(date))
         return [tweet]
 
 

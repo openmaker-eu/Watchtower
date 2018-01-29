@@ -97,15 +97,15 @@ def main():
                 user_topics = get_user_topics(user_id)
                 for topic_id in user_topics:
                     tweets = list(
-                        Connection.Instance().tweetsDB[str(topic_id)].find({'published_at': {'$lte': datetime.now()}}))
+                        Connection.Instance().tweetsDB[str(topic_id)].find({'published_at': {'$lte': datetime.now()}, 'status': 0}))
                     for tweet in tweets:
                         print("Publishing tweet_id: {0} and topic_id: {1}".format(tweet['tweet_id'], topic_id))
                         if publish_tweet(tweet, tokens[0], tokens[1]):
                             Connection.Instance().tweetsDB[str(topic_id)].update_one(
-                                {'tweet_id': tweet['tweet_id']}, {'status': {'$set': 1}})
+                                {'tweet_id': tweet['tweet_id']}, {'$set': {'status': 1}})
                         else:
                             Connection.Instance().tweetsDB[str(topic_id)].update_one(
-                                {'tweet_id': tweet['tweet_id']}, {'status': {'$set': -1}})
+                                {'tweet_id': tweet['tweet_id']}, {'$set': {'status': -1}})
         sleep(300)
 
 

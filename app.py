@@ -1182,7 +1182,6 @@ class TweetsHandler(BaseHandler, TemplateRendering):
         else:
             tweets = logic.get_publish_tweets(topic['topic_id'], user_id)
         twitter_user = logic.get_twitter_user(user_id)
-        print(twitter_user)
         variables = {
             'title': "Tweets",
             'alerts': logic.get_topic_list(user_id),
