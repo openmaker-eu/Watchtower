@@ -48,6 +48,15 @@ services:
             context: ./
             dockerfile: ./.docker/listen_module.docker
 
+    publish_module:
+        container_name: publish_module
+        tty: true
+        volumes:
+            - "./:/root/cloud"
+        build:
+            context: ./
+            dockerfile: ./.docker/publish_module.docker
+
     crontab_module:
         container_name: crontab_module
         tty: true

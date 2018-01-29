@@ -1,14 +1,13 @@
 {% if tweets %} {% for tweet in tweets %}
 <div class="tweet_card" id='tweet_{{ tweet["tweet_id"] }}'>
-    <div class="bg" style="background-image:url({{ tweet['image_url'] }})"></div>
     <div class="pp" align="left">
         <div align="center">
-          <img src="http://pbs.twimg.com/profile_images/685273086896128001/iOdUqMRL_400x400.jpg" alt=""/>
+          <img src="{{ (twitter_user['profile_image_url'][:4] + twitter_user['profile_image_url'][5:]).replace('normal', '400x400') }}" alt=""/>
         </div>
-        <div style="margin-top: 8px;">
-          <span id="name"><b>Enis Simsar</b></span> <br>
-          <a href="http://twitter.com/enisimsar" style="text-decoration: none;" target="_blank"><span
-                  id="nick"> @enisimsar </span></a>
+        <div style="margin-top: 12px;">
+          <span id="name"><b>{{ twitter_user['user_name'] }}</b></span> <br>
+          <a href="http://twitter.com/{{ twitter_user['screen_name'] }}" style="text-decoration: none;" target="_blank"><span
+                  id="nick"> @{{ twitter_user['screen_name'] }} </span></a>
         </div>
         <div class="buttons" style="padding-top:12px" align="right">
           <button type="button" onclick="saveTweet({{ tweet["tweet_id"] }})" class="btn btn-primary btn-save" {% if not new_tweet %} disabled {% endif %}>Save</button>
@@ -16,9 +15,23 @@
         </div>
     </div>
     <div class="details">
-        <div id="description" class="textarea" maxlength="257" contenteditable="true">{{ tweet['body'] }}</div>
-        <a style="font-size:16px" href="{{ tweet['url'] }}" target="_blank">https://t.co/WatchTower</a><br>
+        <div id="description" class="textarea" contenteditable="true">{{ tweet['body'] }}</div>
         <input id="date" size="23" type="text" value="{{ tweet['published_at'] }}" readonly class="form_datetime">
+        <div id="tweet_link">
+        	<a href="{{ tweet['url'] }}" target="_blank" rel="noopener" id="ref">
+        	<div id="image" style="background-image:url({{ tweet['image_url'] }})" value="{{ tweet['image_url'] }}">
+        	</div>
+        	<div id="content">
+        			<h2 id="title">
+        				{{ tweet['title'] }}
+        			</h2>
+        			<p id="tweet_link_description">
+        				{{ tweet['description'] }}
+        			</p>
+              <span id="source">{{ tweet['source'] }}</span>
+        		</div>
+          </a>
+        </div>
     </div>
 </div>
 {% endfor %} {% endif %}

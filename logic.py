@@ -7,6 +7,7 @@ import praw
 import pymongo
 import tweepy
 from datetime import datetime
+import requests
 
 from application.utils import twitter_search_sample_tweets
 from application.utils import delete_audience
@@ -272,12 +273,35 @@ def update_user(user_id, password, country_code, auth_token, twitter_pin):
         token = auth.get_access_token(verifier=twitter_pin)
 
         if twitter_pin != '' and len(token) == 2:
+            auth.set_access_token(token[0], token[1])
+            api = tweepy.API(auth)
+            user = api.me()._json
+
+            profile_image_url = user['profile_image_url_https']
+            screen_name = user['screen_name']
+            user_name = user['name']
+
             sql = (
-                "UPDATE users "
-                "SET password = %s, country_code = %s, twitter_access_token = %s, twitter_access_secret = %s "
-                "WHERE user_id = %s"
+                "SELECT NOT EXISTS (SELECT 1 FROM user_twitter where user_id = %s)"
             )
-            cur.execute(sql, [password, country_code, token[0], token[1], user_id])
+            cur.execute(sql, [user_id])
+            fetched = cur.fetchone()
+
+            if fetched[0]:
+                sql = (
+                    "INSERT INTO user_twitter "
+                    "(user_id, access_token, access_token_secret, profile_image_url, user_name, screen_name) "
+                    "VALUES (%s, %s, %s, %s, %s, %s)"
+                )
+                cur.execute(sql, [user_id, token[0], token[1], profile_image_url, user_name, screen_name])
+            else:
+                sql = (
+                    "UPDATE user_twitter "
+                    "SET access_token = %s, access_token_secret = %s, profile_image_url = %s, "
+                    "user_name = %s, screen_name = %s "
+                    "WHERE user_id = %s"
+                )
+                cur.execute(sql, [token[0], token[1], profile_image_url, user_name, screen_name, user_id])
         else:
             sql = (
                 "UPDATE users "
@@ -359,7 +383,7 @@ def get_topic_list(user_id):
         cur.execute(sql)
         var = cur.fetchall()
 
-        alerts = []
+        topics = []
 
         for i in var:
             sql = (
@@ -381,24 +405,24 @@ def get_topic_list(user_id):
                 temp_topic['type'] = 'subscribed'
             elif i[0] in remaining_topics_topics:
                 temp_topic['type'] = 'unsubscribed'
-            alerts.append(temp_topic)
+            topics.append(temp_topic)
 
-        alerts = sorted(alerts, key=lambda k: k['alertid'])
-        for alert in alerts:
-            alert['newsCount'] = Connection.Instance().newsPoolDB[str(alert['alertid'])].find().count()
-            alert['audienceCount'] = Connection.Instance().audienceDB[str(alert['alertid'])].find().count()
-            alert['eventCount'] = Connection.Instance().events[str(alert['alertid'])].find().count()
-            alert['tweetCount'] = Connection.Instance().db[str(alert['alertid'])].find().count()
+        topics = sorted(topics, key=lambda k: k['alertid'])
+        for topic in topics:
+            topic['newsCount'] = Connection.Instance().newsPoolDB[str(topic['alertid'])].find().count()
+            topic['audienceCount'] = Connection.Instance().audienceDB[str(topic['alertid'])].find().count()
+            topic['eventCount'] = Connection.Instance().events[str(topic['alertid'])].find().count()
+            topic['tweetCount'] = Connection.Instance().db[str(topic['alertid'])].find().count()
             try:
-                hash_tags = list(Connection.Instance().hashtags[str(alert['alertid'])].find({'name': 'month'},
+                hash_tags = list(Connection.Instance().hashtags[str(topic['alertid'])].find({'name': 'month'},
                                                                                             {'month': 1,
                                                                                              '_id': 0}))[0]['month']
             except:
                 hash_tags = []
                 pass
             hash_tags = ["#" + hash_tag['hashtag'] for hash_tag in hash_tags]
-            alert['hashtags'] = ", ".join(hash_tags[:5])
-        return alerts
+            topic['hashtags'] = ", ".join(hash_tags[:5])
+        return topics
 
 
 def topic_exist(user_id):
@@ -1084,15 +1108,48 @@ def get_next_tweet_sequence():
     return cursor['seq']
 
 
+def scrape_url(url):
+    payload = {'scrape': 'true',
+               'id': url,
+               'access_token': config("FACEBOOK_TOKEN")}
+
+    r = requests.post("https://graph.facebook.com/v2.11/", data=payload)
+
+    result = {}
+    if r.status_code == requests.codes.ok:
+        result['response'] = True
+        result['data'] = json.loads(r.text)
+    else:
+        result['reponse'] = False
+
+    return result
+
+
 def get_publish_tweet(topic_id, user_id, tweet_id, news_id, date):
     if int(tweet_id) != -1:
         return [Connection.Instance().tweetsDB[str(topic_id)].find_one({'tweet_id': int(tweet_id)})]
     else:
         news = Connection.Instance().newsPoolDB[str(topic_id)].find_one({'link_id': int(news_id)})
+        result = scrape_url(news['url'])
+        image_url = news['im']
+        description = news['summary']
+        title = news['title']
+        print(result)
+        if result['response']:
+            data = result['data']
+            if 'image' in data and 'url' in data['image'][0]:
+                image_url = data['image'][0]['url']
+            if 'description' in data:
+                description = data['description']
+            if 'title' in data:
+                title = data['title']
         tweet = {
             'tweet_id': -1,
-            'image_url': news['im'],
-            'body': news['summary'][:254] + "...",
+            'image_url': image_url,
+            'body': news['summary'],
+            'title': title,
+            'source': news['source'],
+            'description': description,
             'url': news['url'],
             'published_at': date
         }
@@ -1116,6 +1173,7 @@ def get_publish_tweets(topic_id, user_id):
             tweets.append(temp)
         return tweets
 
+
 def delete_publish_tweet(topic_id, user_id, tweet_id):
     with Connection.Instance().get_cursor() as cur:
         sql = (
@@ -1126,17 +1184,21 @@ def delete_publish_tweet(topic_id, user_id, tweet_id):
         Connection.Instance().tweetsDB[str(topic_id)].remove({'tweet_id': tweet_id})
 
 
-def update_publish_tweet(topic_id, user_id, tweet_id, date, text, news_id):
+def update_publish_tweet(topic_id, user_id, tweet_id, date, text, news_id, title, description, image_url):
     tweet_id = int(tweet_id)
     if int(tweet_id) == -1:
         tweet_id = get_next_tweet_sequence()
         news = Connection.Instance().newsPoolDB[str(topic_id)].find_one({'link_id': int(news_id)})
         tweet = {
             'tweet_id': tweet_id,
-            'image_url': news['im'],
             'body': text,
+            'title': title,
+            'source': news['source'],
+            'description': description,
             'url': news['url'],
-            'published_at': general_utils.tweet_date_to_string(date)
+            'image_url': image_url,
+            'published_at': general_utils.tweet_date_to_string(date),
+            'status': 0
         }
         Connection.Instance().tweetsDB[str(topic_id)].insert_one(tweet)
         with Connection.Instance().get_cursor() as cur:
@@ -1150,3 +1212,22 @@ def update_publish_tweet(topic_id, user_id, tweet_id, date, text, news_id):
         published_at = general_utils.tweet_date_to_string(date)
         Connection.Instance().tweetsDB[str(topic_id)].update_one({'tweet_id': tweet_id},
                                                                  {'$set': {'body': text, 'published_at': published_at}})
+
+
+def get_twitter_user(user_id):
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "SELECT EXISTS (SELECT 1 FROM user_twitter where user_id = %s)"
+        )
+        cur.execute(sql, [int(user_id)])
+        fetched = cur.fetchone()
+        if fetched[0]:
+            sql = (
+                "SELECT user_name, screen_name, profile_image_url "
+                "FROM user_twitter "
+                "WHERE user_id = %s;"
+            )
+            cur.execute(sql, [user_id])
+            user = cur.fetchone()
+            return {'user_name': user[0], 'screen_name': user[1], 'profile_image_url': user[2]}
+        return {'user_name': '', 'screen_name': '', 'profile_image_url': ''}

@@ -18,7 +18,6 @@ import logic
 
 from decouple import config
 
-
 chars = ''.join([string.ascii_letters, string.digits, string.punctuation]).replace('\'', '').replace('"', '').replace(
     '\\', '')
 secret_key = ''.join([random.SystemRandom().choice(chars) for i in range(100)])
@@ -87,14 +86,14 @@ class Application(tornado.web.Application):
             (r"/Audience/(.*)", AudienceHandler),
             (r"/Audience", AudienceHandler),
 
-            (r"/Influencers/(.*)", LocalInfluencersHandler), # added for influencers
+            (r"/Influencers/(.*)", LocalInfluencersHandler),  # added for influencers
             (r"/Influencers", LocalInfluencersHandler),
             (r"/hide_influencer", HideInfluencerHandler),
 
             (r"/Tweets/(.*)", TweetsHandler),
             (r"/Tweets", TweetsHandler),
 
-            (r"/Recommendations/(.*)", RecommendationsHandler), # added for recommendations
+            (r"/Recommendations/(.*)", RecommendationsHandler),  # added for recommendations
             (r"/Recommendations", RecommendationsHandler),
 
             (r"/previewNews", PreviewNewsHandler),
@@ -140,17 +139,18 @@ class Application(tornado.web.Application):
             # API V1.3
             # get_audiences deprecated
             (r"/api/v1.3/get_topics", TopicsV12Handler),
-            (r"/api/v1.3/get_audience_sample", AudienceSampleV13Handler), # new
-            (r"/api/v1.3/get_local_influencers", LocalInfluencersV13Handler), # new
-            (r"/api/v1.3/get_news", NewsFeedsV13Handler), # changed
-            (r"/api/v1.3/search_news", NewsV13Handler), # changed
-            (r"/api/v1.3/get_events", EventV13Handler), # changed
+            (r"/api/v1.3/get_audience_sample", AudienceSampleV13Handler),  # new
+            (r"/api/v1.3/get_local_influencers", LocalInfluencersV13Handler),  # new
+            (r"/api/v1.3/get_news", NewsFeedsV13Handler),  # changed
+            (r"/api/v1.3/search_news", NewsV13Handler),  # changed
+            (r"/api/v1.3/get_events", EventV13Handler),  # changed
             (r"/api/v1.3/get_conversations", ConversationV12Handler),
             (r"/api/v1.3/get_hashtags", HashtagsV12Handler),
 
             (r"/(.*)", tornado.web.StaticFileHandler, {'path': settings['static_path']}),
         ]
         super(Application, self).__init__(handlers, **settings)
+
 
 class NewsFeedsV13Handler(BaseHandler, TemplateRendering, Api500ErrorHandler):
     def get(self):
@@ -167,6 +167,7 @@ class NewsFeedsV13Handler(BaseHandler, TemplateRendering, Api500ErrorHandler):
         news = apiv13.getNewsFeeds(date, cursor, forbidden_domain, topics)
         self.set_header('Content-Type', 'application/json')
         self.write(news)
+
 
 class NewsV13Handler(BaseHandler, TemplateRendering, Api500ErrorHandler):
     def get(self):
@@ -199,7 +200,7 @@ class EventV13Handler(BaseHandler, TemplateRendering, Api500ErrorHandler):
         if topic_id is None:
             self.write({})
         sortedBy = str(self.get_argument('sortedBy', ""))
-        location = str(self.get_argument("location",""))
+        location = str(self.get_argument("location", ""))
         try:
             cursor = int(self.get_argument('cursor', '0'))
             if cursor < 0:
@@ -211,10 +212,11 @@ class EventV13Handler(BaseHandler, TemplateRendering, Api500ErrorHandler):
         self.set_header('Content-Type', 'application/json')
         self.write(events)
 
+
 class AudienceSampleV13Handler(BaseHandler, TemplateRendering, Api500ErrorHandler):
     def get(self):
         topic_id = str(self.get_argument("topic_id", None))
-        location = str(self.get_argument("location",""))
+        location = str(self.get_argument("location", ""))
         try:
             cursor = int(self.get_argument('cursor', '0'))
             if cursor < 0:
@@ -226,10 +228,11 @@ class AudienceSampleV13Handler(BaseHandler, TemplateRendering, Api500ErrorHandle
         self.set_header('Content-Type', 'application/json')
         self.write(audience_sample)
 
+
 class LocalInfluencersV13Handler(BaseHandler, TemplateRendering, Api500ErrorHandler):
     def get(self):
         topic_id = str(self.get_argument("topic_id", None))
-        location = str(self.get_argument("location",""))
+        location = str(self.get_argument("location", ""))
         try:
             cursor = int(self.get_argument('cursor', '0'))
             if cursor < 0:
@@ -242,6 +245,7 @@ class LocalInfluencersV13Handler(BaseHandler, TemplateRendering, Api500ErrorHand
         self.set_header('Content-Type', 'application/json')
         self.write(local_influencers)
 
+
 class Documentationv13Handler(BaseHandler, TemplateRendering):
     def get(self):
         template = 'apiv13.html'
@@ -251,6 +255,7 @@ class Documentationv13Handler(BaseHandler, TemplateRendering):
         }
         content = self.render_template(template, variables)
         self.write(content)
+
 
 class EventV12Handler(BaseHandler, TemplateRendering, Api500ErrorHandler):
     def get(self):
@@ -695,6 +700,7 @@ class BookmarkHandler(BaseHandler, TemplateRendering):
             logic.remove_bookmark(user_id, link_id)
         self.write("")
 
+
 class HideInfluencerHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
     def post(self):
@@ -706,6 +712,7 @@ class HideInfluencerHandler(BaseHandler, TemplateRendering):
         location = logic.get_current_location(tornado.escape.xhtml_escape(self.current_user))
         logic.hide_influencer(topic_id, user_id, influencer_id, description, is_hide, location)
         self.write("")
+
 
 class RateAudienceHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
@@ -939,6 +946,7 @@ class SearchNewsHandler(BaseHandler, TemplateRendering):
         content = self.render_template(template, variables)
         self.write(content)
 
+
 class LocalInfluencersHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
     def get(self, argument=None):
@@ -1029,7 +1037,7 @@ class RecommendationsHandler(BaseHandler, TemplateRendering):
             'audience': audience['audience'],
             'cursor': audience['next_cursor'],
             'alerts': logic.get_topic_list(user_id),
-            'recom_filter':'recommended',
+            'recom_filter': 'recommended',
             'type': "recommendations",
             'username': str(tornado.escape.xhtml_escape(self.get_current_username())),
             'topic': topic,
@@ -1056,11 +1064,12 @@ class RecommendationsHandler(BaseHandler, TemplateRendering):
                 pass
             try:
                 # filter is "rated" or "recommended"
-                audience = logic.get_recommended_audience(topic['topic_id'], location, filter, user_id, int(next_cursor))
+                audience = logic.get_recommended_audience(topic['topic_id'], location, filter, user_id,
+                                                          int(next_cursor))
                 variables = {
                     'audience': audience['audience'],
                     'cursor': audience['next_cursor'],
-                    'recom_filter':filter
+                    'recom_filter': filter
                 }
             except Exception as e:
                 print(e)
@@ -1073,13 +1082,14 @@ class RecommendationsHandler(BaseHandler, TemplateRendering):
                     'audience': audience['audience'],
                     'alertid': topic['topic_id'],
                     'cursor': audience['next_cursor'],
-                    'recom_filter':filter
+                    'recom_filter': filter
                 }
             except Exception as e:
                 print(e)
                 self.write("")
         content = self.render_template(template, variables)
         self.write(content)
+
 
 class AudienceHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
@@ -1150,6 +1160,7 @@ class AudienceHandler(BaseHandler, TemplateRendering):
         content = self.render_template(template, variables)
         self.write(content)
 
+
 class TweetsHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
     def get(self, tweet_id=None):
@@ -1170,7 +1181,8 @@ class TweetsHandler(BaseHandler, TemplateRendering):
             tweets = logic.get_publish_tweet(topic['topic_id'], user_id, tweet_id, news_id, date)
         else:
             tweets = logic.get_publish_tweets(topic['topic_id'], user_id)
-
+        twitter_user = logic.get_twitter_user(user_id)
+        print(twitter_user)
         variables = {
             'title': "Tweets",
             'alerts': logic.get_topic_list(user_id),
@@ -1181,7 +1193,8 @@ class TweetsHandler(BaseHandler, TemplateRendering):
             'topic': topic,
             'location': location,
             'relevant_locations': relevant_locations,
-            'tweets': tweets
+            'tweets': tweets,
+            'twitter_user': twitter_user
         }
         content = self.render_template(template, variables)
         self.write(content)
@@ -1197,8 +1210,12 @@ class TweetsHandler(BaseHandler, TemplateRendering):
         elif posttype == u'update':
             news_id = self.get_argument("news_id")
             date = self.get_argument("date")
+            title = self.get_argument("title")
+            description = self.get_argument("tweet_link_description")
             text = self.get_argument("text")
-            logic.update_publish_tweet(topic['topic_id'], user_id, tweet_id, date, text, news_id)
+            text = self.get_argument("image_url")
+            logic.update_publish_tweet(topic['topic_id'], user_id, tweet_id, date, text, news_id, title, description,
+                                       image_url)
         if tweet_id is not None:
             self.redirect("/Tweets")
         else:

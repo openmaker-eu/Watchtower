@@ -27,26 +27,40 @@ $(document).ready(function () {
 
 function saveTweet(tweet_id) {
     var text = $('#tweet_'.concat(tweet_id)).find("#description").text();
-    var date = $('#tweet_'.concat(tweet_id)).find("#date").val();
-    var items = getParameters();
-    var news_id = -1;
-    if(Object.keys(items).length > 0 && items.news_id){
-        news_id = items.news_id;
-    }
-    $.ajax({
-        url: "/Tweets",
-        method: 'POST',
-        data: {
-            'tweet_id': tweet_id,
-            'posttype': 'update',
-            'text': text,
-            'date': date,
-            'news_id': news_id
+    if (text.length >= 256) {
+        var excess = text.length - 256;
+        var message = "Your tweet body is too long. Please, remove {0} characters.".format(excess);
+        swal("Tweet Length!", message , "error");
+    } else {
+        var date = $('#tweet_'.concat(tweet_id)).find("#date").val();
+        var title = $('#tweet_'.concat(tweet_id)).find("#title").val();
+        var tweet_link_description = $('#tweet_'.concat(tweet_id)).find("#tweet_link_description").val();
+        var bg_url = $('#tweet_'.concat(tweet_id)).find("#image").css('background-image');
+        bg_url = /^url\((['"]?)(.*)\1\)$/.exec(bg_url);
+        bg_url = bg_url ? bg_url[2] : "";
+        var items = getParameters();
+        var news_id = -1;
+        if(Object.keys(items).length > 0 && items.news_id){
+            news_id = items.news_id;
         }
-    }).success(function (response) {
-        $('#tweet_'.concat(tweet_id)).find('.btn-save').attr("disabled", true);;
-        swal("Good job!", "Your tweet is saved!", "success")
-    });
+        $.ajax({
+            url: "/Tweets",
+            method: 'POST',
+            data: {
+                'tweet_id': tweet_id,
+                'posttype': 'update',
+                'text': text,
+                'date': date,
+                'news_id': news_id,
+                'title': title,
+                'tweet_link_description': tweet_link_description,
+                'image_url': bg_url
+            }
+        }).success(function (response) {
+            $('#tweet_'.concat(tweet_id)).find('.btn-save').attr("disabled", true);;
+            swal("Good job!", "Your tweet is saved!", "success")
+        });
+    }
 }
 
 function removeTweet(tweet_id) {
