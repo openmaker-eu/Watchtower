@@ -43,6 +43,6 @@ RUN pipenv install
 
 ENV PATH="/root/cloud:${PATH}"
 
-ADD ./.bash/listen_module-entrypoint.sh /usr/bin/listen_module-entrypoint.sh
-RUN chmod +x /usr/bin/listen_module-entrypoint.sh
-ENTRYPOINT ["/usr/bin/listen_module-entrypoint.sh"]
+ADD ./.bash/publish_module-entrypoint.sh /usr/bin/publish_module-entrypoint.sh
+RUN chmod +x /usr/bin/publish_module-entrypoint.sh
+ENTRYPOINT ["/usr/bin/publish_module-entrypoint.sh"]

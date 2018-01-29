@@ -1,5 +1,6 @@
 from decouple import config
 from datetime import datetime
+from time import sleep
 import sys
 import tweepy
 
@@ -98,6 +99,7 @@ def main():
                     tweets = list(
                         Connection.Instance().tweetsDB[str(topic_id)].find({'published_at': {'$lte': datetime.now()}}))
                     for tweet in tweets:
+                        print("Publishing tweet_id: {0} and topic_id: {1}".format(tweet['tweet_id'], topic_id))
                         if publish_tweet(tweet, tokens[0], tokens[1]):
                             Connection.Instance().tweetsDB[str(topic_id)].update_one(
                                 {'tweet_id': tweet['tweet_id']}, {'status': {'$set': 1}})
