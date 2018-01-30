@@ -101,7 +101,7 @@ def main():
                             {'published_at': {'$lte': datetime.now()}, 'status': 0}))
                     for tweet in tweets:
                         print("Publishing tweet_id: {0} and topic_id: {1}".format(tweet['tweet_id'], topic_id))
-                        url = "http://{0}:8484/redirect?topic_id={1}&tweet_id={21}".format(config("HOST_IP"), topic_id, tweet['tweet_id'])
+                        url = "http://{0}:8484/redirect?topic_id={1}&tweet_id={2}".format(config("HOST_IP"), topic_id, tweet['tweet_id'])
                         if publish_tweet(tweet, url, tokens[0], tokens[1]):
                             Connection.Instance().tweetsDB[str(topic_id)].update_one(
                                 {'tweet_id': tweet['tweet_id']}, {'$set': {'status': 1}}, upsert=True)
