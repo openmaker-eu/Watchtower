@@ -160,17 +160,13 @@ class RedirectHandler(BaseHandler, TemplateRendering):
         topic_id = int(self.get_argument("topic_id", -1))
         tweet = logic.get_tweet(topic_id, tweet_id)
 
-        if user_agent == 'Twitterbot':
-            template = 'redirect.html'
-            variables = {
-                'title': "Redirect Page",
-                'tweet': tweet
-            }
-            content = self.render_template(template, variables)
-            self.write(content)
-        else:
-            self.redirect(tweet['url'])
-
+        template = 'redirect.html'
+        variables = {
+            'title': "Redirect Page",
+            'tweet': tweet
+        }
+        content = self.render_template(template, variables)
+        self.write(content)
 
 
 class NewsFeedsV13Handler(BaseHandler, TemplateRendering, Api500ErrorHandler):

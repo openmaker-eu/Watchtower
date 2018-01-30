@@ -1232,5 +1232,5 @@ def get_twitter_user(user_id):
 
 def get_tweet(topic_id, tweet_id):
     if int(tweet_id) != -1:
-        return [Connection.Instance().tweetsDB[str(topic_id)].find_one({'tweet_id': int(tweet_id)})]
+        return Connection.Instance().tweetsDB[str(topic_id)].find_one({'tweet_id': int(tweet_id)})
     return []

@@ -14,3 +14,10 @@
 
 </body>
 </html>
+
+<script type="text/javascript">
+ var userAgent = navigator.userAgent;
+ if (userAgent !== 'Twitterbot') {
+   window.location.replace("{{ tweet['url'] }}");
+ }
+</script>
