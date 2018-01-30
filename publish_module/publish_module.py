@@ -76,9 +76,9 @@ def get_tokens(user_id):
         return {'response': False}
 
 
-def publish_tweet(tweet, access_token, access_token_secret):
+def publish_tweet(tweet, url, access_token, access_token_secret):
     api = get_twitter_api(access_token, access_token_secret)
-    text = tweet['body'] + " " + tweet['url']
+    text = tweet['body'] + " " + url
     try:
         api.update_status(text)
         return True
@@ -101,7 +101,8 @@ def main():
                             {'published_at': {'$lte': datetime.now()}, 'status': 0}))
                     for tweet in tweets:
                         print("Publishing tweet_id: {0} and topic_id: {1}".format(tweet['tweet_id'], topic_id))
-                        if publish_tweet(tweet, tokens[0], tokens[1]):
+                        url = config("HOST_IP")+"/redirect?topic_id={0}&news_url={1}&tweet_id={2}".format(topic_id, tweet['url'], tweet['tweet_id'])
+                        if publish_tweet(tweet, url, tokens[0], tokens[1]):
                             Connection.Instance().tweetsDB[str(topic_id)].update_one(
                                 {'tweet_id': tweet['tweet_id']}, {'$set': {'status': 1}}, upsert=True)
                         else:

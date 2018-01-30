@@ -60,6 +60,7 @@ class Api500ErrorHandler(tornado.web.RequestHandler):
 class Application(tornado.web.Application):
     def __init__(self):
         handlers = [
+            (r"/redirect", RedirectHandler),
             (r"/", MainHandler),
             (r"/logout", LogoutHandler),
             (r"/login", LoginHandler),
@@ -150,6 +151,26 @@ class Application(tornado.web.Application):
             (r"/(.*)", tornado.web.StaticFileHandler, {'path': settings['static_path']}),
         ]
         super(Application, self).__init__(handlers, **settings)
+
+
+class RedirectHandler(BaseHandler, TemplateRendering):
+    def get(self):
+        user_agent = self.request.headers["User-Agent"]
+        news_url = self.get_argument("news_url")
+        tweet_id = int(self.get_argument("tweet_id", -1))
+        topic_id = int(self.get_argument("topic_id", -1))
+
+        if user_agent == 'Twitterbot':
+            template = 'redirect.html'
+            variables = {
+                'title': "Redirect Page",
+                'tweet': logic.get_tweet(topic_id, tweet_id)
+            }
+            content = self.render_template(template, variables)
+            self.write(content)
+        else:
+            self.redirect(news_url)
+
 
 
 class NewsFeedsV13Handler(BaseHandler, TemplateRendering, Api500ErrorHandler):

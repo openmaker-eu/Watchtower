@@ -1229,3 +1229,8 @@ def get_twitter_user(user_id):
             user = cur.fetchone()
             return {'user_name': user[0], 'screen_name': user[1], 'profile_image_url': user[2]}
         return {'user_name': '', 'screen_name': '', 'profile_image_url': ''}
+
+def get_tweet(topic_id, tweet_id):
+    if int(tweet_id) != -1:
+        return [Connection.Instance().tweetsDB[str(topic_id)].find_one({'tweet_id': int(tweet_id)})]
+    return []
