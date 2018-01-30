@@ -79,6 +79,10 @@
         <link rel="stylesheet" type="text/css" href="/css/star-rating.css"/>
         <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
         <link rel="stylesheet" type="text/css" href="/css/bootstrap-datetimepicker.min.css"/>
+        <script src="/js/bootstrap-datetimepicker.min.js"></script>
+        <script src="/js/moment.js"></script>
+        <script src="/js/moment-timezone.js"></script>
+        <script src="/js/news.js"></script>
         <!--<link rel="stylesheet" type="text/css" href="/css/news_card.css"/>-->
     {% endif %}
 
@@ -94,6 +98,10 @@
         <link rel="stylesheet" type="text/css" href="/css/tweet_card.css"/>
         <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
         <link rel="stylesheet" type="text/css" href="/css/bootstrap-datetimepicker.min.css"/>
+        <script src="/js/bootstrap-datetimepicker.min.js"></script>
+        <script src="/js/moment.js"></script>
+        <script src="/js/moment-timezone.js"></script>
+        <script src="/js/tweets.js"></script>
     {% endif %}
 
     {% if type == "influencers" %}
@@ -404,14 +412,6 @@
     </script>
 {% endif %}
 
-{% if type == "tweets" %}
-
-    <script src="/js/bootstrap-datetimepicker.min.js"></script>
-    <script src="/js/moment.js"></script>
-    <script src="/js/moment-timezone.js"></script>
-    <script src="/js/tweets.js"></script>
-
-{% endif %}
 <!-- for alerts -->
 {% if type == "alertlist" %}
 
@@ -438,13 +438,6 @@
 <!-- for feed -->
 {% if type == "feed" %}
     <script src="/js/feed.js"></script>
-{% endif %}
-
-{% if type == "news" or type == "bookmark" %}
-    <script src="/js/bootstrap-datetimepicker.min.js"></script>
-    <script src="/js/moment.js"></script>
-    <script src="/js/moment-timezone.js"></script>
-    <script src="/js/news.js"></script>
 {% endif %}
 
 
