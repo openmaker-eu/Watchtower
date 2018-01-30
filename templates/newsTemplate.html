@@ -72,7 +72,7 @@
   var now = new Date();
   var now_utc = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(),  now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds());
   $(".form_datetime").datetimepicker({
-    startDate: new now_utc,
+    startDate: now_utc,
     showMeridian: true,
     pickDate: true,
     pickTime: true,
