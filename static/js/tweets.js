@@ -1,12 +1,10 @@
 $(document).ready(function () {
+    $("#spin").spinner();
     $("#topic_dropdown").on('click', 'li a', function () {
         var selText = $(this).children("h4").html();
         $(this).parent('li').siblings().removeClass('active');
         $(this).parents('.btn-group').find('.selection').html(selText);
         $(this).parents('li').addClass("active");
-    });
-    $("#spin").spinner();
-    $("#topic_dropdown").on('click', 'li a', function () {
         $("#spin").show();
         var topic_id = $(this).attr("data-id");
         $.ajax({
@@ -84,6 +82,34 @@ function removeTweet(tweet_id) {
       }).success(function (response) {
           $('#tweet_'.concat(tweet_id)).remove();
       });
-      swal("Deleted!", "Your imaginary file has been deleted.", "success");
+      swal("Deleted!", "Your tweet has been deleted.", "success");
     });
+}
+
+
+function getTweets() {
+    $("#spin").show();
+    var status = $('.btn-success').val();
+    var topic_id = $("#topic_dropdown > .active > a").attr("data-id");
+    $.ajax({
+        type: "GET",
+        url: "/Tweets",
+        data: {
+            'topic_id': topic_id,
+            'status': status,
+            'request_type': "ajax"
+        },
+        success: function (html) {
+            $('#tweetscontainer').empty();
+            $('#tweetscontainer').append(html);
+            $("#spin").hide();
+        }
+    });
+}
+
+
+function changeFilter(clickedFilter) {
+    $('.btn-success').removeClass('btn-success').addClass('btn-default');
+    $(clickedFilter).removeClass('btn-default').addClass('btn-success');
+    getTweets();
 }

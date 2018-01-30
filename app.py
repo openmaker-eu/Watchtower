@@ -1195,14 +1195,21 @@ class TweetsHandler(BaseHandler, TemplateRendering):
             news_id = int(self.get_argument("news_id", -1))
             date = self.get_argument("date", "")
             new_tweet = int(tweet_id) == -1
+            sub_type = "item"
             tweets = logic.get_publish_tweet(topic['topic_id'], user_id, tweet_id, news_id, date)
         else:
-            tweets = logic.get_publish_tweets(topic['topic_id'], user_id)
+            status = int(self.get_argument("status", 0))
+            request_type = self.get_argument("request_type", "")
+            if request_type == 'ajax':
+                template = 'renderTweets.html'
+            sub_type = "list"
+            tweets = logic.get_publish_tweets(topic['topic_id'], user_id, status)
         twitter_user = logic.get_twitter_user(user_id)
         variables = {
             'title': "Tweets",
             'alerts': logic.get_topic_list(user_id),
             'type': "tweets",
+            'sub_type': sub_type,
             'new_tweet': new_tweet,
             'alertlimit': logic.get_topic_limit(user_id),
             'username': str(tornado.escape.xhtml_escape(self.get_current_username())),

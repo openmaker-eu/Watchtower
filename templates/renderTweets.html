@@ -1,33 +1,85 @@
 {% if tweets %} {% for tweet in tweets %}
-<div class="tweet_card" id='tweet_{{ tweet["tweet_id"] }}'>
-    <div class="pp" align="left">
-        <div align="center">
-          <img src="{{ (twitter_user['profile_image_url'][:4] + twitter_user['profile_image_url'][5:]).replace('normal', '400x400') }}" alt=""/>
+    <div class="tweet_card" id='tweet_{{ tweet["tweet_id"] }}'>
+        <div class="pp" align="left">
+            <div align="center">
+                <img src="{{ (twitter_user['profile_image_url'][:4] + twitter_user['profile_image_url'][5:]).replace('normal', '400x400') }}"
+                     alt=""/>
+            </div>
+            <div style="margin-top: 12px;">
+                <span id="name"><b>{{ twitter_user['user_name'] }}</b></span> <br>
+                <a href="http://twitter.com/{{ twitter_user['screen_name'] }}" style="text-decoration: none;"
+                   target="_blank"><span
+                        id="nick"> @{{ twitter_user['screen_name'] }} </span></a>
+            </div>
+            <div class="buttons" style="padding-top:12px" align="right">
+                <button type="button" onclick="saveTweet({{ tweet["tweet_id"] }})" class="btn btn-primary btn-save"
+                        {% if not new_tweet %} disabled {% endif %}>{% if tweet['status'] == 0 %} Save {% else %}
+                    Reschedule {% endif %}</button>
+                {% if not new_tweet and tweet['status'] == 0 %}
+                    <button type="button" onclick="removeTweet({{ tweet["tweet_id"] }})"
+                            class="btn btn-danger btn-remove">Remove
+                    </button>{% endif %}
+            </div>
         </div>
-        <div style="margin-top: 12px;">
-          <span id="name"><b>{{ twitter_user['user_name'] }}</b></span> <br>
-          <a href="http://twitter.com/{{ twitter_user['screen_name'] }}" style="text-decoration: none;" target="_blank"><span
-                  id="nick"> @{{ twitter_user['screen_name'] }} </span></a>
-        </div>
-        <div class="buttons" style="padding-top:12px" align="right">
-          <button type="button" onclick="saveTweet({{ tweet["tweet_id"] }})" class="btn btn-primary btn-save" {% if not new_tweet %} disabled {% endif %}>Save</button>
-          {% if not new_tweet %}<button type="button" onclick="removeTweet({{ tweet["tweet_id"] }})" class="btn btn-danger btn-remove">Remove</button>{% endif %}
+        <div class="details">
+            <div id="description" class="textarea" contenteditable="true">{{ tweet['body'] }}</div>
+            <input id="date" size="27" type="text" value="{{ tweet['published_at'] }}" readonly class="form_datetime">
+            <div id="tweet_link">
+                <a href="{{ tweet['url'] }}" target="_blank" rel="noopener" id="ref">
+                    <div id="image" style="background-image:url({{ tweet['image_url'] }})"
+                         value="{{ tweet['image_url'] }}">
+                    </div>
+                    <div id="content">
+                        <h2 id="title">{{ tweet['title'] }}</h2>
+                        <p id="tweet_link_description">{{ tweet['description'] }}</p>
+                        <span id="source">{{ tweet['source'] }}</span>
+                    </div>
+                </a>
+            </div>
         </div>
     </div>
-    <div class="details">
-        <div id="description" class="textarea" contenteditable="true">{{ tweet['body'] }}</div>
-        <input id="date" size="27" type="text" value="{{ tweet['published_at'] }}" readonly class="form_datetime">
-        <div id="tweet_link">
-        	<a href="{{ tweet['url'] }}" target="_blank" rel="noopener" id="ref">
-        	<div id="image" style="background-image:url({{ tweet['image_url'] }})" value="{{ tweet['image_url'] }}">
-        	</div>
-        	<div id="content">
-        			<h2 id="title">{{ tweet['title'] }}</h2>
-        			<p id="tweet_link_description">{{ tweet['description'] }}</p>
-              <span id="source">{{ tweet['source'] }}</span>
-        		</div>
-          </a>
-        </div>
-    </div>
-</div>
 {% endfor %} {% endif %}
+
+
+<script type="text/javascript">
+    var now = new Date();
+    var now_utc = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds());
+    $(".form_datetime").datetimepicker({
+        startDate: now_utc,
+        showMeridian: true,
+        pickDate: true,
+        pickTime: true,
+        autoclose: true,
+        todayBtn: true,
+        startView: 2,
+        format: "HH:ii P - M dd, yyyy Z",
+        timezone: 'GMT',
+        pickerPosition: "bottom-left"
+    }).on('changeDate', function (ev) {
+        this.closest('.tweet_card').querySelector('.btn-save').removeAttribute("disabled");
+    });
+    $(".textarea").on('input selectionchange propertychange', function () {
+        this.closest('.tweet_card').querySelector('.btn-save').removeAttribute("disabled");
+    });
+    $(document).ready(function () {
+        // Excempt keys(arrows, del, backspace, home, end);
+        var excempt = [37, 38, 39, 40, 46, 8, 36, 35];
+        // Loop through every editiable thing
+        $("[contenteditable='true']").each(function (index, elem) {
+            var $elem = $(elem);
+            // Check for a property called data-input-length="value" (<div contenteditiable="true" data-input-length="100">)
+            var length = $elem.attr('maxlength');
+            // Validation of value
+            if (!isNaN(length)) {
+                // Register keydown handler
+                $elem.on('keydown', function (evt) {
+                    // If the key isn't excempt AND the text is longer than length stop the action.
+                    if (excempt.indexOf(evt.which) === -1 && $elem.text().length > length) {
+                        evt.preventDefault();
+                        return false;
+                    }
+                });
+            }
+        });
+    });
+</script>

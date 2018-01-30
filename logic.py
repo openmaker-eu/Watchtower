@@ -1150,12 +1150,13 @@ def get_publish_tweet(topic_id, user_id, tweet_id, news_id, date):
             'source': news['source'],
             'description': description,
             'url': news['url'],
-            'published_at': date
+            'published_at': date,
+            'status': 0
         }
         return [tweet]
 
 
-def get_publish_tweets(topic_id, user_id):
+def get_publish_tweets(topic_id, user_id, status):
     with Connection.Instance().get_cursor() as cur:
         sql = (
             "SELECT tweet_id "
@@ -1165,7 +1166,8 @@ def get_publish_tweets(topic_id, user_id):
         cur.execute(sql, [user_id, topic_id])
         tweet_ids = [i[0] for i in cur.fetchall()]
         tweets = []
-        for i in Connection.Instance().tweetsDB[str(topic_id)].find({'tweet_id': {'$in': tweet_ids}}):
+        for i in Connection.Instance().tweetsDB[str(topic_id)].find(
+                {'tweet_id': {'$in': tweet_ids}, 'status': int(status)}):
             temp = i
             temp['published_at'] = general_utils.tweet_date_to_string(i['published_at'])
             tweets.append(temp)
@@ -1189,6 +1191,7 @@ def update_publish_tweet(topic_id, user_id, tweet_id, date, text, news_id, title
         news = Connection.Instance().newsPoolDB[str(topic_id)].find_one({'link_id': int(news_id)})
         tweet = {
             'tweet_id': tweet_id,
+            'news_id': news['link_id'],
             'body': text,
             'title': title,
             'source': news['source'],
@@ -1207,9 +1210,14 @@ def update_publish_tweet(topic_id, user_id, tweet_id, date, text, news_id, title
             )
             cur.execute(sql, [user_id, topic_id, tweet_id])
     else:
+        tweet = Connection.Instance().tweetsDB[str(topic_id)].find_one({'tweet_id': int(tweet_id)})
         published_at = general_utils.tweet_date_to_string(date)
-        Connection.Instance().tweetsDB[str(topic_id)].update_one({'tweet_id': tweet_id},
-                                                                 {'$set': {'body': text, 'published_at': published_at}})
+        if tweet['status'] != 0:
+            update_publish_tweet(topic_id, user_id, -1, date, text, tweet['news_id'], title, description, image_url)
+        else:
+            Connection.Instance().tweetsDB[str(topic_id)].update_one({'tweet_id': tweet_id},
+                                                                     {'$set': {'body': text,
+                                                                               'published_at': published_at}})
 
 
 def get_twitter_user(user_id):
@@ -1229,6 +1237,7 @@ def get_twitter_user(user_id):
             user = cur.fetchone()
             return {'user_name': user[0], 'screen_name': user[1], 'profile_image_url': user[2]}
         return {'user_name': '', 'screen_name': '', 'profile_image_url': ''}
+
 
 def get_tweet(topic_id, tweet_id):
     if int(tweet_id) != -1:
