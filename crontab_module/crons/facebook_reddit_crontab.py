@@ -167,7 +167,7 @@ def mineRedditConversation(subreddits, isPreview, timeFilter='day'):
         'client_id': config("REDDIT_CLIENT_ID"),
         'client_secret': config("REDDIT_CLIENT_SECRET"),
         'user_agent': config("REDDIT_USER_AGENT"),
-        'api_type': config("REDDIT_API_TYPE")
+        'api_type': 'json'
     }
     reddit = praw.Reddit(client_id=keys["client_id"],
                          client_secret=keys["client_secret"],
@@ -294,7 +294,7 @@ def searchSubredditNews(topic_id, subredditNames):
             'client_id': config("REDDIT_CLIENT_ID"),
             'client_secret': config("REDDIT_CLIENT_SECRET"),
             'user_agent': config("REDDIT_USER_AGENT"),
-            'api_type': config("REDDIT_API_TYPE")
+            'api_type': 'json'
         }
         reddit = praw.Reddit(client_id=keys["client_id"],
                              client_secret=keys["client_secret"],
