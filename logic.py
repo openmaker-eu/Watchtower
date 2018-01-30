@@ -1167,7 +1167,7 @@ def get_publish_tweets(topic_id, user_id, status):
         tweet_ids = [i[0] for i in cur.fetchall()]
         tweets = []
         for i in Connection.Instance().tweetsDB[str(topic_id)].find(
-                {'tweet_id': {'$in': tweet_ids}, 'status': int(status)}):
+                {'tweet_id': {'$in': tweet_ids}, 'status': int(status)}).sort([('published_at', pymongo.ASCENDING)]):
             temp = i
             temp['published_at'] = general_utils.tweet_date_to_string(i['published_at'])
             tweets.append(temp)
