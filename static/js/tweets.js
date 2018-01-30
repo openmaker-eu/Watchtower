@@ -55,8 +55,11 @@ function saveTweet(tweet_id) {
                 'image_url': bg_url
             }
         }).success(function (response) {
-            $('#tweet_'.concat(tweet_id)).find('.btn-save').attr("disabled", true);;
-            swal("Good job!", "Your tweet is saved!", "success")
+            $('#tweet_'.concat(tweet_id)).find('.btn-save').attr("disabled", true);
+            swal("Good job!", "Your tweet is saved!", "success");
+            if(Object.keys(items).length > 0 && items.news_id){
+                window.location.replace("/Tweets");
+            }
         });
     }
 }
