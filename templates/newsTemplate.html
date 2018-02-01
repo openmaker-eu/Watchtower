@@ -69,36 +69,40 @@
 <script src="/js/star-rating.js"></script>
 
 <script type="text/javascript">
-  var now = new Date();
-  var now_utc = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(),  now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds());
-  $(".form_datetime").datetimepicker({
-    startDate: now_utc,
-    showMeridian: true,
-    pickDate: true,
-    pickTime: true,
-    autoclose: true,
-    todayBtn: true,
-    startView: 2,
-    format:"HH:ii P - M dd, yyyy Z",
-    timezone: 'GMT',
-    pickerPosition: "bottom-left"}).on('changeDate', function(ev){
-      swal({
-          title: "Are you sure?",
-          text: "News with id:{0} will be published on {1}.".format(this.getAttribute('link_id'), this.getAttribute('value')),
-          type: "warning",
-          showCancelButton: true,
-          confirmButtonClass: "btn-success",
-          confirmButtonText: "Yes, go and edit tweet!",
-          cancelButtonText: "No, cancel!",
-          closeOnConfirm: false,
-          closeOnCancel: false
-        },
-        function(isConfirm) {
-          if (isConfirm) {
-            window.location.replace('/Tweets/-1?news_id={0}&date={1}'.format(this.getAttribute('link_id'), this.getAttribute('value')));
-          } else {
-            swal("Cancelled", "Your tweet is not stored", "error");
-          }
-        }.bind(this));
-  });
+    var now = new Date();
+    var now_utc = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds());
+    $(".form_datetime").datetimepicker({
+        startDate: now_utc,
+        showMeridian: true,
+        pickDate: true,
+        pickTime: true,
+        autoclose: true,
+        todayBtn: true,
+        startView: 2,
+        format: "HH:ii P - M dd, yyyy Z",
+        timezone: 'GMT',
+        pickerPosition: "bottom-left"
+    }).on('changeDate', function (ev) {
+        var news = this;
+        swal(
+            {
+                title: "Are you sure?",
+                text: "News with id:{0} will be published on {1}.".format(this.getAttribute('link_id'), this.getAttribute('value')),
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonClass: "btn-success",
+                confirmButtonText: "Yes, go and edit tweet!",
+                cancelButtonText: "No, cancel!",
+                showLoaderOnConfirm: true,
+                closeOnConfirm: false,
+                closeOnCancel: false
+            },
+            function (isConfirm) {
+                if (isConfirm) {
+                    window.location.replace('/Tweets/-1?news_id={0}&date={1}'.format(news.getAttribute('link_id'), news.getAttribute('value')));
+                } else {
+                    swal("Cancelled", "Your tweet is not stored", "error");
+                }
+            });
+    });
 </script>
