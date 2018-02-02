@@ -1,6 +1,8 @@
 import json
 from threading import Thread
 from crontab_module.crons import facebook_reddit_crontab
+import re
+import urlparse
 
 import facebook
 import praw
@@ -1108,9 +1110,25 @@ def get_next_tweet_sequence():
     return cursor['seq']
 
 
+def linky(url):
+    """Sanitize link. clean utm parameters on link."""
+    if not re.match(r'^https?:\/\/', url):
+        url = 'http://%s' % url
+
+    rv = urlparse.urlparse(url)
+
+    if rv.query:
+        query = re.sub(r'utm_\w+=[^&]+&?', '', rv.query)
+        url = '%s://%s%s?%s' % (rv.scheme, rv.hostname, rv.path, query)
+
+    # remove ? at the end of url
+    url = re.sub(r'\?$', '', url)
+    return url
+
+
 def scrape_url(url):
     payload = {'scrape': 'true',
-               'id': url,
+               'id': linky(url),
                'access_token': config("FACEBOOK_TOKEN")}
 
     print(payload)
