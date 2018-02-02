@@ -2,7 +2,7 @@ import json
 from threading import Thread
 from crontab_module.crons import facebook_reddit_crontab
 import re
-import urlparse
+from urllib.parse import urlparse
 
 import facebook
 import praw
@@ -1115,7 +1115,7 @@ def linky(url):
     if not re.match(r'^https?:\/\/', url):
         url = 'http://%s' % url
 
-    rv = urlparse.urlparse(url)
+    rv = urlparse(url)
 
     if rv.query:
         query = re.sub(r'utm_\w+=[^&]+&?', '', rv.query)
