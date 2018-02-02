@@ -1113,6 +1113,8 @@ def scrape_url(url):
                'id': url,
                'access_token': config("FACEBOOK_TOKEN")}
 
+    print(payload)
+
     r = requests.post("https://graph.facebook.com/v2.11/", data=payload)
 
     result = {}
