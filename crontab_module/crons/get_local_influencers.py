@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import sys  # to get system arguments
+sys.path.insert(0,'/root/cloud')
 import time  # for debug
 import re  # for regex in location filtering
 import pymongo  # for pymongo functions
@@ -20,6 +21,7 @@ from nltk.corpus import stopwords
 from nltk.stem.porter import *
 from decouple import config
 import argparse
+
 
 
 consumer_key = config("TWITTER_CONSUMER_KEY")  # API key
