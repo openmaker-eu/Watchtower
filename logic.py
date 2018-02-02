@@ -1116,11 +1116,12 @@ def scrape_url(url):
     r = requests.post("https://graph.facebook.com/v2.11/", data=payload)
 
     result = {}
+    print(r.text)
     if r.status_code == requests.codes.ok:
         result['response'] = True
         result['data'] = json.loads(r.text)
     else:
-        result['reponse'] = False
+        result['response'] = False
 
     return result
 
