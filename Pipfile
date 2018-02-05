@@ -27,9 +27,8 @@ tldextract = "==2.1.0"
 requests = "==2.18.1"
 "urllib3" = "==1.21.1"
 python-dateutil = "==2.6.0"
-numpy = "*"
+numpy = "==1.14.0"
 pandas = "*"
 
 
 [dev-packages]
-
