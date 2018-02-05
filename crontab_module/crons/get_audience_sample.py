@@ -144,7 +144,7 @@ def get_audience_sample_by_topic(userID, topicID, location, sample_size, signal_
 
 # find and store audience samples for all users, for all of their topics.
 def main():
-    if (len(sys.argv) >= 4):
+    if (len(sys.argv) >= 3):
 
         location = sys.argv[1]  # get location from commandline.
         getForAllLocations = sys.argv[2]  # should the sampling be done for all relevant locations
@@ -196,7 +196,7 @@ def main():
                 get_audience_sample_by_topic(userID=-1, topicID=topicID, location=loc, sample_size=N, signal_strength=signal_strength)
 
     else:
-        print("Usage: python get_audience_sample.py <server_ip> <location> <fetch_for_all_relevant_locations>")
+        print("Usage: python get_audience_sample.py <location> <fetch_for_all_relevant_locations>")
 
 
 if __name__ == "__main__":
