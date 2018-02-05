@@ -3,9 +3,9 @@
 import datetime
 import sys
 import time  # for debug
-import os
+from decouple import config
 
-sys.path.insert(0,os.getcwd())
+sys.path.insert(0, config("ROOT_DIR"))
 import numpy as np  # for sampling
 
 from predict_location.predictor import Predictor  # for location

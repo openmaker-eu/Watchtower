@@ -1,8 +1,8 @@
 import datetime
 import sys
-import os
+from decouple import config
 
-sys.path.insert(0,os.getcwd())
+sys.path.insert(0, config("ROOT_DIR"))
 
 import dateutil.relativedelta
 from application.Connections import Connection

@@ -1,7 +1,8 @@
 import pprint  # to print human readable dictionary
 import sys
-import os
-sys.path.insert(0,os.getcwd())
+from decouple import config
+
+sys.path.insert(0, config("ROOT_DIR"))
 
 import tweepy  # Twitter API helper package
 from tweepy import OAuthHandler

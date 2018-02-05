@@ -1,7 +1,7 @@
 import sys
 import time  # for debug
-import os
-sys.path.insert(0,os.getcwd())
+from decouple import config
+sys.path.insert(0, config("ROOT_DIR"))
 
 import numpy as np
 import pymongo  # for pymongo functions

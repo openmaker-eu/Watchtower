@@ -2,8 +2,9 @@
 
 import sys
 from datetime import datetime  # to print the date & time in the output log whenever this script is run OR for time related checks
-import os
-sys.path.insert(0,os.getcwd())
+from decouple import config
+
+sys.path.insert(0, config("ROOT_DIR"))
 
 import pymongo
 import tweepy  # Twitter API helper package

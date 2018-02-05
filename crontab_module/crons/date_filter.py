@@ -1,8 +1,8 @@
 import sys
 from time import gmtime, strftime, time
-import os
+from decouple import config
 
-sys.path.insert(0,os.getcwd())
+sys.path.insert(0, config("ROOT_DIR"))
 
 from application.Connections import Connection
 

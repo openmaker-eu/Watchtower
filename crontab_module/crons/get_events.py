@@ -1,9 +1,9 @@
 import sys
 import time
 from datetime import datetime
-import os
+from decouple import config
 
-sys.path.insert(0,os.getcwd())
+sys.path.insert(0, config("ROOT_DIR"))
 
 import facebook
 import requests

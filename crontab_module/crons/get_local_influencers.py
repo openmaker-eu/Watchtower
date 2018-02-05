@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 import sys  # to get system arguments
-import os # to get current working directory
-sys.path.insert(0,os.getcwd())
+import os
+from decouple import config # to get current working directory
+sys.path.insert(0, config("ROOT_DIR"))
 import time  # for debug
 import re  # for regex in location filtering
 import pymongo  # for pymongo functions
