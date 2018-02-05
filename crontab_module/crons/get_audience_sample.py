@@ -3,8 +3,9 @@
 import datetime
 import sys
 import time  # for debug
+import os
 
-sys.path.insert(0,'/root/cloud')
+sys.path.insert(0,os.getcwd())
 import numpy as np  # for sampling
 
 from predict_location.predictor import Predictor  # for location

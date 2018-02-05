@@ -3,8 +3,9 @@ import re
 import sys
 import time
 from datetime import datetime, timedelta
+import os
 
-sys.path.insert(0,'/root/cloud')
+sys.path.insert(0,os.getcwd())
 
 import facebook
 import praw

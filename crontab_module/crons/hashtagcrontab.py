@@ -1,7 +1,8 @@
 import sys
 from time import gmtime, strftime, time
+import os
 
-sys.path.insert(0,'/root/cloud')
+sys.path.insert(0,os.getcwd())
 
 from application.Connections import Connection
 
