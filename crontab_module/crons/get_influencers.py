@@ -1,7 +1,7 @@
 import pprint  # to print human readable dictionary
 import sys
-
-sys.path.insert(0,'/root/cloud')
+import os
+sys.path.insert(0,os.getcwd())
 
 import tweepy  # Twitter API helper package
 from tweepy import OAuthHandler

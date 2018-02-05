@@ -1,7 +1,7 @@
 import sys
 import time  # for debug
-
-sys.path.insert(0,'/root/cloud')
+import os
+sys.path.insert(0,os.getcwd())
 
 import numpy as np
 import pymongo  # for pymongo functions

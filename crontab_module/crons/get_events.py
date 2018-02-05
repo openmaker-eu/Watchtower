@@ -1,8 +1,9 @@
 import sys
 import time
 from datetime import datetime
+import os
 
-sys.path.insert(0,'/root/cloud')
+sys.path.insert(0,os.getcwd())
 
 import facebook
 import requests
@@ -19,12 +20,12 @@ def mineEventsFromMeetUp(topicList):
         auth = {"sign":"true", "key":mtup_token}
         mtup_params = {"order":"time", "text":topic, "only":"events", "fields":"featured_photo"}
         mtup_params.update(auth)
-        
+
         response = requests.get(url_mtup + "find/upcoming_events", params = mtup_params)
         response = response.json()
-        
+
         mtup_response_events = response["events"]
-        
+
         for event in mtup_response_events:
             event["place"] = event.get("venue",{}).get("city","-") + ", " + event.get("venue",{}).get("country","")
             event["link"] = event.get("link","")
@@ -39,7 +40,7 @@ def mineEventsFromMeetUp(topicList):
             event["updated_time"] = event.get("created",0) / 1e3
             event["updated_date"] = datetime.fromtimestamp(event["updated_time"]).strftime("%Y-%m-%dT%H:%M:%S")
             mtup_result_events.append((event, event["id"]))
-        
+
     return mtup_result_events
 
 def mineEventsFromEventBrite(topicList):
@@ -54,7 +55,7 @@ def mineEventsFromEventBrite(topicList):
                                         params = {"q":topic, "expand":"venue", "page":page_number},
                                         verify=True)
                 response = response.json()
-                
+
                 for event in response["events"]:
                     event["place"] = event.get("venue",{}).get("address",{}).get("city","-") + ", " + event.get("venue",{}).get("address",{}).get("country","-")
                     event["link"] = event.get("url","")
@@ -69,7 +70,7 @@ def mineEventsFromEventBrite(topicList):
                     event["updated_date"] = str(event.get("changed", "0000-00-00T00:00:00")[:19])
                     event["updated_time"] = time.mktime(datetime.strptime(event["updated_date"], "%Y-%m-%dT%H:%M:%S").timetuple())
                     evbr_result_events.append((event, event["id"]))
-                
+
                 page_number += 1
             except:
                 break
@@ -80,10 +81,10 @@ def mineEventsFromFacebook(topicList):
     graph = facebook.GraphAPI(access_token=my_token, version="2.7")
     fb_result_events = []
     for topic in topicList:
-    
+
         response = graph.get_object('search?q=' + topic +
                                     '&type=event&limit=100&fields=attending_count,updated_time,cover,end_time,id,interested_count,name,place,start_time')
-        
+
         #traverse pagination of response
         while True:
             try:
@@ -135,7 +136,7 @@ def startEvent(topic_id, topicList):
     eventsFromEventBrite = mineEventsFromEventBrite(topicList)
     eventsFromFacebook = mineEventsFromFacebook(topicList)
     eventsFromMeetUp = mineEventsFromMeetUp(topicList)
-    
+
     insertEventsIntoDataBase(eventsFromEventBrite, topic_id)
     insertEventsIntoDataBase(eventsFromFacebook, topic_id)
     insertEventsIntoDataBase(eventsFromMeetUp, topic_id)
@@ -157,14 +158,14 @@ if __name__ == '__main__':
 
 
 """
-  _____  ______ _______     _______ _      ______ 
+  _____  ______ _______     _______ _      ______
  |  __ \|  ____/ ____\ \   / / ____| |    |  ____|
- | |__) | |__ | |     \ \_/ / |    | |    | |__   
- |  _  /|  __|| |      \   /| |    | |    |  __|  
- | | \ \| |___| |____   | | | |____| |____| |____ 
+ | |__) | |__ | |     \ \_/ / |    | |    | |__
+ |  _  /|  __|| |      \   /| |    | |    |  __|
+ | | \ \| |___| |____   | | | |____| |____| |____
  |_|  \_\______\_____|  |_|  \_____|______|______|
-                                                  
-                                                  
+
+
 def idsFromFacebook(topicList):
     my_token = config("FACEBOOK_TOKEN")
     graph = facebook.GraphAPI(access_token=my_token, version="2.7")
@@ -222,7 +223,7 @@ def mineEventsFromFacebook(search_id_list, isPreview):
         if c == 5:
             break
 
-    return t    
+    return t
 
 def mineEventsFromEventBrite(topicList):
     print("Getting events from Eventbrite...")
@@ -287,7 +288,7 @@ def mineEventsFromEventBrite(topicList):
                 event['cover'] = event['logo']['original']['url']
 
             result_events.append((event, event['id']))
-        
+
     return result_events
 
 """

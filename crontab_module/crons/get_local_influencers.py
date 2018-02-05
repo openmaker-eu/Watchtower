@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import sys  # to get system arguments
-sys.path.insert(0,'/root/cloud')
+import os # to get current working directory
+sys.path.insert(0,os.getcwd())
 import time  # for debug
 import re  # for regex in location filtering
 import pymongo  # for pymongo functions
@@ -21,8 +22,9 @@ from nltk.corpus import stopwords
 from nltk.stem.porter import *
 from decouple import config
 import argparse
-
-
+from location_regex import *
+from predict_location.predictor import Predictor  # for location
+from bson.json_util import dumps
 
 consumer_key = config("TWITTER_CONSUMER_KEY")  # API key
 consumer_secret = config("TWITTER_CONSUMER_SECRET")  # API secret
@@ -40,7 +42,7 @@ timeThreshold = 12  # in month
 local_infl_size = 40  # local influencers size
 keyword_size = 10
 
-default_signal_strength = 4  
+default_signal_strength = 4
 default_following_limit = 20000
 
 def filterAudience(p, keywords):
@@ -55,7 +57,8 @@ def filterAudience(p, keywords):
         try:
             status_list = list(tweepy.Cursor(api.user_timeline, id=p[
                                "id"], tweet_mode='extended').items(numOfTweets))
-        except tweepy.error.TweepError:
+        except tweepy.error.TweepError as e:
+            print(str(e.api_code))
             verboseprint(
                 "Error fetching tweets\n==============================", debugLevel=1)
             return False
@@ -188,14 +191,33 @@ def getInfluencerParameters():
         d = {(x[:2]): x[2:] for x in cur.fetchall()}
         return d
 
-
 def findLocalInfluencers(location, topicID, keywords):
     signal_strength, following_limit = parameters[topicID, location] if (
         topicID, location) in parameters else [default_signal_strength, default_following_limit]
 
+    location_predictor = Predictor()
+    location = location_predictor.predict_location(location)
+
     verboseprint("Fetching audience profiles from database", debugLevel=2)
-    loc_filtered_audience_ids = Connection.Instance().audienceDB[str(topicID)].distinct(
-        'id', {'predicted_location': location, '$where': 'this.influencers.length > ' + str(signal_strength)})
+
+    if 'predicted_location' not in dumps(list(Connection.Instance().audienceDB[str(topicID)].find({}).sort([('_id',-1)]).limit(1))):
+        print("Using regex for location...")
+        regx = getLocationRegex(location)
+        try:
+            loc_filtered_audience_ids = Connection.Instance().audienceDB[str(topicID)].distinct(
+                'id', {'location': regx, '$where': 'this.influencers.length > ' + str(signal_strength)})
+        except:
+            for audience_member in Connection.Instance().audienceDB[str(topicID)].find({'location': regx}, {'id': 1}):
+                loc_filtered_audience_ids.append(audience_member['id'])
+    else:
+        print("Using predicted location...")
+        try:
+            loc_filtered_audience_ids = Connection.Instance().audienceDB[str(topicID)].distinct(
+                'id', {'predicted_location': location, '$where': 'this.influencers.length > ' + str(signal_strength)})
+        except:
+            for audience_member in Connection.Instance().audienceDB[str(topicID)].find({'predicted_location': location}, {'id': 1}):
+                loc_filtered_audience_ids.append(audience_member['id'])
+
     audience = Connection.Instance().audienceDB['all_audience'].aggregate(
         [
             {'$match': {'id': {'$in': loc_filtered_audience_ids},
@@ -208,6 +230,7 @@ def findLocalInfluencers(location, topicID, keywords):
     audience = list(audience)
     local_influencers = audience[:local_infl_size]
 
+    print("Local influencers size before filtering: " + str(len(local_influencers)))
     passed = [x for x in local_influencers if filterAudience(x, keywords)]
 
     return passed
@@ -216,7 +239,7 @@ def findLocalInfluencers(location, topicID, keywords):
 def verboseprint(*a, **k):
     if "debugLevel" in k and k["debugLevel"] >= args.verbose:
         del k["debugLevel"]
-        print(*a, **k)
+        print(str(*a), str(**k))
 
 
 def writeLocalInfluencersToDB(location, topicID, keywords):

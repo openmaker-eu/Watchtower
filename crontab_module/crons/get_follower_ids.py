@@ -1,10 +1,9 @@
 # Author: Kemal Berk Kocabagli
 
 import sys
-from datetime import \
-    datetime  # to print the date & time in the output log whenever this script is run OR for time related checks
-
-sys.path.insert(0,'/root/cloud')
+from datetime import datetime  # to print the date & time in the output log whenever this script is run OR for time related checks
+import os
+sys.path.insert(0,os.getcwd())
 
 import pymongo
 import tweepy  # Twitter API helper package
@@ -196,13 +195,11 @@ def get_follower_ids():
     '''
     gets the follower ids for all topics. Will be run periodically.
     '''
-    if len(sys.argv) < 3:
-        print("Usage: python get_follower_ids.py <server_ip> <FOLLOWERS_LIMIT>")
-        return
+
     INFLUENCER_COUNT = 0
     INFLUENCER_NUMBER = 0
     N = 1500
-    FOLLOWERS_LIMIT = int(sys.argv[1])  # pass the influencers who have more followers than the limit
+    FOLLOWERS_LIMIT = int(config("FOLLOWERS_LIMIT"))  # pass the influencers who have more followers than the limit
 
     # sort influencers from most to least recently retrieved
     influencers = list(
