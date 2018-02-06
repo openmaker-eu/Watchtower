@@ -163,7 +163,7 @@ def fetchKeywords(topicID):
     urllink = "http://" + \
         config("HOST_IP") + ":8484/api/v1.3/get_hashtags?topic_id=" + str(topicID)
     with urllib.request.urlopen(urllink) as response:
-        html = response.read()
+        html = response.read().decode()
     hashtags = json.loads(html)["hashtags"]
     keywords = [str(x["hashtag"]).lower() for x in hashtags]
     return keywords
