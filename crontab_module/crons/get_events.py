@@ -32,7 +32,7 @@ def mineEventsFromMeetUp(topicList):
             event["cover"] = event.get("featured_photo",{}).get("photo_link",None)
             event["interested"] = -1
             event["coming"] = event.get("yes_rsvp_count","")
-            event["start_time"] = time.mktime(datetime.strptime(event.get("local_date","0000-00-00") + event.get("local_time","00:00"), "%Y-%m-%d%H:%M").timetuple())
+            event["start_time"] = time.mktime(datetime.strptime(event.get("local_date","0001-01-01") + event.get("local_time","00:00"), "%Y-%m-%d%H:%M").timetuple())
             event["start_date"] = datetime.fromtimestamp(event["start_time"]).strftime("%d-%m-%Y")
             event["end_time"] = event["start_time"] + (event.get("duration",0) / 1e3)
             event["end_date"] = datetime.fromtimestamp(event["end_time"]).strftime("%d-%m-%Y")
@@ -62,11 +62,11 @@ def mineEventsFromEventBrite(topicList):
                     event["cover"] = event.get("logo",{}).get("original",{}).get("url",None)
                     event["interested"] = -1
                     event["coming"] = -1
-                    event["start_time"] = time.mktime(datetime.strptime(event.get("start",{}).get("utc","0000-00-00")[:10], "%Y-%m-%d").timetuple())
+                    event["start_time"] = time.mktime(datetime.strptime(event.get("start",{}).get("utc","0001-01-01")[:10], "%Y-%m-%d").timetuple())
                     event["start_date"] = datetime.fromtimestamp(event["start_time"]).strftime('%d-%m-%Y')
-                    event["end_time"] = time.mktime(datetime.strptime(event.get("end",{}).get("utc","0000-00-00")[:10], "%Y-%m-%d").timetuple())
+                    event["end_time"] = time.mktime(datetime.strptime(event.get("end",{}).get("utc","0001-01-01")[:10], "%Y-%m-%d").timetuple())
                     event["end_date"] = datetime.fromtimestamp(event["end_time"]).strftime('%d-%m-%Y')
-                    event["updated_date"] = str(event.get("changed", "0000-00-00T00:00:00")[:19])
+                    event["updated_date"] = str(event.get("changed", "0001-01-01T00:00:00")[:19])
                     event["updated_time"] = time.mktime(datetime.strptime(event["updated_date"], "%Y-%m-%dT%H:%M:%S").timetuple())
                     evbr_result_events.append((event, event["id"]))
                 
@@ -94,11 +94,11 @@ def mineEventsFromFacebook(topicList):
                     event["cover"] = event.get("cover",{}).get("source",None)
                     event["interested"] = event.get("interested_count", -1)
                     event["coming"] = event.get("attending_count","")
-                    event["start_time"] = time.mktime(datetime.strptime(event.get("start_time","0000-00-00")[:10], "%Y-%m-%d").timetuple())
+                    event["start_time"] = time.mktime(datetime.strptime(event.get("start_time","0001-01-01")[:10], "%Y-%m-%d").timetuple())
                     event["start_date"] = datetime.fromtimestamp(event["start_time"]).strftime('%d-%m-%Y')
-                    event["end_time"] = time.mktime(datetime.strptime(event.get("end_time","0000-00-00")[:10], "%Y-%m-%d").timetuple())
+                    event["end_time"] = time.mktime(datetime.strptime(event.get("end_time","0001-01-01")[:10], "%Y-%m-%d").timetuple())
                     event["end_date"] = datetime.fromtimestamp(event["end_time"]).strftime('%d-%m-%Y')
-                    event["updated_date"] = event.get("updated_time", "0000-00-00T00:00:00")[:19]
+                    event["updated_date"] = event.get("updated_time", "0001-01-01T00:00:00")[:19]
                     event["updated_time"] = time.mktime(datetime.strptime(event["updated_date"], "%Y-%m-%dT%H:%M:%S").timetuple())
                     fb_result_events.append((event, event["id"]))
                 response = requests.get(response['paging']['next']).json()
@@ -115,8 +115,8 @@ def insertEventsIntoDataBase(eventsWithIds, topic_id):
 
         if ret.alive:
             for elem in ret:
-                newEventUpdateTime = datetime.strptime(event.get("updated_date","0000-00-00T00:00:00")[:19], "%Y-%m-%dT%H:%M:%S")
-                oldEventUpdateTime = datetime.strptime(elem.get("updated_date","0000-00-00T00:00:00")[:19], "%Y-%m-%dT%H:%M:%S")
+                newEventUpdateTime = datetime.strptime(event.get("updated_date","0001-01-01T00:00:00")[:19], "%Y-%m-%dT%H:%M:%S")
+                oldEventUpdateTime = datetime.strptime(elem.get("updated_date","0001-01-01T00:00:00")[:19], "%Y-%m-%dT%H:%M:%S")
                 if newEventUpdateTime != oldEventUpdateTime:
                     print(newEventUpdateTime)
                     print(oldEventUpdateTime)
