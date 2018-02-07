@@ -11,7 +11,7 @@ $(document).ready(function () {
             url: '/Tweets',
             method: 'GET',
             data: {
-              'topic_id': topic_id
+                'topic_id': topic_id
             },
             timeout: 10000,
             success: function (html) {
@@ -28,7 +28,7 @@ function saveTweet(tweet_id) {
     if (text.length >= 256) {
         var excess = text.length - 256;
         var message = "Your tweet body is too long. Please, remove {0} characters.".format(excess);
-        swal("Tweet Length!", message , "error");
+        swal("Tweet Length!", message, "error");
     } else {
         var date = $('#tweet_'.concat(tweet_id)).find("#date").val();
         var title = $('#tweet_'.concat(tweet_id)).find("#title").text();
@@ -38,9 +38,10 @@ function saveTweet(tweet_id) {
         bg_url = bg_url ? bg_url[2] : "";
         var items = getParameters();
         var news_id = -1;
-        if(Object.keys(items).length > 0 && items.news_id){
+        if (Object.keys(items).length > 0 && items.news_id) {
             news_id = items.news_id;
         }
+        $('#tweet_'.concat(tweet_id)).find('.btn-save').attr("disabled", true);
         $.ajax({
             url: "/Tweets",
             method: 'POST',
@@ -55,38 +56,49 @@ function saveTweet(tweet_id) {
                 'image_url': bg_url
             }
         }).success(function (response) {
-            $('#tweet_'.concat(tweet_id)).find('.btn-save').attr("disabled", true);
-            swal("Good job!", "Your tweet is saved!", "success");
-            if(Object.keys(items).length > 0 && items.news_id){
-                window.location.replace("/Tweets");
-            }
+            swal({
+                    title: "Good job!",
+                    text: "Your tweet is saved!",
+                    type: "success",
+                    showCancelButton: false,
+                    confirmButtonClass: "btn-success",
+                    confirmButtonText: "Ok!",
+                    closeOnConfirm: true,
+                    closeOnCancel: false
+                },
+                function () {
+                    if (Object.keys(items).length > 0 && items.news_id) {
+                        window.location.replace("/Tweets");
+                    }
+                });
         });
     }
 }
 
 function removeTweet(tweet_id) {
-  swal({
-    title: "Are you sure?",
-    text: "Your will not be able to recover this tweet!",
-    type: "warning",
-    showCancelButton: true,
-    confirmButtonClass: "btn-danger",
-    confirmButtonText: "Yes, delete it!",
-    closeOnConfirm: false
-    },
-    function(){
-      $.ajax({
-          url: "/Tweets",
-          method: 'POST',
-          data: {
-              'tweet_id': tweet_id,
-              'posttype': 'remove'
-          }
-      }).success(function (response) {
-          $('#tweet_'.concat(tweet_id)).remove();
-      });
-      swal("Deleted!", "Your tweet has been deleted.", "success");
-    });
+    swal({
+            title: "Are you sure?",
+            text: "Your will not be able to recover this tweet!",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonClass: "btn-danger",
+            confirmButtonText: "Yes, delete it!",
+            closeOnConfirm: false,
+            showLoaderOnConfirm: true
+        },
+        function () {
+            $.ajax({
+                url: "/Tweets",
+                method: 'POST',
+                data: {
+                    'tweet_id': tweet_id,
+                    'posttype': 'remove'
+                }
+            }).success(function (response) {
+                swal("Deleted!", "Your tweet has been deleted.", "success");
+                $('#tweet_'.concat(tweet_id)).remove();
+            });
+        });
 }
 
 

@@ -41,6 +41,8 @@ WORKDIR /root/cloud
 
 RUN pipenv install
 
+RUN curl https://raw.githubusercontent.com/codelucas/newspaper/master/download_corpora.py | pipenv run python3
+
 ENV PATH="/root/cloud:${PATH}"
 
 ADD ./.bash/collector_module-entrypoint.sh /usr/bin/collector_module-entrypoint.sh

@@ -6,7 +6,6 @@ var topic_id = -1;
 var main = function () {
       $("#spin").spinner();
       topic_id = $('#topic_dropdown > li.active > a').attr("data-id");
-      updateReadMores();
 };
 $(document).ready(main);
 
@@ -18,6 +17,31 @@ $(document).ready(function () {
         getEvents();
     });
 
+    $("#location_dropdown").on('click', 'li a', function () {
+        $('#all-events').empty();
+        $("#spin").show();
+        var topic_id = $('#topic_dropdown .active a').attr('data-id');
+        var filter = $('.btn-success').val();
+        $.ajax({
+            url: '/get_events',
+            method: 'GET',
+            data: {
+                'topic_id':topic_id,
+                'filter': filter
+            },
+            timeout: 10000,
+            error: function () {
+                $('#all-events').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");
+                $("#spin").hide();
+            },
+            success: function (html) {
+                $('#all-events').empty();
+                $('#all-events').append(html);
+                $("#spin").hide();
+            }
+        });
+    });
+
     $(window).scroll(function () {
         if ($("#spin").css("display") == "none" && (!isEventsOver) && ($(window).scrollTop() + $(window).height() == $(document).height()) && (isReadyForLoading)) {
             isReadyForLoading = false;
@@ -26,6 +50,8 @@ $(document).ready(function () {
     });
 
 });
+
+
 
 function loadNewEvents() {
     $("#spin").show();

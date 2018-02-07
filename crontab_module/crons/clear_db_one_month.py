@@ -1,7 +1,8 @@
 import datetime
 import sys
+from decouple import config
 
-sys.path.insert(0,'/root/cloud')
+sys.path.insert(0, config("ROOT_DIR"))
 
 import dateutil.relativedelta
 from application.Connections import Connection
@@ -28,7 +29,6 @@ def compress_audience_data():
     Connection.Instance().audienceDB['all_audience'].update({}, {'$unset': {
         "profile_background_color": 1,
         "default_profile_image": 1,
-        "id_str": 1,
         "contributors_enabled": 1,
         "profile_sidebar_border_color": 1,
         "profile_use_background_image": 1,

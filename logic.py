@@ -1,6 +1,8 @@
 import json
 from threading import Thread
 from crontab_module.crons import facebook_reddit_crontab
+import re
+from urllib.parse import urlparse
 
 import facebook
 import praw
@@ -949,8 +951,10 @@ def get_local_influencers(topic_id, cursor, location):
     print("Topic id:" + str(topic_id))
     print("Location:" + location)
     result = {}
-    local_influencers = list(Connection.Instance().local_influencers_DB[str(topic_id) + "_" + str(location)].find({}))[
-                        cursor:cursor + 21]
+    if location.lower()=="global":
+        local_influencers = list(Connection.Instance().influencerDB[str(topic_id)].find({}))[cursor:cursor + 21]
+    else:
+        local_influencers = list(Connection.Instance().local_influencers_DB[str(topic_id)+"_"+str(location)].find({}))[cursor:cursor + 21]
 
     for inf in local_influencers:
         inf['id'] = str(inf['id'])
@@ -1108,19 +1112,38 @@ def get_next_tweet_sequence():
     return cursor['seq']
 
 
+def linky(url):
+    """Sanitize link. clean utm parameters on link."""
+    if not re.match(r'^https?:\/\/', url):
+        url = 'http://%s' % url
+
+    rv = urlparse(url)
+
+    if rv.query:
+        query = re.sub(r'utm_\w+=[^&]+&?', '', rv.query)
+        url = '%s://%s%s?%s' % (rv.scheme, rv.hostname, rv.path, query)
+
+    # remove ? at the end of url
+    url = re.sub(r'\?$', '', url)
+    return url
+
+
 def scrape_url(url):
     payload = {'scrape': 'true',
-               'id': url,
+               'id': linky(url),
                'access_token': config("FACEBOOK_TOKEN")}
+
+    print(payload)
 
     r = requests.post("https://graph.facebook.com/v2.11/", data=payload)
 
     result = {}
+    print(r.text)
     if r.status_code == requests.codes.ok:
         result['response'] = True
         result['data'] = json.loads(r.text)
     else:
-        result['reponse'] = False
+        result['response'] = False
 
     return result
 

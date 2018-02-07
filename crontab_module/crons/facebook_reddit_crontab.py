@@ -3,8 +3,9 @@ import re
 import sys
 import time
 from datetime import datetime, timedelta
+from decouple import config
 
-sys.path.insert(0,'/root/cloud')
+sys.path.insert(0, config("ROOT_DIR"))
 
 import facebook
 import praw
@@ -320,7 +321,7 @@ def searchSubredditNews(topic_id, subredditNames):
             }
 
             if len(mentions) != 0:
-                link_parser.calculate_links(s, Connection.Instance().machine_host)
+                link_parser.calculate_links(s, config("HOST_IP"))
     except:
         print(subredditName)
         pass
@@ -375,7 +376,7 @@ def searchFacebookNews(topic_id, search_ids):
                                 'url': post['link'],
                                 'topic_id': topic_id,
                                 'mentions': listOfMention
-                            }, Connection.Instance().machine_host)
+                            }, config("HOST_IP"))
                 else:
                     break
 

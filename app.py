@@ -2,6 +2,7 @@ import json
 import os
 import random
 import string
+from application.utils.basic import *
 
 import tornado.ioloop
 import tornado.options
@@ -1334,6 +1335,8 @@ class EventPageHandler(BaseHandler, TemplateRendering):
         topic = logic.get_current_topic(tornado.escape.xhtml_escape(self.current_user))
         location = logic.get_current_location(tornado.escape.xhtml_escape(self.current_user))
         relevant_locations = logic.get_relevant_locations()
+        events = apiv13.getEvents(topic['topic_id'], "date", location, 0)
+
         if topic is None:
             self.redirect("/topicinfo")
         variables = {
@@ -1341,7 +1344,8 @@ class EventPageHandler(BaseHandler, TemplateRendering):
             'alerts': logic.get_topic_list(user_id),
             'type': "events",
             'username': str(tornado.escape.xhtml_escape(self.get_current_username())),
-            "document": apiv12.getEvents(topic['topic_id'], "date", 0),
+            'cursor':events['next_cursor'],
+            "document": events,
             'topic': topic,
             'location': location,
             'relevant_locations': relevant_locations
@@ -1355,8 +1359,14 @@ class EventHandler(BaseHandler, TemplateRendering):
     def get(self):
         topic_id = self.get_argument('topic_id')
         filter = self.get_argument('filter')
-        cursor = self.get_argument('cursor')
-        document = apiv12.getEvents(topic_id, filter, cursor)
+        try:
+            cursor = self.get_argument('cursor')
+        except:
+            cursor = 0
+            pass
+        location = logic.get_current_location(tornado.escape.xhtml_escape(self.current_user))
+        print("CURSOR:" + str(cursor))
+        document = apiv13.getEvents(topic_id, filter, location, cursor)
         self.write(self.render_template("single-event.html", {"document": document}))
 
 
