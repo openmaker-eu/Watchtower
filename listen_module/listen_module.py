@@ -58,6 +58,7 @@ def main():
             current_hour = datetime.now().hour
             new_last_sequence_id = str(Connection.Instance().db["counters"].find_one({'_id': "tweetDBId"})['seq'])
             if last_sequence_id == new_last_sequence_id:
+                last_sequence_id = new_last_sequence_id
                 running_topic_list = new_running_topic_list
                 print("Unexpectedly Stopped Module, Restarting...")
                 twitter_module.restart(new_running_topic_list)
