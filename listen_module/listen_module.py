@@ -60,10 +60,10 @@ def main():
             new_last_sequence_id = str(Connection.Instance().db["counters"].find_one({'_id': "tweetDBId"})['seq'])
             print("last_id = {0}, new_last_id = {1}".format(last_sequence_id, new_last_sequence_id))
             if last_sequence_id == new_last_sequence_id:
-                last_sequence_id = new_last_sequence_id
                 running_topic_list = new_running_topic_list
                 print("Unexpectedly Stopped Module, Restarting...")
                 twitter_module.restart(new_running_topic_list)
+            last_sequence_id = new_last_sequence_id
 
 
 if __name__ == "__main__":
