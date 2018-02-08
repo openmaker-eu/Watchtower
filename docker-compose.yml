@@ -27,6 +27,7 @@ services:
           PGDATA: /var/lib/postgresql/data/pgdata
         volumes:
             - "${POSTGRESQL_PATH}:/var/lib/postgresql/data/pgdata"
+            - "./.data/postgresql:/data"
 
     server:
         container_name: server
