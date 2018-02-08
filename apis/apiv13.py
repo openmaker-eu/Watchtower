@@ -26,7 +26,7 @@ def getLocalInfluencers(topic_id, location, cursor):
     if cursor >= max_cursor:
         result['local_influencers']=[]
         result['error'] = "Cannot exceed max cursor = " + str(max_cursor) + "."
-        return json.dumps(result, indent=4)
+        return result
     if (str(topic_id) != "None"):
         with Connection.Instance().get_cursor() as cur:
             # CHECK TOPIC
@@ -42,7 +42,7 @@ def getLocalInfluencers(topic_id, location, cursor):
                 topic_name = var[0][0]
             except:
                 result['error'] = "Topic does not exist."
-                return json.dumps(result, indent=4)
+                return result
 
             location = location.lower()
             # error handling needed for location
@@ -59,7 +59,7 @@ def getLocalInfluencers(topic_id, location, cursor):
                     location = cur.fetchall()[0][0]
                 except:
                     result['error'] = "Location does not exist."
-                    return json.dumps(result, indent=4)
+                    return result
 
                 # GET HIDDEN INFLUENCERS
                 sql = (
@@ -72,7 +72,7 @@ def getLocalInfluencers(topic_id, location, cursor):
                     hidden_ids = [int(influencer_id[0]) for influencer_id in cur.fetchall()]
                 except:
                     result['error'] = "Problem in fetching hidden influencers for current topic and location."
-                    return json.dumps(result, indent=4)
+                    return result
 
             collection = Connection.Instance().local_influencers_DB[str(topic_id)+"_"+str(location)]
 
@@ -109,7 +109,7 @@ def getLocalInfluencers(topic_id, location, cursor):
             result['local_influencers'] = local_influencers
     else:
         result['error'] = "Topic not found"
-    return json.dumps(result, indent=4)
+    return result
 
 def getAudienceSample(topic_id, location, cursor):
     '''
@@ -119,15 +119,16 @@ def getAudienceSample(topic_id, location, cursor):
     result = {}
     cursor_range = 10
     max_cursor = 100
+    cursor = int(cursor)
     if cursor >= max_cursor:
         result['audience_sample']=[]
         result['error'] = "Cannot exceed max cursor = " + str(max_cursor) + "."
-        return json.dumps(result, indent=4)
+        return result
     try:
         topic_id = int(topic_id)
     except:
         result['error'] = "Topic does not exist."
-        return json.dumps(result, indent=4)
+        return result
     if (str(topic_id) != "None"):
         with Connection.Instance().get_cursor() as cur:
             sql = (
@@ -141,7 +142,7 @@ def getAudienceSample(topic_id, location, cursor):
                 topic_name = var[0][0]
             except:
                 result['error'] = "Topic does not exist."
-                return json.dumps(result, indent=4)
+                return result
 
             # error handling needed for location
             print("Location: " + str(location))
@@ -160,7 +161,7 @@ def getAudienceSample(topic_id, location, cursor):
                     location = cur.fetchall()[0][0]
                 except:
                     result['error'] = "Location does not exist."
-                    return json.dumps(result, indent=4)
+                    return result
 
             audience_sample = list(
             Connection.Instance().audience_samples_DB[str(location)+"_"+str(topic_id)].find({},
@@ -178,7 +179,6 @@ def getAudienceSample(topic_id, location, cursor):
             result['topic'] = topic_name
             result['location'] = location
 
-            cursor = int(cursor)
             result['next_cursor'] = cursor + (cursor_range-cursor%cursor_range)
             if cursor!=0: result['previous_cursor'] = cursor - cursor_range if cursor%cursor_range == 0 else cursor - cursor%cursor_range # if we are on the first page, there is no previous cursor
 
@@ -194,23 +194,24 @@ def getAudienceSample(topic_id, location, cursor):
 
     else:
         result['error'] = "Topic not found."
-    return json.dumps(result, indent=4)
+    return result
 
 def getEvents(topic_id, sortedBy, location, cursor):
     cursor_range = 10
     max_cursor = 100
+    cursor = int(cursor)
     result = {}
     events = []
     location = location.lower()
     if cursor >= max_cursor:
         result['events']=[]
         result['error'] = "Cannot exceed max cursor = " + str(max_cursor) + "."
-        return json.dumps(result, indent=4)
+        return result
     try:
         topic_id = int(topic_id)
     except:
         result['event'] = "topic not found"
-        return json.dumps(result, indent=4)
+        return result
     with Connection.Instance().get_cursor() as cur:
         sql = (
             "SELECT topic_name "
@@ -223,7 +224,7 @@ def getEvents(topic_id, sortedBy, location, cursor):
             topic_name = var[0][0]
         except:
             result['error'] = "Topic does not exist."
-            return json.dumps(result, indent=4)
+            return result
 
         events = [] # all events to be returned
         match = {'end_time': {'$gte': time.time()}}
@@ -232,7 +233,6 @@ def getEvents(topic_id, sortedBy, location, cursor):
         result['topic'] = topic_name
         result['location'] = location
 
-        cursor = int(cursor)
 
         # SORT CRITERIA
         if sortedBy == 'interested':
@@ -292,7 +292,7 @@ def getEvents(topic_id, sortedBy, location, cursor):
                   ]))
                   count+=1
                   print("length:" + str(len(events)))
-                  if len(events) > min(cursor+cursor_range,EVENT_LIMIT):
+                  if len(events) >= min(cursor+cursor_range,EVENT_LIMIT):
                       break
                   if (count > COUNTRY_LIMIT):
                       break
@@ -349,26 +349,27 @@ def getEvents(topic_id, sortedBy, location, cursor):
 
             result['events']= events
 
-        return json.dumps(result, indent=4)
+        return result
 
 
 def getNewsFeeds(date, cursor, forbidden_domain, topics):
     result = {}
     cursor_range = 20
     max_cursor = 60
-    if topics == [""]:
-        return json.dumps({})
-
     cursor = int(cursor)
+
+    if topics == [""]:
+        return {}
+
     if cursor >= max_cursor:
         result['news']=[]
         result['error'] = "Cannot exceed max cursor = " + str(max_cursor) + "."
-        return json.dumps(result, indent=4)
+        return result
 
     dates = ['yesterday', 'week', 'month']
     if date not in dates:
         result['Error'] = 'invalid date'
-        return json.dumps(result)
+        return result
 
     # feeds = list(Connection.Instance().filteredNewsPoolDB[themeid].find({'name': date}, {date: 1}))
     # feeds = list(feeds[0][date][cursor:cursor+20])
@@ -399,7 +400,7 @@ def getNewsFeeds(date, cursor, forbidden_domain, topics):
     result['next_cursor_str'] = str(result['next_cursor'])
     result['news'] = news
 
-    return json.dumps(result, indent=4)
+    return result
 
 
 def getNews(news_ids, keywords, languages, cities, countries, user_location, user_language, cursor, since, until,
@@ -411,11 +412,11 @@ def getNews(news_ids, keywords, languages, cities, countries, user_location, use
     if cursor >= max_cursor:
         result['news']=[]
         result['error'] = "Cannot exceed max cursor = " + str(max_cursor) + "."
-        return json.dumps(result, indent=4)
+        return result
     if topics ==[""] and news_ids == [""] and keywords == [""] and since == "" and until == "" and \
                     languages == [""] and cities == [""] and countries == [""] and user_location == [""] \
             and user_language == [""] and domains == [""]:
-        return json.dumps({'news': [], 'next_cursor': 0, 'next_cursor_str': "0"})
+        return {'news': [], 'next_cursor': 0, 'next_cursor_str': "0"}
 
     aggregate_dictionary = []
     find_dictionary = {}
@@ -464,14 +465,14 @@ def getNews(news_ids, keywords, languages, cities, countries, user_location, use
             since_in_dictionary = datetime.strptime(since, "%d-%m-%Y")
             date_dictionary['$gte'] = since_in_dictionary
         except ValueError:
-            return json.dumps({'error': "please, enter a valid since day. DAY-MONTH-YEAR"})
+            return {'error': "please, enter a valid since day. DAY-MONTH-YEAR"}
 
     if until != "":
         try:
             until_in_dictionary = datetime.strptime(until, "%d-%m-%Y")
             date_dictionary['$lte'] = until_in_dictionary
         except ValueError:
-            return json.dumps({'error': "please, enter a valid since day. DAY-MONTH-YEAR"})
+            return {'error': "please, enter a valid since day. DAY-MONTH-YEAR"}
 
     if date_dictionary != {}:
         find_dictionary['published_at'] = date_dictionary

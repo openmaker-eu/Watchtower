@@ -59,9 +59,8 @@ def filterAudience(p, keywords):
             status_list = list(tweepy.Cursor(api.user_timeline, id=p[
                                "id"], tweet_mode='extended').items(numOfTweets))
         except tweepy.error.TweepError as e:
-            print(str(e.api_code))
             verboseprint(
-                "Error fetching tweets\n==============================", debugLevel=1)
+                "Error fetching tweets, error code: "+str(e.api_code)+"\n==============================", debugLevel=1)
             return False
 
         if not status_list:
@@ -233,6 +232,7 @@ def findLocalInfluencers(location, topicID, keywords):
 
     print("Local influencers size before filtering: " + str(len(local_influencers)))
     passed = [x for x in local_influencers if filterAudience(x, keywords)]
+    print("Local influencers size after filtering: " + str(len(passed)))
 
     return passed
 

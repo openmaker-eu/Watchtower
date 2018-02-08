@@ -951,8 +951,10 @@ def get_local_influencers(topic_id, cursor, location):
     print("Topic id:" + str(topic_id))
     print("Location:" + location)
     result = {}
-    local_influencers = list(Connection.Instance().local_influencers_DB[str(topic_id) + "_" + str(location)].find({}))[
-                        cursor:cursor + 21]
+    if location.lower()=="global":
+        local_influencers = list(Connection.Instance().influencerDB[str(topic_id)].find({}))[cursor:cursor + 21]
+    else:
+        local_influencers = list(Connection.Instance().local_influencers_DB[str(topic_id)+"_"+str(location)].find({}))[cursor:cursor + 21]
 
     for inf in local_influencers:
         inf['id'] = str(inf['id'])
