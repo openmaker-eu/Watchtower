@@ -11,3 +11,4 @@ RUN mkdir -p /var/lib/postgresql/9.6
 COPY ./.data/postgresql/schemas.sql /data
 COPY ./.data/postgresql/relevant_locations_data.sql /data
 COPY ./.data/postgresql/country_code_data.sql /data
+COPY ./.data/postgresql/location_country_codes_data.sql /data
