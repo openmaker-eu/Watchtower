@@ -9,7 +9,7 @@ SET row_security = off;
 
 SET search_path = public, pg_catalog;
 
-COPY location_country_codes FROM stdin;
+COPY location_country_codes (location, country_codes) FROM stdin;
 andorra	{"ad": 0, "es": 1}
 united arab emirates	{"ae": 0}
 afghanistan	{"af": 0}
@@ -89815,7 +89815,7 @@ fangkou	{"cn": 0}
 changge	{"cn": 0}
 linzhou	{"cn": 0}
 mandokdong	{"kr": 0}
-\\.
+\.
 
 
 --
