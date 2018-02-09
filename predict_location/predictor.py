@@ -1,5 +1,6 @@
 from enum import Enum
 from pdb import set_trace
+from application.Connections import Connection
 import os
 
 class Code(Enum):
@@ -8,9 +9,6 @@ class Code(Enum):
     BOTH = 3
     NOTACODE = 4
 
-LOC_DATABASE_PATH = os.getcwd() + "/predict_location/city_location.txt"
-COUNTRY_DATABASE_PATH = os.getcwd() + "/predict_location/country_code.txt"
-
 UsaStateCodes = ["al","ak","az","ar","ca","co","ct","de","dc","fl","ga","hi","id","il","in","ia","ks","ky","la",
 "me","md","ma","mi","mn","ms","mo","mt","ne","nv","nh","nj","nm","ny","nc","nd","oh","ok","or","pa","ri","sc","sd",
 "tn","tx","ut","vt","va","wa","wv","wi","wy"]
@@ -18,29 +16,30 @@ UsaStateCodes = ["al","ak","az","ar","ca","co","ct","de","dc","fl","ga","hi","id
 class Predictor(object):
     """Predict location from given location string"""
     def __init__(self):
-        self.location_database = self.fetch_location_database(LOC_DATABASE_PATH)
-        self.country_code_database = self.fetch_country_code_database(COUNTRY_DATABASE_PATH)
+        # self.location_database = self.fetch_location_database(LOC_DATABASE_PATH)
+        # self.country_code_database = self.fetch_country_code_database(COUNTRY_DATABASE_PATH)
+        self.country_code_database, self.location_database = self.fetch_database()
 
-    def fetch_location_database(self, location_database_path):
-        database = {}
-        with open(location_database_path, "r") as source:
-            for line in source:
-                city, countries = [x.strip() for x in line.split("|")]
-                countries = [(x.strip(), int(y.strip())) for x, y in [
-                z.split() for z in countries[1:-1].split(",")]]
-                database[city] = countries
-        return database
-
-    def fetch_country_code_database(self, location_database_path):
-        database = {}
-        with open(location_database_path, "r") as source:
-            for line in source:
-                country, code = [x.strip() for x in line.split("-")]
-                database[country] = code
-        return database
+    '''
+        Fetches country_code_database and location_database and  from PostGreSql DB
+    '''
+    def fetch_database(self):
+        with Connection.Instance().get_cursor() as cur:
+            # country_code
+            print("Fetching country_code database...")
+            cur.execute("SELECT * FROM country_code")
+            result = cur.fetchall()
+            country_code_database = {x[0] : x[1] for x in result}
+            
+            # location country codes
+            print("Fetching location_country_codes database...")
+            cur.execute("SELECT * FROM location_country_codes")
+            result = cur.fetchall()
+            location_database = {x[0] : list(x[1].items()) for x in result}
+            
+            return(country_code_database, location_database)
 
     def predict_location(self, query, ):
-        #set_trace()
         if not query:
             return ""
 
