@@ -204,9 +204,10 @@ def main():
             for topicID, topicName in topics:
                 if topicID!=57: continue
                 for loc in list(location_dict.keys()):
-                    print("Sampling audience for LOCATION: " + location_dict[loc] + ", TOPIC: " + topicName + "(" + str(topicID) + ")")
+                    print("Sampling audience for LOCATION: " + location_dict[loc] + "(" + loc + "), TOPIC: " + topicName + "(" + str(topicID) + ")")
                     if (topicID, loc) in aud_exec_dict:
-                        if ((datetime.datetime.today() - aud_exec_dict[(topicID, loc)]).seconds < (int(hours) * 60*60)):
+                        #print(str((datetime.datetime.utcnow() - aud_exec_dict[(topicID, loc)]).seconds))
+                        if ((datetime.datetime.utcnow() - aud_exec_dict[(topicID, loc)]).seconds < (int(hours) * 60*60)):
                             print("Skipping audience since it has been sampled within the last " + hours + " hour(s).")
                             continue
                     start = datetime.datetime.utcnow()
