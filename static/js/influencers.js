@@ -25,9 +25,11 @@ $(document).ready(function () {
         $('#influencers').empty();
         $("#spin").show();
         var filter = $('.btn-success').val();
+        var location = $(this).attr("data-id");
         $.ajax({
             url: '/Influencers',
             method: 'POST',
+            data: {'location': location},
             timeout: 10000,
             error: function () {
                 $('#influencers').append("<p style='color: red; font-size: 15px'><b>Ops! We have some problem. Please, try again.</b></p>");

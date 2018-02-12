@@ -27,11 +27,13 @@ $(document).ready(function () {
         $('#audiencecontainer').empty();
         $("#spin").show();
         var aid = $('#topic_dropdown .active a').attr('data-id');
+        var location = $(this).attr("data-id");
         $.ajax({
             url: '/Audience',
             method: 'POST',
             data: {
-                'alertid': aid
+                'alertid': aid,
+                'location':location
             },
             timeout: 10000,
             error: function () {

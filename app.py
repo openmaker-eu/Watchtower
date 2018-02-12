@@ -971,7 +971,10 @@ class LocalInfluencersHandler(BaseHandler, TemplateRendering):
         user_id = tornado.escape.xhtml_escape(self.current_user)
         template = 'afterlogintemplate.html'
         topic = logic.get_current_topic(tornado.escape.xhtml_escape(self.current_user))
-        location = logic.get_current_location(tornado.escape.xhtml_escape(self.current_user))
+        try:
+            location = self.get_argument('location')
+        except:
+            location = logic.get_current_location(tornado.escape.xhtml_escape(self.current_user))
         relevant_locations = logic.get_relevant_locations()
 
         if topic is None:
@@ -999,7 +1002,10 @@ class LocalInfluencersHandler(BaseHandler, TemplateRendering):
     def post(self, argument=None):
         variables = {}
         topic = logic.get_current_topic(tornado.escape.xhtml_escape(self.current_user))
-        location = logic.get_current_location(tornado.escape.xhtml_escape(self.current_user))
+        try:
+            location = self.get_argument('location')
+        except:
+            location = logic.get_current_location(tornado.escape.xhtml_escape(self.current_user))
         user_id = tornado.escape.xhtml_escape(self.current_user)
 
         if argument is not None:
@@ -1115,7 +1121,10 @@ class AudienceHandler(BaseHandler, TemplateRendering):
         user_id = tornado.escape.xhtml_escape(self.current_user)
         template = 'afterlogintemplate.html'
         topic = logic.get_current_topic(tornado.escape.xhtml_escape(self.current_user))
-        location = logic.get_current_location(tornado.escape.xhtml_escape(self.current_user))
+        try:
+            location = self.get_argument('location')
+        except:
+            location = logic.get_current_location(tornado.escape.xhtml_escape(self.current_user))
         relevant_locations = logic.get_relevant_locations()
         if topic is None:
             self.redirect("/topicinfo")
@@ -1143,7 +1152,12 @@ class AudienceHandler(BaseHandler, TemplateRendering):
         variables = {}
         topic = logic.get_current_topic(tornado.escape.xhtml_escape(self.current_user))
         user_id = tornado.escape.xhtml_escape(self.current_user)
-        location = logic.get_current_location(tornado.escape.xhtml_escape(self.current_user))
+        try:
+            location = self.get_argument('location')
+            print("got location from JS.")
+        except:
+            location = logic.get_current_location(tornado.escape.xhtml_escape(self.current_user))
+
         if argument is not None:
             template = 'audienceTemplate.html'
             alertid = self.get_argument('alertid')
@@ -1364,7 +1378,10 @@ class EventHandler(BaseHandler, TemplateRendering):
         except:
             cursor = 0
             pass
-        location = logic.get_current_location(tornado.escape.xhtml_escape(self.current_user))
+        try:
+            location = self.get_argument('location') # this will be called upon a change in location
+        except:
+            location = logic.get_current_location(tornado.escape.xhtml_escape(self.current_user)) # this will be called when new events are loading (cursoring)
         print("CURSOR:" + str(cursor))
         document = apiv13.getEvents(topic_id, filter, location, cursor)
         self.write(self.render_template("single-event.html", {"document": document}))

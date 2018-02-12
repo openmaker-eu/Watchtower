@@ -22,12 +22,14 @@ $(document).ready(function () {
         $("#spin").show();
         var topic_id = $('#topic_dropdown .active a').attr('data-id');
         var filter = $('.btn-success').val();
+        var location = $(this).attr("data-id");
         $.ajax({
             url: '/get_events',
             method: 'GET',
             data: {
                 'topic_id':topic_id,
-                'filter': filter
+                'filter': filter,
+                'location':location
             },
             timeout: 10000,
             error: function () {
