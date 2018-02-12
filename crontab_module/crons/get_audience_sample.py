@@ -201,44 +201,48 @@ def main():
             for topic_id, location, last_executed in cur.fetchall():
                 aud_exec_dict[(topic_id, location)] = last_executed
 
-            for topicID, topicName in topics:
-                if topicID!=57: continue
-                for loc in list(location_dict.keys()):
-                    print("Sampling audience for LOCATION: " + location_dict[loc] + "(" + loc + "), TOPIC: " + topicName + "(" + str(topicID) + ")")
-                    if (topicID, loc) in aud_exec_dict:
-                        #print(str((datetime.datetime.utcnow() - aud_exec_dict[(topicID, loc)]).seconds))
-                        if ((datetime.datetime.utcnow() - aud_exec_dict[(topicID, loc)]).seconds < (int(hours) * 60*60)):
-                            print("Skipping audience since it has been sampled within the last " + hours + " hour(s).")
-                            continue
-                    start = datetime.datetime.utcnow()
-                    result = get_audience_sample_by_topic(userID=-1, topicID=topicID, location=loc, sample_size=N, signal_strength=signal_strength, predictor=location_predictor)
+    for topicID, topicName in topics:
+        if topicID!=60: continue
+        for loc in list(location_dict.keys()):
+            print("Sampling audience for LOCATION: " + location_dict[loc] + "(" + loc + "), TOPIC: " + topicName + "(" + str(topicID) + ")")
+            if (topicID, loc) in aud_exec_dict:
+                #print(str((datetime.datetime.utcnow() - aud_exec_dict[(topicID, loc)]).seconds))
+                if ((datetime.datetime.utcnow() - aud_exec_dict[(topicID, loc)]).seconds < (int(hours) * 60*60)):
+                    print("Skipping audience since it has been sampled within the last " + hours + " hour(s).")
+                    continue
+            start = datetime.datetime.utcnow()
+            result = get_audience_sample_by_topic(userID=-1, topicID=topicID, location=loc, sample_size=N, signal_strength=signal_strength, predictor=location_predictor)
 
-                    try:
-                        predicted_location_count, regex_count =result
-                    except:
-                        predicted_location_count, regex_count = (0,0)
+            try:
+                predicted_location_count, regex_count =result
+            except:
+                predicted_location_count, regex_count = (0,0)
 
-                    end = datetime.datetime.utcnow()
+            end = datetime.datetime.utcnow()
 
-                    sql = (
-                        "INSERT INTO audience_samples_last_executed "
-                        "VALUES (%(topicID)s, %(location)s, %(execution_duration)s, %(last_executed)s, %(from_predicted_location)s, %(from_regex)s) "
-                        "ON CONFLICT (topic_id,location) DO UPDATE "
-                        "SET execution_duration=%(execution_duration)s, last_executed=%(last_executed)s, from_predicted_location = %(from_predicted_location)s, from_regex = %(from_regex)s "
-                    )
+            sql = (
+                "INSERT INTO audience_samples_last_executed "
+                "VALUES (%(topicID)s, %(location)s, %(execution_duration)s, %(last_executed)s, %(from_predicted_location)s, %(from_regex)s) "
+                "ON CONFLICT (topic_id,location) DO UPDATE "
+                "SET execution_duration=%(execution_duration)s, last_executed=%(last_executed)s, from_predicted_location = %(from_predicted_location)s, from_regex = %(from_regex)s "
+            )
 
-                    params = {
-                        'topicID': int(topicID),
-                        'location': loc,
-                        'execution_duration':end-start,
-                        'last_executed': end,
-                        'from_predicted_location': int(predicted_location_count),
-                        'from_regex': int(regex_count)
-                    }
+            params = {
+                'topicID': int(topicID),
+                'location': loc,
+                'execution_duration':end-start,
+                'last_executed': end,
+                'from_predicted_location': int(predicted_location_count),
+                'from_regex': int(regex_count)
+            }
 
-                    print("Writing logs to Postgres...")
+            print("Writing logs to Postgres...")
+            with Connection.Instance().get_cursor() as cur:
+                try:
                     cur.execute(sql, params)
-                    print("Complete.\n")
+                except:
+                    print("Error while saving.")
+            print("Complete.\n")
 
 if __name__ == "__main__":
     main()
