@@ -1,17 +1,12 @@
 # Author: Kemal Berk Kocabagli
 
-import datetime
 import sys
-import time  # for debug
 from decouple import config
-
 sys.path.insert(0, config("ROOT_DIR"))
-import numpy as np  # for sampling
 
+from application.utils.basic import *
 from predict_location.predictor import Predictor  # for location
-
-from application.Connections import Connection
-
+from application.Connections import Connection # for database connections
 
 def print_sample_audience(sample_audience_weighted, sample_audience_exploration):
     print('{:>1}{:>20}{:>40}{:>20}'.format("", "Screen name", "Location", "Followers count, Influencers count"))
@@ -35,7 +30,7 @@ def print_sample_audience(sample_audience_weighted, sample_audience_exploration)
 
 # gets a sample from the audience for a given topic
 # applies location filtering first
-def get_audience_sample_by_topic(userID, topicID, location, sample_size, signal_strength):
+def get_audience_sample_by_topic(userID, topicID, location, sample_size, signal_strength, predictor):
     start = time.time()
     location = location.lower()  # cast location to lowercase
     loc_filtered_audience_ids = []
@@ -47,29 +42,35 @@ def get_audience_sample_by_topic(userID, topicID, location, sample_size, signal_
         except:
             for audience_member in Connection.Instance().audienceDB[str(topicID)].find({'processed':True,'location':{'$ne':''},'$where': 'this.influencers.length > '+ str(signal_strength)},{'_id':0,'id':1}):
                 loc_filtered_audience_ids.append(audience_member['id'])
+
+        predicted_location_count = 0
+        regex_count = len(loc_filtered_audience_ids)
     else:
-        location_predictor = Predictor()
+        location_predictor = predictor
         location = location_predictor.predict_location(location)
-        if 'predicted_location' not in dumps(Connection.Instance().audienceDB[str(topicID)].find({}).sort([('_id',-1)]).limit(1)):
-            print("Using regex for location...")
-            regx = location_regex.getLocationRegex(location)
-            loc_filtered_audience_ids = []
-            try:
-                loc_filtered_audience_ids = Connection.Instance().audienceDB[str(topicID)].distinct('id', {'location': {'$regex':regx}})
-            except:
-                for audience_member in Connection.Instance().audienceDB[str(topicID)].find({'location': regx}, {'id': 1}):
-                    loc_filtered_audience_ids.append(audience_member['id'])
-        else:
-            print("Using predictions for location...")
-        # if 'predicted_location' not in dumps(Connection.Instance().audienceDB[str(topicID)].find({}).sort([('_id',-1)]).limit(1)):
-        #     print("running predict location...")
-        #     # call predicted_location function on current topic
-        #     findPredictedLocation(Connection.Instance().machine_host, str(topicID), Connection.Instance().audienceDB, "location", location_predictor)
-            try:
-                loc_filtered_audience_ids = Connection.Instance().audienceDB[str(topicID)].distinct('id',{'predicted_location':{'$exists':True}, 'predicted_location':location, '$where':'this.influencers.length > ' + str(signal_strength)})
-            except:
-                for audience_member in Connection.Instance().audienceDB[str(topicID)].find({'predicted_location':{'$exists':True}, 'predicted_location':location, '$where':'this.influencers.length > ' + str(signal_strength)},{'_id':0,'id':1}):
-                    loc_filtered_audience_ids.append(audience_member['id'])
+        loc_filtered_audience_ids = set()
+
+        try:
+            loc_filtered_audience_ids.add(Connection.Instance().audienceDB[str(topicID)].distinct('id',{'predicted_location':{'$exists':True}, 'predicted_location':location, '$where':'this.influencers.length > ' + str(signal_strength)}))
+        except:
+            for audience_member in Connection.Instance().audienceDB[str(topicID)].find({'predicted_location':{'$exists':True}, 'predicted_location':location, '$where':'this.influencers.length > ' + str(signal_strength)},{'_id':0,'id':1}):
+                loc_filtered_audience_ids.add(audience_member['id'])
+
+        predicted_location_count = len(loc_filtered_audience_ids)
+        print("Filtered " + str(predicted_location_count) + " audience members according to predicted location.")
+
+        regx = location_regex.getLocationRegex(location)
+
+        try:
+            loc_filtered_audience_ids.add(Connection.Instance().audienceDB[str(topicID)].distinct('id', {'predicted_location':{'$exists':False},'location': {'$regex':regx}}))
+        except:
+            for audience_member in Connection.Instance().audienceDB[str(topicID)].find({'predicted_location':{'$exists':False},'location': regx}, {'_id':0,'id': 1}):
+                loc_filtered_audience_ids.add(audience_member['id'])
+
+        loc_filtered_audience_ids = list(loc_filtered_audience_ids)
+        regex_count = len(loc_filtered_audience_ids)-predicted_location_count
+        print("Filtered " + str(regex_count) + " audience members with regex.")
+
 
     print("Filtered audience by location in " + str(time.time() - start) + " seconds.")
     start = time.time()
@@ -141,46 +142,46 @@ def get_audience_sample_by_topic(userID, topicID, location, sample_size, signal_
                 print("Exception in insert_many:" + str(e))
                 # print_sample_audience(sample_audience_weighted, sample_audience_exploration)
 
+        return (predicted_location_count, regex_count)
 
 # find and store audience samples for all users, for all of their topics.
 def main():
-    if (len(sys.argv) >= 3):
+    location = config("LOCATION") # get location from env.
+    getForSpecificUsers = config("SPECIFIC_USERS_AUD") # should we process samples for specific users
+    getForAllLocations = config("ALL_LOCATIONS_AUD")  # should we process samples for all relevant locations
+    N = 500  # audience sample size
+    signal_strength = 3
+    location_predictor = Predictor()
+    hours = sys.argv[1] if len(sys.argv)>1 else 1
 
-        location = sys.argv[1]  # get location from commandline.
-        getForAllLocations = sys.argv[2]  # should the sampling be done for all relevant locations
-        N = 500  # audience sample size
-        signal_strength = 3
+    print("Script ran: " + str(datetime.datetime.utcnow()))
 
-        print("Script ran: " + str(datetime.datetime.now()))
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "SELECT topic_id, topic_name "
+            "FROM topics "
+        )
+        cur.execute(sql)
+        topics = cur.fetchall()  # list of all topics
+        topic_dict = dict()
+        for topicID, topicName in topics:
+            topic_dict[topicID] = topicName
 
-        with Connection.Instance().get_cursor() as cur:
-            sql = (
-                "SELECT topic_id, topic_name "
-                "FROM topics "
-            )
-            cur.execute(sql)
-            topics = cur.fetchall()  # list of all topics
-            topic_dict = dict()
-            for topicID, topicName in topics:
-                topic_dict[topicID] = topicName
+        sql = (
+            "SELECT user_id, topic_id "
+            "FROM user_topic "
+        )
+        cur.execute(sql)
+        users_and_topics = cur.fetchall()  # list of all topics
 
-            sql = (
-                "SELECT user_id, topic_id "
-                "FROM user_topic "
-            )
-            cur.execute(sql)
-            users_and_topics = cur.fetchall()  # list of all topics
+        if (getForSpecificUsers == "1"):
+            for userID, topicID in users_and_topics:
+                print("================================================================================================")
+                print("Sampling audience for USER: " + str(userID) + " , LOCATION: " + location + ", TOPIC: " + topic_dict[
+                    topicID] + "(" + str(topicID) + ")")
+                get_audience_sample_by_topic(userID=userID, topicID=topicID, location=location, sample_size=N, signal_strength=signal_strength, predictor=location_predictor)
 
-        # for userID, topicID in users_and_topics:
-        #     print("================================================================================================")
-        #     print("Sampling audience for USER: " + str(userID) + " , LOCATION: " + location + ", TOPIC: " + topic_dict[
-        #         topicID] + "(" + str(topicID) + ")")
-        #     get_audience_sample_by_topic(userID=userID, topicID=topicID, location=location, sample_size=N, signal_strength=signal_strength)
-
-        if (getForAllLocations == "0"):
-            return
-
-        with Connection.Instance().get_cursor() as cur:
+        if (getForAllLocations == "1"):
             sql = (
                 "SELECT location_name, location_code "
                 "FROM relevant_locations "
@@ -190,14 +191,53 @@ def main():
             for location_name, location_code in cur.fetchall():
                 location_dict[location_code] = location_name
 
-        for topicID, topicName in topics:
-            for loc in list(location_dict.keys()):
-                print("Sampling audience for LOCATION: " + location_dict[loc] + ", TOPIC: " + topicName + "(" + str(topicID) + ")")
-                get_audience_sample_by_topic(userID=-1, topicID=topicID, location=loc, sample_size=N, signal_strength=signal_strength)
+            sql = (
+                "SELECT topic_id, location, last_executed "
+                "FROM audience_samples_last_executed "
+            )
 
-    else:
-        print("Usage: python get_audience_sample.py <location> <fetch_for_all_relevant_locations>")
+            cur.execute(sql)
+            aud_exec_dict= dict()
+            for topic_id, location, last_executed in cur.fetchall():
+                aud_exec_dict[(topic_id, location)] = last_executed
 
+            for topicID, topicName in topics:
+                if topicID!=57: continue
+                for loc in list(location_dict.keys()):
+                    print("Sampling audience for LOCATION: " + location_dict[loc] + ", TOPIC: " + topicName + "(" + str(topicID) + ")")
+                    if (topicID, loc) in aud_exec_dict:
+                        if ((datetime.datetime.today() - aud_exec_dict[(topicID, loc)]).seconds < (int(hours) * 60*60)):
+                            print("Skipping audience since it has been sampled within the last " + hours + " hour(s).")
+                            continue
+                    start = datetime.datetime.utcnow()
+                    result = get_audience_sample_by_topic(userID=-1, topicID=topicID, location=loc, sample_size=N, signal_strength=signal_strength, predictor=location_predictor)
+
+                    try:
+                        predicted_location_count, regex_count =result
+                    except:
+                        predicted_location_count, regex_count = (0,0)
+
+                    end = datetime.datetime.utcnow()
+
+                    sql = (
+                        "INSERT INTO audience_samples_last_executed "
+                        "VALUES (%(topicID)s, %(location)s, %(execution_duration)s, %(last_executed)s, %(from_predicted_location)s, %(from_regex)s) "
+                        "ON CONFLICT (topic_id,location) DO UPDATE "
+                        "SET execution_duration=%(execution_duration)s, last_executed=%(last_executed)s, from_predicted_location = %(from_predicted_location)s, from_regex = %(from_regex)s "
+                    )
+
+                    params = {
+                        'topicID': int(topicID),
+                        'location': loc,
+                        'execution_duration':end-start,
+                        'last_executed': end,
+                        'from_predicted_location': int(predicted_location_count),
+                        'from_regex': int(regex_count)
+                    }
+
+                    print("Writing logs to Postgres...")
+                    cur.execute(sql, params)
+                    print("Complete.\n")
 
 if __name__ == "__main__":
     main()

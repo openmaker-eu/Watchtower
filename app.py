@@ -1,7 +1,4 @@
-import json
-import os
-import random
-import string
+
 from application.utils.basic import *
 
 import tornado.ioloop
@@ -16,8 +13,6 @@ from apis import apiv12, apiv13, apiv1, apiv11
 
 from crontab_module.crons import facebook_reddit_crontab
 import logic
-
-from decouple import config
 
 chars = ''.join([string.ascii_letters, string.digits, string.punctuation]).replace('\'', '').replace('"', '').replace(
     '\\', '')

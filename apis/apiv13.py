@@ -1,17 +1,13 @@
 # Author: Kemal Berk Kocabagli
 
-import json
 import sys
-import time
-import re
-import pprint
+from decouple import config
+sys.path.insert(0, config("ROOT_DIR"))
 
-sys.path.append('../')
+from application.utils.basic import *
+from application.utils import general_utils
 
 from application.Connections import Connection
-import location_regex  # to get regular expressions for locations
-import csv  # for sort by location
-from application.utils import general_utils
 from predict_location.predictor import Predictor # for location
 
 def getLocalInfluencers(topic_id, location, cursor):

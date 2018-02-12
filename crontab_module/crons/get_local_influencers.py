@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-import sys  # to get system arguments
-import os
+import sys
 from decouple import config # to get current working directory
 sys.path.insert(0, config("ROOT_DIR"))
-import time  # for debug
-import re  # for regex in location filtering
+
+from application.utils.basic import *
+
 import pymongo  # for pymongo functions
 import numpy as np  # for sampling
 # to print the date & time in the output log whenever this script is run
@@ -21,11 +21,8 @@ import pandas as pd
 import nltk
 from nltk.corpus import stopwords
 from nltk.stem.porter import *
-from decouple import config
 import argparse
-from location_regex import *
 from predict_location.predictor import Predictor  # for location
-from bson.json_util import dumps
 
 consumer_key = config("TWITTER_CONSUMER_KEY")  # API key
 consumer_secret = config("TWITTER_CONSUMER_SECRET")  # API secret
@@ -202,7 +199,7 @@ def findLocalInfluencers(location, topicID, keywords):
 
     if 'predicted_location' not in dumps(list(Connection.Instance().audienceDB[str(topicID)].find({}).sort([('_id',-1)]).limit(1))):
         print("Using regex for location...")
-        regx = getLocationRegex(location)
+        regx = location_regex.getLocationRegex(location)
         try:
             loc_filtered_audience_ids = Connection.Instance().audienceDB[str(topicID)].distinct(
                 'id', {'location': regx, '$where': 'this.influencers.length > ' + str(signal_strength)})
