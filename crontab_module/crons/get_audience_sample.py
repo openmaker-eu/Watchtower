@@ -207,7 +207,7 @@ def main():
             if (topicID, loc) in aud_exec_dict:
                 #print(str((datetime.datetime.utcnow() - aud_exec_dict[(topicID, loc)]).seconds))
                 if ((datetime.datetime.utcnow() - aud_exec_dict[(topicID, loc)]).seconds < (int(hours) * 60*60)):
-                    print("Skipping audience since it has been sampled within the last " + hours + " hour(s).")
+                    print("Skipping audience since it has been sampled within the last " + str(hours) + " hour(s).")
                     continue
             start = datetime.datetime.utcnow()
             result = get_audience_sample_by_topic(userID=-1, topicID=topicID, location=loc, sample_size=N, signal_strength=signal_strength, predictor=location_predictor)
