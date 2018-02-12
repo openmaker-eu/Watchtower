@@ -202,7 +202,6 @@ def main():
                 aud_exec_dict[(topic_id, location)] = last_executed
 
     for topicID, topicName in topics:
-        if topicID!=60: continue
         for loc in list(location_dict.keys()):
             print("Sampling audience for LOCATION: " + location_dict[loc] + "(" + loc + "), TOPIC: " + topicName + "(" + str(topicID) + ")")
             if (topicID, loc) in aud_exec_dict:
