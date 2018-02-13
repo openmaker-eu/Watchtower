@@ -41,11 +41,11 @@ cmd_6 = "echo 'source " + python_venv + "; python3 " + cron_directory + "get_aud
 job_6 = my_cron.new(command=cmd_6)
 job_6.setall("0 */3 * * *")
 
-"""
-cmd_7 = "echo 'source " + python_venv + "; python3 " + cron_directory + "get_follower_ids.py  " + config("FOLLOWERS_LIMIT") + " >> /tmp/get_follower_ids.txt' | /bin/bash"
+cmd_7 = "echo 'source " + python_venv + "; python3 " + cron_directory + "update_predicted_location_crontab.py  " + config("HOST_IP") + " >> /tmp/update_predicted_location_crontab.txt' | /bin/bash"
 job_7  = my_cron.new(command=cmd_7)
-job_7.setall("0 0 */2 * *")
+job_7.setall("0 3 * * 0")
 
+"""
 cmd_8 = "echo 'source " + python_venv + "; python3 " + cron_directory + "get_local_influencers.py >> /tmp/get_local_influencers.txt' | /bin/bash"
 job_8  = my_cron.new(command=cmd_8)
 job_8.setall("0 */3 * * *")
