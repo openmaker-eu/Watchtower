@@ -16,273 +16,383 @@ SET row_security = off;
 
 SET search_path = public, pg_catalog;
 
+SET default_tablespace = '';
+
+SET default_with_oids = false;
+
+--
+-- Name: country_code; Type: TABLE; Schema: public; Owner: openmakerpsql
+--
+
+CREATE TABLE country_code (
+    location_name text,
+    country_code text
+);
+
+
+ALTER TABLE country_code OWNER TO openmakerpsql;
+
 --
 -- Data for Name: country_code; Type: TABLE DATA; Schema: public; Owner: openmakerpsql
 --
 
-COPY country_code (country_name, country_code) FROM stdin;
-Aruba	AA
-Antigua and Barbuda	AC
-United Arab Emirates	AE
-Afghanistan	AF
-Algeria	AG
-Azerbaijan	AJ
-Albania	AL
-Armenia	AM
-Andorra	AN
-Angola	AO
-American Samoa	AQ
-Argentina	AR
-Australia	AS
-Ashmore and Cartier Islands	AT
-Austria	AU
-Anguilla	AV
-Antarctica	AY
-Bahrain	BA
-Barbados	BB
-Botswana	BC
-Bermuda	BD
-Belgium	BE
-Bahamas, The	BF
-Bangladesh	BG
-Belize	BH
-Bosnia and Herzegovina	BK
-Bolivia	BL
-Saint Barthelemy	TB
-Myanmar	BM
-Benin	BN
-Belarus	BO
-Solomon Islands	BP
-Navassa Island	BQ
-Brazil	BR
-Bassas da India	BS
-Bhutan	BT
-Bulgaria	BU
-Bouvet Island	BV
-Brunei	BX
-Burundi	BY
-Canada	CA
-Cambodia	CB
-Chad	CD
-Sri Lanka	CE
-Congo, Republic of the	CF
-Congo, Democratic Republic of the	CG
-China	CH
-Chile	CI
-Cayman Islands	CJ
-Cocos (Keeling) Islands	CK
-Cameroon	CM
-Comoros	CN
-Colombia	CO
-Northern Mariana Islands	CQ
-Coral Sea Islands	CR
-Costa Rica	CS
-Central African Republic	CT
-Cuba	CU
-Cape Verde	CV
-Cook Islands	CW
-Cyprus	CY
-Denmark	DA
-Djibouti	DJ
-Dominica	DO
-Dominican Republic	DR
-Dhekelia Sovereign Base Area	DX
-Ecuador	EC
-Egypt	EG
-Ireland	EI
-Equatorial Guinea	EK
-Estonia	EN
-Eritrea	ER
-El Salvador	ES
-Ethiopia	ET
-Europa Island	EU
-Czech Republic	EZ
-French Guiana	FG
-Finland	FI
-Fiji	FJ
-Falkland Islands (Islas Malvinas)	FK
-Micronesia, Federated States of	FM
-Faroe Islands	FO
-French Polynesia	FP
-France	FR
-French Southern and Antarctic Lands	FS
-Gambia, The	GA
-Gabon	GB
-Georgia	GG
-Ghana	GH
-Gibraltar	GI
-Grenada	GJ
-Guernsey	GK
-Greenland	GL
-Germany	GM
-Glorioso Islands	GO
-Guadeloupe	GP
-Guam	GQ
-Greece	GR
-Guatemala	GT
-Guinea	GV
-Guyana	GY
-Gaza Strip	GZ
-Haiti	HA
-Hong Kong	HK
-Heard Island and McDonald Islands	HM
-Honduras	HO
-Croatia	HR
-Hungary	HU
-Iceland	IC
-Indonesia	ID
-Isle of Man	IM
-India	IN
-British Indian Ocean Territory	IO
-Clipperton Island	IP
-Iran	IR
-Israel	IS
-Italy	IT
-Cote d'Ivoire	IV
-Iraq	IZ
-Japan	JA
-Jersey	JE
-Jamaica	JM
-Jan Mayen	JN
-Jordan	JO
-Juan de Nova Island	JU
-Kenya	KE
-Kyrgyzstan	KG
-Korea, North	KN
-Kiribati	KR
-Korea, South	KS
-Christmas Island	KT
-Kuwait	KU
-Kosovo	KV
-Kazakhstan	KZ
-Laos	LA
-Lebanon	LE
-Latvia	LG
-Lithuania	LH
-Liberia	LI
-Slovakia	LO
-Liechtenstein	LS
-Lesotho	LT
-Luxembourg	LU
-Libya	LY
-Madagascar	MA
-Martinique	MB
-Macau	MC
-Moldova, Republic of	MD
-Mayotte	MF
-Mongolia	MG
-Montserrat	MH
-Malawi	MI
-Montenegro	MJ
-The Former Yugoslav Republic of Macedonia	MK
-Mali	ML
-Monaco	MN
-Morocco	MO
-Mauritius	MP
-Mauritania	MR
-Malta	MT
-Oman	MU
-Maldives	MV
-Mexico	MX
-Malaysia	MY
-Mozambique	MZ
-New Caledonia	NC
-Niue	NE
-Norfolk Island	NF
-Niger	NG
-Vanuatu	NH
-Nigeria	NI
-Netherlands	NL
-No Man's Land	NM
-Norway	NO
-Nepal	NP
-Nauru	NR
-Suriname	NS
-Nicaragua	NU
-New Zealand	NZ
-Paraguay	PA
-Pitcairn Islands	PC
-Peru	PE
-Paracel Islands	PF
-Spratly Islands	PG
-Pakistan	PK
-Poland	PL
-Panama	PM
-Portugal	PO
-Papua New Guinea	PP
-Palau	PS
-Guinea-Bissau	PU
-Qatar	QA
-Reunion	RE
-Serbia	RI
-Marshall Islands	RM
-Saint Martin	RN
-Romania	RO
-Philippines	RP
-Puerto Rico	RQ
-Russia	RS
-Rwanda	RW
-Saudi Arabia	SA
-Saint Pierre and Miquelon	SB
-Saint Kitts and Nevis	SC
-Seychelles	SE
-South Africa	SF
-Senegal	SG
-Saint Helena	SH
-Slovenia	SI
-Sierra Leone	SL
-San Marino	SM
-Singapore	SN
-Somalia	SO
-Spain	SP
-Saint Lucia	ST
-Sudan	SU
-Svalbard	SV
-Sweden	SW
-South Georgia and the Islands	SX
-Sint Maarten	NN
-Syrian Arab Republic	SY
-Switzerland	SZ
-Trinidad and Tobago	TD
-Tromelin Island	TE
-Thailand	TH
-Tajikistan	TI
-Turks and Caicos Islands	TK
-Tokelau	TL
-Tonga	TN
-Togo	TO
-Sao Tome and Principe	TP
-Tunisia	TS
-East Timor	TT
-Turkey	TU
-Tuvalu	TV
-Taiwan	TW
-Turkmenistan	TX
-Tanzania, United Republic of	TZ
-Curacao	UC
-Uganda	UG
-United Kingdom	UK
-Ukraine	UP
-United States	US
-Burkina Faso	UV
-Uruguay	UY
-Uzbekistan	UZ
-Saint Vincent and the Grenadines	VC
-Venezuela	VE
-British Virgin Islands	VI
-Vietnam	VM
-Virgin Islands (US)	VQ
-Holy See (Vatican City)	VT
-Namibia	WA
-Palestine, State of	WE
-Wallis and Futuna	WF
-Western Sahara	WI
-Samoa	WS
-Swaziland	WZ
-Serbia and Montenegro	YI
-Yemen	YM
-Zambia	ZA
-Zimbabwe	ZI
+COPY country_code (location_name, country_code) FROM stdin;
+afghanistan	af
+åland islands	ax
+albania	al
+algeria	dz
+american samoa	as
+andorra	ad
+angola	ao
+anguilla	ai
+antarctica	aq
+antigua and barbuda	ag
+argentina	ar
+armenia	am
+aruba	aw
+australia	au
+austria	at
+azerbaijan	az
+bahamas	bs
+bahrain	bh
+bangladesh	bd
+barbados	bb
+belarus	by
+belgium	be
+belize	bz
+benin	bj
+bermuda	bm
+bhutan	bt
+bolivia, plurinational state of	bo
+bonaire, sint eustatius and saba	bq
+bosnia and herzegovina	ba
+botswana	bw
+bouvet island	bv
+brazil	br
+british indian ocean territory	io
+brunei darussalam	bn
+bulgaria	bg
+burkina faso	bf
+burundi	bi
+cambodia	kh
+cameroon	cm
+canada	ca
+cape verde	cv
+cayman islands	ky
+central african republic	cf
+chad	td
+chile	cl
+china	cn
+christmas island	cx
+cocos (keeling) islands	cc
+colombia	co
+comoros	km
+congo	cg
+congo, the democratic republic of the	cd
+congo	cd
+cook islands	ck
+costa rica	cr
+côte d'ivoire	ci
+croatia	hr
+cuba	cu
+curaçao	cw
+cyprus	cy
+czech republic	cz
+denmark	dk
+djibouti	dj
+dominica	dm
+dominican republic	do
+ecuador	ec
+egypt	eg
+el salvador	sv
+equatorial guinea	gq
+eritrea	er
+estonia	ee
+ethiopia	et
+falkland islands (malvinas)	fk
+faroe islands	fo
+fiji	fj
+finland	fi
+france	fr
+french guiana	gf
+french polynesia	pf
+french southern territories	tf
+gabon	ga
+gambia	gm
+georgia	ge
+germany	de
+ghana	gh
+gibraltar	gi
+greece	gr
+greenland	gl
+grenada	gd
+guadeloupe	gp
+guam	gu
+guatemala	gt
+guernsey	gg
+guinea	gn
+guinea bissau	gw
+guyana	gy
+haiti	ht
+heard island and mcdonald islands	hm
+holy see (vatican city state)	va
+honduras	hn
+hong kong	hk
+hungary	hu
+iceland	is
+india	in
+indonesia	id
+iran, islamic republic of	ir
+iran	ir
+iraq	iq
+ireland	ie
+isle of man	im
+israel	il
+italy	it
+jamaica	jm
+japan	jp
+jersey	je
+jordan	jo
+kazakhstan	kz
+kenya	ke
+kiribati	ki
+korea, democratic people's republic of	kp
+korea, republic of	kr
+korea	kr
+kuwait	kw
+kyrgyzstan	kg
+lao people's democratic republic	la
+latvia	lv
+lebanon	lb
+lesotho	ls
+liberia	lr
+libya	ly
+liechtenstein	li
+lithuania	lt
+luxembourg	lu
+macao	mo
+macedonia, the former yugoslav republic of	mk
+macedonia	mk
+madagascar	mg
+malawi	mw
+malaysia	my
+maldives	mv
+mali	ml
+malta	mt
+marshall islands	mh
+martinique	mq
+mauritania	mr
+mauritius	mu
+mayotte	yt
+mexico	mx
+micronesia, federated states of	fm
+moldova, republic of	md
+moldova	md
+monaco	mc
+mongolia	mn
+montenegro	me
+montserrat	ms
+morocco	ma
+mozambique	mz
+myanmar	mm
+namibia	na
+nauru	nr
+nepal	np
+netherlands	nl
+new caledonia	nc
+new zealand	nz
+nicaragua	ni
+niger	ne
+nigeria	ng
+niue	nu
+norfolk island	nf
+northern mariana islands	mp
+norway	no
+oman	om
+pakistan	pk
+palau	pw
+palestine, state of	ps
+panama	pa
+papua new guinea	pg
+paraguay	py
+peru	pe
+philippines	ph
+pitcairn	pn
+poland	pl
+portugal	pt
+puerto rico	pr
+qatar	qa
+réunion	re
+romania	ro
+russian federation	ru
+rwanda	rw
+saint barthélemy	bl
+saint helena, ascension and tristan da cunha	sh
+saint kitts and nevis	kn
+saint lucia	lc
+saint martin	mf
+saint pierre and miquelon	pm
+saint vincent and the grenadines	vc
+samoa	ws
+san marino	sm
+sao tome and principe	st
+saudi arabia	sa
+senegal	sn
+serbia	rs
+seychelles	sc
+sierra leone	sl
+singapore	sg
+sint maarten (dutch part)	sx
+slovakia	sk
+slovenia	si
+solomon islands	sb
+somalia	so
+south africa	za
+south georgia and the south sandwich islands	gs
+south sudan	ss
+spain	es
+sri lanka	lk
+sudan	sd
+suriname	sr
+svalbard and jan mayen	sj
+swaziland	sz
+sweden	se
+switzerland	ch
+syrian arab republic	sy
+taiwan, province of china	tw
+tajikistan	tj
+tanzania, united republic of	tz
+tanzania	tz
+thailand	th
+timor leste	tl
+togo	tg
+tokelau	tk
+tonga	to
+trinidad and tobago	tt
+tunisia	tn
+turkey	tr
+turkmenistan	tm
+turks and caicos islands	tc
+tuvalu	tv
+uganda	ug
+ukraine	ua
+united arab emirates	ae
+united kingdom	gb
+united states	us
+united states minor outlying islands	um
+uruguay	uy
+uzbekistan	uz
+vanuatu	vu
+venezuela, bolivarian republic of	ve
+venezuela	ve
+viet nam	vn
+virgin islands, british	vg
+virgin islands, u.s.	vi
+wallis and futuna	wf
+western sahara	eh
+yemen	ye
+zambia	zm
+zimbabwe	zw
+russia	ru
+korea	kr
+taiwan	tw
+iran	ir
+venezuela	ve
+vietnam	vn
+syria	sy
+ivory coast	ci
+tanzania	tz
+日本	jp
+中国	cn
+deutschland	de
+italia	it
+россия	ru
+españa	es
+brasil	br
+भारत	in
+méxico	mx
+대한민국	kr
+nederland	nl
+türkiye	tr
+polska	pl
+belgië	be
+belgique	be
+belgien	be
+suisse	ch
+schweiz	ch
+svizzera	ch
+sverige	se
+العربية السعودية	sa
+norge	no
+österreich	at
+臺灣	tw
+ελλάδα	gr
+danmark	dk
+ایران	ir
+ประเทศไทย	th
+suomi	fi
+éire	ie
+الامارات	ae
+česká republika	cz
+香港	hk
+ישראל	il
+إِسْرَائِيلُ‎	il
+românia	ro
+新加坡	sg
+украина	ua
+україна	ua
+pilipinas	ph
+پاکِستان	pk
+مَصْر	eg
+الجزائر	dz
+دولة الكويت	kw
+magyarország	hu
+қазақстан	kz
+казахстан	kz
+perú	pe
+قطر	qa
+slovensko	sk
+العراق	iq
+ليبيا	ly
+việt nam	vn
+المغرب‎	ma
+বাংলাদেশ	bd
+hrvatska	hr
+беларусь	by
+عمان‎	om
+السودان	sd
+سورية‎	sy
+luxemburg	lu
+lëtzebuerg	lu
+slovenija	si
+србија	rs
+srbija	rs
+българия	bg
+lietuva	lt
+azərbaycan, азәрбајҹан, آذربايجان	az
+república dominicana	do
+تونس‎	tn
+tunisie	tn
+ශ්රී ලංකා	lk
+இலங்கை	lk
+latvija	lv
+لُبْنَان‎	lb
+liban	lb
+ўзбекистон	uz
+узбекистан	uz
+اليَمَن	ye
+ኢትዮጵያ	et
+κύπρος	cy
+kıbrıs	cy
+cameroun	cm
+eesti	ee
+côte d’ivoire	ci
+panamá	pa
+مملكة البحرين	bh
+الأردن‎	jo
+guinée équatoriale	gq
+guiné equatorial	gq
+guinea ecuatorial	gq
 \.
 
 
