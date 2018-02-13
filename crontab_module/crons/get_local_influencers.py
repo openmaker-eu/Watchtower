@@ -35,10 +35,10 @@ api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
 
 blacklist = ["party", "erasmus", "deal", "discount"]
 numOfTweets = 10
-
-timeThreshold = 12  # in month
-local_infl_size = 40  # local influencers size
 keyword_size = 10
+timeThreshold = 12  # in months
+
+local_infl_size = 40  # local influencers size
 
 default_signal_strength = 4
 default_following_limit = 20000
@@ -141,7 +141,7 @@ def countKeywordsInTweet(fullTexts, queries):
 
 def getTopics():
     '''
-        Returns all topics in the OpenMaker staging database.
+        Returns all topics in the OpenMaker db (staging or production).
     '''
     with Connection.Instance().get_cursor() as cur:
         sql = (
@@ -153,6 +153,21 @@ def getTopics():
         for topic_id, topic_name in cur.fetchall():
             topics[int(topic_id)] = topic_name
         return topics
+
+def getLocations():
+    '''
+        Returns all relevant locations in the OpenMaker db (staging or production).
+    '''
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "SELECT location_name,location_code "
+            "FROM relevant_locations "
+        )
+        cur.execute(sql)
+        locations = dict()
+        for location_name, location_code in cur.fetchall():
+            locations[location_code] = location_name
+        return locations
 
 
 def fetchKeywords(topicID):
@@ -192,46 +207,32 @@ def findLocalInfluencers(location, topicID, keywords):
     signal_strength, following_limit = parameters[topicID, location] if (
         topicID, location) in parameters else [default_signal_strength, default_following_limit]
 
-    location_predictor = Predictor()
-    location = location_predictor.predict_location(location)
-
     verboseprint("Fetching audience profiles from database", debugLevel=2)
 
-    if 'predicted_location' not in dumps(list(Connection.Instance().audienceDB[str(topicID)].find({}).sort([('_id',-1)]).limit(1))):
-        print("Using regex for location...")
-        regx = location_regex.getLocationRegex(location)
-        try:
-            loc_filtered_audience_ids = Connection.Instance().audienceDB[str(topicID)].distinct(
-                'id', {'location': regx, '$where': 'this.influencers.length > ' + str(signal_strength)})
-        except:
-            for audience_member in Connection.Instance().audienceDB[str(topicID)].find({'location': regx}, {'id': 1}):
-                loc_filtered_audience_ids.append(audience_member['id'])
-    else:
-        print("Using predicted location...")
-        try:
-            loc_filtered_audience_ids = Connection.Instance().audienceDB[str(topicID)].distinct(
-                'id', {'predicted_location': location, '$where': 'this.influencers.length > ' + str(signal_strength)})
-        except:
-            for audience_member in Connection.Instance().audienceDB[str(topicID)].find({'predicted_location': location}, {'id': 1}):
-                loc_filtered_audience_ids.append(audience_member['id'])
-
-    audience = Connection.Instance().audienceDB['all_audience'].aggregate(
+    audience = Connection.Instance().audience_samples_DB[location+ "_" + str(topicID)].aggregate(
         [
-            {'$match': {'id': {'$in': loc_filtered_audience_ids},
-                        'friends_count': {'$lt': following_limit}}},
-            {'$project': {'_id': 0}},
+            {'$project':
+                {
+                    '_id': 0,
+                }
+            },
+            {'$match':
+                {
+                    'friends_count': {'$lt': following_limit},
+                    'influencers_count': {'$gt': signal_strength}
+                }
+            },
             {'$sort': {'followers_count': -1}}
         ],
         allowDiskUse=True
     )
     audience = list(audience)
-    local_influencers = audience[:local_infl_size]
 
-    print("Local influencers size before filtering: " + str(len(local_influencers)))
-    passed = [x for x in local_influencers if filterAudience(x, keywords)]
-    print("Local influencers size after filtering: " + str(len(passed)))
+    print("Local influencers size before filtering: " + str(len(audience)))
+    local_influencers = [x for x in audience if filterAudience(x, keywords)]
+    print("Local influencers size after filtering: " + str(len(local_influencers)))
 
-    return passed
+    return local_influencers[:local_infl_size]
 
 
 def verboseprint(*a, **k):
@@ -259,10 +260,9 @@ def writeLocalInfluencersToDB(location, topicID, keywords):
 
 
 def writeAllLocalInfluencersToDB():
-    locations = ["es", "gb", "sk", "it", "tr"]
     for topicID in topics:
         keywords = fetchKeywords(topicID)[:keyword_size]
-        for location in locations:
+        for location in locations.keys():
             verboseprint(
                 "Now Processing => topicID = {}, location = {}".format(topicID, location), debugLevel=2)
             writeLocalInfluencersToDB(location, topicID, keywords)
@@ -274,6 +274,7 @@ parser.add_argument("-v", "--verbose", type=int, default=2,
                     nargs="?", const=2, choices=set((0, 1, 2)))
 args = parser.parse_args()
 
+locations = getLocations()
 topics = getTopics()
 parameters = getInfluencerParameters()
 
