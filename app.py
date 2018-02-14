@@ -468,7 +468,7 @@ class RegisterHandler(BaseHandler, TemplateRendering):
         username = self.get_argument("username")
         password = str(self.get_argument("password"))
         country = str(self.get_argument("country"))
-        register_info = logic.register(str(username), password, country.upper())
+        register_info = logic.register(str(username), password, country.lower())
         if register_info['response']:
             self.set_secure_cookie("user_id", str(register_info['user_id']))
             self.set_secure_cookie("username", str(username))
@@ -537,7 +537,7 @@ class ProfileHandler(BaseHandler, TemplateRendering):
         user_id = tornado.escape.xhtml_escape(self.current_user)
         auth_token = self.get_secure_cookie("request_token")
         self.clear_cookie("request_token")
-        update_info = logic.update_user(user_id, password, country.upper(), auth_token, twitter_pin)
+        update_info = logic.update_user(user_id, password, country.lower(), auth_token, twitter_pin)
         if update_info['response']:
             self.write({'response': True, 'redirectUrl': '/Topics'})
         else:
