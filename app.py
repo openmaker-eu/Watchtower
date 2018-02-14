@@ -1,4 +1,3 @@
-
 from application.utils.basic import *
 
 import tornado.ioloop
@@ -62,6 +61,7 @@ class Application(tornado.web.Application):
             (r"/login", LoginHandler),
             (r"/register", RegisterHandler),
             (r"/profile", ProfileHandler),
+            (r"/twitter_auth", TwitterAuthHandler),
             (r"/Topics", TopicsHandler),
             (r"/topicinfo", CreateEditTopicHandler),
             (r"/topicinfo/([0-9]*)", CreateEditTopicHandler),
@@ -542,6 +542,44 @@ class ProfileHandler(BaseHandler, TemplateRendering):
             self.write({'response': True, 'redirectUrl': '/Topics'})
         else:
             self.write(json.dumps(update_info))
+
+
+class TwitterAuthHandler(BaseHandler, TemplateRendering):
+    @tornado.web.authenticated
+    def get(self):
+        user_id = tornado.escape.xhtml_escape(self.current_user)
+        template = 'afterlogintemplate.html'
+        topic = logic.get_current_topic(tornado.escape.xhtml_escape(self.current_user))
+        location = logic.get_current_location(tornado.escape.xhtml_escape(self.current_user))
+        relevant_locations = logic.get_relevant_locations()
+        user = logic.get_user(user_id)
+        auth_url = logic.get_twitter_auth_url()
+        variables = {
+            'title': "Twitter Auth",
+            'type': "twitterAuth",
+            'username': user['username'],
+            'country': user['country'],
+            'alerts': logic.get_topic_list(user_id),
+            'topic': topic,
+            'location': location,
+            'relevant_locations': relevant_locations,
+            'auth_url': auth_url[0]
+        }
+        self.set_secure_cookie("request_token", str(auth_url[1]))
+        content = self.render_template(template, variables)
+        self.write(content)
+
+    @tornado.web.authenticated
+    def post(self):
+        twitter_pin = self.get_argument("twitter_pin", "")
+        user_id = tornado.escape.xhtml_escape(self.current_user)
+        auth_token = self.get_secure_cookie("request_token")
+        self.clear_cookie("request_token")
+        update_info = logic.update_twitter_auth(user_id, auth_token, twitter_pin)
+        if update_info['response']:
+            self.write({'response': True, 'redirectUrl': '/Topics'})
+        else:
+            self.write({'response': False})
 
 
 class TopicsHandler(BaseHandler, TemplateRendering):
@@ -1353,7 +1391,7 @@ class EventPageHandler(BaseHandler, TemplateRendering):
             'alerts': logic.get_topic_list(user_id),
             'type': "events",
             'username': str(tornado.escape.xhtml_escape(self.get_current_username())),
-            'cursor':events['next_cursor'],
+            'cursor': events['next_cursor'],
             "document": events,
             'topic': topic,
             'location': location,
@@ -1374,9 +1412,10 @@ class EventHandler(BaseHandler, TemplateRendering):
             cursor = 0
             pass
         try:
-            location = self.get_argument('location') # this will be called upon a change in location
+            location = self.get_argument('location')  # this will be called upon a change in location
         except:
-            location = logic.get_current_location(tornado.escape.xhtml_escape(self.current_user)) # this will be called when new events are loading (cursoring)
+            location = logic.get_current_location(tornado.escape.xhtml_escape(
+                self.current_user))  # this will be called when new events are loading (cursoring)
         print("CURSOR:" + str(cursor))
         document = apiv13.getEvents(topic_id, filter, location, cursor)
         self.write(self.render_template("single-event.html", {"document": document}))

@@ -53,7 +53,7 @@ def get_influencers(topicID):
                     # check if he already exists in the database
                     inf = Connection.Instance().influencerDB['all_influencers'].find_one({'id': influencer_dict['id']})
                     # if he exists,
-                    if (inf is not None):  # update his topics list
+                    if inf is not None:  # update his topics list
                         Connection.Instance().influencerDB['all_influencers'].update(
                             {'id': inf['id']},
                             {'$addToSet': {

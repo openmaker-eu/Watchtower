@@ -1,0 +1,21 @@
+<div class="row">
+    <div class="container" style="margin: 0 auto;width: 50%;">
+        <legend align="center">
+            <h2>Update Your Profile</h2></legend>
+        <form role="form" method="post" class="update-form">
+            <div class="form-group">
+                <label class="sr-only" for="twitter">Twitter PIN</label>
+                <input type="text" style="text-transform:uppercase" name="twitter_pin" placeholder="Twitter PIN"
+                       class="form-twitter-pin form-control" id="form-twitter-pin"> Please, get your twitter pin <a
+                    href="{{ auth_url }}"
+                    target="_blank">here</a>
+            </div>
+            <p>
+                <a class="btn btn-md btn-success has-spinner">
+                    <span class="spinner"><i class="fa fa-refresh fa-spin"></i></span>
+                    Update
+                </a>
+            </p>
+        </form>
+    </div>
+</div>

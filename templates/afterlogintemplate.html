@@ -122,7 +122,7 @@
         <link rel="stylesheet" type="text/css" href="//css/event_card.css"/>
     {% endif %}
 
-    {% if type == "profile" %}
+    {% if type == "profile" or type == "twitterAuth" %}
         <style type="text/css">
             @import url("//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css");
 
@@ -205,6 +205,7 @@
                             class="glyphicon glyphicon-user"></span> {{ username }} <span class="caret"></span></a>
                     <ul class="dropdown-menu">
                         <li><a href="/profile">My Profile</a></li>
+                        <li><a href="/twitter_auth">Twitter Auth</a></li>
                         <li><a href="/Recommendations">Recommendations</a></li> <!-- Added for recommendations -->
                         <li><a href="/bookmark">Bookmarks</a></li>
                         <li><a href="/logout">Logout</a></li>
@@ -335,6 +336,9 @@
 {% endif %}
 {% if type == "profile" %}
     {% include 'profile.html' %}
+{% endif %}
+{% if type == "twitterAuth" %}
+    {% include 'twitterAuth.html' %}
 {% endif %}
 {% if type == "tweets" %}
     {% include 'tweetTemplate.html' %}
@@ -468,6 +472,12 @@
 {% if type == "profile" %}
     <script src="/js/jquery-1.11.1.min.js"></script>
     <script type="text/javascript" src="/js/profile.js"></script>
+{% endif %}
+
+
+{% if type == "twitterAuth" %}
+    <script src="/js/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="/js/twitterAuth.js"></script>
 {% endif %}
 </body>
 

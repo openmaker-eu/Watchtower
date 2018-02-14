@@ -256,6 +256,49 @@ def get_user(user_id):
         return {'username': fetched[0], 'country': country}
 
 
+def update_twitter_auth(user_id, auth_token, twitter_pin):
+    with Connection.Instance().get_cursor() as cur:
+        consumer_key = config("TWITTER_CONSUMER_KEY")
+        consumer_secret = config("TWITTER_CONSUMER_SECRET")
+        auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+        auth.request_token = eval(auth_token)
+        auth.secure = True
+        token = auth.get_access_token(verifier=twitter_pin)
+
+        if twitter_pin != '' and len(token) == 2:
+            auth.set_access_token(token[0], token[1])
+            api = tweepy.API(auth)
+            user = api.me()._json
+
+            profile_image_url = user['profile_image_url_https']
+            screen_name = user['screen_name']
+            user_name = user['name']
+
+            sql = (
+                "SELECT NOT EXISTS (SELECT 1 FROM user_twitter where user_id = %s)"
+            )
+            cur.execute(sql, [user_id])
+            fetched = cur.fetchone()
+
+            if fetched[0]:
+                sql = (
+                    "INSERT INTO user_twitter "
+                    "(user_id, access_token, access_token_secret, profile_image_url, user_name, screen_name) "
+                    "VALUES (%s, %s, %s, %s, %s, %s)"
+                )
+                cur.execute(sql, [user_id, token[0], token[1], profile_image_url, user_name, screen_name])
+            else:
+                sql = (
+                    "UPDATE user_twitter "
+                    "SET access_token = %s, access_token_secret = %s, profile_image_url = %s, "
+                    "user_name = %s, screen_name = %s "
+                    "WHERE user_id = %s"
+                )
+                cur.execute(sql, [token[0], token[1], profile_image_url, user_name, screen_name, user_id])
+
+        return {'response': True}
+
+
 def update_user(user_id, password, country_code, auth_token, twitter_pin):
     with Connection.Instance().get_cursor() as cur:
         sql = (
