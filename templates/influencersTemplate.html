@@ -16,12 +16,12 @@
             </ul>
         </div>
 
-        <button class="hidebtn" onclick="document.getElementById('{{influencer['id'] ~ influencer['hidden']}}').click()">
+        <button class="hidebtn" onclick="hideInfluencer('{{influencer['id']}}','',$(this).children('a'));">
           {% if influencer['hidden'] == False %}
-              <a id="{{influencer['id'] ~ influencer['hidden']}}" class="text" hiddenflag=false href="javascript:void(0)" onclick="hideInfluencer('{{influencer['id']}}', '',this);">Hide</a>
+              <a class="text" hiddenflag=false href="javascript:void(0)">Hide</a>
           {% endif %}
           {% if influencer['hidden'] == True %}
-              <a id="{{influencer['id'] ~ influencer['hidden']}}" class="text" hiddenflag=true href="javascript:void(0)" onclick="hideInfluencer('{{influencer['id']}}', '',this);">Unhide</a>
+              <a class="text" hiddenflag=true href="javascript:void(0)">Unhide</a>
           {% endif %}
         </button>
 
