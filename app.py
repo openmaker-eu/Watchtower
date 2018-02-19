@@ -75,6 +75,7 @@ class Application(tornado.web.Application):
             (r"/Events", EventPageHandler),
             (r"/get_events/(.*)", EventHandler),
             (r"/get_events", EventHandler),
+            (r"/hide_event", HideEventHandler),
             (r"/News/(.*)", NewsHandler),
             (r"/News", NewsHandler),
             (r"/Search", SearchHandler),
@@ -146,7 +147,7 @@ class Application(tornado.web.Application):
 
             (r"/(.*)", tornado.web.StaticFileHandler, {'path': settings['static_path']}),
         ]
-        super(Application, self).__init__(handlers, **settings)
+        super(Application, self).__init__(handlers, **settings, debug=True)
 
 
 class RedirectHandler(BaseHandler, TemplateRendering):
@@ -762,6 +763,17 @@ class HideInfluencerHandler(BaseHandler, TemplateRendering):
         user_id = tornado.escape.xhtml_escape(self.current_user)
         location = logic.get_current_location(tornado.escape.xhtml_escape(self.current_user))
         logic.hide_influencer(topic_id, user_id, influencer_id, description, is_hide, location)
+        self.write("")
+
+class HideEventHandler(BaseHandler, TemplateRendering):
+    @tornado.web.authenticated
+    def post(self):
+        event_link = str(self.get_argument("event_link"))
+        topic_id = logic.get_current_topic(tornado.escape.xhtml_escape(self.current_user))['topic_id']
+        is_hide = (self.get_argument("is_hide") == "true")
+        description = self.get_argument("description")
+        user_id = tornado.escape.xhtml_escape(self.current_user)
+        logic.hide_event(topic_id, user_id, event_link, description, is_hide)
         self.write("")
 
 
@@ -1382,7 +1394,7 @@ class EventPageHandler(BaseHandler, TemplateRendering):
         topic = logic.get_current_topic(tornado.escape.xhtml_escape(self.current_user))
         location = logic.get_current_location(tornado.escape.xhtml_escape(self.current_user))
         relevant_locations = logic.get_relevant_locations()
-        events = apiv13.getEvents(topic['topic_id'], "date", location, 0)
+        events = logic.get_events(topic['topic_id'], "date", location, 0)
 
         if topic is None:
             self.redirect("/topicinfo")
@@ -1417,7 +1429,7 @@ class EventHandler(BaseHandler, TemplateRendering):
             location = logic.get_current_location(tornado.escape.xhtml_escape(
                 self.current_user))  # this will be called when new events are loading (cursoring)
         print("CURSOR:" + str(cursor))
-        document = apiv13.getEvents(topic_id, filter, location, cursor)
+        document = logic.get_events(topic_id, filter, location, cursor)
         self.write(self.render_template("single-event.html", {"document": document}))
 
 

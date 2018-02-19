@@ -252,6 +252,21 @@ def getEvents(topic_id, sortedBy, location, cursor):
             EVENT_LIMIT = 70
             COUNTRY_LIMIT=80
             cdl = []
+            hidden_event_links = []
+
+            # GET HIDDEN EVENTS
+            sql = (
+                "SELECT event_link "
+                "FROM hidden_events "
+                "WHERE topic_id = %s "
+            )
+            try:
+                cur.execute(sql, [int(topic_id)])
+                hidden_event_links = [str(event[0]) for event in cur.fetchall()]
+            except:
+                result['error'] = "Problem in fetching hidden events for current topic."
+                return result
+
             with open('rank_countries.csv', 'r') as f:
               reader = csv.reader(f)
               country_distance_lists = list(reader)
@@ -267,17 +282,18 @@ def getEvents(topic_id, sortedBy, location, cursor):
                   print("Checking db for country (#" + str(count) + "): " + str(country))
 
                   match['$or'] = [{'place':location_regex.getLocationRegex(country)},{'predicted_place':country}]
+                  match['link'] = {'$nin': hidden_event_links}
                   events += list(Connection.Instance().events[str(topic_id)].aggregate([
                       {'$match': match},
                       {'$project': {'_id': 0,
                           "updated_time": 1,
                           "cover": 1,
-                          "end_time": 1,
                           "description":1,
+                          "start_time":1,
+                          "end_time":1,
                           "id": 1,
                           "name": 1,
                           "place": 1,
-                          "start_time": 1,
                           "link": 1,
                           "interested": 1,
                           "coming":1
@@ -344,6 +360,12 @@ def getEvents(topic_id, sortedBy, location, cursor):
             result['next_cursor_str'] = str(result['next_cursor'])
 
             result['events']= events
+
+        for event in result['events']:
+            if not isinstance(event['start_time'],str):
+                event['start_time'] = datetime.datetime.utcfromtimestamp(event['start_time']).strftime('%Y-%m-%dT%H:%M:%SZ')
+            if not isinstance(event['end_time'],str):
+                event['end_time'] = datetime.datetime.utcfromtimestamp(event['end_time']).strftime('%Y-%m-%dT%H:%M:%SZ')
 
         return result
 
