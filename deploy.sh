@@ -1,5 +1,7 @@
 #!/bin/sh
 
+eval $(cat .env | sed 's/^/export /')
+
 docker-compose down
 docker-compose up -d
 
