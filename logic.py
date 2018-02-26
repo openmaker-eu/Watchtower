@@ -582,17 +582,17 @@ def add_topic(topic, user_id):
             "LIMIT 1"
         )
         cur.execute(sql)
-        topic = cur.fetchone()
-        print(topic)
+        topic_fetched = cur.fetchone()
+        print(topic_fetched)
 
-    if topic['name'] == topic[1]:
+    if topic['name'] == topic_fetched[1]:
         sql = (
             "INSERT INTO user_topic "
             "(user_id, topic_id) "
             "VALUES (%s, %s)"
         )
-        cur.execute(sql, [int(user_id), int(topic[0])])
-        topic = get_topic_all_of_them_list(int(topic[0]))
+        cur.execute(sql, [int(user_id), int(topic_fetched[0])])
+        topic = get_topic_all_of_them_list(int(topic_fetched[0]))
         set_user_topics_imit(user_id, 'decrement')
         set_current_topic(user_id)
         t = Thread(target=add_facebook_pages_and_subreddits, args=(topic['alertid'], topic['keywords'],))
