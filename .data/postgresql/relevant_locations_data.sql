@@ -17,7 +17,7 @@ SET row_security = off;
 SET search_path = public, pg_catalog;
 
 --
--- Data for Name: relevant_locations; Type: TABLE DATA; Schema: public; Owner: openmakerpsql
+-- Data for Name: relevant_locations; Type: TABLE DATA; Schema: public; Owner: ${POSTGRESQL_USER}
 --
 
 COPY relevant_locations (location_name, location_code) FROM stdin;
@@ -33,4 +33,3 @@ global	global
 --
 -- PostgreSQL database dump complete
 --
-

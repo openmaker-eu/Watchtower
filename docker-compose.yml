@@ -7,6 +7,9 @@ services:
             dockerfile: ./.docker/mongodb.docker
         volumes:
             - "${MONGODB_PATH}:/data/db"
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USER}
+            MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASSWORD}
         ports:
             - "27017:27017"
         command: --auth
