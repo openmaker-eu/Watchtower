@@ -44,7 +44,11 @@ def main():
     twitter_module = TwitterListen()
     twitter_module.setup(running_topic_list)
     current_hour = datetime.now().hour
-    last_sequence_id = str(Connection.Instance().db["counters"].find_one({'_id': "tweetDBId"})['seq'])
+    try:
+        last_sequence_id = str(Connection.Instance().db["counters"].find_one({'_id': "tweetDBId"})['seq'])
+    except:
+        last_sequence_id = 0
+        pass
 
     count = 0
     while True:
