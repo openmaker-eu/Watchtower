@@ -2,6 +2,15 @@
 
 eval $(cat .env | sed 's/^/export /')
 
+echo "$(whoami)"
+
+[ "$UID" -eq 0 ] || exec sudo "$0" "$@"
+
+ufw allow 8484/tcp
+ufw allow 27017/tcp
+ufw allow 9181/tcp
+ufw allow 5432/tcp
+
 docker-compose down
 docker-compose up -d
 
