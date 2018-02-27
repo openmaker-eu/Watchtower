@@ -20,7 +20,7 @@ import pymongo
 
 
 def get_next_links_sequence(machine_host):
-    MongoDBClient = pymongo.MongoClient('mongodb://{0}:{1}@{2}:27017/'.format(config("MONGODB_USER"), config("MONGODB_USER"), machine_host), connect=False)
+    MongoDBClient = pymongo.MongoClient('mongodb://{0}:{1}@{2}:27017/'.format(config("MONGODB_USER"), config("MONGODB_PASSWORD"), machine_host), connect=False)
     news_pool_db = MongoDBClient.newsPool
     cursor = news_pool_db["counters"].find_and_modify(
         query={'_id': "link_id"},
@@ -93,7 +93,7 @@ def link_parser(link):
 
 
 def calculate_links(data, machine_host):
-    MongoDBClient = pymongo.MongoClient('mongodb://{0}:{1}@{2}:27017/'.format(config("MONGODB_USER"), config("MONGODB_USER"), machine_host), connect=False)
+    MongoDBClient = pymongo.MongoClient('mongodb://{0}:{1}@{2}:27017/'.format(config("MONGODB_USER"), config("MONGODB_PASSWORD"), machine_host), connect=False)
     news_pool_db = MongoDBClient.newsPool
     if data['channel'] == 'reddit':
         short_link = data['url']

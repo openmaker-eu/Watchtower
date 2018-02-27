@@ -2,7 +2,7 @@ import time
 import pymongo
 from decouple import config
 ###
-MONGO_USERNAME_PASS = 'mongodb://{0}:{1}@'.format(config("MONGODB_USER"), config("MONGODB_USER"))
+MONGO_USERNAME_PASS = 'mongodb://{0}:{1}@'.format(config("MONGODB_USER"), config("MONGODB_PASSWORD"))
 MONGO_PORT = ':27017/'
 BATCH_SIZE = 100000
 ###
