@@ -54,6 +54,7 @@ def separates_tweet(alertDic, tweet):
             if tweet['lang'] in alert['lang']:
                 for keyword in alert['keywords']:
                     keyword = re.compile(keyword.replace(" ", "(.?)"), re.IGNORECASE)
+                    tweet['tweetDBId'] = get_next_tweets_sequence()
                     if 'extended_tweet' in tweet and 'full_text' in tweet['extended_tweet']:
                         if re.search(keyword, str(tweet['extended_tweet']['full_text'])):
                             updatedTime = datetime.fromtimestamp(int(tweet['timestamp_ms']) / 1e3)
@@ -118,7 +119,6 @@ class StdOutListener(StreamListener):
         if not self.terminate:
             try:
                 tweet = json.loads(data)
-                tweet['tweetDBId'] = get_next_tweets_sequence()
                 separates_tweet(self.alertDic, tweet)
                 return True
             except Exception as e:
