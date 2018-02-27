@@ -595,7 +595,7 @@ def add_topic(topic, user_id):
         topic = get_topic_all_of_them_list(int(topic_fetched[0]))
         set_user_topics_imit(user_id, 'decrement')
         set_current_topic(user_id)
-        t = Thread(target=add_facebook_pages_and_subreddits, args=(topic['alertid'], topic['keywords'],))
+        t = Thread(target=add_facebook_pages_and_subreddits, args=(topic_fetched[1], topic['keywords'],))
         t.start()
 
 
