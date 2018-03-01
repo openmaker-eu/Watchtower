@@ -1,3 +1,16 @@
+"""
+Auth Handlers for Watchtower
+"""
+__author__ = ['Kemal Berk Kocabagli', 'Enis Simsar']
+
+import tornado.web
+import tornado.escape
+import json
+
+from handlers.base import BaseHandler, TemplateRendering
+import logic
+
+
 class RegisterHandler(BaseHandler, TemplateRendering):
     def get(self):
         template = 'register.html'
@@ -85,3 +98,41 @@ class ProfileHandler(BaseHandler, TemplateRendering):
             self.write({'response': True, 'redirectUrl': '/Topics'})
         else:
             self.write(json.dumps(update_info))
+
+
+class TwitterAuthHandler(BaseHandler, TemplateRendering):
+    @tornado.web.authenticated
+    def get(self):
+        user_id = tornado.escape.xhtml_escape(self.current_user)
+        template = 'afterlogintemplate.html'
+        topic = logic.get_current_topic(tornado.escape.xhtml_escape(self.current_user))
+        location = logic.get_current_location(tornado.escape.xhtml_escape(self.current_user))
+        relevant_locations = logic.get_relevant_locations()
+        user = logic.get_user(user_id)
+        auth_url = logic.get_twitter_auth_url()
+        variables = {
+            'title': "Twitter Auth",
+            'type': "twitterAuth",
+            'username': user['username'],
+            'country': user['country'],
+            'alerts': logic.get_topic_list(user_id),
+            'topic': topic,
+            'location': location,
+            'relevant_locations': relevant_locations,
+            'auth_url': auth_url[0]
+        }
+        self.set_secure_cookie("request_token", str(auth_url[1]))
+        content = self.render_template(template, variables)
+        self.write(content)
+
+    @tornado.web.authenticated
+    def post(self):
+        twitter_pin = self.get_argument("twitter_pin", "")
+        user_id = tornado.escape.xhtml_escape(self.current_user)
+        auth_token = self.get_secure_cookie("request_token")
+        self.clear_cookie("request_token")
+        update_info = logic.update_twitter_auth(user_id, auth_token, twitter_pin)
+        if update_info['response']:
+            self.write({'response': True, 'redirectUrl': '/Topics'})
+        else:
+            self.write({'response': False})
