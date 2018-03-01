@@ -4,7 +4,7 @@ Watchtower Web Server
 __author__ = ['Kemal Berk Kocabagli', 'Enis Simsar', 'Baris Esmer']
 
 import tornado.ioloop
-import tornado.options
+from tornado.options import options
 import tornado.web
 
 from raven.contrib.tornado import AsyncSentryClient
@@ -23,14 +23,19 @@ class WatchtowerApp(tornado.web.Application):
 
 
 def main():
-    tornado.options.parse_command_line()
+    options.parse_command_line()
     app = WatchtowerApp()
     try:
         app.sentry_client = AsyncSentryClient(config("SENTRY_TOKEN"))
     except RuntimeError as err:
         logger.log_and_print(err)
         pass
-    app.listen(8484)
+
+    try:
+        app.listen(options.port)
+        logger.log_and_print("Listening on port " + str(options.port))
+    except SystemError as err:
+        logger.log_and_print(err)
     tornado.ioloop.IOLoop.current().start()
 
 

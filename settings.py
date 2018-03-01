@@ -6,6 +6,9 @@ __author__ = ['Kemal Berk Kocabagli', 'Enis Simsar']
 # import random
 # import string
 import os
+from tornado.options import define, options
+
+define("port", default=8484, help="run on the given port", type=int)
 
 # chars = ''.join([string.ascii_letters, string.digits, string.punctuation]).replace('\'', '').replace('"', '').replace(
 #     '\\', '')
