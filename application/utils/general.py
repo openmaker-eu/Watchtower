@@ -2,6 +2,17 @@ from datetime import datetime
 from time import time
 
 import bson.objectid
+import logging
+
+
+class Logger:
+    def __init__(self, file_name):
+        logging.basicConfig(filename=file_name, filemode='a+', level=logging.DEBUG)
+        self.logger = logging.getLogger('watchtower.' + __name__ + '.log')
+
+    def log_and_print(self,text):
+        self.logger.debug(text)
+        print(text)
 
 
 def determine_date(date):
@@ -23,6 +34,7 @@ def date_formatter(x):
         return str(x)
     else:
         raise TypeError(x)
+
 
 def tweet_date_to_string(x):
     if isinstance(x, datetime):
