@@ -8,7 +8,10 @@ from threading import Thread
 from crontab_module.crons import facebook_reddit_crontab
 from urllib.parse import urlparse
 import re
+import datetime
 import time
+import json
+import csv
 
 import facebook
 import praw
@@ -17,8 +20,9 @@ import tweepy
 import requests
 
 from application.utils import twitter_search_sample_tweets
-import delete_community
 from application.utils import general
+from application.utils import location_regex
+import delete_community
 
 from application.Connections import Connection
 
@@ -1238,7 +1242,7 @@ def get_local_influencers(topic_id, cursor, location):
     with Connection.Instance().get_cursor() as cur:
         sql = (
             "SELECT influencer_id "
-            "FROM added_influencers "
+            "FROM hidden_influencers "
             "WHERE country_code = %s and topic_id = %s "
         )
         cur.execute(sql, [str(location), int(topic_id)])
