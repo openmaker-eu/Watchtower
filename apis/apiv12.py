@@ -10,7 +10,7 @@ import pymongo
 sys.path.append('../')
 
 from application.Connections import Connection
-from application.utils import general_utils
+from application.utils import general
 
 
 def getTopics(keywords):
@@ -238,7 +238,7 @@ def getNews(news_ids, keywords, languages, cities, countries, user_location, use
         'news': news[cursor:cursor + 20]
     }
 
-    return json.dumps(result, default=general_utils.date_formatter)
+    return json.dumps(result, default=general.date_formatter)
 
 
 def getHastags(topic_id, date):

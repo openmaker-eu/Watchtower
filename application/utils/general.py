@@ -8,7 +8,7 @@ import logging
 class Logger:
     def __init__(self, file_name):
         logging.basicConfig(filename=file_name, filemode='a+', level=logging.DEBUG)
-        self.logger = logging.getLogger('watchtower.' + __name__ + '.log')
+        self.logger = logging.getLogger('./logs/watchtower.' + file_name + '.log')
 
     def log_and_print(self,text):
         self.logger.debug(text)

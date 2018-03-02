@@ -5,7 +5,7 @@ from decouple import config
 sys.path.insert(0, config("ROOT_DIR"))
 
 from application.utils.basic import *
-from application.utils import general_utils
+from application.utils import general
 
 from application.Connections import Connection
 from predict_location.predictor import Predictor # for location
@@ -534,4 +534,4 @@ def getNews(news_ids, keywords, languages, cities, countries, user_location, use
     result['next_cursor_str'] = str(result['next_cursor'])
     result['news'] = news
 
-    return json.dumps(result, default=general_utils.date_formatter, indent=4)
+    return json.dumps(result, default=general.date_formatter, indent=4)
