@@ -8,7 +8,7 @@ from threading import Thread
 from crontab_module.crons import facebook_reddit_crontab
 from urllib.parse import urlparse
 import re
-from time import time
+import time
 
 import facebook
 import praw
