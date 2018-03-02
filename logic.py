@@ -1,12 +1,14 @@
 import sys
-from decouple import config
-sys.path.insert(0, config("ROOT_DIR"))
 
-from application.utils.basic import *
+from decouple import config
+
+#sys.path.insert(0, config("ROOT_DIR"))
 
 from threading import Thread
 from crontab_module.crons import facebook_reddit_crontab
 from urllib.parse import urlparse
+import re
+from time import time
 
 import facebook
 import praw
@@ -15,10 +17,20 @@ import tweepy
 import requests
 
 from application.utils import twitter_search_sample_tweets
-from application.utils import delete_audience
-from application.utils import general_utils
+import delete_community
+from application.utils import general
 
 from application.Connections import Connection
+
+# Accessing Twitter API
+consumer_key = config("TWITTER_CONSUMER_KEY")  # API key
+consumer_secret = config("TWITTER_CONSUMER_SECRET")  # API secret
+access_token = config("TWITTER_ACCESS_TOKEN")
+access_secret = config("TWITTER_ACCESS_SECRET")
+
+auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+auth.set_access_token(access_token, access_secret)
+api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
 
 
 def set_current_topic(user_id):
@@ -641,7 +653,7 @@ def delete_topic(topic_id, user_id):
         cur.execute(sql, [topic_id])
     set_current_topic(user_id)
 
-    t = Thread(target=delete_audience.main, args=(alert['alertid'],))
+    t = Thread(target=delete_community.main, args=(alert['alertid'],))
     t.start()
 
 
@@ -811,6 +823,23 @@ def rate_audience(topic_id, user_id, audience_id, rating):
                     "VALUES (%s, %s, %s, %s)"
                 )
                 cur.execute(sql, [int(user_id), int(audience_id), int(topic_id), float(rating)])
+
+def add_local_influencer(topic_id, location, screen_name):
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "INSERT INTO added_influencers "
+            "(topic_id, country_code, screen_name) "
+            "VALUES (%s, %s, %s)"
+        )
+        cur.execute(sql, [int(topic_id), str(location), str(screen_name), ""])
+
+    if Connection.Instance().added_local_influencers_DB['added_influencers'].find_one({"screen_name":screen_name}) is None:
+        new_local_influencer = api.get_user(screen_name)
+        new_local_influencer['topics']=topic_id
+        new_local_influencer['locations']=location
+        Connection.Instance().added_local_influencers_DB['added_influencers'].insert_one(new_local_influencer)
+    else:
+        Connection.Instance().added_local_influencers_DB['added_influencers'].update({"screen_name":screen_name},{"$addToSet":{"topics":topic_id, "locations":location}})
 
 
 def hide_influencer(topic_id, user_id, influencer_id, description, is_hide, location):
@@ -1014,8 +1043,6 @@ def get_audience(topic_id, user_id, cursor, location):
     result['audiences'] = audiences
     return result
 
-def configure_influencer(topic_id, influencer_id):
-    print("configuring influencer")
 
 def get_events(topic_id, sortedBy, location, cursor):
     cursor_range = 10
@@ -1206,10 +1233,24 @@ def get_local_influencers(topic_id, cursor, location):
     print("Topic id:" + str(topic_id))
     print("Location:" + location)
     result = {}
+    local_influencers=[]
+
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "SELECT influencer_id "
+            "FROM added_influencers "
+            "WHERE country_code = %s and topic_id = %s "
+        )
+        cur.execute(sql, [str(location), int(topic_id)])
+        hidden_ids = [str(influencer_id[0]) for influencer_id in cur.fetchall()]
+        # print("Hidden ids:")
+        # print(hidden_ids)
+
+
     if location.lower()=="global":
-        local_influencers = list(Connection.Instance().influencerDB[str(topic_id)].find({}))[cursor:cursor + 21]
+        local_influencers += list(Connection.Instance().influencerDB["all_influencers"].find({"topics":topic_id}))[cursor:cursor + 21]
     else:
-        local_influencers = list(Connection.Instance().local_influencers_DB[str(topic_id)+"_"+str(location)].find({}))[cursor:cursor + 21]
+        local_influencers += list(Connection.Instance().local_influencers_DB[str(topic_id)+"_"+str(location)].find({}))[cursor:cursor + 21]
 
     for inf in local_influencers:
         inf['id'] = str(inf['id'])
@@ -1447,7 +1488,7 @@ def get_publish_tweets(topic_id, user_id, status):
         for i in Connection.Instance().tweetsDB[str(topic_id)].find(
                 {'tweet_id': {'$in': tweet_ids}, 'status': int(status)}).sort([('published_at', pymongo.ASCENDING)]):
             temp = i
-            temp['published_at'] = general_utils.tweet_date_to_string(i['published_at'])
+            temp['published_at'] = general.tweet_date_to_string(i['published_at'])
             tweets.append(temp)
         return tweets
 
@@ -1476,7 +1517,7 @@ def update_publish_tweet(topic_id, user_id, tweet_id, date, text, news_id, title
             'description': description,
             'url': news['url'],
             'image_url': image_url,
-            'published_at': general_utils.tweet_date_to_string(date),
+            'published_at': general.tweet_date_to_string(date),
             'status': 0
         }
         Connection.Instance().tweetsDB[str(topic_id)].insert_one(tweet)
@@ -1489,15 +1530,13 @@ def update_publish_tweet(topic_id, user_id, tweet_id, date, text, news_id, title
             cur.execute(sql, [user_id, topic_id, tweet_id])
     else:
         tweet = Connection.Instance().tweetsDB[str(topic_id)].find_one({'tweet_id': int(tweet_id)})
-        published_at = general_utils.tweet_date_to_string(date)
+        published_at = general.tweet_date_to_string(date)
         if tweet['status'] != 0:
             update_publish_tweet(topic_id, user_id, -1, date, text, tweet['news_id'], title, description, image_url)
         else:
             Connection.Instance().tweetsDB[str(topic_id)].update_one({'tweet_id': tweet_id},
                                                                      {'$set': {'body': text,
                                                                                'published_at': published_at}})
-
-
 def get_twitter_user(user_id):
     with Connection.Instance().get_cursor() as cur:
         sql = (
