@@ -20,7 +20,9 @@ import pymongo
 
 
 def get_next_links_sequence(machine_host):
-    MongoDBClient = pymongo.MongoClient('mongodb://{0}:{1}@{2}:27017/'.format(config("MONGODB_USER"), config("MONGODB_PASSWORD"), machine_host), connect=False)
+    MongoDBClient = pymongo.MongoClient(
+        'mongodb://{0}:{1}@{2}:27017/'.format(config("MONGODB_USER"), config("MONGODB_PASSWORD"), machine_host),
+        connect=False)
     news_pool_db = MongoDBClient.newsPool
     cursor = news_pool_db["counters"].find_and_modify(
         query={'_id': "link_id"},
@@ -33,6 +35,21 @@ def get_next_links_sequence(machine_host):
 
 def short_url(url):
     return head(url, allow_redirects=True).url
+
+
+def update_last_news_date(topic_id):
+    con = psycopg2.connect(
+        "dbname='{0}' user='{1}' host='{2}' password='{3}'".format(config("POSTGRESQL_DB"), config("POSTGRESQL_USER"),
+                                                                   config("HOST_IP"), config("POSTGRESQL_PASSWORD")))
+    cur = con.cursor()
+    updated_time = datetime.fromtimestamp(int(tweet['timestamp_ms']) / 1e3)
+    sql = (
+        "UPDATE topics "
+        "SET last_news_date = %s "
+        "WHERE topic_id = %s"
+    )
+    cur.execute(sql, [updated_time, int(topic_id)])
+    con.close()
 
 
 def link_parser(link):
@@ -93,7 +110,9 @@ def link_parser(link):
 
 
 def calculate_links(data, machine_host):
-    MongoDBClient = pymongo.MongoClient('mongodb://{0}:{1}@{2}:27017/'.format(config("MONGODB_USER"), config("MONGODB_PASSWORD"), machine_host), connect=False)
+    MongoDBClient = pymongo.MongoClient(
+        'mongodb://{0}:{1}@{2}:27017/'.format(config("MONGODB_USER"), config("MONGODB_PASSWORD"), machine_host),
+        connect=False)
     news_pool_db = MongoDBClient.newsPool
     if data['channel'] == 'reddit':
         short_link = data['url']
@@ -107,6 +126,7 @@ def calculate_links(data, machine_host):
             if check != 0:
                 news_pool_db[str(topic_id)].find_one_and_update({'url': link}, {
                     '$addToSet': {'mentions': {'$each': data['mentions']}}})
+                update_last_news_date(topic_id)
             else:
                 dic = link_parser(link)
                 if dic is not None:
@@ -123,6 +143,7 @@ def calculate_links(data, machine_host):
                         dic['link_id'] = get_next_links_sequence(machine_host)
                         dic['mentions'] = data['mentions']
                         news_pool_db[str(topic_id)].insert_one(dic)
+                    update_last_news_date(topic_id)
         except Exception as e:
             print(e)
             pass
@@ -138,6 +159,7 @@ def calculate_links(data, machine_host):
             if check != 0:
                 news_pool_db[str(topic_id)].find_one_and_update({'url': link}, {
                     '$addToSet': {'mentions': {'$each': data['mentions']}}})
+                update_last_news_date(topic_id)
 
             check = len(list(news_pool_db[str(topic_id)].find(
                 {'short_links': short_link})))
@@ -145,6 +167,7 @@ def calculate_links(data, machine_host):
             if check != 0:
                 news_pool_db[str(topic_id)].find_one_and_update(
                     {'short_links': short_link}, {'$addToSet': {'mentions': {'$each': data['mentions']}}})
+                update_last_news_date(topic_id)
             else:
                 dic = link_parser(link)
 
@@ -164,6 +187,7 @@ def calculate_links(data, machine_host):
                         dic['mentions'] = data['mentions']
                         dic['short_links'] = [short_link]
                         news_pool_db[str(topic_id)].insert_one(dic)
+                    update_last_news_date(topic_id)
         except Exception as e:
             print(e)
             pass
@@ -197,6 +221,7 @@ def calculate_links(data, machine_host):
                     if check != 0:
                         news_pool_db[str(topic_id)].find_one_and_update({'url': link}, {
                             '$addToSet': {'mentions': tweet_tuple}})
+                        update_last_news_date(topic_id)
                         return
 
                     check = len(list(news_pool_db[str(topic_id)].find(
@@ -205,6 +230,7 @@ def calculate_links(data, machine_host):
                     if check != 0:
                         news_pool_db[str(topic_id)].find_one_and_update(
                             {'short_links': short_link}, {'$addToSet': {'mentions': tweet_tuple}})
+                        update_last_news_date(topic_id)
                     else:
                         dic = link_parser(link)
                         if dic is not None:
@@ -223,12 +249,14 @@ def calculate_links(data, machine_host):
                                 dic['mentions'] = [tweet_tuple]
                                 dic['short_links'] = [short_link]
                                 news_pool_db[str(topic_id)].insert_one(dic)
+                            update_last_news_date(topic_id)
                 except Exception as e:
                     print(e)
                     pass
         except Exception as e:
             print(e)
             pass
+
 
 def parseStrDate(dateString):
     try:

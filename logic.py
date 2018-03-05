@@ -460,7 +460,7 @@ def get_topic_list(user_id):
             var = cur.fetchone()
             temp_topic = {'alertid': i[0], 'name': i[1], 'description': i[2], 'keywords': i[3].split(","),
                           'lang': i[4].split(","), 'creationTime': i[5], 'updatedTime': i[7], 'status': i[8],
-                          'publish': i[9], 'created_by': var[0]}
+                          'publish': i[9], 'newsUpdatedTime': i[10], 'created_by': var[0]}
             if i[0] in own_topic_ids:
                 temp_topic['type'] = 'me'
             elif i[0] in subscribe_topic_ids:

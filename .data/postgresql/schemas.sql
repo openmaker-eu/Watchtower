@@ -288,7 +288,8 @@ CREATE TABLE topics (
     keyword_limit integer,
     last_tweet_date date,
     is_running boolean DEFAULT true,
-    is_publish boolean DEFAULT false
+    is_publish boolean DEFAULT false,
+    last_news_date date
 );
 
 
