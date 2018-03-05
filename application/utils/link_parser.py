@@ -16,7 +16,7 @@ try:
 except ImportError:
     from BeautifulSoup import BeautifulSoup
 
-import pymongo
+import pymongo, psycopg2
 
 
 def get_next_links_sequence(machine_host):
