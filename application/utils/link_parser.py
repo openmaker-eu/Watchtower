@@ -38,6 +38,7 @@ def short_url(url):
 
 
 def update_last_news_date(topic_id):
+    print("update news date")
     con = psycopg2.connect(
         "dbname='{0}' user='{1}' host='{2}' password='{3}'".format(config("POSTGRESQL_DB"), config("POSTGRESQL_USER"),
                                                                    config("HOST_IP"), config("POSTGRESQL_PASSWORD")))
@@ -51,6 +52,7 @@ def update_last_news_date(topic_id):
     cur.execute(sql, [updated_time, int(topic_id)])
     con.commit()
     con.close()
+    print("update finish news date")
 
 
 def link_parser(link):
