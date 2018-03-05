@@ -44,7 +44,7 @@ def update_last_news_date(topic_id):
         "dbname='{0}' user='{1}' host='{2}' password='{3}'".format(config("POSTGRESQL_DB"), config("POSTGRESQL_USER"),
                                                                    config("HOST_IP"), config("POSTGRESQL_PASSWORD")))
     cur = con.cursor()
-    updated_time = datetime.fromtimestamp(int(tweet['timestamp_ms']) / 1e3)
+    updated_time = datetime.now()
     sql = (
         "UPDATE topics "
         "SET last_news_date = %s "
