@@ -49,6 +49,7 @@ def update_last_news_date(topic_id):
         "WHERE topic_id = %s"
     )
     cur.execute(sql, [updated_time, int(topic_id)])
+    con.commit()
     con.close()
 
 
