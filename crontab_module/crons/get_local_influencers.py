@@ -45,25 +45,27 @@ default_following_limit = 20000
 
 def filterAudience(p, keywords):
     verboseprint("Filter " + p["name"] + " ?", debugLevel=1)
+    passedFrom = dict.fromkeys(["blacklistCheck", "tweetCheck", "hashtagCheck"] , False)
 
     if any(word in p["description"] for word in blacklist):
         verboseprint("RESULT = FILTERED", debugLevel=1)
         verboseprint("==============================", debugLevel=1)
-        return False
+        return passedFrom
     else:
         verboseprint("Fetching tweets", debugLevel=1)
+        passedFrom["blacklistCheck"] = True
         try:
             status_list = list(tweepy.Cursor(api.user_timeline, id=p[
                                "id"], tweet_mode='extended').items(numOfTweets))
         except tweepy.error.TweepError as e:
             verboseprint(
                 "Error fetching tweets, error code: "+str(e.api_code)+"\n==============================", debugLevel=1)
-            return False
+            return None
 
         if not status_list:
             verboseprint(
                 "No Tweets !\n==============================", debugLevel=1)
-            return False
+            return None
 
         hashtags = set([str(x["text"]).lower()
                         for y in status_list for x in y.entities.get("hashtags")])
@@ -93,14 +95,13 @@ def filterAudience(p, keywords):
         hashtags_unrelated = (
             not any(keyword in hashtags for keyword in keywords)) and sum(count) == 0
 
-        if tweets_outdated or hashtags_unrelated:
-            verboseprint("RESULT = FILTERED", debugLevel=1)
-            verboseprint("==============================", debugLevel=1)
-            return False
+        if not hashtags_unrelated:
+            passedFrom["hashtagCheck"] = True
 
-    verboseprint("RESULT = PASSED", debugLevel=1)
-    verboseprint("==============================", debugLevel=1)
-    return True
+        if not tweets_outdated:
+            passedFrom["tweetCheck"] = True
+
+    return passedFrom
 
 
 def tokenize(text):
@@ -203,12 +204,7 @@ def getInfluencerParameters():
         d = {(x[:2]): x[2:] for x in cur.fetchall()}
         return d
 
-def findLocalInfluencers(location, topicID, keywords):
-    signal_strength, following_limit = parameters[topicID, location] if (
-        topicID, location) in parameters else [default_signal_strength, default_following_limit]
-
-    verboseprint("Fetching audience profiles from database", debugLevel=2)
-
+def getAudienceFromAudienceSamples(location, topicID, following_limit, signal_strength):
     audience = Connection.Instance().audience_samples_DB[location+ "_" + str(topicID)].aggregate(
         [
             {'$project':
@@ -226,11 +222,53 @@ def findLocalInfluencers(location, topicID, keywords):
         ],
         allowDiskUse=True
     )
-    audience = list(audience)
+    return list(audience)
 
-    print("Local influencers size before filtering: " + str(len(audience)))
-    local_influencers = [x for x in audience if filterAudience(x, keywords)]
-    print("Local influencers size after filtering: " + str(len(local_influencers)))
+def findLocalInfluencers(location, topicID, keywords):
+    signal_strength, following_limit = parameters[topicID, location] if (
+        topicID, location) in parameters else [default_signal_strength, default_following_limit]
+
+    verboseprint("Fetching audience profiles from database", debugLevel=2)
+
+    audience = getAudienceFromAudienceSamples(location, topicID, following_limit, signal_strength)
+
+    print("Local influencers size with default parameters: " + str(len(audience)))
+
+    if len(audience) < 10:
+        # Lower parameters until we have more than 10 influencers
+        while len(audience) < 10 and signal_strength >= 0:
+            signal_strength -= 1
+            audience = getAudienceFromAudienceSamples(location, topicID, following_limit, signal_strength)
+
+        local_influencers = audience[:10]
+    else:
+        filterResponse = []
+        for index,x in enumerate(audience):
+            resp = filterAudience(x,keywords)
+            if resp is not None:
+                filterResponse.append((index, resp))
+
+        # Blacklist check
+        passed_blacklist = [elem for elem in filterResponse if elem[1]["blacklistCheck"]]
+
+        if len(passed_blacklist) < 10:
+            print("Failed blacklistCheck")
+            local_influencers = audience
+        else:
+            # Hashtag Check
+            passed_hashtag = [elem for elem in passed_blacklist if elem[1]["hashtagCheck"]]
+            if len(passed_hashtag) < 10:
+                print("Failed hashtagCheck")
+                local_influencers = [audience[elem[0]] for elem in passed_blacklist]
+            else:
+                # Tweet Check
+                passed_tweet = [elem for elem in passed_hashtag if elem[1]["tweetCheck"]]
+                if len(passed_tweet) < 10:
+                    print("Failed tweetCheck")
+                    local_influencers = [audience[elem[0]] for elem in passed_hashtag]
+                else:
+                    print("Passed all filterings")
+                    local_influencers = [audience[elem[0]] for elem in passed_tweet]
 
     return local_influencers[:local_infl_size]
 
@@ -272,7 +310,7 @@ def writeAllLocalInfluencersToDB():
 parser = argparse.ArgumentParser(description='This.')
 parser.add_argument("-v", "--verbose", type=int, default=2,
                     nargs="?", const=2, choices=set((0, 1, 2)))
-args = parser.parse_args()
+args, unknown = parser.parse_known_args()
 
 locations = getLocations()
 topics = getTopics()
