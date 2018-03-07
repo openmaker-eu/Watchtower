@@ -23,6 +23,7 @@ $(document).ready(function () {
         var topic_id = $('#topic_dropdown .active a').attr('data-id');
         var filter = $('.btn-success').val();
         var location = $(this).attr("data-id");
+        isEventsOver = false;
         $.ajax({
             url: '/get_events',
             method: 'GET',

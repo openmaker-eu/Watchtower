@@ -30,7 +30,7 @@
           </div>
 
 
-          <button class="hidebtn" onclick="hideEvent('{{event['link']}}', '',$(this).children('a'));">
+          <button class="managebtn" onclick="hideEvent('{{event['link']}}', '',$(this).children('a'));">
             {% if event['hidden'] == False %}
                 <a url="{{event['link']}}" class="text" hiddenflag=false href="javascript:void(0)">Hide</a>
             {% endif %}
