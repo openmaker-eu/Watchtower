@@ -2,10 +2,7 @@ import sys
 
 from decouple import config
 
-#sys.path.insert(0, config("ROOT_DIR"))
-
 from threading import Thread
-from crontab_module.crons import facebook_reddit_crontab
 from urllib.parse import urlparse
 import re
 import datetime
@@ -18,10 +15,13 @@ import praw
 import pymongo
 import tweepy
 import requests
+import psycopg2
 
 from application.utils import twitter_search_sample_tweets
 from application.utils import general
 from application.utils import location_regex
+from crontab_module.crons import facebook_reddit_crontab
+
 import delete_community
 
 from application.Connections import Connection
@@ -828,6 +828,7 @@ def rate_audience(topic_id, user_id, audience_id, rating):
                 )
                 cur.execute(sql, [int(user_id), int(audience_id), int(topic_id), float(rating)])
 
+
 def add_local_influencer(topic_id, location, screen_name):
     with Connection.Instance().get_cursor() as cur:
         sql = (
@@ -843,7 +844,15 @@ def add_local_influencer(topic_id, location, screen_name):
         new_local_influencer['locations']=location
         Connection.Instance().added_local_influencers_DB['added_influencers'].insert_one(new_local_influencer)
     else:
-        Connection.Instance().added_local_influencers_DB['added_influencers'].update({"screen_name":screen_name},{"$addToSet":{"topics":topic_id, "locations":location}})
+        Connection.Instance().added_local_influencers_DB['added_influencers'].update(
+            {"screen_name":screen_name},
+            {
+                "$addToSet": {
+                    "topics": topic_id,
+                    "locations": location
+                }
+            }
+        )
 
 
 def hide_influencer(topic_id, user_id, influencer_id, description, is_hide, location):
@@ -871,6 +880,7 @@ def hide_influencer(topic_id, user_id, influencer_id, description, is_hide, loca
                 "WHERE topic_id = %s and country_code = %s and influencer_id = %s "
             )
             cur.execute(sql, [int(topic_id), str(location), str(influencer_id)])
+
 
 def hide_event(topic_id, user_id, event_link, description, is_hide):
     # print("in hide influencer:")
@@ -1048,6 +1058,34 @@ def get_audience(topic_id, user_id, cursor, location):
     return result
 
 
+def get_audience_stats(topic_id, location):
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "SELECT execution_duration, last_executed, from_predicted_location, from_regex "
+            "FROM audience_samples_last_executed "
+            "WHERE topic_id = %(topic_id)s and location = %(location)s "
+        )
+
+        params = {
+            'topic_id': int(topic_id),
+            'location': location,
+        }
+
+        cur.execute(sql, params)
+        audience_stats = {}
+
+        execution_duration, last_executed, from_predicted_location, from_regex = cur.fetchall()[0]
+
+        audience_stats['topic_id'] = int(topic_id)
+        audience_stats['location'] = str(location)
+        audience_stats['execution_duration'] = round(execution_duration.total_seconds(), 2)
+        audience_stats['last_executed'] = last_executed.date()
+        audience_stats['from_predicted_location'] = from_predicted_location
+        audience_stats['from_regex'] = from_regex
+
+        return audience_stats
+
+
 def get_events(topic_id, sortedBy, location, cursor):
     cursor_range = 10
     max_cursor = 100
@@ -1086,47 +1124,96 @@ def get_events(topic_id, sortedBy, location, cursor):
         result['location'] = location
 
 
-        # SORT CRITERIA
-        if sortedBy == 'interested':
-            sort['interested']=-1
-        elif sortedBy == 'date' or sortedBy=='':
-            sort['start_time']=1
-        else:
-            return {'error': "please enter a valid sortedBy value."}
+    # SORT CRITERIA
+    if sortedBy == 'interested':
+        sort['interested']=-1
+    elif sortedBy == 'date' or sortedBy=='':
+        sort['start_time']=1
+    else:
+        return {'error': "please enter a valid sortedBy value."}
 
-        print("Location: " + str(location))
-        if location !="" and location.lower()!="global":
-            #location_predictor = Predictor()
-            #location = location_predictor.predict_location(location)
-            if location == "italy": location = "it"
-            elif location == "spain": location = "es"
-            elif location == "slovakia": location = "sk"
-            elif location == "uk": location = "gb"
-            elif location == "turkey": location = "tr"
+    print("Location: " + str(location))
+    if location !="" and location.lower()!="global":
+        #location_predictor = Predictor()
+        #location = location_predictor.predict_location(location)
+        if location == "italy": location = "it"
+        elif location == "spain": location = "es"
+        elif location == "slovakia": location = "sk"
+        elif location == "uk": location = "gb"
+        elif location == "turkey": location = "tr"
 
-            print("Filtering and sorting by location: " + location)
-            EVENT_LIMIT = 70
-            COUNTRY_LIMIT=80
-            cdl = []
+        print("Filtering and sorting by location: " + location)
+        EVENT_LIMIT = 70
+        COUNTRY_LIMIT=80
+        cdl = []
 
-            with open('rank_countries.csv', 'r') as f:
-              reader = csv.reader(f)
-              country_distance_lists = list(reader)
-              for i in range(len(country_distance_lists)):
-                  if country_distance_lists[i][0] == location:
-                      cdl = country_distance_lists[i]
-              print("Found cdl!")
-              count = 0
-              for country in cdl:
-                  if count ==0:
-                      count+=1
-                      continue
-                  print("Checking db for country (#" + str(count) + "): " + str(country))
+        with open('rank_countries.csv', 'r') as f:
+            reader = csv.reader(f)
+            country_distance_lists = list(reader)
+            for i in range(len(country_distance_lists)):
+                if country_distance_lists[i][0] == location:
+                    cdl = country_distance_lists[i]
+            print("Found cdl!")
+        count = 0
+        for country in cdl[1:]:
+            match['$or'] = [{'place': re.compile("^.*\\b" + country + "$", re.IGNORECASE)}, {'predicted_place': country}]
+            events_in_current_location = list(Connection.Instance().events[str(topic_id)].aggregate([
+                {'$match': match},
+                {'$project': {'_id': 0,
+                              "updated_time": 1,
+                              "cover": 1,
+                              "end_time": 1,
+                              "description":1,
+                              "start_date":1,
+                              "end_date":1,
+                              "id": 1,
+                              "name": 1,
+                              "place": 1,
+                              "start_time": 1,
+                              "link": 1,
+                              "interested": 1,
+                              "coming":1
+                              }},
+                {'$sort': sort}
+                #{'$skip': int(cursor)},
+                #{'$limit': 10}
+            ]))
+            events += events_in_current_location
+            count += 1
+            message = "Checked db for country (#" + str(count) + "): " + str(country)
+            if len(events_in_current_location) > 0 :
+                message += " + " + str(len(events_in_current_location)) + " events!"
 
-                  match['$or'] = [{'place':location_regex.getLocationRegex(country)},{'predicted_place':country}]
-                  events += list(Connection.Instance().events[str(topic_id)].aggregate([
-                      {'$match': match},
-                      {'$project': {'_id': 0,
+            print(message)
+
+            print("length:" + str(len(events)))
+            if len(events) >= min(cursor+cursor_range,EVENT_LIMIT):
+                break
+            if (count > COUNTRY_LIMIT):
+                print("Searched closest " + str(COUNTRY_LIMIT) + " countries. Stopping here.")
+                break
+
+        #pprint.pprint([e['place'] for e in events])
+        display_events= events[cursor:min(cursor+cursor_range,max_cursor)]
+
+        result['next_cursor'] = cursor + (cursor_range-cursor % cursor_range)
+        if cursor !=0 : result['previous_cursor'] = cursor - cursor_range if cursor % cursor_range == 0 else cursor - cursor%cursor_range # if we are on the first page, there is no previous cursor
+
+        # cursor boundary checks
+        if result['next_cursor']  >= min(EVENT_LIMIT,max_cursor) or len(display_events) < cursor_range:
+            result['next_cursor'] = 0
+        if 'previous_cursor' in result:
+            if result['previous_cursor']  == 0:
+                result['previous_cursor']  = -1
+
+        result['next_cursor_str'] = str(result['next_cursor'])
+        result['events'] = display_events
+
+    else:
+        print("returning all events...")
+        events = list(Connection.Instance().events[str(topic_id)].aggregate([
+            {'$match': match},
+            {'$project': {'_id': 0,
                           "updated_time": 1,
                           "cover": 1,
                           "end_time": 1,
@@ -1140,71 +1227,25 @@ def get_events(topic_id, sortedBy, location, cursor):
                           "link": 1,
                           "interested": 1,
                           "coming":1
-                      }},
-                      {'$sort': sort}
-                      #{'$skip': int(cursor)},
-                      #{'$limit': 10}
-                  ]))
-                  count+=1
-                  print("length:" + str(len(events)))
-                  if len(events) >= min(cursor+cursor_range,EVENT_LIMIT):
-                      break
-                  if (count > COUNTRY_LIMIT):
-                      break
+                          }},
+            {'$sort': sort},
+            {'$skip': int(cursor)},
+            {'$limit': min(cursor_range,max_cursor-cursor)}
+        ]))
 
-            #pprint.pprint([e['place'] for e in events])
-            display_events= events[cursor:min(cursor+cursor_range,max_cursor)]
+        cursor = int(cursor)
+        result['next_cursor'] = cursor + (cursor_range-cursor%cursor_range)
+        if cursor!=0: result['previous_cursor'] = cursor - cursor_range if cursor%cursor_range == 0 else cursor - cursor%cursor_range # if we are on the first page, there is no previous cursor
 
-            result['next_cursor'] = cursor + (cursor_range-cursor%cursor_range)
-            if cursor!=0: result['previous_cursor'] = cursor - cursor_range if cursor%cursor_range == 0 else cursor - cursor%cursor_range # if we are on the first page, there is no previous cursor
+        # cursor boundary checks
+        if result['next_cursor']  >= max_cursor or len(events) < cursor_range:
+            result['next_cursor'] = 0
+        if 'previous_cursor' in result:
+            if result['previous_cursor']  == 0:
+                result['previous_cursor']  = -1
 
-            # cursor boundary checks
-            if result['next_cursor']  >= min(EVENT_LIMIT,max_cursor) or len(display_events) < cursor_range:
-                result['next_cursor'] = 0
-            if 'previous_cursor' in result:
-                if result['previous_cursor']  == 0:
-                    result['previous_cursor']  = -1
-
-            result['next_cursor_str'] = str(result['next_cursor'])
-            result['events'] = display_events
-
-        else:
-            print("returning all events...")
-            events = list(Connection.Instance().events[str(topic_id)].aggregate([
-                {'$match': match},
-                {'$project': {'_id': 0,
-                    "updated_time": 1,
-                    "cover": 1,
-                    "end_time": 1,
-                    "description":1,
-                    "start_date":1,
-                    "end_date":1,
-                    "id": 1,
-                    "name": 1,
-                    "place": 1,
-                    "start_time": 1,
-                    "link": 1,
-                    "interested": 1,
-                    "coming":1
-                }},
-                {'$sort': sort},
-                {'$skip': int(cursor)},
-                {'$limit': min(cursor_range,max_cursor-cursor)}
-            ]))
-
-            cursor = int(cursor)
-            result['next_cursor'] = cursor + (cursor_range-cursor%cursor_range)
-            if cursor!=0: result['previous_cursor'] = cursor - cursor_range if cursor%cursor_range == 0 else cursor - cursor%cursor_range # if we are on the first page, there is no previous cursor
-
-            # cursor boundary checks
-            if result['next_cursor']  >= max_cursor or len(events) < cursor_range:
-                result['next_cursor'] = 0
-            if 'previous_cursor' in result:
-                if result['previous_cursor']  == 0:
-                    result['previous_cursor']  = -1
-
-            result['next_cursor_str'] = str(result['next_cursor'])
-            result['events']= events
+        result['next_cursor_str'] = str(result['next_cursor'])
+        result['events']= events
 
     with Connection.Instance().get_cursor() as cur:
         sql = (
@@ -1231,6 +1272,40 @@ def get_events(topic_id, sortedBy, location, cursor):
             event['end_time'] = datetime.datetime.utcfromtimestamp(event['end_time']).strftime('%Y-%m-%dT%H:%M:%SZ')
 
     return result
+
+
+def add_or_delete_fetch_followers_job(user_id, influencer_id, fetching):
+    status = "created"
+    print(str(user_id))
+    print(str(influencer_id))
+    if fetching:
+        print("Adding fetch followers for influencer: " + str(influencer_id) + " to job queue")
+        with Connection.Instance().get_cursor() as cur:
+            sql = (
+                "INSERT INTO fetch_followers_job_queue "
+                "VALUES (%(user_id)s, %(influencer_id)s, %(creation_time)s, %(status)s) "
+            )
+
+            params = {
+                'user_id': int(user_id),
+                'influencer_id': str(influencer_id),
+                'creation_time': datetime.datetime.utcnow(),
+                'status': status,
+            }
+
+            try:
+                cur.execute(sql, params)
+            except psycopg2.OperationalError as e:
+                print('Unable to connect!\n{0}').format(e)
+    else:
+        print("Deleting fetch followers job for influencer:" + str(influencer_id))
+        with Connection.Instance().get_cursor() as cur:
+            sql = (
+                "DELETE FROM fetch_followers_job_queue "
+                "WHERE influencer_id = %s "
+            )
+            cur.execute(sql, [str(influencer_id)])
+
 
 def get_local_influencers(topic_id, cursor, location):
     print("In get local infs")
@@ -1267,15 +1342,23 @@ def get_local_influencers(topic_id, cursor, location):
         )
         cur.execute(sql, [str(location), int(topic_id)])
         hidden_ids = [str(influencer_id[0]) for influencer_id in cur.fetchall()]
-        # print("Hidden ids:")
-        # print(hidden_ids)
+
+        sql = (
+            "SELECT influencer_id "
+            "FROM fetch_followers_job_queue "
+        )
+        cur.execute(sql)
+        fetching_ids = [str(influencer_id[0]) for influencer_id in cur.fetchall()]
+
         for influencer in local_influencers:
             if str(influencer['id']) in hidden_ids:
-                # print(str(influencer['id']) + " is hidden")
                 influencer['hidden'] = True
             else:
                 influencer['hidden'] = False
-                # print(str(influencer['id']) + " not hidden")
+            if str(influencer['id']) in fetching_ids:
+                influencer['in_fetch_followers_queue'] = True
+            else:
+                influencer['in_fetch_followers_queue'] = False
 
     cursor = int(cursor) + 21
     if cursor >= 500 or len(local_influencers) == 0:
