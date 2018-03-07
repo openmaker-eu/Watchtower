@@ -23,6 +23,9 @@
     <link rel="stylesheet"
           href="http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,300,600,700">
     <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic,700italic">
+    <link rel=”stylesheet” id=”font-awesome-css”
+          href=”https://use.fontawesome.com/releases/v5.0.8/css/all.css” type=”text/css” media=”screen”>
+
     <!-- for alertForm -->
     <link rel="stylesheet" href="/css/bootstrap-theme.min.css">
     <link rel="stylesheet" href="/css/bootstrap-tagsinput.css">
@@ -299,6 +302,14 @@
     </div>
 </div>
 
+{% if type == "audiences" or type == "events" or type == "influencers" %}
+    <button class="back-to-top" id="back-to-top" >
+        <a href="#" class="to-top-link">
+            Back to top
+        </a>
+    </button>
+{% endif %}
+
 {% if type == "alertlist" %}
     <div class="container" style="padding:10px" id="alertspage">
         {% include 'alerts.html' %}
@@ -343,6 +354,7 @@
 {% if type == "tweets" %}
     {% include 'tweetTemplate.html' %}
 {% endif %}
+
 <!-- /.container -->
 <!-- Bootstrap core JavaScript
 ================================================== -->
@@ -361,6 +373,23 @@
 
 <script>
     $(document).ready(function () {
+        var offset = 250;
+        var duration = 300;
+        $(window).scroll(function() {
+            if (jQuery(this).scrollTop() > offset) {
+                $("#back-to-top").fadeIn(duration);
+            }
+            else {
+                $("#back-to-top").fadeOut(duration);
+            }
+            });
+
+        $("#back-to-top").click(function(event) {
+            event.preventDefault();
+            $("html, body").animate({scrollTop: 0}, duration);
+            return false;
+        })
+
         $("#topic_dropdown").on('click', 'li a', function () {
             if ($(this).attr("data-id") != undefined) {
                 var selText = $(this).children("h4").html();
@@ -479,6 +508,7 @@
     <script src="/js/jquery-1.11.1.min.js"></script>
     <script type="text/javascript" src="/js/twitterAuth.js"></script>
 {% endif %}
+
 </body>
 
 </html>
