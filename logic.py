@@ -1000,10 +1000,22 @@ def get_news(user_id, topic_id, date, cursor):
         cur.execute(sql, [int(user_id)])
         bookmarks = [link_id[0] for link_id in cur.fetchall()]
 
+        sql = (
+            "SELECT news_id "
+            "FROM user_tweet "
+            "WHERE user_id = %s"
+        )
+        cur.execute(sql, [int(user_id)])
+        tweets = [link_id[0] for link_id in cur.fetchall()]
+
     for feed in feeds:
         feed['bookmark'] = False
         if feed['link_id'] in bookmarks:
             feed['bookmark'] = True
+
+        feed['tweet'] = False
+        if feed['link_id'] in tweets:
+            feed['tweet'] = True
 
         feed['sentiment'] = 0
         try:
