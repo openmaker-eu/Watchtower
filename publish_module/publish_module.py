@@ -76,15 +76,19 @@ def get_tokens(user_id):
         return {'response': False}
 
 
-def publish_tweet(tweet, url, access_token, access_token_secret):
+def publish_tweet(topic_id, tweet, url, access_token, access_token_secret):
     api = get_twitter_api(access_token, access_token_secret)
     text = tweet['body'] + " " + url
     try:
-        api.update_status(text)
-        return True
+        s = api.update_status(text)
+        id_str = s.id_str
+        link = "https://twitter.com/statuses/" + id_str
+        Connection.Instance().tweetsDB[str(topic_id)].update_one(
+            {'tweet_id': tweet['tweet_id']}, {'$set': {'status': 1, 'tweet_link': link}}, upsert=True)
     except:
         pass
-    return False
+    Connection.Instance().tweetsDB[str(topic_id)].update_one(
+        {'tweet_id': tweet['tweet_id']}, {'$set': {'status': -1}}, upsert=True)
 
 
 def main():
@@ -102,12 +106,7 @@ def main():
                     for tweet in tweets:
                         print("Publishing tweet_id: {0} and topic_id: {1}".format(tweet['tweet_id'], topic_id))
                         url = "{0}redirect?topic_id={1}&tweet_id={2}".format(config("HOST_URL"), topic_id, tweet['tweet_id'])
-                        if publish_tweet(tweet, url, tokens[0], tokens[1]):
-                            Connection.Instance().tweetsDB[str(topic_id)].update_one(
-                                {'tweet_id': tweet['tweet_id']}, {'$set': {'status': 1}}, upsert=True)
-                        else:
-                            Connection.Instance().tweetsDB[str(topic_id)].update_one(
-                                {'tweet_id': tweet['tweet_id']}, {'$set': {'status': -1}}, upsert=True)
+                        publish_tweet(topic_id, tweet, url, tokens[0], tokens[1])
         sleep(300)
 
 
