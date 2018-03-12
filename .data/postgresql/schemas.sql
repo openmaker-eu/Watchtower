@@ -392,7 +392,8 @@ ALTER TABLE user_topic_subscribe OWNER TO ${POSTGRESQL_USER};
 CREATE TABLE user_tweet (
     user_id bigint,
     topic_id bigint,
-    tweet_id bigint
+    tweet_id bigint,
+    news_id bigint
 );
 
 

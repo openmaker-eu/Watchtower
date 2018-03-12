@@ -1611,10 +1611,10 @@ def update_publish_tweet(topic_id, user_id, tweet_id, date, text, news_id, title
         with Connection.Instance().get_cursor() as cur:
             sql = (
                 "INSERT INTO user_tweet "
-                "(user_id, topic_id, tweet_id) "
-                "VALUES (%s, %s, %s);"
+                "(user_id, topic_id, tweet_id, news_id) "
+                "VALUES (%s, %s, %s, %s);"
             )
-            cur.execute(sql, [user_id, topic_id, tweet_id])
+            cur.execute(sql, [user_id, topic_id, tweet_id, news['link_id']])
     else:
         tweet = Connection.Instance().tweetsDB[str(topic_id)].find_one({'tweet_id': int(tweet_id)})
         published_at = general.tweet_date_to_string(date)
