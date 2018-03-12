@@ -23,8 +23,6 @@ def get_twitter_api(access_token, access_token_secret):
 
 def get_user_topics(user_id):
     with Connection.Instance().get_cursor() as cur:
-
-        SELECT topic_id, ARRAY_agg(tweet_id) as tweets FROM user_tweet WHERE user_id = 0 GROUP BY topic_id;
         sql = (
             "SELECT topic_id, ARRAY_agg(tweet_id) as tweets "
             "FROM user_tweet "
