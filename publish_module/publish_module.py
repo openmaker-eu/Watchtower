@@ -85,7 +85,8 @@ def publish_tweet(topic_id, tweet, url, access_token, access_token_secret):
         link = "https://twitter.com/statuses/" + id_str
         Connection.Instance().tweetsDB[str(topic_id)].update_one(
             {'tweet_id': tweet['tweet_id']}, {'$set': {'status': 1, 'tweet_link': link}}, upsert=True)
-    except:
+    except Exception as e:
+        print(e)
         pass
     Connection.Instance().tweetsDB[str(topic_id)].update_one(
         {'tweet_id': tweet['tweet_id']}, {'$set': {'status': -1}}, upsert=True)
