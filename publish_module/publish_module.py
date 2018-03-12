@@ -98,8 +98,8 @@ def main():
                         Connection.Instance().tweetsDB[str(topic_tweet[0])].find(
                             {'published_at': {'$lte': datetime.now()}, 'tweet_id': {'$in': topic_tweet[1]}, 'status': 0}))
                     for tweet in tweets:
-                        print("Publishing tweet_id: {0} and topic_id: {1}".format(tweet['tweet_id'], topic_id))
-                        url = "{0}redirect?topic_id={1}&tweet_id={2}".format(config("HOST_URL"), topic_id, tweet['tweet_id'])
+                        print("Publishing tweet_id: {0} and topic_id: {1}".format(tweet['tweet_id'], topic_tweet[0]))
+                        url = "{0}redirect?topic_id={1}&tweet_id={2}".format(config("HOST_URL"), topic_tweet[0], tweet['tweet_id'])
                         publish_tweet(topic_id, tweet, url, tokens[0], tokens[1])
         sleep(300)
 
