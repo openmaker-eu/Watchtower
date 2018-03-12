@@ -23,25 +23,18 @@ def get_twitter_api(access_token, access_token_secret):
 
 def get_user_topics(user_id):
     with Connection.Instance().get_cursor() as cur:
+
+        SELECT topic_id, ARRAY_agg(tweet_id) as tweets FROM user_tweet WHERE user_id = 0 GROUP BY topic_id;
         sql = (
-            "SELECT topic_id FROM user_topic WHERE user_id = %s ;"
+            "SELECT topic_id, ARRAY_agg(tweet_id) as tweets "
+            "FROM user_tweet "
+            "WHERE user_id = %s "
+            "GROUP BY topic_id;"
         )
         cur.execute(sql, [user_id])
         var = cur.fetchall()
 
-        own_topic_ids = [i[0] for i in var]
-
-        sql = (
-            "SELECT topic_id FROM user_topic_subscribe WHERE user_id = %s ;"
-        )
-        cur.execute(sql, [user_id])
-        var = cur.fetchall()
-
-        subscribe_topic_ids = [i[0] for i in var]
-
-        all_topics = set(own_topic_ids + subscribe_topic_ids)
-
-        return all_topics
+        return var
 
 
 def get_users():
@@ -96,14 +89,16 @@ def main():
     while True:
         users = get_users()
         for user_id in users:
+            tokens = None
             tokens = get_tokens(user_id)
             if tokens['response']:
                 tokens = tokens['tokens']
                 user_topics = get_user_topics(user_id)
-                for topic_id in user_topics:
+                print(user_id, "\n", user_topics)
+                for topic_tweet in user_topics:
                     tweets = list(
-                        Connection.Instance().tweetsDB[str(topic_id)].find(
-                            {'published_at': {'$lte': datetime.now()}, 'status': 0}))
+                        Connection.Instance().tweetsDB[str(topic_tweet[0])].find(
+                            {'published_at': {'$lte': datetime.now()}, 'tweet_id': {'$in': topic_tweet[1]}, 'status': 0}))
                     for tweet in tweets:
                         print("Publishing tweet_id: {0} and topic_id: {1}".format(tweet['tweet_id'], topic_id))
                         url = "{0}redirect?topic_id={1}&tweet_id={2}".format(config("HOST_URL"), topic_id, tweet['tweet_id'])
