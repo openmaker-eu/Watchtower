@@ -1,6 +1,7 @@
 import time
 import pymongo
 from decouple import config
+from predictor import Predictor
 ###
 MONGO_USERNAME_PASS = 'mongodb://{0}:{1}@'.format(config("MONGODB_USER"), config("MONGODB_PASSWORD"))
 MONGO_PORT = ':27017/'
