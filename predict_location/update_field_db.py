@@ -1,7 +1,7 @@
 import time
 import pymongo
 from decouple import config
-from predictor import Predictor
+from .predictor import Predictor
 ###
 MONGO_USERNAME_PASS = 'mongodb://{0}:{1}@'.format(config("MONGODB_USER"), config("MONGODB_PASSWORD"))
 MONGO_PORT = ':27017/'
@@ -16,6 +16,9 @@ def update_field_collection(host, collection_name, database, field_name, predict
     update_field_name = "predicted_" + field_name
 
     collection = database.get_collection(collection_name)
+
+    if collection_name == "all_audience":
+        return
 
     cursor = collection.find({update_field_name : {"$exists" : False}}).limit(BATCH_SIZE)
     n = 1
@@ -57,7 +60,7 @@ def update_field_db(host, database_name, field_name):
     collection_names = database.collection_names()
 
     # Create predictor object
-    predictor = Predictor(LOC_DATABASE_PATH, COUNTRY_DATABASE_PATH)
+    predictor = Predictor()
 
     for collection_name in collection_names:
         update_field_collection(host, collection_name, database, field_name,predictor)
