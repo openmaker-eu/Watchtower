@@ -60,7 +60,7 @@ def publish_tweet(topic_id, tweet, url, access_token, access_token_secret):
     try:
         s = api.update_status(text)
         id_str = s.id_str
-        tweet = json.loads(s)
+        tweet = s._json
         link = "https://twitter.com/statuses/" + id_str
         Connection.Instance().tweetsDB[str(topic_id)].update_one(
             {'tweet_id': tweet['tweet_id']}, {'$set': {'status': 1, 'tweet_link': link, 'tweet': tweet}}, upsert=True)
