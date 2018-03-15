@@ -60,6 +60,14 @@ To deploy this project you need Docker and Docker-compose to be installed in you
 
 Open your favourite browser and type [http://localhost:8484](http://localhost:8484)
 
+## Run
+
+* Run the following command to start server
+
+```$ sudo bash run.sh```
+
+Open your favourite browser and type [http://localhost:8484](http://localhost:8484)
+
 
 ## Authors
 
