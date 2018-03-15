@@ -1020,7 +1020,7 @@ def get_news(user_id, topic_id, date, cursor):
         cur.execute(sql, [int(user_id)])
         bookmarks = [link_id[0] for link_id in cur.fetchall()]
 
-        tweets = Connection.Instance().tweetsDB[str(topic_id)].find({}, {'news_id': 1})
+        tweets = list(Connection.Instance().tweetsDB[str(topic_id)].find({}, {'news_id': 1}))
         tweets = [link_id['news_id'] for link_id in tweets]
 
     for feed in feeds:
