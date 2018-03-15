@@ -386,20 +386,6 @@ CREATE TABLE user_topic_subscribe (
 ALTER TABLE user_topic_subscribe OWNER TO ${POSTGRESQL_USER};
 
 --
--- Name: user_tweet; Type: TABLE; Schema: public; Owner: ${POSTGRESQL_USER}
---
-
-CREATE TABLE user_tweet (
-    user_id bigint,
-    topic_id bigint,
-    tweet_id bigint,
-    news_id bigint
-);
-
-
-ALTER TABLE user_tweet OWNER TO ${POSTGRESQL_USER};
-
---
 -- Name: user_twitter; Type: TABLE; Schema: public; Owner: ${POSTGRESQL_USER}
 --
 
@@ -409,7 +395,8 @@ CREATE TABLE user_twitter (
     access_token_secret text,
     profile_image_url text,
     user_name text,
-    screen_name text
+    screen_name text,
+    twitter_id text
 );
 
 

@@ -61,6 +61,10 @@ class TweetsHandler(BaseHandler, TemplateRendering):
             news_id = int(self.get_argument("news_id", -1))
             date = self.get_argument("date", "")
             new_tweet = int(tweet_id) == -1
+            if new_tweet:
+                twitter_user = logic.get_twitter_user(user_id)
+                if twitter_user['twitter_id'] == '':
+                    self.redirect("/twitter_auth")
             sub_type = "item"
             tweets = logic.get_publish_tweet(topic['topic_id'], user_id, tweet_id, news_id, date)
         else:
@@ -109,4 +113,3 @@ class TweetsHandler(BaseHandler, TemplateRendering):
             self.redirect("/Tweets")
         else:
             self.write({'response': True})
-

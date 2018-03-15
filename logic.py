@@ -38,11 +38,13 @@ auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_secret)
 api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
 
+
 # from http://www.pythoncentral.io/hashing-strings-with-python/
 def hash_password(password):
-  # uuid is used to generate a random number
-  salt = uuid.uuid4().hex
-  return hashlib.sha256(salt.encode() + password.encode()).hexdigest()
+    # uuid is used to generate a random number
+    salt = uuid.uuid4().hex
+    return hashlib.sha256(salt.encode() + password.encode()).hexdigest()
+
 
 # from http://www.pythoncentral.io/hashing-strings-with-python/
 def check_password(hashed_password, user_password):
@@ -305,6 +307,7 @@ def update_twitter_auth(user_id, auth_token, twitter_pin):
             profile_image_url = user['profile_image_url_https']
             screen_name = user['screen_name']
             user_name = user['name']
+            twitter_id = user['id_str']
 
             sql = (
                 "SELECT NOT EXISTS (SELECT 1 FROM user_twitter where user_id = %s)"
@@ -315,18 +318,18 @@ def update_twitter_auth(user_id, auth_token, twitter_pin):
             if fetched[0]:
                 sql = (
                     "INSERT INTO user_twitter "
-                    "(user_id, access_token, access_token_secret, profile_image_url, user_name, screen_name) "
-                    "VALUES (%s, %s, %s, %s, %s, %s)"
+                    "(user_id, access_token, access_token_secret, profile_image_url, user_name, screen_name, twitter_id) "
+                    "VALUES (%s, %s, %s, %s, %s, %s, %s)"
                 )
-                cur.execute(sql, [user_id, token[0], token[1], profile_image_url, user_name, screen_name])
+                cur.execute(sql, [user_id, token[0], token[1], profile_image_url, user_name, screen_name, twitter_id])
             else:
                 sql = (
                     "UPDATE user_twitter "
                     "SET access_token = %s, access_token_secret = %s, profile_image_url = %s, "
-                    "user_name = %s, screen_name = %s "
+                    "user_name = %s, screen_name = %s, twitter_id = %s "
                     "WHERE user_id = %s"
                 )
-                cur.execute(sql, [token[0], token[1], profile_image_url, user_name, screen_name, user_id])
+                cur.execute(sql, [token[0], token[1], profile_image_url, user_name, screen_name, twitter_id, user_id])
 
         return {'response': True}
 
@@ -357,6 +360,7 @@ def update_user(user_id, password, country_code, auth_token, twitter_pin):
             profile_image_url = user['profile_image_url_https']
             screen_name = user['screen_name']
             user_name = user['name']
+            twitter_id = user['id_str']
 
             sql = (
                 "SELECT NOT EXISTS (SELECT 1 FROM user_twitter where user_id = %s)"
@@ -367,18 +371,18 @@ def update_user(user_id, password, country_code, auth_token, twitter_pin):
             if fetched[0]:
                 sql = (
                     "INSERT INTO user_twitter "
-                    "(user_id, access_token, access_token_secret, profile_image_url, user_name, screen_name) "
-                    "VALUES (%s, %s, %s, %s, %s, %s)"
+                    "(user_id, access_token, access_token_secret, profile_image_url, user_name, screen_name, twitter_id) "
+                    "VALUES (%s, %s, %s, %s, %s, %s, %s)"
                 )
-                cur.execute(sql, [user_id, token[0], token[1], profile_image_url, user_name, screen_name])
+                cur.execute(sql, [user_id, token[0], token[1], profile_image_url, user_name, screen_name, twitter_id])
             else:
                 sql = (
                     "UPDATE user_twitter "
                     "SET access_token = %s, access_token_secret = %s, profile_image_url = %s, "
-                    "user_name = %s, screen_name = %s "
+                    "user_name = %s, screen_name = %s, twitter_id = %s "
                     "WHERE user_id = %s"
                 )
-                cur.execute(sql, [token[0], token[1], profile_image_url, user_name, screen_name, user_id])
+                cur.execute(sql, [token[0], token[1], profile_image_url, user_name, screen_name, twitter_id, user_id])
         else:
             sql = (
                 "UPDATE users "
@@ -853,14 +857,15 @@ def add_local_influencer(topic_id, location, screen_name):
         )
         cur.execute(sql, [int(topic_id), str(location), str(screen_name), ""])
 
-    if Connection.Instance().added_local_influencers_DB['added_influencers'].find_one({"screen_name":screen_name}) is None:
+    if Connection.Instance().added_local_influencers_DB['added_influencers'].find_one(
+            {"screen_name": screen_name}) is None:
         new_local_influencer = api.get_user(screen_name)
-        new_local_influencer['topics']=topic_id
-        new_local_influencer['locations']=location
+        new_local_influencer['topics'] = topic_id
+        new_local_influencer['locations'] = location
         Connection.Instance().added_local_influencers_DB['added_influencers'].insert_one(new_local_influencer)
     else:
         Connection.Instance().added_local_influencers_DB['added_influencers'].update(
-            {"screen_name":screen_name},
+            {"screen_name": screen_name},
             {
                 "$addToSet": {
                     "topics": topic_id,
@@ -1015,13 +1020,8 @@ def get_news(user_id, topic_id, date, cursor):
         cur.execute(sql, [int(user_id)])
         bookmarks = [link_id[0] for link_id in cur.fetchall()]
 
-        sql = (
-            "SELECT news_id "
-            "FROM user_tweet "
-            "WHERE user_id = %s"
-        )
-        cur.execute(sql, [int(user_id)])
-        tweets = [link_id[0] for link_id in cur.fetchall()]
+        tweets = Connection.Instance().tweetsDB[str(topic_id)].find({}, {'news_id': 1})
+        tweets = [link_id['news_id'] for link_id in tweets]
 
     for feed in feeds:
         feed['bookmark'] = False
@@ -1121,7 +1121,7 @@ def get_events(topic_id, sortedBy, location, cursor):
     events = []
     location = location.lower()
     if cursor >= max_cursor:
-        result['events']=[]
+        result['events'] = []
         result['error'] = "Cannot exceed max cursor = " + str(max_cursor) + "."
         return result
     try:
@@ -1143,35 +1143,39 @@ def get_events(topic_id, sortedBy, location, cursor):
             result['error'] = "Topic does not exist."
             return result
 
-        events = [] # all events to be returned
+        events = []  # all events to be returned
         match = {'end_time': {'$gte': time.time()}}
         sort = {}
 
         result['topic'] = topic_name
         result['location'] = location
 
-
     # SORT CRITERIA
     if sortedBy == 'interested':
-        sort['interested']=-1
-    elif sortedBy == 'date' or sortedBy=='':
-        sort['start_time']=1
+        sort['interested'] = -1
+    elif sortedBy == 'date' or sortedBy == '':
+        sort['start_time'] = 1
     else:
         return {'error': "please enter a valid sortedBy value."}
 
     print("Location: " + str(location))
-    if location !="" and location.lower()!="global":
-        #location_predictor = Predictor()
-        #location = location_predictor.predict_location(location)
-        if location == "italy": location = "it"
-        elif location == "spain": location = "es"
-        elif location == "slovakia": location = "sk"
-        elif location == "uk": location = "gb"
-        elif location == "turkey": location = "tr"
+    if location != "" and location.lower() != "global":
+        # location_predictor = Predictor()
+        # location = location_predictor.predict_location(location)
+        if location == "italy":
+            location = "it"
+        elif location == "spain":
+            location = "es"
+        elif location == "slovakia":
+            location = "sk"
+        elif location == "uk":
+            location = "gb"
+        elif location == "turkey":
+            location = "tr"
 
         print("Filtering and sorting by location: " + location)
         EVENT_LIMIT = 70
-        COUNTRY_LIMIT=80
+        COUNTRY_LIMIT = 80
         cdl = []
 
         with open('rank_countries.csv', 'r') as f:
@@ -1183,55 +1187,57 @@ def get_events(topic_id, sortedBy, location, cursor):
             print("Found cdl!")
         count = 0
         for country in cdl[1:]:
-            match['$or'] = [{'place': re.compile("^.*\\b" + country + "$", re.IGNORECASE)}, {'predicted_place': country}]
+            match['$or'] = [{'place': re.compile("^.*\\b" + country + "$", re.IGNORECASE)},
+                            {'predicted_place': country}]
             events_in_current_location = list(Connection.Instance().events[str(topic_id)].aggregate([
                 {'$match': match},
                 {'$project': {'_id': 0,
                               "updated_time": 1,
                               "cover": 1,
                               "end_time": 1,
-                              "description":1,
-                              "start_date":1,
-                              "end_date":1,
+                              "description": 1,
+                              "start_date": 1,
+                              "end_date": 1,
                               "id": 1,
                               "name": 1,
                               "place": 1,
                               "start_time": 1,
                               "link": 1,
                               "interested": 1,
-                              "coming":1
+                              "coming": 1
                               }},
                 {'$sort': sort}
-                #{'$skip': int(cursor)},
-                #{'$limit': 10}
+                # {'$skip': int(cursor)},
+                # {'$limit': 10}
             ]))
             events += events_in_current_location
             count += 1
             message = "Checked db for country (#" + str(count) + "): " + str(country)
-            if len(events_in_current_location) > 0 :
+            if len(events_in_current_location) > 0:
                 message += " + " + str(len(events_in_current_location)) + " events!"
 
             print(message)
 
             print("length:" + str(len(events)))
-            if len(events) >= min(cursor+cursor_range,EVENT_LIMIT):
+            if len(events) >= min(cursor + cursor_range, EVENT_LIMIT):
                 break
             if (count > COUNTRY_LIMIT):
                 print("Searched closest " + str(COUNTRY_LIMIT) + " countries. Stopping here.")
                 break
 
-        #pprint.pprint([e['place'] for e in events])
-        display_events= events[cursor:min(cursor+cursor_range,max_cursor)]
+        # pprint.pprint([e['place'] for e in events])
+        display_events = events[cursor:min(cursor + cursor_range, max_cursor)]
 
-        result['next_cursor'] = cursor + (cursor_range-cursor % cursor_range)
-        if cursor !=0 : result['previous_cursor'] = cursor - cursor_range if cursor % cursor_range == 0 else cursor - cursor%cursor_range # if we are on the first page, there is no previous cursor
+        result['next_cursor'] = cursor + (cursor_range - cursor % cursor_range)
+        if cursor != 0: result[
+            'previous_cursor'] = cursor - cursor_range if cursor % cursor_range == 0 else cursor - cursor % cursor_range  # if we are on the first page, there is no previous cursor
 
         # cursor boundary checks
-        if result['next_cursor']  >= min(EVENT_LIMIT,max_cursor) or len(display_events) < cursor_range:
+        if result['next_cursor'] >= min(EVENT_LIMIT, max_cursor) or len(display_events) < cursor_range:
             result['next_cursor'] = 0
         if 'previous_cursor' in result:
-            if result['previous_cursor']  == 0:
-                result['previous_cursor']  = -1
+            if result['previous_cursor'] == 0:
+                result['previous_cursor'] = -1
 
         result['next_cursor_str'] = str(result['next_cursor'])
         result['events'] = display_events
@@ -1244,35 +1250,36 @@ def get_events(topic_id, sortedBy, location, cursor):
                           "updated_time": 1,
                           "cover": 1,
                           "end_time": 1,
-                          "description":1,
-                          "start_date":1,
-                          "end_date":1,
+                          "description": 1,
+                          "start_date": 1,
+                          "end_date": 1,
                           "id": 1,
                           "name": 1,
                           "place": 1,
                           "start_time": 1,
                           "link": 1,
                           "interested": 1,
-                          "coming":1
+                          "coming": 1
                           }},
             {'$sort': sort},
             {'$skip': int(cursor)},
-            {'$limit': min(cursor_range,max_cursor-cursor)}
+            {'$limit': min(cursor_range, max_cursor - cursor)}
         ]))
 
         cursor = int(cursor)
-        result['next_cursor'] = cursor + (cursor_range-cursor%cursor_range)
-        if cursor!=0: result['previous_cursor'] = cursor - cursor_range if cursor%cursor_range == 0 else cursor - cursor%cursor_range # if we are on the first page, there is no previous cursor
+        result['next_cursor'] = cursor + (cursor_range - cursor % cursor_range)
+        if cursor != 0: result[
+            'previous_cursor'] = cursor - cursor_range if cursor % cursor_range == 0 else cursor - cursor % cursor_range  # if we are on the first page, there is no previous cursor
 
         # cursor boundary checks
-        if result['next_cursor']  >= max_cursor or len(events) < cursor_range:
+        if result['next_cursor'] >= max_cursor or len(events) < cursor_range:
             result['next_cursor'] = 0
         if 'previous_cursor' in result:
-            if result['previous_cursor']  == 0:
-                result['previous_cursor']  = -1
+            if result['previous_cursor'] == 0:
+                result['previous_cursor'] = -1
 
         result['next_cursor_str'] = str(result['next_cursor'])
-        result['events']= events
+        result['events'] = events
 
     with Connection.Instance().get_cursor() as cur:
         sql = (
@@ -1293,9 +1300,9 @@ def get_events(topic_id, sortedBy, location, cursor):
                 # print(str(event['link']) + " not hidden")
 
     for event in result['events']:
-        if not isinstance(event['start_time'],str):
+        if not isinstance(event['start_time'], str):
             event['start_time'] = datetime.datetime.utcfromtimestamp(event['start_time']).strftime('%Y-%m-%dT%H:%M:%SZ')
-        if not isinstance(event['end_time'],str):
+        if not isinstance(event['end_time'], str):
             event['end_time'] = datetime.datetime.utcfromtimestamp(event['end_time']).strftime('%Y-%m-%dT%H:%M:%SZ')
 
     return result
@@ -1339,7 +1346,7 @@ def get_local_influencers(topic_id, cursor, location):
     print("Topic id:" + str(topic_id))
     print("Location:" + location)
     result = {}
-    local_influencers=[]
+    local_influencers = []
 
     with Connection.Instance().get_cursor() as cur:
         sql = (
@@ -1352,11 +1359,13 @@ def get_local_influencers(topic_id, cursor, location):
         # print("Hidden ids:")
         # print(hidden_ids)
 
-
-    if location.lower()=="global":
-        local_influencers += list(Connection.Instance().influencerDB["all_influencers"].find({"topics":topic_id}))[cursor:cursor + 21]
+    if location.lower() == "global":
+        local_influencers += list(Connection.Instance().influencerDB["all_influencers"].find({"topics": topic_id}))[
+                             cursor:cursor + 21]
     else:
-        local_influencers += list(Connection.Instance().local_influencers_DB[str(topic_id)+"_"+str(location)].find({}))[cursor:cursor + 21]
+        local_influencers += list(
+            Connection.Instance().local_influencers_DB[str(topic_id) + "_" + str(location)].find({}))[
+                             cursor:cursor + 21]
 
     for inf in local_influencers:
         inf['id'] = str(inf['id'])
@@ -1590,44 +1599,34 @@ def get_publish_tweet(topic_id, user_id, tweet_id, news_id, date):
 
 
 def get_publish_tweets(topic_id, user_id, status):
-    with Connection.Instance().get_cursor() as cur:
-        sql = (
-            "SELECT tweet_id "
-            "FROM user_tweet "
-            "WHERE user_id = %s and topic_id = %s;"
-        )
-        cur.execute(sql, [user_id, topic_id])
-        tweet_ids = [i[0] for i in cur.fetchall()]
-        tweets = []
-        sort_order = pymongo.ASCENDING
-        if int(status) == 1:
-            sort_order = pymongo.DESCENDING
-        for i in Connection.Instance().tweetsDB[str(topic_id)].find(
-                {'tweet_id': {'$in': tweet_ids}, 'status': int(status)}).sort([('published_at', sort_order)]):
-            temp = i
-            temp['published_at'] = general.tweet_date_to_string(i['published_at'])
-            tweets.append(temp)
-        return tweets
+    tweet_ids = [i['tweet_id'] for i in Connection.Instance().tweetsDB[str(topic_id)].find({'user_id': user_id}, {'tweet_id': 1})]
+    tweets = []
+    sort_order = pymongo.ASCENDING
+    if int(status) == 1:
+        sort_order = pymongo.DESCENDING
+    for i in Connection.Instance().tweetsDB[str(topic_id)].find(
+            {'tweet_id': {'$in': tweet_ids}, 'status': int(status)}).sort([('published_at', sort_order)]):
+        temp = i
+        temp['published_at'] = general.tweet_date_to_string(i['published_at'])
+        tweets.append(temp)
+    return tweets
 
 
 def delete_publish_tweet(topic_id, user_id, tweet_id):
-    with Connection.Instance().get_cursor() as cur:
-        sql = (
-            "DELETE FROM user_tweet "
-            "WHERE user_id = %s and topic_id = %s and tweet_id = %s;"
-        )
-        cur.execute(sql, [user_id, topic_id, tweet_id])
-        Connection.Instance().tweetsDB[str(topic_id)].remove({'tweet_id': tweet_id})
+    Connection.Instance().tweetsDB[str(topic_id)].remove({'tweet_id': tweet_id})
 
 
 def update_publish_tweet(topic_id, user_id, tweet_id, date, text, news_id, title, description, image_url):
     tweet_id = int(tweet_id)
+    twitter_user = get_twitter_user(user_id)
     if int(tweet_id) == -1:
         tweet_id = get_next_tweet_sequence()
         news = Connection.Instance().newsPoolDB[str(topic_id)].find_one({'link_id': int(news_id)})
         tweet = {
             'tweet_id': tweet_id,
             'news_id': news['link_id'],
+            'user_id': user_id,
+            'twitter_id': twitter_user['twitter_id'],
             'body': text,
             'title': title,
             'source': news['source'],
@@ -1638,13 +1637,6 @@ def update_publish_tweet(topic_id, user_id, tweet_id, date, text, news_id, title
             'status': 0
         }
         Connection.Instance().tweetsDB[str(topic_id)].insert_one(tweet)
-        with Connection.Instance().get_cursor() as cur:
-            sql = (
-                "INSERT INTO user_tweet "
-                "(user_id, topic_id, tweet_id, news_id) "
-                "VALUES (%s, %s, %s, %s);"
-            )
-            cur.execute(sql, [user_id, topic_id, tweet_id, news['link_id']])
     else:
         tweet = Connection.Instance().tweetsDB[str(topic_id)].find_one({'tweet_id': int(tweet_id)})
         published_at = general.tweet_date_to_string(date)
@@ -1653,7 +1645,12 @@ def update_publish_tweet(topic_id, user_id, tweet_id, date, text, news_id, title
         else:
             Connection.Instance().tweetsDB[str(topic_id)].update_one({'tweet_id': tweet_id},
                                                                      {'$set': {'body': text,
-                                                                               'published_at': published_at}})
+                                                                               'published_at': published_at,
+                                                                               'user_id': user_id,
+                                                                               'twitter_id': twitter_user[
+                                                                                   'twitter_id']}})
+
+
 def get_twitter_user(user_id):
     with Connection.Instance().get_cursor() as cur:
         sql = (
@@ -1663,14 +1660,14 @@ def get_twitter_user(user_id):
         fetched = cur.fetchone()
         if fetched[0]:
             sql = (
-                "SELECT user_name, screen_name, profile_image_url "
+                "SELECT user_name, screen_name, profile_image_url, twitter_id "
                 "FROM user_twitter "
                 "WHERE user_id = %s;"
             )
             cur.execute(sql, [user_id])
             user = cur.fetchone()
-            return {'user_name': user[0], 'screen_name': user[1], 'profile_image_url': user[2]}
-        return {'user_name': '', 'screen_name': '', 'profile_image_url': ''}
+            return {'user_name': user[0], 'screen_name': user[1], 'profile_image_url': user[2], 'twitter_id': user[3]}
+        return {'user_name': '', 'screen_name': '', 'profile_image_url': '', 'twitter_id': ''}
 
 
 def get_tweet(topic_id, tweet_id):
