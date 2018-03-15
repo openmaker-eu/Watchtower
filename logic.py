@@ -1020,7 +1020,7 @@ def get_news(user_id, topic_id, date, cursor):
         cur.execute(sql, [int(user_id)])
         bookmarks = [link_id[0] for link_id in cur.fetchall()]
 
-        tweets = list(Connection.Instance().tweetsDB[str(topic_id)].find({}, {'news_id': 1}))
+        tweets = list(Connection.Instance().tweetsDB[str(topic_id)].find({'user_id': user_id}, {'news_id': 1}))
         tweets = [link_id['news_id'] if 'news_id' in link_id else -1 for link_id in tweets]
 
     for feed in feeds:
@@ -1613,7 +1613,7 @@ def get_publish_tweets(topic_id, user_id, status):
 
 
 def delete_publish_tweet(topic_id, user_id, tweet_id):
-    Connection.Instance().tweetsDB[str(topic_id)].remove({'tweet_id': tweet_id})
+    Connection.Instance().tweetsDB[str(topic_id)].remove({'tweet_id': int(tweet_id)})
 
 
 def update_publish_tweet(topic_id, user_id, tweet_id, date, text, news_id, title, description, image_url):
