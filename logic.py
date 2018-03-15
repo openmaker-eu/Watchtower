@@ -16,6 +16,8 @@ import pymongo
 import tweepy
 import requests
 import psycopg2
+import uuid
+import hashlib
 
 from application.utils import twitter_search_sample_tweets
 from application.utils import general
@@ -35,6 +37,17 @@ access_secret = config("TWITTER_ACCESS_SECRET")
 auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_secret)
 api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
+
+# from http://www.pythoncentral.io/hashing-strings-with-python/
+def hash_password(password):
+  # uuid is used to generate a random number
+  salt = uuid.uuid4().hex
+  return hashlib.sha256(salt.encode() + password.encode()).hexdigest()
+
+# from http://www.pythoncentral.io/hashing-strings-with-python/
+def check_password(hashed_password, user_password):
+    password, salt = hashed_password.split(':')
+    return password == hashlib.sha256(salt.encode() + user_password.encode()).hexdigest()
 
 
 def set_current_topic(user_id):
@@ -238,6 +251,8 @@ def register(username, password, country_code):
         if fetched[0]:
             return {'response': False, 'error_type': 2, 'message': 'Invalid country code.'}
 
+        password = hash_password(password)
+
         sql = (
             "INSERT INTO users "
             "(username, password, alertlimit, country_code) "
@@ -387,7 +402,7 @@ def login(username, password):
         if len(fetched) == 0:
             return {'response': False, 'error_type': 1, 'message': 'Invalid username'}
 
-        if password != fetched[0][2]:
+        if check_password(fetched[0][2], password):
             return {'response': False, 'error_type': 2, 'message': 'Invalid password'}
 
         return {'response': True, 'user_id': fetched[0][0]}
@@ -1585,7 +1600,7 @@ def get_publish_tweets(topic_id, user_id, status):
         tweet_ids = [i[0] for i in cur.fetchall()]
         tweets = []
         sort_order = pymongo.ASCENDING
-        if int(status) == 1: 
+        if int(status) == 1:
             sort_order = pymongo.DESCENDING
         for i in Connection.Instance().tweetsDB[str(topic_id)].find(
                 {'tweet_id': {'$in': tweet_ids}, 'status': int(status)}).sort([('published_at', sort_order)]):
