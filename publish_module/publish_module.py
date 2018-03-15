@@ -82,7 +82,7 @@ def main():
                         continue
                     tweets = list(
                         Connection.Instance().tweetsDB[str(topic_id)].find(
-                            {'published_at': {'$lte': datetime.now()}, 'user_id': user_id, 'twitter_id': tokens[2],
+                            {'published_at': {'$lte': datetime.now()}, 'user_id': str(user_id), 'twitter_id': tokens[2],
                              'status': 0}))
                     for tweet in tweets:
                         print("Publishing tweet_id: {0} and topic_id: {1}".format(tweet['tweet_id'], topic_id))
