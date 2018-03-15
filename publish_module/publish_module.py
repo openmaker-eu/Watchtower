@@ -88,7 +88,7 @@ def main():
                         print("Publishing tweet_id: {0} and topic_id: {1}".format(tweet['tweet_id'], topic_id))
                         url = "{0}redirect?topic_id={1}&tweet_id={2}".format(config("HOST_URL"), topic_id,
                                                                              tweet['tweet_id'])
-                        publish_tweet(topic_tweet[0], tweet, url, tokens[0], tokens[1])
+                        publish_tweet(topic_id, tweet, url, tokens[0], tokens[1])
         sleep(300)
 
 
