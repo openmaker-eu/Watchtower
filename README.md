@@ -56,7 +56,7 @@ To deploy this project you need Docker and Docker-compose to be installed in you
 * Modify .env file according to your configurations
 * Run the following command to build server
 
-``` sudo bash deploy.sh```
+```$ sudo bash deploy.sh```
 
 Open your favourite browser and type [http://localhost:8484](http://localhost:8484)
 
