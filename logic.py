@@ -402,7 +402,7 @@ def login(username, password):
         if len(fetched) == 0:
             return {'response': False, 'error_type': 1, 'message': 'Invalid username'}
 
-        if check_password(fetched[0][2], str(password)):
+        if not check_password(fetched[0][2], str(password)):
             return {'response': False, 'error_type': 2, 'message': 'Invalid password'}
 
         return {'response': True, 'user_id': fetched[0][0]}
