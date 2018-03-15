@@ -1021,7 +1021,7 @@ def get_news(user_id, topic_id, date, cursor):
         bookmarks = [link_id[0] for link_id in cur.fetchall()]
 
         tweets = list(Connection.Instance().tweetsDB[str(topic_id)].find({}, {'news_id': 1}))
-        tweets = [link_id['news_id'] for link_id in tweets]
+        tweets = [link_id['news_id'] if 'news_id' in link_id else -1 for link_id in tweets]
 
     for feed in feeds:
         feed['bookmark'] = False

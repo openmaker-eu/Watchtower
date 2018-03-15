@@ -26,7 +26,8 @@ def main():
     options.parse_command_line()
     app = WatchtowerApp()
     try:
-        app.sentry_client = AsyncSentryClient(config("SENTRY_TOKEN"))
+        if config("SENTRY_TOKEN") != 'null':
+            app.sentry_client = AsyncSentryClient(config("SENTRY_TOKEN"))
     except RuntimeError as err:
         logger.log_and_print(err)
         pass
