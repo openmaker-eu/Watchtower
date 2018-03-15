@@ -77,8 +77,6 @@ def main():
             tokens = get_tokens(user_id)
             if tokens['response']:
                 tokens = tokens['tokens']
-                user_topics = get_user_topics(user_id)
-                print(user_id, "\n", user_topics)
                 for topic_id in Connection.Instance().tweetsDB.collection_names():
                     if topic_id == 'counters':
                         continue
