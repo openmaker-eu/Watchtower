@@ -20,13 +20,14 @@ def update_field_collection(host, collection_name, database, field_name, predict
     if collection_name == "all_audience":
         return
 
-    cursor = collection.find({update_field_name : {"$exists" : False}}).limit(BATCH_SIZE)
-    n = 1
-    while cursor.count(with_limit_and_skip=True):
-        print("...Processing batch " + str(n))
+    cursor = collection.find({update_field_name : {"$exists" : False}})
 
-        bulk = collection.initialize_unordered_bulk_op()
+    bulk = collection.initialize_unordered_bulk_op()
 
+    if not cursor.count():
+        print("...No record to update !")
+    else:
+        print("...Number of records to update :",cursor.count())
         for record in cursor:
             if update_field_name in record: # This is redundant ?
                 continue
@@ -34,13 +35,13 @@ def update_field_collection(host, collection_name, database, field_name, predict
                 bulk.find({'_id':record['_id']}).update({'$set' : {update_field_name : predictor.predict_location(record[field_name])}})
             else:
                 bulk.find({'_id':record['_id']}).update({'$set' : {update_field_name : ""}})
+        print("...Execute bulk write")
         try:
             bulk.execute()
-        except pymongo.errors.InvalidOperation:
-            print("     NO RECORD WITH {} FIELD IN THIS BATCH".format(field_name.upper()))
-
-        cursor = collection.find({update_field_name : {"$exists" : False}}).skip(n*BATCH_SIZE).limit(BATCH_SIZE)
-        n += 1
+        except pymongo.errors.InvalidOperation as e:
+            print(str(e))
+        else:
+            print("...DONE!")
 
 
 # Update all collections in the given database
