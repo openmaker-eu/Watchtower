@@ -108,7 +108,7 @@ def calculateScore(per, keywords):
     fullTexts = [x.full_text for x in status_list]
     keywordOccurenceNumbers = countKeywordsInTweet(fullTexts, keywords)
     count = sum([keywordOccurence*multiplier for keywordOccurence, multiplier in zip(keywordOccurenceNumbers, keywordCounts)])
-    pdb.set_trace()
+
     final_score = per["followers_count"]*(count + hashtagCount + penalty)
 
     return final_score
@@ -148,7 +148,6 @@ def get_local_influencers():
     # Sort audience sample and and write top 20 to influencers database
     for collection_name in Connection.Instance().audience_samples_DB.collection_names():
         collection = Connection.Instance().audience_samples_DB[collection_name]
-        pdb.set_trace()
         influencers = list(collection.find({}).sort([("influencer_score" , -1)]).limit(20))
         location, topic = collection_name.split("_")
         local_influencers_collection = Connection.Instance().local_influencers_DB[topic+"_"+location]
