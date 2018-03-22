@@ -19,6 +19,44 @@
     box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
 }
 
+.stats {
+    padding: 0 0 10px 0;
+    border-top: 4px solid #FFF;
+    text-align: center;
+    background-color: #FFF;
+}
+
+.stats a {
+    text-decoration: none;
+}
+
+.stats span {
+    color: #000;
+    display: block;
+}
+
+.stats ul {
+    margin: 0;
+    padding: 10px 0 0 0;
+    display: block;
+}
+
+.stats li {
+    width: 50%;
+    list-style-type: none;
+    display: inline-block;
+    font-size: 14px;
+    color: #AAA;
+    text-decoration: none;
+}
+
+.stats li span {
+    color: #000;
+    font-size: 20px;
+    display: block;
+}
+
+
 .details {
     padding: 0 0 10px 0;
     border-top: 4px solid #FFF;

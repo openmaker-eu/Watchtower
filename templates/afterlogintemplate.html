@@ -355,6 +355,8 @@
     {% include 'tweetTemplate.html' %}
 {% endif %}
 
+</body>
+
 <!-- /.container -->
 <!-- Bootstrap core JavaScript
 ================================================== -->
@@ -428,14 +430,14 @@
     });
 </script>
 
-{% if topic %}
+{% if topic_id %}
     <script>
         $(document).ready(function () {
-            var selText = $("li a[data-id={{topic['topic_id']}}]").children("h4").html();
+            var selText = $("li a[data-id={{topic_id}}]").children("h4").html();
             console.log({{topic}});
-            $("li a[data-id={{topic['topic_id']}}]").parent('li').siblings().removeClass('active');
-            $("li a[data-id={{topic['topic_id']}}]").parents('.btn-group').find('.selection').html(selText);
-            $("li a[data-id={{topic['topic_id']}}]").parents('li').addClass("active");
+            $("li a[data-id={{topic_id}}]").parent('li').siblings().removeClass('active');
+            $("li a[data-id={{topic_id}}]").parents('.btn-group').find('.selection').html(selText);
+            $("li a[data-id={{topic_id}}]").parents('li').addClass("active");
 
             var selText = $("li a[data-id={{location}}]").children("h4").html();
             console.log("{{location}}");
@@ -508,7 +510,5 @@
     <script src="/js/jquery-1.11.1.min.js"></script>
     <script type="text/javascript" src="/js/twitterAuth.js"></script>
 {% endif %}
-
-</body>
 
 </html>
