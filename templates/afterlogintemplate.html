@@ -430,14 +430,15 @@
     });
 </script>
 
-{% if topic_id %}
-    <script>
+{% if topic %}
+    <script type="text/javascript">
         $(document).ready(function () {
-            var selText = $("li a[data-id={{topic_id}}]").children("h4").html();
+            var selText = $("li a[data-id={{topic['topic_id']}}]").children("h4").html();
             console.log({{topic}});
-            $("li a[data-id={{topic_id}}]").parent('li').siblings().removeClass('active');
-            $("li a[data-id={{topic_id}}]").parents('.btn-group').find('.selection').html(selText);
-            $("li a[data-id={{topic_id}}]").parents('li').addClass("active");
+            $("li a[data-id={{topic['topic_id']}}]").parent('li').siblings().removeClass('active');
+            $("li a[data-id={{topic['topic_id']}}]").parents('.btn-group').find('.selection').html(selText);
+            $("li a[data-id={{topic['topic_id']}}]").parents('li').addClass("active");
+
 
             var selText = $("li a[data-id={{location}}]").children("h4").html();
             console.log("{{location}}");
