@@ -34,6 +34,13 @@
             border-color: #de615e;
         }
 
+        .divider-vertical {
+            height: 50px;
+            margin: 0 9px;
+            border-left: 1px solid #F2F2F2;
+            border-right: 1px solid #FFF;
+        }
+
         .bootstrap-tagsinput {
             width: 100%;
         }
@@ -170,14 +177,34 @@
         </div>
         <div id="navbar" class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
-                <li {% if type=="news" %} class="active" {% endif %}>
-                    <a href="/News">News</a>
+                <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                        APIs <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a href="/api">API v1</a>
+                        </li>
+                        <li>
+                            <a href="/api/v1.1">API v1.1</a>
+                        </li>
+                        <li>
+                            <a href="/api/v1.2">API v1.2</a>
+                        </li>
+                        <li>
+                            <a href="/api/v1.3">API v1.3</a>
+                        </li>
+                    </ul>
                 </li>
 
                 <li {% if type=="tweets" %} class="active" {% endif %}>
                     <a href="/Tweets">Tweets</a>
                 </li>
 
+                <li class="divider-vertical"></li>
+
+                <li {% if type=="news" %} class="active" {% endif %}>
+                    <a href="/News">News</a>
+                </li>
 
                 <li {% if type=="conversation" %} class="active" {% endif %}>
                     <a href="/Conversations">Conversations</a>
