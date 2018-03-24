@@ -17,20 +17,20 @@ class AudienceHandler(BaseHandler, TemplateRendering):
     def get(self, argument=None):
         user_id = tornado.escape.xhtml_escape(self.current_user)
         template = 'afterlogintemplate.html'
-        topic_id = logic.get_current_topic(user_id)['topic_id']
-        print(" (GET) Getting audience for topic " + str(topic_id))
+        topic = logic.get_current_topic(user_id)
+        print(" (GET) Getting audience for topic " + str(topic['topic_id']))
         try:
             location = self.get_argument('location')
         except:
             location = logic.get_current_location(tornado.escape.xhtml_escape(self.current_user))
         relevant_locations = logic.get_relevant_locations()
-        if topic_id is None:
+        if topic is None:
             self.redirect("/topicinfo")
-        audiences = logic.get_audience(topic_id, user_id, 0, location)
-        audience_stats = logic.get_audience_stats(topic_id, location)
+        audiences = logic.get_audience(topic['topic_id'], user_id, 0, location)
+        audience_stats = logic.get_audience_stats(topic['topic_id'], location)
         variables = {
             'title': "Audience",
-            'topic_id': topic_id,
+            'topic': topic,
             'audiences': audiences['audiences'],
             'cursor': audiences['next_cursor'],
             'alerts': logic.get_topic_list(user_id),
@@ -56,7 +56,8 @@ class AudienceHandler(BaseHandler, TemplateRendering):
         except:
             location = logic.get_current_location(tornado.escape.xhtml_escape(self.current_user))
 
-        if argument is not None:  # change in topic or location dropdown
+        if argument is not None:  # scroll
+            print("Scrolled down.")
             template = 'audienceTemplate.html'
             try:
                 next_cursor = self.get_argument('next_cursor')
@@ -75,7 +76,8 @@ class AudienceHandler(BaseHandler, TemplateRendering):
             except Exception as e:
                 print(e)
                 self.write("")
-        else:  # scroll
+        else:  # change in topic or location dropdown
+            print("Changed topic or location.")
             template = 'alertAudience.html'
             user_id = tornado.escape.xhtml_escape(self.current_user)
             try:
@@ -85,6 +87,7 @@ class AudienceHandler(BaseHandler, TemplateRendering):
                 variables = {
                     'audiences': audiences['audiences'],
                     'audience_stats': audience_stats,
+                    'topic_id': topic_id,
                     'cursor': audiences['next_cursor']
                 }
             except Exception as e:

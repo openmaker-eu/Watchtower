@@ -1048,6 +1048,11 @@ def get_news(user_id, topic_id, date, cursor):
 
 
 def get_audience(topic_id, user_id, cursor, location):
+    print("In get audience")
+    if topic_id is None:
+        print("Topic is not defined.")
+    print("Topic " + str(topic_id))
+    print("Cursor " + str(cursor))
     result = {}
     audiences = list(Connection.Instance().audience_samples_DB[str(location) + "_" + str(topic_id)].find({}))[
                 cursor:cursor + 21]
@@ -1069,7 +1074,6 @@ def get_audience(topic_id, user_id, cursor, location):
         ratings = {str(rating[0]): rating[1] for rating in rating_list}
 
     for audience in audiences:
-
         audience['rate'] = 0
         try:
             audience['rate'] = ratings[str(audience['id'])]
