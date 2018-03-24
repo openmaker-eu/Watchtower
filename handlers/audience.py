@@ -47,8 +47,9 @@ class AudienceHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
     def post(self, argument=None):
         variables = {}
-        topic_id = self.get_argument('topic_id')
         user_id = tornado.escape.xhtml_escape(self.current_user)
+        topic = logic.get_current_topic(user_id)
+        topic_id = topic['topic_id']
         print(" (POST) Getting audience for topic " + str(topic_id))
         try:
             location = self.get_argument('location')
@@ -77,7 +78,11 @@ class AudienceHandler(BaseHandler, TemplateRendering):
                 print(e)
                 self.write("")
         else:  # change in topic or location dropdown
-            print("Changed topic or location.")
+            try:
+                topic_id = self.get_argument('topic_id')
+                print("Changed topic.")
+            except:
+                print("Changed location.")
             template = 'alertAudience.html'
             user_id = tornado.escape.xhtml_escape(self.current_user)
             try:

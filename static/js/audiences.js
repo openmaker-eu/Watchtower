@@ -26,13 +26,12 @@ $(document).ready(function () {
     $("#location_dropdown").on('click', 'li a', function () {
         $('#audiencecontainer').empty();
         $("#spin").show();
-        var topicId = $('#topic_dropdown .active a').attr('data-id');
+        // var topicId = $('#topic_dropdown .active a').attr('data-id');
         var location = $(this).attr("data-id");
         $.ajax({
             url: '/Audience',
             method: 'POST',
             data: {
-                'topic_id': topicId,
                 'location':location
             },
             timeout: 10000,
@@ -59,8 +58,7 @@ $(document).ready(function () {
                     url: '/Audience/scroll',
                     method: 'POST',
                     data: {
-                        'next_cursor': ncursor,
-                        'topic_id': topic_id
+                        'next_cursor': ncursor
                     },
                     success: function (html) {
                         $('#audiencewrapper').append(html);

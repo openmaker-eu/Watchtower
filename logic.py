@@ -1052,6 +1052,7 @@ def get_audience(topic_id, user_id, cursor, location):
     if topic_id is None:
         print("Topic is not defined.")
     print("Topic " + str(topic_id))
+    print("Location " + str(location))
     print("Cursor " + str(cursor))
     result = {}
     audiences = list(Connection.Instance().audience_samples_DB[str(location) + "_" + str(topic_id)].find({}))[
