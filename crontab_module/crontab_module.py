@@ -45,11 +45,11 @@ cmd_7 = "echo 'source " + python_venv + "; python3 " + cron_directory + "update_
 job_7  = my_cron.new(command=cmd_7)
 job_7.setall("0 3 * * 0")
 
-"""
+
 cmd_8 = "echo 'source " + python_venv + "; python3 " + cron_directory + "get_local_influencers.py >> /tmp/get_local_influencers.txt' | /bin/bash"
 job_8  = my_cron.new(command=cmd_8)
 job_8.setall("0 */3 * * *")
-"""
+
 
 cmd_9 = "echo 'source " + python_venv + "; python3 " + cron_directory + "get_events.py >> /tmp/get_events.txt' | /bin/bash"
 job_9 = my_cron.new(command=cmd_9)
