@@ -1,0 +1,50 @@
+# This Dockerfile generates an image for a container for Python development purposes.
+# Latest updated on: 2018-01-08
+
+FROM ubuntu:latest
+
+# Linux Packages
+################
+RUN apt-get update && apt-get install -y \
+apt-utils \
+git \
+vim \
+curl \
+wget \
+psmisc \
+tmux \
+software-properties-common
+
+# Python Linux Dependencies
+###########################
+RUN apt-get update && apt-get install -y \
+python3 \
+python3-pip \
+python3-dev
+
+# Pipenv
+########
+RUN pip3 install --upgrade pip && \
+pip3 install pipenv
+ENV SHELL /bin/bash
+
+# Locale Encoding: make the "en_US.UTF-8" locale so utf-8 is enabled by default
+###############################################################################
+RUN apt-get update && apt-get install -y locales && rm -rf /var/lib/apt/lists/* \
+&& localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
+ENV LANG en_US.utf8
+
+ADD ./Pipfile /root/cloud/Pipfile
+ADD ./Pipfile.lock /root/cloud/Pipfile.lock
+
+WORKDIR /root/cloud
+
+RUN pipenv install
+
+RUN curl https://raw.githubusercontent.com/codelucas/newspaper/master/download_corpora.py | pipenv run python3
+
+ENV PATH="/root/cloud:${PATH}"
+
+ADD ./.bash/crontab_module-entrypoint.sh /usr/bin/crontab_module-entrypoint.sh
+RUN chmod +x /usr/bin/crontab_module-entrypoint.sh
+ENTRYPOINT ["/usr/bin/crontab_module-entrypoint.sh"]

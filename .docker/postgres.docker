@@ -1,0 +1,8 @@
+FROM postgres:9.6
+
+RUN apt-get update && apt-get install -y vim
+
+RUN rm -rf /data
+RUN mkdir /data
+
+RUN mkdir -p /var/lib/postgresql/9.6

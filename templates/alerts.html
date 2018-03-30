@@ -14,20 +14,20 @@
                         <div class="dropdown-content">
                             {% if alert['type'] == 'me' %}
                                 <a href="/topicinfo/{{ alert['alertid'] }}">Edit</a>
-                                <a href="#" onclick="alertbuttonclick({{ alert['alertid'] }}, 'remove');"
+                                <a href="javascript:void(0)" onclick="alertbuttonclick({{ alert['alertid'] }}, 'remove');"
                                    posttype="remove" alertid="{{ alert['alertid'] }}">Remove</a>
                                 {% if not alert['status'] %}
-                                    <a href="#" onclick="alertbuttonclick({{ alert['alertid'] }}, 'start');"
+                                    <a href="javascript:void(0)" onclick="alertbuttonclick({{ alert['alertid'] }}, 'start');"
                                        posttype="start" alertid="{{ alert['alertid'] }}">Start</a> {% else %}
-                                    <a href="#" onclick="alertbuttonclick({{ alert['alertid'] }}, 'stop');"
+                                    <a href="javascript:void(0)" onclick="alertbuttonclick({{ alert['alertid'] }}, 'stop');"
                                        posttype="stop" alertid="{{ alert['alertid'] }}">Stop</a> {% endif %}
                                 {% if not alert['publish'] %}
-                                    <a href="#" onclick="alertbuttonclick({{ alert['alertid'] }}, 'publish');"
+                                    <a href="javascript:void(0)" onclick="alertbuttonclick({{ alert['alertid'] }}, 'publish');"
                                        posttype="publish" alertid="{{ alert['alertid'] }}">Publish</a> {% else %}
-                                    <a href="#" onclick="alertbuttonclick({{ alert['alertid'] }}, 'unpublish');"
+                                    <a href="javascript:void(0)" onclick="alertbuttonclick({{ alert['alertid'] }}, 'unpublish');"
                                        posttype="unpublish" alertid="{{ alert['alertid'] }}">Unpublish</a>
                                 {% endif %} {% elif alert['type'] == 'subscribed' %}
-                                <a href="#" onclick="alertbuttonclick({{ alert['alertid'] }}, 'unsubscribe');"
+                                <a href="javascript:void(0)" onclick="alertbuttonclick({{ alert['alertid'] }}, 'unsubscribe');"
                                    posttype="unsubscribe" alertid="{{ alert['alertid'] }}">Unsubscribe</a> {% endif %}
                         </div>
                     </div>
@@ -40,7 +40,7 @@
                       <b>Tweet Count:</b> {{ alert['tweetCount'] }} <br> <b>Top Five
                         Hashtags:</b> {{ alert['hashtags'] }} <br> <br>
                         <span style="font-size:13px;float:right"><b>Created at:</b> {{ alert['creationTime'] }} <br>
-                  <b>Last updated date:</b> {{ alert['updatedTime'] }} </span>
+                  <b>Last tweet updated date:</b> {{ alert['updatedTime'] }} <br> <b>Last news updated date:</b> {{ alert['newsUpdatedTime'] }} </span>
                     </p>
                 </div>
             </div>
@@ -80,20 +80,20 @@
                         <div class="dropdown-content">
                             {% if alert['type'] == 'me' %}
                                 <a href="/topicinfo/{{ alert['alertid'] }}">Edit</a>
-                                <a href="#" onclick="alertbuttonclick({{ alert['alertid'] }}, 'remove');"
+                                <a href="javascript:void(0)" onclick="alertbuttonclick({{ alert['alertid'] }}, 'remove');"
                                    posttype="remove" alertid="{{ alert['alertid'] }}">Remove</a>
                                 {% if not alert['status'] %}
-                                    <a href="#" onclick="alertbuttonclick({{ alert['alertid'] }}, 'start');"
+                                    <a href="javascript:void(0)" onclick="alertbuttonclick({{ alert['alertid'] }}, 'start');"
                                        posttype="start" alertid="{{ alert['alertid'] }}">Start</a> {% else %}
-                                    <a href="#" onclick="alertbuttonclick({{ alert['alertid'] }}, 'stop');"
+                                    <a href="javascript:void(0)" onclick="alertbuttonclick({{ alert['alertid'] }}, 'stop');"
                                        posttype="stop" alertid="{{ alert['alertid'] }}">Stop</a> {% endif %}
                                 {% if not alert['publish'] %}
-                                    <a href="#" onclick="alertbuttonclick({{ alert['alertid'] }}, 'publish');"
+                                    <a href="javascript:void(0)" onclick="alertbuttonclick({{ alert['alertid'] }}, 'publish');"
                                        posttype="publish" alertid="{{ alert['alertid'] }}">Publish</a> {% else %}
-                                    <a href="#" onclick="alertbuttonclick({{ alert['alertid'] }}, 'unpublish');"
+                                    <a href="javascript:void(0)" onclick="alertbuttonclick({{ alert['alertid'] }}, 'unpublish');"
                                        posttype="unpublish" alertid="{{ alert['alertid'] }}">Unpublish</a>
                                 {% endif %} {% elif alert['type'] == 'subscribed' %}
-                                <a href="#" onclick="alertbuttonclick({{ alert['alertid'] }}, 'unsubscribe');"
+                                <a href="javascript:void(0)" onclick="alertbuttonclick({{ alert['alertid'] }}, 'unsubscribe');"
                                    posttype="unsubscribe" alertid="{{ alert['alertid'] }}">Unsubscribe</a> {% endif %}
                         </div>
                     </div>
@@ -107,7 +107,7 @@
                         Hashtags:</b> {{ alert['hashtags'] }} <br> <br>
                         <span style="font-size:13px;float:right"><b>Created by:</b> {{ alert['created_by'] }} <br>
                           <b>Created at:</b> {{ alert['creationTime'] }} <br>
-                    <b>Last updated date:</b> {{ alert['updatedTime'] }} </span>
+                    <b>Last tweet updated date:</b> {{ alert['updatedTime'] }} <br> <b>Last news updated date:</b> {{ alert['newsUpdatedTime'] }} </span>
                     </p>
                 </div>
             </div>
@@ -126,7 +126,7 @@
                     <div class="dropdown" style="float:right">
                         <button class="dropbtn">More</button>
                         <div class="dropdown-content">
-                            <a href="#" onclick="alertbuttonclick({{ alert['alertid'] }}, 'subscribe');"
+                            <a href="javascript:void(0)" onclick="alertbuttonclick({{ alert['alertid'] }}, 'subscribe');"
                                posttype="subscribe" alertid="{{ alert['alertid'] }}">Subscribe</a>
                         </div>
                     </div>
@@ -140,7 +140,7 @@
                         Hashtags:</b> {{ alert['hashtags'] }} <br> <br>
                         <span style="font-size:13px;float:right"><b>Created by:</b> {{ alert['created_by'] }} <br>
                           <b>Created at:</b> {{ alert['creationTime'] }} <br>
-                  <b>Last updated date:</b> {{ alert['updatedTime'] }} </span>
+                  <b>Last tweet updated date:</b> {{ alert['updatedTime'] }}  <br> <b>Last news updated date:</b> {{ alert['newsUpdatedTime'] }}</span>
                     </p>
                 </div>
             </div>

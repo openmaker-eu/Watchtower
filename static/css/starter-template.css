@@ -62,3 +62,30 @@ body {
     padding-top: 5px;
     padding-bottom: 5px;
 }
+
+.back-to-top {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    font-size: 14px;
+    padding-right: 15px;
+    padding-left: 15px;
+
+    margin: 0;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 120px;
+    height: 60px;
+    z-index: 100;
+    color: black;
+    background-color: #f5f5f5;
+}
+
+.back-to-top:hover {
+    box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+}
+
+a.to-top-link:link
+{
+   color: black;
+   text-decoration: none;
+}

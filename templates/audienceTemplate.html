@@ -1,3 +1,17 @@
+{% if audience_stats is defined and cursor == 21 %}
+    <div class="audience_card" cursor="{{ cursor }}">
+        <div class="stats">
+            <h3> Statistics: </h3> ---
+           <ul>
+                <!-- <li>Topic id/location <span>{{ audience_stats['topic_id']}} / {{ audience_stats['location']}} </span></li> <br/><br/> !-->
+                <li>Execution time (in seconds): <span>{{ audience_stats['execution_duration']}}</span></li> <br/><br/>
+                <li>Last executed: <span>{{ audience_stats['last_executed'] }}</span></li> <br/><br/>
+                <li>Filtered by predicted location/regex: <span>{{ audience_stats['from_predicted_location'] }} / {{ audience_stats['from_regex'] }} </span></li> <br/>
+            </ul>
+        </div>
+    </div>
+{% endif %}
+
 {% for audience in audiences %}
 
     <div class="audience_card" cursor="{{ cursor }}">

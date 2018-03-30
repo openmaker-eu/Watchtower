@@ -1,0 +1,159 @@
+@import url(//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css);
+
+.influencer_card {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    transition: 0.3s;
+    float: left;
+    margin: 16px 0 0 16px;
+    border-radius: 5px; /* 5px rounded corners */
+    position: relative;
+}
+
+.grid {
+  display: grid;
+   grid-template-areas: "a a a";
+   grid-auto-columns: 1fr 1fr 1fr;
+
+}
+
+.influencer_card:hover {
+    box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+}
+
+.details {
+    padding: 0 0 10px 0;
+    border-top: 4px solid #FFF;
+    text-align: center;
+    background-color: #FFF;
+}
+
+.details a {
+    text-decoration: none;
+}
+
+.details span {
+    color: #000;
+    display: block;
+}
+
+.details #name {
+    font-size: 20px;
+}
+
+.details #nick {
+    font-size: 14px;
+}
+
+.details #description {
+    font-size: 14px;
+}
+
+.details ul {
+    margin: 0;
+    padding: 10px 0 0 0;
+    display: block;
+}
+
+.details li {
+    width: 32%;
+    list-style-type: none;
+    display: inline-block;
+    font-size: 14px;
+    color: #AAA;
+    text-decoration: none;
+}
+
+.details li span {
+    color: #000;
+    font-size: 20px;
+    display: block;
+}
+
+.pp {
+    margin-top: -40px;
+}
+
+.pp img {
+    border-radius: 50%;
+    min-width: 80px;
+    max-width: 80px;
+    border: 4px solid #FFF;
+}
+
+.bg {
+    border-radius: 5px 5px 0 0;
+    background-repeat: no-repeat;
+    background-color: rgba(29, 161, 242, 1);
+    background-size: cover;
+    background-position: center;
+    width: 100%;
+    height: 150px;
+}
+
+fieldset, label { margin: 0; padding: 0; }
+h1 { font-size: 1.5em; margin: 10px; }
+
+.hidebtn {
+    /*background-color: #4CAF50;*/
+    background-color: white;
+    -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, .15), 0 1px 5px rgba(0, 0, 0, .075);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .15), 0 1px 5px rgba(0, 0, 0, .075);
+    color: black;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+    opacity:0.5;
+    position: absolute;
+    top: 0;
+    right:0;
+    padding:5px;
+}
+
+.hidebtn .text {
+    opacity:0.5;
+    text-decoration: none;
+}
+
+.hidebtn .text:hover {
+    color:#0090F4;
+    opacity:1;
+    text-decoration: none;
+}
+
+.hidebtn:hover {
+  opacity:1;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+}
+
+.dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+.dropdown-content a:hover {
+    background-color: #f1f1f1
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+.dropdown:hover .dropbtn {
+    background-color: #3e8e41;
+}

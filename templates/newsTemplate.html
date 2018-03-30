@@ -1,107 +1,113 @@
 {% for feed in feeds %}
     <div class="margin-bottom-15" cursor="{{ cursor }}" domain="{{ feed['domain'] }}">
-       <div class="col-md-3">
-           <img src="{{ feed['im'] }}" onerror="this.src='/images/image-not-found.png'"
-                class="img-responsive feed_img">
-       </div>
-       <div class="col-md-9">
-           <p></p>
-           <h4 style="margin-bottom:4px;">
-               <div class="ban-domain">
-                   <a href="javascript:;" onclick="ban_domain('{{ feed['domain'] }}')"
-                      style="color: #000000;text-decoration: none;">
-                       <span style="float:right;font-size:24px" align="right"
+        <div class="col-md-3">
+            <img src="{{ feed['im'] }}" onerror="this.src='/images/image-not-found.png'"
+                 class="img-responsive feed_img">
+        </div>
+        <div class="col-md-9">
+            <p></p>
+            <h4 style="margin-bottom:4px;">
+                <div class="tweet-news">
+                  {% if not feed['tweet'] %}
+                  <input style="color: #00aced;margin-top:2px;margin-left:5px;float:right;width:24px" align="right"
+                         link_id="{{ feed['link_id'] }}" class="form_datetime"
+                         type="image" src="/static/images/twitter-logo.png" readonly>
+                  {% else %}
+                  <input style="color: #808080;margin-top:2px;margin-left:5px;float:right;width:24px" align="right"
+                         link_id="{{ feed['link_id'] }}" class="form_datetime"
+                         type="image" src="/static/images/twitter-logo-disable.png" readonly>
+                  {% endif %}
+                </div>
+                <div class="ban-domain">
+                    <a href="javascript:;" onclick="ban_domain('{{ feed['domain'] }}')"
+                       style="color: #000000;text-decoration: none;">
+                       <span style="margin-left:5px;float:right;font-size:24px" align="right"
                              class="glyphicon glyphicon-ban-circle"></span>
-                   </a>
-               </div>
-               <div class="bookmark" id="{{ feed['link_id'] }}">
-                   {% if not feed['bookmark'] %}
-                       <a href="javascript:;" onclick="dummy('add', '{{ feed['link_id'] }}')"
-                          style="color: #000000;text-decoration: none;">
-                           <span style="float:right;color:#D70000;font-size:24px" align="right"
+                    </a>
+                </div>
+                <div class="bookmark" id="{{ feed['link_id'] }}">
+                    {% if not feed['bookmark'] %}
+                        <a href="javascript:;" onclick="dummy('add', '{{ feed['link_id'] }}')"
+                           style="color: #000000;text-decoration: none;">
+                           <span style="margin-left:5px;float:right;color:#D70000;font-size:24px" align="right"
                                  class="glyphicon glyphicon-bookmark"></span>
-                       </a>
-                   {% else %}
-                       <a href="javascript:;" onclick="dummy('remove', '{{ feed['link_id'] }}')"
-                          style="color: #000000;text-decoration: none;">
-                           <span style="float:right;color:#808080;font-size:24px" align="right"
+                        </a>
+                    {% else %}
+                        <a href="javascript:;" onclick="dummy('remove', '{{ feed['link_id'] }}')"
+                           style="color: #000000;text-decoration: none;">
+                           <span style="margin-left:5px;float:right;color:#808080;font-size:24px" align="right"
                                  class="glyphicon glyphicon-bookmark"></span>
-                       </a>
-                   {% endif %}
-               </div>
-               <a href="{{ feed['url'] }}" target="_blank"
-                  style="color: #000000;text-decoration: none;"><span> <strong>{{ feed['title'] }}</strong></span></a>
-           </h4>
-           <a style="margin-bottom:3px;color:#666666;text-decoration: none;" href="http://{{ feed['source'] }}"
-              target="_blank">{{ feed['source'] }}</a><br>
-           <p style="margin-top:-3px">
-               <small>{% if feed['published_at'] %} {{ feed['published_at'] }} {% endif %}</small>
-           </p>
-           <p></p>
-           <p>
-           </p>
-           <p>{{ feed['summary'] }}</p>
-           <p></p>
+                        </a>
+                    {% endif %}
+                </div>
+                <a href="{{ feed['url'] }}" target="_blank"
+                   style="color: #000000;text-decoration: none;"><span> <strong>{{ feed['title'] }}</strong></span></a>
+            </h4>
+            <a style="margin-bottom:3px;color:#666666;text-decoration: none;" href="http://{{ feed['source'] }}"
+               target="_blank">{{ feed['source'] }}</a><br>
+            <p style="margin-top:-3px">
+                <small>{% if feed['published_at'] %} {{ feed['published_at'] }} {% endif %}</small>
+            </p>
+            <p></p>
+            <p>
+            </p>
+            <p>{{ feed['summary'] }}</p>
+            <p></p>
 
-           <div class="sentiment" style="font-size:0.8em;text-align:right">
-             <input id="sentiment_{{ feed['link_id'] }}" data-show-caption="false" onchange="sentiment('{{ feed['link_id']}}')" class="rating rating-loading" data-size="xs" data-min="0" data-max="5" data-step="0.5" value="{{ feed['sentiment'] }}">
+            <div class="sentiment" style="font-size:0.8em;text-align:right">
+                <input id="sentiment_{{ feed['link_id'] }}" data-show-caption="false"
+                       onchange="sentiment('{{ feed['link_id'] }}')" class="rating rating-loading" data-size="xs"
+                       data-min="0" data-max="5" data-step="0.5" value="{{ feed['sentiment'] }}">
             </div>
 
-           <br>
+            <br>
 
-       </div>
+        </div>
 
-       <div class="col-md-12 margin-top-15">
-           <hr>
-       </div>
-   </div>
- {% endfor %}
+        <div class="col-md-12 margin-top-15">
+            <hr>
+        </div>
+    </div>
+{% endfor %}
 
+<script src="/js/bootstrap-datetimepicker.min.js"></script>
+<script src="/js/star-rating.js"></script>
 
-<script type="text/javascript" src="static/js/star-rating.js"/>
-
-
-<!--
- {% for feed in feeds %}
-
-<div class="news_card" cursor="{{ cursor }}" domain="{{ feed['domain'] }}">
-  <div class="bg" style="background-image:url({{ feed['im'] }})"></div>
-  <div class="details">
-    <a href="{{ feed['url'] }}" target="_blank">
-                <span id="title"> <strong>{{ feed['title'] }}</strong></span>
-                </a>
-    <a href="http://{{ feed['source'] }}" target="_blank"><span
-                        id="source"> {{ feed['source'] }}  {% if feed['published_at'] %} {{ feed['published_at'] }} {% endif %}</span></a>
-    <br>
-    <span id="description">{{ feed['summary'] }}</span> <br>
-    <ul>
-      <li class="bookmark" id="{{ feed['link_id'] }}">
-        {% if not feed['bookmark'] %}
-        <a href="javascript:;" onclick="dummy('add', '{{ feed['link_id'] }}')">
-                  <span style="float:center;color:#D70000"
-                        class="glyphicon glyphicon-bookmark"></span>
-              </a> {% else %}
-        <a href="javascript:;" onclick="dummy('remove', '{{ feed['link_id'] }}')">
-                  <span style="float:center;color:#808080"
-                        class="glyphicon glyphicon-bookmark"></span>
-              </a> {% endif %}
-      </li>
-      <li class="sentiment" id="sentiment_{{ feed['link_id'] }}" style="float:center">
-        <a href="javascript:;" onclick="sentiment('negative', '{{ feed['link_id'] }}')">
-                        <span style="display:inline;{% if feed['sentiment'] == -1 %}color:#66BB6A{% else %}color:#BDBDBD{% endif %}"
-                              class="glyphicon glyphicon-remove-sign"></span>
-                    </a>
-        <a href="javascript:;" onclick="sentiment('positive', '{{ feed['link_id'] }}')">
-                        <span style="display:inline;{% if feed['sentiment'] == 1 %}color:#66BB6A{% else %}color:#BDBDBD{% endif %}"
-                            class="glyphicon glyphicon-ok-sign"></span>
-                    </a>
-      </li>
-      <li class="ban-domain"><a href="javascript:;" onclick="ban_domain('{{ feed['domain'] }}')">
-            <span class="glyphicon glyphicon-ban-circle"></span>
-        </a></li>
-    </ul>
-
-  </div>
-</div>
-
-{% endfor %}-->
+<script type="text/javascript">
+    var now = new Date();
+    var now_utc = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds());
+    $(".form_datetime").datetimepicker({
+        startDate: now_utc,
+        showMeridian: true,
+        pickDate: true,
+        pickTime: true,
+        autoclose: true,
+        todayBtn: true,
+        startView: 2,
+        format: "HH:ii P - M dd, yyyy Z",
+        timezone: 'GMT',
+        pickerPosition: "bottom-left"
+    }).on('changeDate', function (ev) {
+        var news = this;
+        swal(
+            {
+                title: "Are you sure?",
+                text: "News with id:{0} will be published on {1}.".format(this.getAttribute('link_id'), this.getAttribute('value')),
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonClass: "btn-success",
+                confirmButtonText: "Yes, go and edit tweet!",
+                cancelButtonText: "No, cancel!",
+                showLoaderOnConfirm: true,
+                closeOnConfirm: false,
+                closeOnCancel: false
+            },
+            function (isConfirm) {
+                if (isConfirm) {
+                    window.location.replace('/Tweets/-1?news_id={0}&date={1}'.format(news.getAttribute('link_id'), news.getAttribute('value')));
+                } else {
+                    swal("Cancelled", "Your tweet is not stored", "error");
+                }
+            });
+    });
+</script>

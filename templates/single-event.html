@@ -1,27 +1,46 @@
 <div class="wrapper">
-    {% for event in document['events'] %}
+  {% for event in document['events'] %}
 
-        <div class="event_card">
-            <div class="bg" style="background-image:url({{ event['cover'] }})"></div>
+      <div class="event_card" {% if event['hidden'] == True %} style="opacity:0.3" {% endif %} url="{{event['link']}}">
 
-            <div class="details">
-                <a href='{{ event['link'] }}' target='_blank'><span id="title"><b>{{ event['name'] }}</b></span></a>
-                <span id="place">{{ event['place'] }}</span>
-                {% if 'start_date' not in event %}
-                  <span id="date">{{ event['start_time'] }}</span>
+          <div class="bg" style="background-image:url({{ event['cover'] }})"></div>
+
+          <div class="details">
+              <a href='{{ event['link'] }}' target='_blank'><span id="title"><b>{{ event['name'] }}</b></span></a>
+              <span id="place">{{ event['place'] }}</span>
+              {% if 'start_date' not in event %}
+                <span id="date">{{ event['start_time'] }}</span>
+              {% else %}
+                {% if 'end_date' not in event %}
+                  <span id="date">{{ event['start_date'] }}</span>
+                  <!-- <span id="time"> {{ event['start_time'] }} -- </span> -->
                 {% else %}
                   {% if event['start_date'] == event['end_date'] %}
                     <span id="date">{{ event['start_date'] }}</span>
+                    <!-- <span id="time"> {{ event['start_time'] }} -- {{ event['end_time'] }}</span> -->
                   {% else %}
                     <span id="date">{{ event['start_date'] }} -- {{ event['end_date'] }}</span>
                   {% endif %}
                 {% endif %}
-                <ul>
-                    <li>Coming <span>{% if event['coming']==-1 %} N/A {% else %} {{event['coming']}} {% endif %} </span></li>
-                    <li>Interested <span>{% if event['interested']==-1 %} N/A {% else %} {{event['interested']}} {% endif %}</span></li>
-                </ul>
-            </div>
-        </div>
+              {% endif %}
+              <ul>
+                  <li>Coming <span>{% if event['coming']==-1 %} N/A {% else %} {{event['coming']}} {% endif %} </span></li>
+                  <li>Interested <span>{% if event['interested']==-1 %} N/A {% else %} {{event['interested']}} {% endif %}</span></li>
+              </ul>
+          </div>
 
-    {% endfor %}
+
+          <button class="managebtn" onclick="hideEvent('{{event['link']}}', '',$(this).children('a'));">
+            {% if event['hidden'] == False %}
+                <a url="{{event['link']}}" class="text" hiddenflag=false href="javascript:void(0)">Hide</a>
+            {% endif %}
+            {% if event['hidden'] == True %}
+                <a url="{{event['link']}}" class="text" hiddenflag=true href="javascript:void(0)">Unhide</a>
+            {% endif %}
+          </button>
+
+
+      </div>
+
+  {% endfor %}
 </div>
