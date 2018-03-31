@@ -129,20 +129,6 @@ ALTER TABLE archived_topics OWNER TO ${POSTGRESQL_USER};
 
 COMMENT ON COLUMN archived_topics.audience_deleted IS 'if this topic''s audience has been deleted before, this field will be True';
 
-
---
--- Name: audience_parameters; Type: TABLE; Schema: public; Owner: ${POSTGRESQL_USER}
---
-
-CREATE TABLE audience_parameters (
-    topic_id bigint NOT NULL,
-    location text NOT NULL,
-    signal_strength bigint
-);
-
-
-ALTER TABLE audience_parameters OWNER TO ${POSTGRESQL_USER};
-
 --
 -- Name: audience_samples_last_executed; Type: TABLE; Schema: public; Owner: ${POSTGRESQL_USER}
 --
@@ -197,20 +183,6 @@ CREATE TABLE hidden_influencers (
 
 
 ALTER TABLE hidden_influencers OWNER TO ${POSTGRESQL_USER};
-
---
--- Name: influencer_parameters; Type: TABLE; Schema: public; Owner: ${POSTGRESQL_USER}
---
-
-CREATE TABLE influencer_parameters (
-    topic_id bigint NOT NULL,
-    location text NOT NULL,
-    signal_strength bigint DEFAULT 3,
-    following_limit bigint
-);
-
-
-ALTER TABLE influencer_parameters OWNER TO ${POSTGRESQL_USER};
 
 --
 -- Name: location_country_codes; Type: TABLE; Schema: public; Owner: ${POSTGRESQL_USER}
@@ -386,6 +358,20 @@ CREATE TABLE user_topic_subscribe (
 ALTER TABLE user_topic_subscribe OWNER TO ${POSTGRESQL_USER};
 
 --
+-- Name: user_tweet; Type: TABLE; Schema: public; Owner: ${POSTGRESQL_USER}
+--
+
+CREATE TABLE user_tweet (
+    user_id bigint,
+    topic_id bigint,
+    tweet_id bigint,
+    news_id bigint
+);
+
+
+ALTER TABLE user_tweet OWNER TO ${POSTGRESQL_USER};
+
+--
 -- Name: user_twitter; Type: TABLE; Schema: public; Owner: ${POSTGRESQL_USER}
 --
 
@@ -453,14 +439,6 @@ ALTER TABLE ONLY added_influencers
 
 
 --
--- Name: audience_parameters audience_id; Type: CONSTRAINT; Schema: public; Owner: ${POSTGRESQL_USER}
---
-
-ALTER TABLE ONLY audience_parameters
-    ADD CONSTRAINT audience_id PRIMARY KEY (topic_id, location);
-
-
---
 -- Name: hidden_events hidden_events_pkey; Type: CONSTRAINT; Schema: public; Owner: ${POSTGRESQL_USER}
 --
 
@@ -474,14 +452,6 @@ ALTER TABLE ONLY hidden_events
 
 ALTER TABLE ONLY hidden_influencers
     ADD CONSTRAINT hidden_influencers_pkey PRIMARY KEY (topic_id, country_code, influencer_id);
-
-
---
--- Name: influencer_parameters id; Type: CONSTRAINT; Schema: public; Owner: ${POSTGRESQL_USER}
---
-
-ALTER TABLE ONLY influencer_parameters
-    ADD CONSTRAINT id PRIMARY KEY (topic_id, location);
 
 
 --

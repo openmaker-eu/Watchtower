@@ -1,7 +1,7 @@
 """
 Main Handler for Watchtower
 """
-__author__ = ['Kemal Berk Kocabagli', 'Enis Simsar']
+__author__ = ['Enis Simsar', 'Kemal Berk Kocabagli']
 
 from handlers.base import BaseHandler, TemplateRendering
 

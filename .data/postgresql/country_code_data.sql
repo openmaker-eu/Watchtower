@@ -21,18 +21,6 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
--- Name: country_code; Type: TABLE; Schema: public; Owner: ${POSTGRESQL_USER}
---
-
-CREATE TABLE country_code (
-    location_name text,
-    country_code text
-);
-
-
-ALTER TABLE country_code OWNER TO ${POSTGRESQL_USER};
-
---
 -- Data for Name: country_code; Type: TABLE DATA; Schema: public; Owner: ${POSTGRESQL_USER}
 --
 
