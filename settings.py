@@ -1,7 +1,7 @@
 """
 This is the settings file for Watchtower.
 """
-__author__ = ['Kemal Berk Kocabagli', 'Enis Simsar']
+__author__ = ['Enis Simsar', 'Kemal Berk Kocabagli']
 
 # import random
 # import string

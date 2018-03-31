@@ -1,7 +1,7 @@
 """
 Watchtower Web Server
 """
-__author__ = ['Kemal Berk Kocabagli', 'Enis Simsar', 'Baris Esmer']
+__author__ = ['Enis Simsar', 'Kemal Berk Kocabagli', 'Baris Esmer']
 
 import tornado.ioloop
 from tornado.options import options

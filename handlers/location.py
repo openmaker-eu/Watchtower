@@ -1,7 +1,7 @@
 """
 Audience Handlers for Watchtower
 """
-__author__ = ['Kemal Berk Kocabagli', 'Enis Simsar']
+__author__ = ['Enis Simsar', 'Kemal Berk Kocabagli']
 
 import tornado.web
 import tornado.escape
