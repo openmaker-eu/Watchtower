@@ -43,7 +43,7 @@ api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
 def hash_password(password):
     # uuid is used to generate a random number
     salt = uuid.uuid4().hex
-    return hashlib.sha256(salt.encode() + password.encode()).hexdigest()
+    return hashlib.sha256(salt.encode() + password.encode()).hexdigest() + ':' + salt
 
 
 # from http://www.pythoncentral.io/hashing-strings-with-python/
