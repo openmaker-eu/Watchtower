@@ -1,24 +1,32 @@
+import sys
+from decouple import config
+sys.path.insert(0, config("ROOT_DIR"))
+
+from predict_location.predictor import Predictor  # for location
+from application.Connections import Connection # for database connections
+
 import time
 import pymongo
-from decouple import config
-from .predictor import Predictor
-###
-MONGO_USERNAME_PASS = 'mongodb://{0}:{1}@'.format(config("MONGODB_USER"), config("MONGODB_PASSWORD"))
-MONGO_PORT = ':27017/'
-BATCH_SIZE = 100000
-###
+
+def fetchTopics():
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "SELECT topic_id,is_masked_location "
+            "FROM topics "
+            "WHERE topics.is_masked_location = false "
+        )
+        cur.execute(sql)
+        
+        return [x[0] for x in cur.fetchall()]
 
 # Update single collection in the given database
-def update_field_collection(host, collection_name, database, field_name, predictor):
+def update_field_collection(collection_name, database, field_name, predictor):
     print("Predict {} field in collection {} of the database {}".format(field_name, collection_name, database.name))
 
     # Set the update field
     update_field_name = "predicted_" + field_name
 
     collection = database.get_collection(collection_name)
-
-    if collection_name == "all_audience":
-        return
 
     cursor = collection.find({update_field_name : {"$exists" : False}})
 
@@ -45,23 +53,17 @@ def update_field_collection(host, collection_name, database, field_name, predict
 
 
 # Update all collections in the given database
-def update_field_db(host, database_name, field_name):
-    # Connect to server
-    mongoDBClient = pymongo.MongoClient(MONGO_USERNAME_PASS+host+MONGO_PORT, connect=False)
+def update_field_db(database_name, field_name):
 
-    if database_name not in mongoDBClient.database_names():
+    if database_name not in Connection.Instance().MongoDBClient.database_names():
         raise Exception("Database does not exist !")
 
-    database = mongoDBClient.get_database(database_name)
+    database = Connection.Instance().MongoDBClient.get_database(database_name)
 
-    # Which collections to pass
-    exclude = ["all_audience"]
-
-    # Get names of all collections in the database
-    collection_names = database.collection_names()
+    topics = fetchTopics()
 
     # Create predictor object
     predictor = Predictor()
 
-    for collection_name in collection_names:
-        update_field_collection(host, collection_name, database, field_name,predictor)
+    for topic_id in topics:
+        update_field_collection(str(topic_id), database, field_name,predictor)
