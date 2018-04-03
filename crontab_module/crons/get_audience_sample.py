@@ -160,18 +160,21 @@ def main():
         sql = (
             "SELECT topic_id, topic_name "
             "FROM topics "
+            "WHERE is_masked_location = %s"
         )
-        cur.execute(sql)
+        cur.execute(sql, [False])
         topics = cur.fetchall()  # list of all topics
         topic_dict = dict()
         for topicID, topicName in topics:
             topic_dict[topicID] = topicName
 
+        ids = [i[0] for i in topics]
         sql = (
             "SELECT user_id, topic_id "
             "FROM user_topic "
+            "WHERE topic_id IN %s"
         )
-        cur.execute(sql)
+        cur.execute(sql, tuple(ids))
         users_and_topics = cur.fetchall()  # list of all topics
 
         if (getForSpecificUsers == "1"):
