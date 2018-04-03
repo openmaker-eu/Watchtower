@@ -261,7 +261,8 @@ CREATE TABLE topics (
     last_tweet_date date,
     is_running boolean DEFAULT true,
     is_publish boolean DEFAULT false,
-    last_news_date date
+    last_news_date date,
+    is_masked_location boolean default false
 );
 
 
