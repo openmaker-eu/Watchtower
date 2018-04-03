@@ -174,7 +174,7 @@ def main():
             "FROM user_topic "
             "WHERE topic_id IN %s"
         )
-        cur.execute(sql, tuple(ids))
+        cur.execute(sql, [tuple(ids)])
         users_and_topics = cur.fetchall()  # list of all topics
 
         if (getForSpecificUsers == "1"):
