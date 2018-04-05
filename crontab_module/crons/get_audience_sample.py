@@ -152,7 +152,7 @@ def main():
     N = 500  # audience sample size
     signal_strength = 3
     location_predictor = Predictor()
-    hours = sys.argv[1] if len(sys.argv)>1 else 1
+    hours = 1
 
     print("Script ran: " + str(datetime.datetime.utcnow()))
 

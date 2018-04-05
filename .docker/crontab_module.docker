@@ -12,7 +12,8 @@ vim \
 curl \
 wget \
 psmisc \
-tmux \
+nano \
+cron \
 software-properties-common
 
 # Python Linux Dependencies
@@ -37,6 +38,7 @@ ENV LANG en_US.utf8
 ADD ./Pipfile /root/cloud/Pipfile
 ADD ./Pipfile.lock /root/cloud/Pipfile.lock
 
+ENV PIPENV_PIPFILE /root/cloud/Pipfile
 WORKDIR /root/cloud
 
 RUN pipenv install
@@ -45,6 +47,8 @@ RUN curl https://raw.githubusercontent.com/codelucas/newspaper/master/download_c
 
 ENV PATH="/root/cloud:${PATH}"
 
-ADD ./.bash/crontab_module-entrypoint.sh /usr/bin/crontab_module-entrypoint.sh
-RUN chmod +x /usr/bin/crontab_module-entrypoint.sh
-ENTRYPOINT ["/usr/bin/crontab_module-entrypoint.sh"]
+COPY .crontab_module/crontab /etc/cron.d/cloud_cron
+RUN chmod 0644 /etc/cron.d/cloud_cron
+RUN crontab /etc/cron.d/cloud_cron
+RUN touch /var/log/cron_daily.log
+ENTRYPOINT ["cron", "-f"]
