@@ -1,3 +1,4 @@
+# coding=utf-8
 import re # for regex in location filtering
 
 def getLocationRegex(location):

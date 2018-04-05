@@ -3,13 +3,12 @@
 import sys
 from datetime import datetime  # to print the date & time in the output log whenever this script is run OR for time related checks
 from decouple import config
-
-sys.path.insert(0, config("ROOT_DIR"))
-
 import pymongo
 import tweepy  # Twitter API helper package
 from decouple import config
 from tweepy import OAuthHandler
+
+sys.path.insert(0, config("ROOT_DIR"))
 
 from application.Connections import Connection
 
@@ -62,14 +61,14 @@ def copy_follower_ids_to_new_topics(influencer):
 
 
 def get_follower_ids_by_influencer(influencer):
-    '''
+    """
     gets the follower ids for a specific influencer from Twitter and saves them to MongoDB for each of the influencer's topics.
 
     most recent followers are in page 0.
     Start from page 0 and go until we come across <THRESHOLD> follower ids successively that we already have in our DB retrieved from this influencer.
 
     for new topics, followers are copied from the first topic of the influencer.
-    '''
+    """
     print("Getting follower ids for influencer " + str(influencer['screen_name']))
 
     if (influencer['protected'] == True):
@@ -182,20 +181,27 @@ def get_follower_ids_by_influencer(influencer):
 
     Connection.Instance().influencerDB['all_influencers'].update(
         {'id': influencer['id']},
-        {'$set': {'last_processed': datetime.now()}  # update last processed time of this influencer
-         }
+        {
+            '$set': {
+                'last_processed': datetime.now()  # update last processed time of this influencer
+            },
+            '$inc': {
+                'retrieved_follower_id_count': followers_count  # update retrieved follower count of this influencer
+            }
+        }
     )
 
     print("Processed influencer: " + influencer['screen_name'] + " : " + str(
         followers_count) + " new followers.")  # Processing DONE.
+
     print("========================================")
     return 1
 
 
 def get_follower_ids():
-    '''
+    """
     gets the follower ids for all topics. Will be run periodically.
-    '''
+    """
 
     INFLUENCER_COUNT = 0
     INFLUENCER_NUMBER = 0
@@ -217,19 +223,22 @@ def get_follower_ids():
             print("Passing this influencer as his followers count exceeds the limit.")
             continue
         # if the influencer has been processed before, wait for at least a day to process him again.
-        # get_influencers will be run once per week. Therefore, no new topic can be added to the influencer throughout a day.
+        # get_influencers will be run once per week. Therefore, no new topic can be added
+        # to the influencer throughout a day.
         if 'last_processed' in influencer:
             if 'finished_once' in influencer:
-                if influencer['finished_once'] == True:
-                    if ((datetime.today() - influencer['last_processed']).days > 10):
+                if influencer['finished_once']:
+                    if (datetime.today() - influencer['last_processed']).days > 10:
                         result = get_follower_ids_by_influencer(influencer)
-                        if result == 1: INFLUENCER_COUNT += 1  # successfully processed the influencer
+                        if result == 1:
+                            INFLUENCER_COUNT += 1  # successfully processed the influencer
                     else:
                         print(influencer['screen_name'] + "(finished once) HAS ALREADY BEEN PROCESSED IN LAST 10 DAYS.")
                 else:
-                    if ((datetime.today() - influencer['last_processed']).days > 1):
+                    if (datetime.today() - influencer['last_processed']).days > 1:
                         result = get_follower_ids_by_influencer(influencer)
-                        if result == 1: INFLUENCER_COUNT += 1  # successfully processed the influencer
+                        if result == 1:
+                            INFLUENCER_COUNT += 1  # successfully processed the influencer
                     else:
                         print(influencer['screen_name'] + " HAS ALREADY BEEN PROCESSED TODAY.")
         else:
