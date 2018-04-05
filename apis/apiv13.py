@@ -310,7 +310,7 @@ def getEvents(topic_id, sortedBy, location, cursor):
                       break
 
             #pprint.pprint([e['place'] for e in events])
-            display_events= events[cursor:min(cursor+cursor_range,max_cursor)]
+            display_events = events[cursor:min(cursor+cursor_range,max_cursor)]
 
             result['next_cursor'] = cursor + (cursor_range-cursor%cursor_range)
             if cursor!=0: result['previous_cursor'] = cursor - cursor_range if cursor%cursor_range == 0 else cursor - cursor%cursor_range # if we are on the first page, there is no previous cursor
@@ -535,3 +535,43 @@ def getNews(news_ids, keywords, languages, cities, countries, user_location, use
     result['news'] = news
 
     return json.dumps(result, default=general.date_formatter, indent=4)
+
+
+def getChallenges(is_open, date, cursor):
+    result = {}
+    cursor = int(cursor)
+    cursor_range = 10
+    max_cursor = 60
+    if cursor >= max_cursor:
+        result['news'] = []
+        result['error'] = "Cannot exceed max cursor = " + str(max_cursor) + "."
+        return result
+
+    match = dict()
+    if is_open:
+        match['status'] = "OPEN"
+
+    challenges = list(Connection.Instance().challengesDB['innocentive'].aggregate([
+        {'$match': match},
+        {'$project': {
+            '_id':0
+        }}
+    ])
+    )
+    challenges = challenges[cursor:min(cursor + cursor_range, max_cursor)]
+
+    result['next_cursor'] = cursor + (cursor_range - cursor % cursor_range)
+    if cursor != 0: result[
+        'previous_cursor'] = cursor - cursor_range if cursor % cursor_range == 0 else cursor - cursor % cursor_range  # if we are on the first page, there is no previous cursor
+
+    # cursor boundary checks
+    if result['next_cursor'] >= max_cursor or len(challenges) < cursor_range:
+        result['next_cursor'] = 0
+    if 'previous_cursor' in result:
+        if result['previous_cursor'] == 0:
+            result['previous_cursor'] = -1
+
+    result['next_cursor_str'] = str(result['next_cursor'])
+    result['challenges'] = challenges
+
+    return result

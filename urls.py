@@ -7,7 +7,7 @@ import tornado.web
 
 from settings import settings
 from handlers.main import MainHandler
-from handlers.auth import LoginHandler, LogoutHandler, ProfileHandler, RegisterHandler, TwitterAuthHandler
+from handlers.auth import LoginHandler, LogoutHandler, ProfileHandler, RegisterHandler, TwitterAuthHandler, FacebookAuthHandler
 
 from handlers.topic import TopicHandler, TopicsHandler, CreateEditTopicHandler, PagesHandler
 from handlers.topic import ThemesHandler, ThemesV11Handler, TopicsV12Handler
@@ -24,8 +24,10 @@ from handlers.news import NewsV12Handler, NewsV13Handler, FeedsHandler, FeedsV11
 from handlers.audience import AudienceHandler, RateAudienceHandler
 from handlers.audience import AudienceV12Handler, AudienceSampleV13Handler
 
-from handlers.influencer import LocalInfluencersHandler, HideInfluencerHandler
+from handlers.influencer import LocalInfluencersHandler, HideInfluencerHandler, FetchFollowersHandler
 from handlers.influencer import InfluencersHandler, InfluencersV11Handler, LocalInfluencersV13Handler
+
+from handlers.challenge import ChallengeV13Handler
 
 from handlers.tweet import RedirectHandler, NewTweetsHandler, TweetsHandler
 from handlers.recommendation import RecommendationsHandler
@@ -42,6 +44,7 @@ url_patterns = [
     (r"/profile", ProfileHandler),
     (r"/register", RegisterHandler),
     (r"/twitter_auth", TwitterAuthHandler),
+    (r"/facebook_auth", FacebookAuthHandler),
 
     # TOPIC
     (r"/saveTopicId", TopicHandler),
@@ -87,6 +90,7 @@ url_patterns = [
     (r"/Influencers/(.*)", LocalInfluencersHandler),  # added for influencers
     (r"/Influencers", LocalInfluencersHandler),
     (r"/hide_influencer", HideInfluencerHandler),
+    (r"/fetch_followers", FetchFollowersHandler),
 
     # TWEET
     (r"/Tweets/(.*)", TweetsHandler),
@@ -140,6 +144,7 @@ url_patterns = [
     (r"/api/v1.3/get_events", EventV13Handler),  # changed
     (r"/api/v1.3/get_conversations", ConversationV12Handler),
     (r"/api/v1.3/get_hashtags", HashtagsV12Handler),
+    (r"/api/v1.3/get_challenges", ChallengeV13Handler),  # new
 
     (r"/(.*)", tornado.web.StaticFileHandler, {'path': settings['static_path']}),
 ]
