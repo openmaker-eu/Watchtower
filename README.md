@@ -73,7 +73,7 @@ Open your favourite browser and type [http://localhost:8484](http://localhost:84
 
 * **Enis Simsar** - *Initial work* - [enisimsar](https://github.com/enisimsar)
 * **Kemal Berk Kocabağlı** - [berk94](https://github.com/berk94)
-* **Barış Can Esmer** - *Initial work* - [barisesmer](https://github.com/barisesmer)
+* **Barış Can Esmer** - [barisesmer](https://github.com/barisesmer)
 
 See also the list of [contributors](https://github.com/enisimsar/WatchTower/contributors) who participated in this project.
 
