@@ -7,7 +7,7 @@ import tornado.web
 
 from settings import settings
 from handlers.main import MainHandler
-from handlers.auth import LoginHandler, LogoutHandler, ProfileHandler, RegisterHandler, TwitterAuthHandler, FacebookAuthHandler
+from handlers.auth import LoginHandler, LogoutHandler, ProfileHandler, RegisterHandler, TwitterAuthHandler # , FacebookAuthHandler
 
 from handlers.topic import TopicHandler, TopicsHandler, CreateEditTopicHandler, PagesHandler
 from handlers.topic import ThemesHandler, ThemesV11Handler, TopicsV12Handler
@@ -44,7 +44,7 @@ url_patterns = [
     (r"/profile", ProfileHandler),
     (r"/register", RegisterHandler),
     (r"/twitter_auth", TwitterAuthHandler),
-    (r"/facebook_auth", FacebookAuthHandler),
+    #(r"/facebook_auth", FacebookAuthHandler),
 
     # TOPIC
     (r"/saveTopicId", TopicHandler),

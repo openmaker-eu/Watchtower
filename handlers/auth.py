@@ -6,6 +6,7 @@ __author__ = ['Enis Simsar', 'Kemal Berk Kocabagli']
 import tornado.web
 import tornado.escape
 import json
+from decouple import config
 
 from handlers.base import BaseHandler, TemplateRendering
 import logic
@@ -98,6 +99,20 @@ class ProfileHandler(BaseHandler, TemplateRendering):
             self.write({'response': True, 'redirectUrl': '/Topics'})
         else:
             self.write(json.dumps(update_info))
+
+
+# class FacebookAuthHandler(BaseHandler, TemplateRendering):
+#     @tornado.web.authenticated
+#     def post(self):
+#         print("In Facebook Auth Handler")
+#         AUTH_URL = "https://www.facebook.com/v2.12/dialog/oauth"
+#         state = 0  # generate a random string
+#         params = {
+#             'client_id': config('FACEBOOK_CLIENT_ID'),
+#             'redirect_uri': self.get_argument('redirect_uri'),
+#             'state': state
+#         }
+
 
 
 class TwitterAuthHandler(BaseHandler, TemplateRendering):
