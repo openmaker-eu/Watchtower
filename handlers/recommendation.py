@@ -1,7 +1,7 @@
 """
 Recommendation Handlers for Watchtower
 """
-__author__ = ['Enis Simsar', 'Kemal Berk Kocabagli']
+__author__ = ['Kemal Berk Kocabagli', 'Enis Simsar']
 
 import tornado.web
 import tornado.escape

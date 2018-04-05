@@ -1,7 +1,7 @@
 """
 Influencer Handlers for Watchtower
 """
-__author__ = ['Enis Simsar', 'Kemal Berk Kocabagli']
+__author__ = ['Kemal Berk Kocabagli', 'Enis Simsar']
 
 import tornado.web
 import tornado.escape
@@ -96,6 +96,16 @@ class HideInfluencerHandler(BaseHandler, TemplateRendering):
         user_id = tornado.escape.xhtml_escape(self.current_user)
         location = logic.get_current_location(tornado.escape.xhtml_escape(self.current_user))
         logic.hide_influencer(topic_id, user_id, influencer_id, description, is_hide, location)
+        self.write("")
+
+
+class FetchFollowersHandler(BaseHandler, TemplateRendering):
+    @tornado.web.authenticated
+    def post(self):
+        user_id = tornado.escape.xhtml_escape(self.current_user)
+        influencer_id = str(self.get_argument("influencer_id"))
+        fetching = (self.get_argument("fetching") == "true")
+        logic.add_or_delete_fetch_followers_job(user_id, influencer_id, fetching)
         self.write("")
 
 
