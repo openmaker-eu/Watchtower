@@ -29,6 +29,8 @@ class Connection:
             self.infDB = self.MongoDBClient.influenceRanks
             self.tweetsDB = self.MongoDBClient.tweetsDB
 
+            self.challengesDB = self.MongoDBClient.challenges
+
 
             # AUDIENCE
             self.influencerDB = self.MongoDBClient.influencers_test # db for influencers
