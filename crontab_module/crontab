@@ -14,7 +14,7 @@ PIPENV_PIPFILE=/root/cloud/Pipfile
 0 1 * * 1 pipenv run python3 /root/cloud/crontab_module/crons/clear_db_one_month.py >> /var/log/cron_daily.log 2>&1
 0 */3 * * * pipenv run python3 /root/cloud/crontab_module/crons/get_audience_sample.py >> /var/log/cron_daily.log 2>&1
 0 3 * * 0 pipenv run python3 /root/cloud/crontab_module/crons/update_predicted_location_crontab.py >> /var/log/cron_daily.log 2>&1
-0 */3 * * * pipenv run python3 /root/cloud/crontab_module/crons/get_local_influencers.py.py >> /var/log/cron_daily.log 2>&1
+0 */3 * * * pipenv run python3 /root/cloud/crontab_module/crons/get_local_influencers.py >> /var/log/cron_daily.log 2>&1
 0 3 * * * pipenv run python3 /root/cloud/crontab_module/crons/get_events.py >> /var/log/cron_daily.log 2>&1
 
 ##########################################################################

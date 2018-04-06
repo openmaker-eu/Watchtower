@@ -70,6 +70,10 @@ def fetchKeywords(topicID, keyword_size):
         html = response.read().decode()
     hashtags = json.loads(html)["hashtags"]
     keywords = [(str(x["hashtag"]).lower() , int(x["count"])) for x in hashtags[:keyword_size]]
+
+    if not keywords:
+        return None
+
     # normalize count so that maximum of them is 10
     maxCount = max([x[1] for x in keywords])
     keywords = [(hashtag, max(int((count/maxCount)*10), 1) ) for hashtag,count in keywords]
