@@ -192,13 +192,23 @@ def getAudienceSample(topic_id, location, cursor):
         result['error'] = "Topic not found."
     return result
 
-def getEvents(topic_id, sortedBy, location, cursor):
+
+def getEvent(topic_id, event_id):
+    try:
+        return Connection.Instance().events[str(topic_id)].find_one({'id': event_id})
+    except:
+        return {'error': 'Event not found.'}
+
+
+def getEvents(topic_id, sortedBy, location, cursor, event_ids):
     cursor_range = 10
     max_cursor = 100
     cursor = int(cursor)
     result = {}
-    events = []
+    match = {}
+    sort = {}
     location = location.lower()
+
     if cursor >= max_cursor:
         result['events']=[]
         result['error'] = "Cannot exceed max cursor = " + str(max_cursor) + "."
@@ -222,13 +232,10 @@ def getEvents(topic_id, sortedBy, location, cursor):
             result['error'] = "Topic does not exist."
             return result
 
-        events = [] # all events to be returned
-        match = {'end_time': {'$gte': time.time()}}
-        sort = {}
+        events = []  # all events to be returned
 
         result['topic'] = topic_name
         result['location'] = location
-
 
         # SORT CRITERIA
         if sortedBy == 'interested':
@@ -237,6 +244,11 @@ def getEvents(topic_id, sortedBy, location, cursor):
             sort['start_time']=1
         else:
             return {'error': "please enter a valid sortedBy value."}
+
+        if event_ids is not None:
+            match['id'] = {'$in': event_ids}
+
+        match['end_time'] = {'$gte': time.time()}
 
         print("Location: " + str(location))
         if location !="" and location.lower()!="global":
@@ -283,6 +295,7 @@ def getEvents(topic_id, sortedBy, location, cursor):
 
                   match['$or'] = [{'place':location_regex.getLocationRegex(country)},{'predicted_place':country}]
                   match['link'] = {'$nin': hidden_event_links}
+                  print(match)
                   events += list(Connection.Instance().events[str(topic_id)].aggregate([
                       {'$match': match},
                       {'$project': {'_id': 0,

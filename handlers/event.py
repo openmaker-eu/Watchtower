@@ -120,6 +120,10 @@ class EventV13Handler(BaseHandler, TemplateRendering, Api500ErrorHandler):
         except:
             cursor = 0
             pass
-        events = apiv13.getEvents(topic_id, sorted_by, location, int(cursor))
+        event_ids = self.get_argument("event_ids", None)
+        if event_ids is not None:
+            event_ids= event_ids.split(",")
+        print(event_ids)
+        events = apiv13.getEvents(topic_id, sorted_by, location, int(cursor), event_ids)
         self.set_header('Content-Type', 'application/json')
         self.write(events)
