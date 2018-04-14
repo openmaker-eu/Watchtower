@@ -1604,7 +1604,8 @@ def get_publish_tweet(topic_id, user_id, tweet_id, news_id, date):
 
 
 def get_publish_tweets(topic_id, user_id, status):
-    tweet_ids = [i['tweet_id'] for i in Connection.Instance().tweetsDB[str(topic_id)].find({'user_id': user_id}, {'tweet_id': 1})]
+    tweet_ids = [i['tweet_id'] for i in
+                 Connection.Instance().tweetsDB[str(topic_id)].find({'user_id': user_id}, {'tweet_id': 1})]
     tweets = []
     sort_order = pymongo.ASCENDING
     if int(status) == 1:
@@ -1679,3 +1680,22 @@ def get_tweet(topic_id, tweet_id):
     if int(tweet_id) != -1:
         return Connection.Instance().tweetsDB[str(topic_id)].find_one({'tweet_id': int(tweet_id)})
     return []
+
+def get_crons():
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "SELECT cron_name, started_at, ended_at, status "
+            "FROM crons "
+            "WHERE id IN ("
+                "SELECT MAX(id) "
+                "FROM crons "
+                "GROUP BY cron_name"
+            ");"
+        )
+        cur.execute(sql, [])
+        fetched = cur.fetchall()
+
+        if fetched:
+            return [{'cron_name': cron[0], 'started_at': cron[1], 'ended_at': cron[2], 'status': cron[3]} for cron in fetched]
+
+        return []
