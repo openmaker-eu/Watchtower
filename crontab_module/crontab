@@ -7,14 +7,14 @@ LC_ALL=en_US.UTF-8
 PIPENV_VENV_IN_PROJECT=1
 PIPENV_PIPFILE=/root/cloud/Pipfile
 
-0 */1 * * * bash /root/cloud/crontab_module/cron.sh "News Date Filter" "pipenv run python3 /root/cloud/crontab_module/crons/date_filter.py  >> /var/log/cron_daily.log 2>&1"
-0 3 * * * bash /root/cloud/crontab_module/cron.sh "Facebook Reddit" "pipenv run python3 /root/cloud/crontab_module/crons/facebook_reddit_crontab.py >> /var/log/cron_daily.log 2>&1"
-0 1 * * * bash /root/cloud/crontab_module/cron.sh "Hashtag Filter" "pipenv run python3 /root/cloud/crontab_module/crons/hashtagcrontab.py >> /var/log/cron_daily.log 2>&1"
-0 0 * * 1 bash /root/cloud/crontab_module/cron.sh "Influencers" "pipenv run python3 /root/cloud/crontab_module/crons/get_influencers.py >> /var/log/cron_daily.log 2>&1"
-0 1 * * 1 bash /root/cloud/crontab_module/cron.sh "Database Clean" "pipenv run python3 /root/cloud/crontab_module/crons/clear_db_one_month.py >> /var/log/cron_daily.log 2>&1"
-0 */3 * * * bash /root/cloud/crontab_module/cron.sh "Audience Filter" "pipenv run python3 /root/cloud/crontab_module/crons/get_audience_sample.py >> /var/log/cron_daily.log 2>&1"
-0 3 * * 0 bash /root/cloud/crontab_module/cron.sh "Update Predicted Location" "pipenv run python3 /root/cloud/crontab_module/crons/update_predicted_location_crontab.py >> /var/log/cron_daily.log 2>&1"
-0 */3 * * * bash /root/cloud/crontab_module/cron.sh "Local Influencers" "pipenv run python3 /root/cloud/crontab_module/crons/get_local_influencers.py >> /var/log/cron_daily.log 2>&1"
-0 3 * * * bash /root/cloud/crontab_module/cron.sh "Events Harvester" "pipenv run python3 /root/cloud/crontab_module/crons/get_events.py >> /var/log/cron_daily.log 2>&1"
+0 */1 * * * bash /root/cloud/crontab_module/cron.sh "News Date Filter" "pipenv run python3 /root/cloud/crontab_module/crons/date_filter.py"
+0 3 * * * bash /root/cloud/crontab_module/cron.sh "Facebook Reddit" "pipenv run python3 /root/cloud/crontab_module/crons/facebook_reddit_crontab.py"
+0 1 * * * bash /root/cloud/crontab_module/cron.sh "Hashtag Filter" "pipenv run python3 /root/cloud/crontab_module/crons/hashtagcrontab.py"
+0 0 * * 1 bash /root/cloud/crontab_module/cron.sh "Influencers" "pipenv run python3 /root/cloud/crontab_module/crons/get_influencers.py"
+0 1 * * 1 bash /root/cloud/crontab_module/cron.sh "Database Clean" "pipenv run python3 /root/cloud/crontab_module/crons/clear_db_one_month.py"
+0 */3 * * * bash /root/cloud/crontab_module/cron.sh "Audience Filter" "pipenv run python3 /root/cloud/crontab_module/crons/get_audience_sample.py"
+0 3 * * 0 bash /root/cloud/crontab_module/cron.sh "Update Predicted Location" "pipenv run python3 /root/cloud/crontab_module/crons/update_predicted_location_crontab.py"
+0 */3 * * * bash /root/cloud/crontab_module/cron.sh "Local Influencers" "pipenv run python3 /root/cloud/crontab_module/crons/get_local_influencers.py"
+0 3 * * * bash /root/cloud/crontab_module/cron.sh "Events Harvester" "pipenv run python3 /root/cloud/crontab_module/crons/get_events.py"
 
 ##########################################################################
