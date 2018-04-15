@@ -1,3 +1,4 @@
+redis
 psycopg2
 pymongo
 newspaper3k

@@ -11,7 +11,7 @@ from application.Connections import Connection
 
 from decouple import config
 
-pool = ConnectionPool(host='db', port=6379, db=0)
+pool = ConnectionPool(host='db', port=6379, password=config("REDIS_PASSWORD"), db=0)
 redis_conn = Redis(connection_pool=pool)
 q = Queue(connection=redis_conn)  # no args implies the default queue
 
