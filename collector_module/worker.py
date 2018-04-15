@@ -5,7 +5,7 @@ from redis import from_url
 from rq import Worker, Queue, Connection
 from decouple import config
 
-sys.path.insert(0,config("ROOD_DIR"))
+sys.path.insert(0,config("ROOT_DIR"))
 
 listen = ['default']
 
