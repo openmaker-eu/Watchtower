@@ -72,6 +72,8 @@ services:
 
     rq-server:
         container_name: rq-server
+        environment:
+            - REDIS_PASSWORD=${REDIS_PASSWORD}
         build:
             context: ./
             dockerfile: ./.docker/rq-server.docker
