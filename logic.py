@@ -1690,7 +1690,7 @@ def get_crons():
                 "SELECT MAX(id) "
                 "FROM crons "
                 "GROUP BY cron_name"
-            ");"
+            ") ORDER BY cron_name;"
         )
         cur.execute(sql, [])
         fetched = cur.fetchall()
