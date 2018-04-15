@@ -23,7 +23,7 @@
                 <td>
                     {% if cron['status'] %}
                         <i class="fas fa-circle" style="color: #4CAF50"></i>
-                    {% elif cron['ended_at'] is None %}
+                    {% elif cron['ended_at'] is none %}
                         <i class="fas fa-spinner"></i>
                     {% else %}
                         <i class="fas fa-circle" style="color:#F44336"></i>
