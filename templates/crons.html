@@ -14,7 +14,7 @@
                 <th scope="row">{{ cron['cron_name'] }}</th>
                 <td>{{ cron['started_at'] }}</td>
                 <td>
-                    {% if cron['ended_at'] is None %}
+                    {% if cron['ended_at'] is none %}
                         -
                     {% else %}
                         {{ cron['ended_at'] }}
