@@ -93,6 +93,8 @@ services:
 
     rq-dashboard:
         container_name: rq-dashboard
+        environment:
+            - REDIS_PASSWORD=${REDIS_PASSWORD}
         build:
             context: ./
             dockerfile: ./.docker/rq-dashboard.docker
@@ -103,6 +105,8 @@ services:
 
     rq-worker:
         container_name: rq-worker
+        environment:
+            - WORKER_NUMBER=${WORKER_NUMBER}
         volumes:
             - "./:/root/cloud"
         build:
