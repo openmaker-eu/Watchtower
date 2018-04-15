@@ -11,7 +11,7 @@ listen = ['default']
 
 redis_url = 'redis://:{0}@db:6379'.format(config("REDIS_PASSWORD"))
 
-conn = redis.from_url(redis_url)
+conn = from_url(redis_url)
 
 if __name__ == '__main__':
     with Connection(conn):
