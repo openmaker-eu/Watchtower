@@ -5,6 +5,7 @@
             <th scope="col">Cron Name</th>
             <th scope="col">Started At</th>
             <th scope="col">Ended At</th>
+            <th scope="col">Duration</th>
             <th scope="col">Status</th>
         </tr>
         </thead>
@@ -19,6 +20,9 @@
                     {% else %}
                         {{ cron['ended_at'] }}
                     {% endif %}
+                </td>
+                <td>
+                    {{ cron['duration'] }}
                 </td>
                 <td>
                     {% if cron['status'] %}

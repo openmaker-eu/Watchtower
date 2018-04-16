@@ -1,32 +1,26 @@
-import sys
-
-from decouple import config
-
+import csv
+import datetime
+import hashlib
+import json
+import re
+import time
+import uuid
 from threading import Thread
 from urllib.parse import urlparse
-import re
-import datetime
-import time
-import json
-import csv
 
 import facebook
 import praw
-import pymongo
-import tweepy
-import requests
 import psycopg2
-import uuid
-import hashlib
-
-from application.utils import twitter_search_sample_tweets
-from application.utils import general
-from application.utils import location_regex
-from crontab_module.crons import facebook_reddit_crontab
+import pymongo
+import requests
+import tweepy
+from decouple import config
 
 import delete_community
-
 from application.Connections import Connection
+from application.utils import general
+from application.utils import twitter_search_sample_tweets
+from crontab_module.crons import facebook_reddit_crontab
 
 # Accessing Twitter API
 consumer_key = config("TWITTER_CONSUMER_KEY")  # API key
@@ -1681,21 +1675,33 @@ def get_tweet(topic_id, tweet_id):
         return Connection.Instance().tweetsDB[str(topic_id)].find_one({'tweet_id': int(tweet_id)})
     return []
 
+
 def get_crons_log():
     with Connection.Instance().get_cursor() as cur:
         sql = (
             "SELECT cron_name, started_at, ended_at, status "
             "FROM crons_log "
             "WHERE id IN ("
-                "SELECT MAX(id) "
-                "FROM crons_log "
-                "GROUP BY cron_name"
+            "SELECT MAX(id) "
+            "FROM crons_log "
+            "GROUP BY cron_name"
             ") ORDER BY cron_name;"
         )
         cur.execute(sql, [])
         fetched = cur.fetchall()
 
         if fetched:
-            return [{'cron_name': cron[0], 'started_at': cron[1], 'ended_at': cron[2], 'status': cron[3]} for cron in fetched]
+            def get_duration(x, y):
+                if y is None: return "-"
+                diff = y - x
+                days, seconds = diff.days, diff.seconds
+                hours = days * 24 + seconds // 3600
+                minutes = (seconds % 3600) // 60
+                seconds = seconds % 60
+
+                return "{0} h, {1} min, {2} sec.".format(hours, minutes, seconds)
+
+            return [{'cron_name': cron[0], 'started_at': cron[1], 'ended_at': cron[2], 'status': cron[3],
+                     'duration': get_duration(cron[1], cron[2])} for cron in fetched]
 
         return []
