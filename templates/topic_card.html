@@ -34,12 +34,12 @@
             <b>Tweet Count:</b> {{ alert['tweetCount'] }} <br> <b>Hashtags:</b>
             {% for hashtag in alert['hashtags'] %}
                 {% if hashtag['active'] %}
-                    <button style="margin: 1px" id="{{ alert['alertid'] }}_{{ hashtag['hashtag'] }}" type="button" class="btn btn-success btn-xs not-focusable"
+                    <button style="margin: 1px" id="{{ alert['alertid'] }}_{{ hashtag['hashtag'] }}" type="button" class="btn btn-success btn-xs"
                             onclick="hashtagSave('{{ alert['alertid'] }}', '{{ hashtag['hashtag'] }}', false)">{{ hashtag['hashtag'] }}
                         <span
                                 class="badge">{{ hashtag['count'] }}</span></button>
                 {% else %}
-                    <button style="margin: 1px" sid="{{ alert['alertid'] }}_{{ hashtag['hashtag'] }}" type="button" class="btn btn-success btn-outline btn-xs not-focusable"
+                    <button style="margin: 1px" id="{{ alert['alertid'] }}_{{ hashtag['hashtag'] }}" type="button" class="btn btn-success btn-outline btn-xs"
                             onclick="hashtagSave('{{ alert['alertid'] }}', '{{ hashtag['hashtag'] }}', true)">{{ hashtag['hashtag'] }} <span
                             class="badge">{{ hashtag['count'] }}</span></button>
                 {% endif %}

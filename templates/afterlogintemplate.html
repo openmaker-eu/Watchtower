@@ -171,6 +171,11 @@
     {% endif %}
 
     {% if type == 'alertlist' %}
+        <script type="text/javascript"> document.addEventListener('click', function (e) {
+            if (document.activeElement.toString() == '[object HTMLButtonElement]') {
+                document.activeElement.blur();
+            }
+        }); </script>
         <style type="text/css">
             .btn-outline {
                 background-color: transparent;
@@ -184,11 +189,6 @@
 
             .btn-success.btn-outline:hover {
                 color: #fff;
-            }
-
-            .not-focusable:focus {
-                outline: none;
-                box-shadow: none;
             }
         </style>
     {% endif %}

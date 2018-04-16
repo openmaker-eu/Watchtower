@@ -54,9 +54,6 @@ function alertbuttonclick(aid, ptype) {
 }
 
 function hashtagSave(topic_id, hashtag, isActive) {
-    $("#{0}_{1}".format(topic_id, hashtag)).focus(function(event) {
-        event.target.blur();
-    });
     $.ajax({
         url: "/hashtag",
         method: 'POST',
