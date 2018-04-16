@@ -153,6 +153,24 @@
         </style>
     {% endif %}
 
+    {% if type == 'crons' %}
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.10/css/all.css"
+              integrity="sha384-+d0P83n9kaQMCwj8F4RJB66tzIwOKmrdb46+porD/OvrJ+37WqIM7UoBtwHO6Nlg"
+              crossorigin="anonymous">
+
+        <style type="text/css">
+            th {
+                text-align: center;
+                vertical-align: middle;
+            }
+
+            td {
+                text-align: center;
+                vertical-align: middle;
+            }
+        </style>
+    {% endif %}
+
 </head>
 
 <body style="padding-top:50px">
@@ -226,6 +244,7 @@
                             class="glyphicon glyphicon-user"></span> {{ username }} <span class="caret"></span></a>
                     <ul class="dropdown-menu">
                         <li><a href="/profile">My Profile</a></li>
+                        <li><a href="/Crons">Crons</a></li>
                         <li><a href="/twitter_auth">Social Media Auth</a></li>
                         <li><a href="/Recommendations">Recommendations</a></li> <!-- Added for recommendations -->
                         <li><a href="/bookmark">Bookmarks</a></li>
@@ -252,6 +271,7 @@
                 <li {% if type=="alertlist" or type=="editAlert" or type=="createAlert" %} class="active" {% endif %}>
                     <a href="/Topics"><strong>Manage Topics</strong></a>
                 </li>
+                {% if type != 'crons' %}
                 <li>
                     <div class="btn-group" style="margin:8px">
                         <a class="btn btn-default dropdown-toggle btn-blog " data-toggle="dropdown" href="#"
@@ -264,6 +284,7 @@
                         </ul>
                     </div>
                 </li>
+                {% endif %}
             </ul>
 
             <div class="navbar-brand" style="margin-left:30">
@@ -321,7 +342,7 @@
 </div>
 
 {% if type == "audiences" or type == "events" or type == "influencers" %}
-    <button class="back-to-top" id="back-to-top" >
+    <button class="back-to-top" id="back-to-top">
         <a href="#" class="to-top-link">
             Back to top
         </a>
@@ -372,6 +393,9 @@
 {% if type == "tweets" %}
     {% include 'tweetTemplate.html' %}
 {% endif %}
+{% if type == "crons" %}
+    {% include 'crons.html' %}
+{% endif %}
 
 </body>
 
@@ -395,16 +419,16 @@
     $(document).ready(function () {
         var offset = 250;
         var duration = 300;
-        $(window).scroll(function() {
+        $(window).scroll(function () {
             if (jQuery(this).scrollTop() > offset) {
                 $("#back-to-top").fadeIn(duration);
             }
             else {
                 $("#back-to-top").fadeOut(duration);
             }
-            });
+        });
 
-        $("#back-to-top").click(function(event) {
+        $("#back-to-top").click(function (event) {
             event.preventDefault();
             $("html, body").animate({scrollTop: 0}, duration);
             return false;

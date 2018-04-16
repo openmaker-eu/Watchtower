@@ -1,0 +1,36 @@
+<div class="container">
+    <table class="table">
+        <thead class="thead-light">
+        <tr>
+            <th scope="col">Cron Name</th>
+            <th scope="col">Started At</th>
+            <th scope="col">Ended At</th>
+            <th scope="col">Status</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for cron in crons %}
+            <tr>
+                <th scope="row">{{ cron['cron_name'] }}</th>
+                <td>{{ cron['started_at'] }}</td>
+                <td>
+                    {% if cron['ended_at'] is none %}
+                        -
+                    {% else %}
+                        {{ cron['ended_at'] }}
+                    {% endif %}
+                </td>
+                <td>
+                    {% if cron['status'] %}
+                        <i class="fas fa-circle" style="color: #4CAF50"></i>
+                    {% elif cron['ended_at'] is none %}
+                        <i class="fas fa-spinner fa-spin"></i>
+                    {% else %}
+                        <i class="fas fa-circle" style="color:#F44336"></i>
+                    {% endif %}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
