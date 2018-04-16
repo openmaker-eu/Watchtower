@@ -35,8 +35,8 @@ DROP TABLE public.signal_strenghts;
 DROP TABLE public.relevant_locations;
 DROP TABLE public.country_code;
 DROP TABLE public.archived_topics;
-DROP TABLE public.crons;
-DROP SEQUENCE public.cron_id_seq;
+DROP TABLE public.crons_log;
+DROP SEQUENCE public.cron_log_id_seq;
 DROP EXTENSION adminpack;
 DROP EXTENSION plpgsql;
 DROP SCHEMA public;
@@ -237,10 +237,10 @@ CREATE SEQUENCE topic_id_seq
 ALTER TABLE topic_id_seq OWNER TO ${POSTGRESQL_USER};
 
 --
--- Name: cron_id_seq; Type: SEQUENCE; Schema: public; Owner: ${POSTGRESQL_USER}
+-- Name: cron_log_id_seq; Type: SEQUENCE; Schema: public; Owner: ${POSTGRESQL_USER}
 --
 
-CREATE SEQUENCE cron_id_seq
+CREATE SEQUENCE cron_log_id_seq
     START WITH 0
     INCREMENT BY 1
     NO MINVALUE
@@ -248,7 +248,7 @@ CREATE SEQUENCE cron_id_seq
     CACHE 1;
 
 
-ALTER TABLE cron_id_seq OWNER TO ${POSTGRESQL_USER};
+ALTER TABLE cron_log_id_seq OWNER TO ${POSTGRESQL_USER};
 
 --
 -- Name: topic_subreddit; Type: TABLE; Schema: public; Owner: ${POSTGRESQL_USER}
@@ -428,8 +428,8 @@ ALTER TABLE users OWNER TO ${POSTGRESQL_USER};
 -- Name: topics; Type: TABLE; Schema: public; Owner: ${POSTGRESQL_USER}
 --
 
-CREATE TABLE crons (
-    id bigint DEFAULT nextval('cron_id_seq'::regclass) NOT NULL,
+CREATE TABLE crons_log (
+    id bigint DEFAULT nextval('cron_log_id_seq'::regclass) NOT NULL,
     cron_name text,
     started_at timestamp,
     ended_at timestamp,
@@ -437,7 +437,7 @@ CREATE TABLE crons (
 );
 
 
-ALTER TABLE crons OWNER TO ${POSTGRESQL_USER};
+ALTER TABLE crons_log OWNER TO ${POSTGRESQL_USER};
 
 --
 -- Name: users_and_topics; Type: VIEW; Schema: public; Owner: ${POSTGRESQL_USER}

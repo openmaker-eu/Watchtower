@@ -29,7 +29,7 @@ from handlers.influencer import InfluencersHandler, InfluencersV11Handler, Local
 
 from handlers.challenge import ChallengeV13Handler
 
-from handlers.cron import CronHandler
+from handlers.crons_log import CronsLogHandler
 
 from handlers.tweet import RedirectHandler, NewTweetsHandler, TweetsHandler
 from handlers.recommendation import RecommendationsHandler
@@ -110,7 +110,7 @@ url_patterns = [
     (r"/saveLocation", LocationHandler),
 
     # CRONS MANAGEMENT
-    (r"/Crons", CronHandler),
+    (r"/crons-logs", CronsLogHandler),
 
     # DOCUMENTATION
     (r"/api", DocumentationHandler),

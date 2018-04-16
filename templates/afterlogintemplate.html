@@ -153,7 +153,7 @@
         </style>
     {% endif %}
 
-    {% if type == 'crons' %}
+    {% if type == 'crons_log' %}
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.10/css/all.css"
               integrity="sha384-+d0P83n9kaQMCwj8F4RJB66tzIwOKmrdb46+porD/OvrJ+37WqIM7UoBtwHO6Nlg"
               crossorigin="anonymous">
@@ -244,7 +244,7 @@
                             class="glyphicon glyphicon-user"></span> {{ username }} <span class="caret"></span></a>
                     <ul class="dropdown-menu">
                         <li><a href="/profile">My Profile</a></li>
-                        <li><a href="/Crons">Crons</a></li>
+                        <li><a href="/crons-logs">Crons Logs</a></li>
                         <li><a href="/twitter_auth">Social Media Auth</a></li>
                         <li><a href="/Recommendations">Recommendations</a></li> <!-- Added for recommendations -->
                         <li><a href="/bookmark">Bookmarks</a></li>
@@ -271,7 +271,7 @@
                 <li {% if type=="alertlist" or type=="editAlert" or type=="createAlert" %} class="active" {% endif %}>
                     <a href="/Topics"><strong>Manage Topics</strong></a>
                 </li>
-                {% if type != 'crons' %}
+                {% if type != 'crons_log' %}
                 <li>
                     <div class="btn-group" style="margin:8px">
                         <a class="btn btn-default dropdown-toggle btn-blog " data-toggle="dropdown" href="#"
@@ -393,8 +393,8 @@
 {% if type == "tweets" %}
     {% include 'tweetTemplate.html' %}
 {% endif %}
-{% if type == "crons" %}
-    {% include 'crons.html' %}
+{% if type == "crons_log" %}
+    {% include 'crons_log.html' %}
 {% endif %}
 
 </body>

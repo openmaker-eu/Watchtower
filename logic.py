@@ -1681,14 +1681,14 @@ def get_tweet(topic_id, tweet_id):
         return Connection.Instance().tweetsDB[str(topic_id)].find_one({'tweet_id': int(tweet_id)})
     return []
 
-def get_crons():
+def get_crons_log():
     with Connection.Instance().get_cursor() as cur:
         sql = (
             "SELECT cron_name, started_at, ended_at, status "
-            "FROM crons "
+            "FROM crons_log "
             "WHERE id IN ("
                 "SELECT MAX(id) "
-                "FROM crons "
+                "FROM crons_log "
                 "GROUP BY cron_name"
             ") ORDER BY cron_name;"
         )
