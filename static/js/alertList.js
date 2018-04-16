@@ -52,3 +52,25 @@ function alertbuttonclick(aid, ptype) {
         //notification(aid);
     });
 }
+
+function hashtagSave(topic_id, hashtag, isActive) {
+    $("#{0}_{1}".format(topic_id, hashtag)).focus(function(event) {
+        event.target.blur();
+    });
+    $.ajax({
+        url: "/hashtag",
+        method: 'POST',
+        data: {
+            'topic_id': topic_id,
+            'hashtag': hashtag,
+            'save_type': isActive
+        }
+    }).success(function (response) {
+        if (isActive) {
+            $("#{0}_{1}".format(topic_id, hashtag)).removeClass('btn-outline');
+        } else {
+            $("#{0}_{1}".format(topic_id, hashtag)).addClass('btn-outline');
+        }
+        $("#{0}_{1}".format(topic_id, hashtag)).attr('onclick', "hashtagSave('{0}', '{1}', {2})".format(topic_id, hashtag, !isActive));
+    });
+}

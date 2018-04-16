@@ -223,6 +223,18 @@ CREATE TABLE topic_facebook_page (
 ALTER TABLE topic_facebook_page OWNER TO ${POSTGRESQL_USER};
 
 --
+-- Name: topic_hashtag; Type: TABLE; Schema: public; Owner: ${POSTGRESQL_USER}
+--
+
+CREATE TABLE topic_hashtag (
+    topic_id bigint,
+    hashtag text
+);
+
+
+ALTER TABLE topic_hashtag OWNER TO ${POSTGRESQL_USER};
+
+--
 -- Name: topic_id_seq; Type: SEQUENCE; Schema: public; Owner: ${POSTGRESQL_USER}
 --
 

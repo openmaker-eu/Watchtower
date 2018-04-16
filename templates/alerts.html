@@ -4,46 +4,7 @@
       <h2>Topics You Have Created</h2>
         <div class="grid">
             {% for alert in alerts %} {% if alert['type'] == 'me' %}
-            <div class="topic_card">
-                <div class="container" style="padding: 16px 16px;width: 100%;">
-                    <h3><b>{% if alert['type'] == 'subscribed' %}
-                        <span style="color:#50AE54" title="You subscribe to this topic."
-                              class="glyphicon glyphicon-certificate"></span> {% endif %}{{ alert['name'] }}</b></h3>
-                    <div class="dropdown" style="float:right">
-                        <button class="dropbtn">More</button>
-                        <div class="dropdown-content">
-                            {% if alert['type'] == 'me' %}
-                                <a href="/topicinfo/{{ alert['alertid'] }}">Edit</a>
-                                <a href="javascript:void(0)" onclick="alertbuttonclick({{ alert['alertid'] }}, 'remove');"
-                                   posttype="remove" alertid="{{ alert['alertid'] }}">Remove</a>
-                                {% if not alert['status'] %}
-                                    <a href="javascript:void(0)" onclick="alertbuttonclick({{ alert['alertid'] }}, 'start');"
-                                       posttype="start" alertid="{{ alert['alertid'] }}">Start</a> {% else %}
-                                    <a href="javascript:void(0)" onclick="alertbuttonclick({{ alert['alertid'] }}, 'stop');"
-                                       posttype="stop" alertid="{{ alert['alertid'] }}">Stop</a> {% endif %}
-                                {% if not alert['publish'] %}
-                                    <a href="javascript:void(0)" onclick="alertbuttonclick({{ alert['alertid'] }}, 'publish');"
-                                       posttype="publish" alertid="{{ alert['alertid'] }}">Publish</a> {% else %}
-                                    <a href="javascript:void(0)" onclick="alertbuttonclick({{ alert['alertid'] }}, 'unpublish');"
-                                       posttype="unpublish" alertid="{{ alert['alertid'] }}">Unpublish</a>
-                                {% endif %} {% elif alert['type'] == 'subscribed' %}
-                                <a href="javascript:void(0)" onclick="alertbuttonclick({{ alert['alertid'] }}, 'unsubscribe');"
-                                   posttype="unsubscribe" alertid="{{ alert['alertid'] }}">Unsubscribe</a> {% endif %}
-                        </div>
-                    </div>
-                    <hr>
-                    <p style="font-size:15px"><b>Keywords:</b> {{ ", ".join(alert['keywords']) }} <br>
-                        <b>Languages:</b> {{ ", ".join(alert['lang']) }}</p>
-                    <p style="font-size:14px"><b>News Count:</b> {{ alert['newsCount'] }} <br>
-                      <b>Audience Count:</b> {{ alert['audienceCount'] }} <br>
-                      <b>Event Count:</b> {{ alert['eventCount'] }} <br>
-                      <b>Tweet Count:</b> {{ alert['tweetCount'] }} <br> <b>Top Five
-                        Hashtags:</b> {{ alert['hashtags'] }} <br> <br>
-                        <span style="font-size:13px;float:right"><b>Created at:</b> {{ alert['creationTime'] }} <br>
-                  <b>Last tweet updated date:</b> {{ alert['updatedTime'] }} <br> <b>Last news updated date:</b> {{ alert['newsUpdatedTime'] }} </span>
-                    </p>
-                </div>
-            </div>
+            {% include 'topic_card.html' %}
         {% endif %} {% endfor %}
 
             <div class="topic_card" style="margin-top:2.5%">
@@ -70,47 +31,7 @@
         <h2>Topics You Have Subscribed</h2>
         <div class="grid">
              {% for alert in alerts %} {% if alert['type'] == 'subscribed' %}
-            <div class="topic_card">
-                <div class="container" style="padding: 16px 16px;width: 100%;">
-                    <h3><b>{% if alert['type'] == 'subscribed' %}
-                        <span style="color:#50AE54" title="You subscribe to this topic."
-                              class="glyphicon glyphicon-certificate"></span> {% endif %}{{ alert['name'] }}</b></h3>
-                    <div class="dropdown" style="float:right">
-                        <button class="dropbtn">More</button>
-                        <div class="dropdown-content">
-                            {% if alert['type'] == 'me' %}
-                                <a href="/topicinfo/{{ alert['alertid'] }}">Edit</a>
-                                <a href="javascript:void(0)" onclick="alertbuttonclick({{ alert['alertid'] }}, 'remove');"
-                                   posttype="remove" alertid="{{ alert['alertid'] }}">Remove</a>
-                                {% if not alert['status'] %}
-                                    <a href="javascript:void(0)" onclick="alertbuttonclick({{ alert['alertid'] }}, 'start');"
-                                       posttype="start" alertid="{{ alert['alertid'] }}">Start</a> {% else %}
-                                    <a href="javascript:void(0)" onclick="alertbuttonclick({{ alert['alertid'] }}, 'stop');"
-                                       posttype="stop" alertid="{{ alert['alertid'] }}">Stop</a> {% endif %}
-                                {% if not alert['publish'] %}
-                                    <a href="javascript:void(0)" onclick="alertbuttonclick({{ alert['alertid'] }}, 'publish');"
-                                       posttype="publish" alertid="{{ alert['alertid'] }}">Publish</a> {% else %}
-                                    <a href="javascript:void(0)" onclick="alertbuttonclick({{ alert['alertid'] }}, 'unpublish');"
-                                       posttype="unpublish" alertid="{{ alert['alertid'] }}">Unpublish</a>
-                                {% endif %} {% elif alert['type'] == 'subscribed' %}
-                                <a href="javascript:void(0)" onclick="alertbuttonclick({{ alert['alertid'] }}, 'unsubscribe');"
-                                   posttype="unsubscribe" alertid="{{ alert['alertid'] }}">Unsubscribe</a> {% endif %}
-                        </div>
-                    </div>
-                    <hr>
-                    <p style="font-size:15px"><b>Keywords:</b> {{ ", ".join(alert['keywords']) }} <br>
-                        <b>Languages:</b> {{ ", ".join(alert['lang']) }}</p>
-                    <p style="font-size:14px"><b>News Count:</b> {{ alert['newsCount'] }} <br>
-                      <b>Audience Count:</b> {{ alert['audienceCount'] }} <br>
-                      <b>Event Count:</b> {{ alert['eventCount'] }} <br>
-                      <b>Tweet Count:</b> {{ alert['tweetCount'] }} <br> <b>Top Five
-                        Hashtags:</b> {{ alert['hashtags'] }} <br> <br>
-                        <span style="font-size:13px;float:right"><b>Created by:</b> {{ alert['created_by'] }} <br>
-                          <b>Created at:</b> {{ alert['creationTime'] }} <br>
-                    <b>Last tweet updated date:</b> {{ alert['updatedTime'] }} <br> <b>Last news updated date:</b> {{ alert['newsUpdatedTime'] }} </span>
-                    </p>
-                </div>
-            </div>
+            {% include 'topic_card.html' %}
         {% endif %} {% endfor %}
 
         </div>
@@ -118,32 +39,7 @@
         <h2>Topics You Can Subscribe</h2>
         <div class="grid">
           {% for alert in alerts %} {% if alert['type'] == 'unsubscribed' %}
-            <div class="topic_card">
-                <div class="container" style="padding: 16px 16px;width: 100%;">
-                    <h3><b>{% if alert['type'] == 'unsubscribed' %}
-                        <span style="color:#D32F2F" title="You do not subscribe to this topic."
-                              class="glyphicon glyphicon-certificate"></span> {% endif %}{{ alert['name'] }}</b></h3>
-                    <div class="dropdown" style="float:right">
-                        <button class="dropbtn">More</button>
-                        <div class="dropdown-content">
-                            <a href="javascript:void(0)" onclick="alertbuttonclick({{ alert['alertid'] }}, 'subscribe');"
-                               posttype="subscribe" alertid="{{ alert['alertid'] }}">Subscribe</a>
-                        </div>
-                    </div>
-                    <hr>
-                    <p style="font-size:15px"><b>Keywords:</b> {{ ", ".join(alert['keywords']) }} <br>
-                        <b>Languages:</b> {{ ", ".join(alert['lang']) }}</p>
-                    <p style="font-size:14px"><b>News Count:</b> {{ alert['newsCount'] }} <br>
-                      <b>Audience Count:</b> {{ alert['audienceCount'] }} <br>
-                      <b>Event Count:</b> {{ alert['eventCount'] }} <br>
-                      <b>Tweet Count:</b> {{ alert['tweetCount'] }} <br> <b>Top Five
-                        Hashtags:</b> {{ alert['hashtags'] }} <br> <br>
-                        <span style="font-size:13px;float:right"><b>Created by:</b> {{ alert['created_by'] }} <br>
-                          <b>Created at:</b> {{ alert['creationTime'] }} <br>
-                  <b>Last tweet updated date:</b> {{ alert['updatedTime'] }}  <br> <b>Last news updated date:</b> {{ alert['newsUpdatedTime'] }}</span>
-                    </p>
-                </div>
-            </div>
+            {% include 'topic_card.html' %}
         {% endif %} {% endfor %}
         </div>
     </div>

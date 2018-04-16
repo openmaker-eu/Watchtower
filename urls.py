@@ -31,6 +31,8 @@ from handlers.challenge import ChallengeV13Handler
 
 from handlers.crons_log import CronsLogHandler
 
+from handlers.hashtag import HashtagHandler
+
 from handlers.tweet import RedirectHandler, NewTweetsHandler, TweetsHandler
 from handlers.recommendation import RecommendationsHandler
 from handlers.location import LocationHandler
@@ -111,6 +113,9 @@ url_patterns = [
 
     # CRONS MANAGEMENT
     (r"/crons-logs", CronsLogHandler),
+
+    # HASHTAG
+    (r"/hashtag", HashtagHandler),
 
     # DOCUMENTATION
     (r"/api", DocumentationHandler),

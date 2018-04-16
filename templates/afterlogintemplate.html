@@ -27,7 +27,6 @@
           href=”https://use.fontawesome.com/releases/v5.0.8/css/all.css” type=”text/css” media=”screen”>
 
     <!-- for alertForm -->
-    <link rel="stylesheet" href="/css/bootstrap-theme.min.css">
     <link rel="stylesheet" href="/css/bootstrap-tagsinput.css">
     <style type="text/css">
         .form-alert form .input-error {
@@ -171,6 +170,29 @@
         </style>
     {% endif %}
 
+    {% if type == 'alertlist' %}
+        <style type="text/css">
+            .btn-outline {
+                background-color: transparent;
+                color: inherit;
+                transition: all .5s;
+            }
+
+            .btn-success.btn-outline {
+                color: #5cb85c;
+            }
+
+            .btn-success.btn-outline:hover {
+                color: #fff;
+            }
+
+            .not-focusable:focus {
+                outline: none;
+                box-shadow: none;
+            }
+        </style>
+    {% endif %}
+
 </head>
 
 <body style="padding-top:50px">
@@ -272,18 +294,18 @@
                     <a href="/Topics"><strong>Manage Topics</strong></a>
                 </li>
                 {% if type != 'crons_log' %}
-                <li>
-                    <div class="btn-group" style="margin:8px">
-                        <a class="btn btn-default dropdown-toggle btn-blog " data-toggle="dropdown" href="#"
-                           id="dropdownMenu1" style="width:200px;"><span
-                                class="selection pull-left">Select a Topic</span>
-                            <span class="pull-right glyphiconglyphicon-chevron-down caret"
-                                  style="float:right;margin-top:10px;"></span></a>
-                        <ul class="dropdown-menu" id="topic_dropdown" role="menu" aria-labelledby="dropdownMenu1">
-                            {% include'alertDropdownMenu.html' %}
-                        </ul>
-                    </div>
-                </li>
+                    <li>
+                        <div class="btn-group" style="margin:8px">
+                            <a class="btn btn-default dropdown-toggle btn-blog " data-toggle="dropdown" href="#"
+                               id="dropdownMenu1" style="width:200px;"><span
+                                    class="selection pull-left">Select a Topic</span>
+                                <span class="pull-right glyphiconglyphicon-chevron-down caret"
+                                      style="float:right;margin-top:10px;"></span></a>
+                            <ul class="dropdown-menu" id="topic_dropdown" role="menu" aria-labelledby="dropdownMenu1">
+                                {% include'alertDropdownMenu.html' %}
+                            </ul>
+                        </div>
+                    </li>
                 {% endif %}
             </ul>
 

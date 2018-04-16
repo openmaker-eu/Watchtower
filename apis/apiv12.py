@@ -251,7 +251,14 @@ def getHastags(topic_id, date):
     hashtags = []
 
     if len(hashtag_list) > 0:
-        hashtags = hashtag_list[0][date]
+        with Connection.Instance().get_cursor() as cur:
+            sql = (
+                "SELECT ARRAY_AGG(hashtag) FROM topic_hashtag WHERE topic_id = %s ;"
+            )
+            cur.execute(sql, [topic_id])
+            var = cur.fetchone()
+            tags = var[0] if var[0] is not None else []
+            hashtags = [item for item in hashtag_list[0][date] if item['hashtag'] not in tags]
 
     return json.dumps({'hashtags': hashtags})
 

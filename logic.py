@@ -490,13 +490,21 @@ def get_topic_list(user_id):
             topic['tweetCount'] = Connection.Instance().db[str(topic['alertid'])].find().count()
             try:
                 hash_tags = list(Connection.Instance().hashtags[str(topic['alertid'])].find({'name': 'month'},
-                                                                                            {'month': 1,
+                                                                                            {'month': 1, 'count': 1,
                                                                                              '_id': 0}))[0]['month']
             except:
                 hash_tags = []
                 pass
-            hash_tags = ["#" + hash_tag['hashtag'] for hash_tag in hash_tags]
-            topic['hashtags'] = ", ".join(hash_tags[:5])
+            sql = (
+                "SELECT ARRAY_AGG(hashtag) FROM topic_hashtag WHERE topic_id = %s ;"
+            )
+            cur.execute(sql, [topic['alertid']])
+            var = cur.fetchone()
+            tags = var[0] if var[0] is not None else []
+            hash_tags = [
+                {'hashtag': hash_tag['hashtag'], 'count': hash_tag['count'], 'active': hash_tag['hashtag'] not in tags}
+                for hash_tag in hash_tags]
+            topic['hashtags'] = hash_tags
         return topics
 
 
@@ -1710,3 +1718,32 @@ def get_crons_log():
                      'duration': get_duration(cron[1], cron[2])} for cron in fetched]
 
         return []
+
+
+def topic_hashtag(topic_id, hashtag, save_type):
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "SELECT EXISTS (SELECT 1 FROM topic_hashtag where topic_id = %s AND hashtag = %s)"
+        )
+        cur.execute(sql, [int(topic_id), hashtag])
+        fetched = cur.fetchone()
+
+        if fetched[0]:
+            if not save_type:
+                return
+            else:
+                sql = (
+                    "DELETE FROM topic_hashtag "
+                    "WHERE topic_id = %s AND hashtag = %s;"
+                )
+                cur.execute(sql, [int(topic_id), hashtag])
+        else:
+            if not save_type:
+                sql = (
+                    "INSERT INTO topic_hashtag "
+                    "(topic_id, hashtag) "
+                    "VALUES (%s, %s);"
+                )
+                cur.execute(sql, [int(topic_id), hashtag])
+            else:
+                return
