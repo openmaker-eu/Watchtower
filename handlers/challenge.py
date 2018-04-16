@@ -6,7 +6,6 @@ from apis import apiv1, apiv11, apiv12, apiv13
 
 
 class ChallengeV13Handler(BaseHandler, TemplateRendering):
-    @tornado.web.authenticated
     def get(self):
         is_open = bool(self.get_argument('is_open', False))
         date = str(self.get_argument("date", ""))
@@ -18,6 +17,5 @@ class ChallengeV13Handler(BaseHandler, TemplateRendering):
             cursor = 0
             pass
         challenges = apiv13.getChallenges(is_open, date, int(cursor))
-        print("got the challenges!")
         self.set_header('Content-Type', 'application/json')
         self.write(challenges)
