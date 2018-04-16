@@ -1699,6 +1699,11 @@ def get_crons_log():
                 minutes = (seconds % 3600) // 60
                 seconds = seconds % 60
 
+                if hours == 0 and minutes == 0:
+                    return "{0} seconds".format(seconds)
+                elif hours == 0:
+                    return "{0} min, {1} seconds".format(minutes, seconds)
+
                 return "{0} h, {1} min, {2} sec.".format(hours, minutes, seconds)
 
             return [{'cron_name': cron[0], 'started_at': cron[1], 'ended_at': cron[2], 'status': cron[3],
