@@ -30,7 +30,7 @@ class NewTweetsHandler(BaseHandler, TemplateRendering):
 
 class RedirectHandler(BaseHandler, TemplateRendering):
     def get(self):
-        user_agent = self.request.headers["User-Agent"]
+        user_agent = self.request.headers["User-Agent"] if "User-Agent" in self.request.headers else ""
         tweet_id = int(self.get_argument("tweet_id", -1))
         topic_id = int(self.get_argument("topic_id", -1))
         tweet = logic.get_tweet(topic_id, tweet_id)
