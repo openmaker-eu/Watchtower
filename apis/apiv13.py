@@ -77,16 +77,16 @@ def getLocalInfluencers(topic_id, location, cursor):
 
             local_influencers = list(
                 collection.find({'id': {'$nin':hidden_ids}},
-                 {'_id': False,
-                 'name':1,
-                 'screen_name':1,
-                 'description':1,
-                 'location':1,
-                 'time-zone':1,
-                 'lang':1,
-                 'profile_image_url_https':1
-                 })[cursor:min(cursor+cursor_range,max_cursor)]
-                )
+                                {'_id': False,
+                                 'name':1,
+                                 'screen_name':1,
+                                 'description':1,
+                                 'location':1,
+                                 'time-zone':1,
+                                 'lang':1,
+                                 'profile_image_url_https':1
+                                 })[cursor:min(cursor+cursor_range,max_cursor)]
+            )
 
             result['topic'] = topic_name
             result['location'] = location
@@ -160,16 +160,16 @@ def getAudienceSample(topic_id, location, cursor):
                     return result
 
             audience_sample = list(
-            Connection.Instance().audience_samples_DB[str(location)+"_"+str(topic_id)].find({},
-            {'_id': False,
-            'name':1,
-            'screen_name':1,
-            'description':1,
-            'location':1,
-            'time-zone':1,
-            'lang':1,
-            'profile_image_url_https':1
-            })[cursor:min(cursor+cursor_range,max_cursor)]
+                Connection.Instance().audience_samples_DB[str(location)+"_"+str(topic_id)].find({},
+                                                                                                {'_id': False,
+                                                                                                 'name':1,
+                                                                                                 'screen_name':1,
+                                                                                                 'description':1,
+                                                                                                 'location':1,
+                                                                                                 'time-zone':1,
+                                                                                                 'lang':1,
+                                                                                                 'profile_image_url_https':1
+                                                                                                 })[cursor:min(cursor+cursor_range,max_cursor)]
             )
 
             result['topic'] = topic_name
@@ -192,14 +192,6 @@ def getAudienceSample(topic_id, location, cursor):
         result['error'] = "Topic not found."
     return result
 
-
-def getEvent(topic_id, event_id):
-    try:
-        return Connection.Instance().events[str(topic_id)].find_one({'id': event_id})
-    except:
-        return {'error': 'Event not found.'}
-
-
 def getEvents(topic_id, sortedBy, location, cursor, event_ids):
     cursor_range = 10
     max_cursor = 100
@@ -207,47 +199,100 @@ def getEvents(topic_id, sortedBy, location, cursor, event_ids):
     result = {}
     match = {}
     sort = {}
+    events = []  # all events to be returned
+    cursor_updated=  False
+
     location = location.lower()
+    no_topic_id = False
 
     if cursor >= max_cursor:
         result['events']=[]
         result['error'] = "Cannot exceed max cursor = " + str(max_cursor) + "."
         return result
-    try:
-        topic_id = int(topic_id)
-    except:
-        result['event'] = "topic not found"
-        return result
-    with Connection.Instance().get_cursor() as cur:
-        sql = (
-            "SELECT topic_name "
-            "FROM topics "
-            "WHERE topic_id = %s;"
-        )
+
+    # SORT CRITERIA
+    if sortedBy == 'interested':
+        sort['interested']=-1
+    elif sortedBy == 'date' or sortedBy=='':
+        sort['start_time']=1
+    else:
+        return {'error': "please enter a valid sortedBy value."}
+
+    # if event ids are entered, ignore all other filters. Only return the requested events.
+    if event_ids is not None:
+        print("Fetching specific events...")
+        topics=dict()
+        with Connection.Instance().get_cursor() as cur:
+            sql = (
+                "SELECT topic_id, topic_name "
+                "FROM topics "
+            )
+            try:
+                cur.execute(sql)
+                for topic_id, topic_name in cur.fetchall():
+                    topics[topic_id]=topic_name
+            except:
+                print("Problem with fetching topics.")
+
+        for colname in Connection.Instance().events.collection_names():
+            evs = list(Connection.Instance().events[colname].aggregate([
+                {'$match': {'id': {'$in': event_ids}}},
+                {'$project': {'_id': 0,
+                              "updated_time": 1,
+                              "cover": 1,
+                              "description": 1,
+                              "start_time": 1,
+                              "end_time": 1,
+                              "id": 1,
+                              "name": 1,
+                              "place": 1,
+                              "link": 1,
+                              "interested": 1,
+                              "coming": 1
+                              }},
+                {'$sort': sort},
+            # {'$skip': int(cursor)},
+                # {'$limit': 10}
+            ]))
+
+            for e in evs:
+                e['topic'] = topics[int(colname)]
+            events += evs
+            
+            e_ids = set([e['id'] for e in evs])
+            if len(set(event_ids) - e_ids) == 0:
+                break
+        result['topic'] = "All topics"
+
+    else:
         try:
-            cur.execute(sql, [topic_id])
-            var = cur.fetchall()
-            topic_name = var[0][0]
+            topic_id = int(topic_id)
         except:
-            result['error'] = "Topic does not exist."
-            return result
+            if event_ids is None:
+                result['error'] = "Either topic id or event ids should be provided."
+                return result
 
-        events = []  # all events to be returned
+        # A topic_id is provided
+        with Connection.Instance().get_cursor() as cur:
+            sql = (
+                "SELECT topic_name "
+                "FROM topics "
+                "WHERE topic_id = %s;"
+            )
+            try:
+                cur.execute(sql, [topic_id])
+                var = cur.fetchall()
+                topic_name = var[0][0]
+                result['topic'] = topic_name
 
-        result['topic'] = topic_name
+            except:
+                if no_topic_id:
+                    print("Topic was not provided.")
+                else:
+                    print("Provided topic does not exist.")
+                    return {'error': 'Topic does not exist and no event ids are provided.'}
+
         result['location'] = location
-
-        # SORT CRITERIA
-        if sortedBy == 'interested':
-            sort['interested']=-1
-        elif sortedBy == 'date' or sortedBy=='':
-            sort['start_time']=1
-        else:
-            return {'error': "please enter a valid sortedBy value."}
-
-        if event_ids is not None:
-            match['id'] = {'$in': event_ids}
-
         match['end_time'] = {'$gte': time.time()}
 
         print("Location: " + str(location))
@@ -264,63 +309,70 @@ def getEvents(topic_id, sortedBy, location, cursor, event_ids):
             EVENT_LIMIT = 70
             COUNTRY_LIMIT=80
             cdl = []
-            hidden_event_links = []
 
             # GET HIDDEN EVENTS
-            sql = (
-                "SELECT event_link "
-                "FROM hidden_events "
-                "WHERE topic_id = %s "
-            )
-            try:
-                cur.execute(sql, [int(topic_id)])
-                hidden_event_links = [str(event[0]) for event in cur.fetchall()]
-            except:
-                result['error'] = "Problem in fetching hidden events for current topic."
-                return result
+            with Connection.Instance().get_cursor() as cur:
+                hidden_event_links=[]
+
+                try:
+                    colnames = Connection.Instance().events.collection_names() if no_topic_id else [topic_id]
+                    for colname in colnames:
+                        print(colname)
+                        sql = (
+                            "SELECT event_link "
+                            "FROM hidden_events "
+                            "WHERE topic_id = %s "
+                        )
+                        cur.execute(sql, [int(colname)])
+                        hidden_event_links.extend(str(event[0]) for event in cur.fetchall())
+                        print(hidden_event_links)
+                except:
+                    result['error'] = "Problem in fetching hidden events for current topic."
+                    return result
 
             with open('rank_countries.csv', 'r') as f:
-              reader = csv.reader(f)
-              country_distance_lists = list(reader)
-              for i in range(len(country_distance_lists)):
-                  if country_distance_lists[i][0] == location:
-                      cdl = country_distance_lists[i]
-              print("Found cdl!")
-              count = 0
-              for country in cdl:
-                  if count ==0:
-                      count+=1
-                      continue
-                  print("Checking db for country (#" + str(count) + "): " + str(country))
+                reader = csv.reader(f)
+                country_distance_lists = list(reader)
+                for i in range(len(country_distance_lists)):
+                    if country_distance_lists[i][0] == location:
+                        cdl = country_distance_lists[i]
+                print("Found cdl!")
+                count = 0
+                for country in cdl:
+                    if count ==0:
+                        count+=1
+                        continue
+                    print("Checking db for country (#" + str(count) + "): " + str(country))
 
-                  match['$or'] = [{'place':location_regex.getLocationRegex(country)},{'predicted_place':country}]
-                  match['link'] = {'$nin': hidden_event_links}
-                  print(match)
-                  events += list(Connection.Instance().events[str(topic_id)].aggregate([
-                      {'$match': match},
-                      {'$project': {'_id': 0,
-                          "updated_time": 1,
-                          "cover": 1,
-                          "description":1,
-                          "start_time":1,
-                          "end_time":1,
-                          "id": 1,
-                          "name": 1,
-                          "place": 1,
-                          "link": 1,
-                          "interested": 1,
-                          "coming":1
-                      }},
-                      {'$sort': sort}
-                      #{'$skip': int(cursor)},
-                      #{'$limit': 10}
-                  ]))
-                  count+=1
-                  print("length:" + str(len(events)))
-                  if len(events) >= min(cursor+cursor_range,EVENT_LIMIT):
-                      break
-                  if (count > COUNTRY_LIMIT):
-                      break
+                    match['$or'] = [{'place':location_regex.getLocationRegex(country)},{'predicted_place':country}]
+                    match['link'] = {'$nin': hidden_event_links}
+
+                    events += list(Connection.Instance().events[str(topic_id)].aggregate([
+                        {'$match': match},
+                        {'$project': {'_id': 0,
+                                      "updated_time": 1,
+                                      "cover": 1,
+                                      "description": 1,
+                                      "start_time": 1,
+                                      "end_time": 1,
+                                      "id": 1,
+                                      "name": 1,
+                                      "place": 1,
+                                      "link": 1,
+                                      "interested": 1,
+                                      "coming": 1
+                                      }},
+                        {'$sort': sort}
+                        # {'$skip': int(cursor)},
+                        # {'$limit': 10}
+                    ]))
+
+                    count+=1
+                    print("length:" + str(len(events)))
+                    if len(events) >= min(cursor+cursor_range,EVENT_LIMIT):
+                        break
+                    if (count > COUNTRY_LIMIT):
+                        break
 
             #pprint.pprint([e['place'] for e in events])
             display_events = events[cursor:min(cursor+cursor_range,max_cursor)]
@@ -336,51 +388,57 @@ def getEvents(topic_id, sortedBy, location, cursor, event_ids):
                     result['previous_cursor']  = -1
 
             result['next_cursor_str'] = str(result['next_cursor'])
-            result['events'] = display_events
+            cursor_updated=True
+
+            events = display_events
 
         else:
             print("returning all events...")
             events = list(Connection.Instance().events[str(topic_id)].aggregate([
                 {'$match': match},
                 {'$project': {'_id': 0,
-                    "updated_time": 1,
-                    "cover": 1,
-                    "end_time": 1,
-                    "description":1,
-                    "id": 1,
-                    "name": 1,
-                    "place": 1,
-                    "start_time": 1,
-                    "link": 1,
-                    "interested": 1,
-                    "coming":1
-                }},
+                              "updated_time": 1,
+                              "cover": 1,
+                              "end_time": 1,
+                              "description": 1,
+                              "id": 1,
+                              "name": 1,
+                              "place": 1,
+                              "start_time": 1,
+                              "link": 1,
+                              "interested": 1,
+                              "coming": 1
+                              }},
                 {'$sort': sort},
                 {'$skip': int(cursor)},
-                {'$limit': min(cursor_range,max_cursor-cursor)}
+                {'$limit': min(cursor_range, max_cursor - cursor)}
             ]))
-            cursor = int(cursor)
-            result['next_cursor'] = cursor + (cursor_range-cursor%cursor_range)
-            if cursor!=0: result['previous_cursor'] = cursor - cursor_range if cursor%cursor_range == 0 else cursor - cursor%cursor_range # if we are on the first page, there is no previous cursor
 
-            # cursor boundary checks
-            if result['next_cursor']  >= max_cursor or len(events) < cursor_range:
-                result['next_cursor'] = 0
-            if 'previous_cursor' in result:
-                if result['previous_cursor']  == 0:
-                    result['previous_cursor']  = -1
+    # CURSOR CHECK AND UPDATE
+    if not cursor_updated:
+        cursor = int(cursor)
+        result['next_cursor'] = cursor + (cursor_range - cursor % cursor_range)
+        if cursor != 0: result[
+            'previous_cursor'] = cursor - cursor_range if cursor % cursor_range == 0 else cursor - cursor % cursor_range  # if we are on the first page, there is no previous cursor
 
-            result['next_cursor_str'] = str(result['next_cursor'])
+        if result['next_cursor'] >= max_cursor or len(events) < cursor_range:
+            result['next_cursor'] = 0
+        if 'previous_cursor' in result:
+            if result['previous_cursor'] == 0:
+                result['previous_cursor'] = -1
 
-            result['events']= events
+        result['next_cursor_str'] = str(result['next_cursor'])
 
-        for event in result['events']:
-            if not isinstance(event['start_time'],str):
-                event['start_time'] = datetime.datetime.utcfromtimestamp(event['start_time']).strftime('%Y-%m-%dT%H:%M:%SZ')
-            if not isinstance(event['end_time'],str):
-                event['end_time'] = datetime.datetime.utcfromtimestamp(event['end_time']).strftime('%Y-%m-%dT%H:%M:%SZ')
+    # Correct date time format
+    for event in events:
+        if not isinstance(event['start_time'],str):
+            event['start_time'] = datetime.datetime.utcfromtimestamp(event['start_time']).strftime('%Y-%m-%dT%H:%M:%SZ')
+        if not isinstance(event['end_time'],str):
+            event['end_time'] = datetime.datetime.utcfromtimestamp(event['end_time']).strftime('%Y-%m-%dT%H:%M:%SZ')
 
-        return result
+    result['events'] = events
+
+    return result
 
 
 def getNewsFeeds(date, cursor, forbidden_domain, topics):
