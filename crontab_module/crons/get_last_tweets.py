@@ -23,7 +23,7 @@ auth.set_access_token(access_token, access_secret)
 api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
 
 number_of_tweets = 10
-window_size = 60
+window_size = 850
 
 def getTweets(id,number_of_tweets):
     '''
