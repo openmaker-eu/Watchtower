@@ -1,28 +1,16 @@
-import tweepy  # Twitter API helper package
 import urllib
 import nltk
 import json
 from nltk.corpus import stopwords
 from nltk.stem.porter import *
-from tweepy import OAuthHandler
-from tweepy.error import TweepError
 from time import gmtime, strftime, time
 from decouple import config
 from datetime import datetime
 import pymongo
 import sys
-import pdb
 sys.path.insert(0, config("ROOT_DIR"))
 from application.Connections import Connection
 
-consumer_key = config("TWITTER_CONSUMER_KEY")  # API key
-consumer_secret = config("TWITTER_CONSUMER_SECRET")  # API secret
-access_token = config("TWITTER_ACCESS_TOKEN")
-access_secret = config("TWITTER_ACCESS_SECRET")
-
-auth = OAuthHandler(consumer_key, consumer_secret)
-auth.set_access_token(access_token, access_secret)
-api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
 
 blacklist = ["party", "erasmus", "deal", "discount"]
 numOfTweets = 10
@@ -93,10 +81,7 @@ def calculateScore(per, keywords):
 
     penalty = -20*sum([word in per["description"] for word in blacklist])
 
-    try:
-        status_list = list(tweepy.Cursor(api.user_timeline, id=per["id"], tweet_mode='extended').items(numOfTweets))
-    except tweepy.error.TweepError as e:
-        return None
+    status_list = get_last_tweets(per["id"])
 
     if not status_list:
         return None
@@ -117,6 +102,14 @@ def calculateScore(per, keywords):
 
     return final_score
 
+def get_last_tweets(twitter_id):
+    resp = list(Connection.Instance().MongoDBClient.last_tweets["tweets"].find({"id" : twitter_id}))
+
+    if resp:
+        return resp[0]["tweets"]
+    
+    return None
+
 def update_influencer_score():
     for collection_name in Connection.Instance().audience_samples_DB.collection_names():
         collection = Connection.Instance().audience_samples_DB[collection_name]
@@ -131,8 +124,6 @@ def update_influencer_score():
 
         bulk = collection.initialize_unordered_bulk_op()
         
-        # Calculate score only for not processed
-        #cursor = collection.find({"influencer_score" : {"$exists" : False}})
         # Calculate score every time
         cursor = collection.find()
 
