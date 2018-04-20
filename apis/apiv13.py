@@ -221,8 +221,21 @@ def getEvents(topic_id, sortedBy, location, cursor, event_ids):
     # if event ids are entered, ignore all other filters. Only return the requested events.
     if event_ids is not None:
         print("Fetching specific events...")
+        topics=dict()
+        with Connection.Instance().get_cursor() as cur:
+            sql = (
+                "SELECT topic_id, topic_name "
+                "FROM topics "
+            )
+            try:
+                cur.execute(sql)
+                for topic_id, topic_name in cur.fetchall():
+                    topics[topic_id]=topic_name
+            except:
+                print("Problem with fetching topics.")
+
         for colname in Connection.Instance().events.collection_names():
-            events += list(Connection.Instance().events[colname].aggregate([
+            evs = list(Connection.Instance().events[colname].aggregate([
                 {'$match': {'id': {'$in': event_ids}}},
                 {'$project': {'_id': 0,
                               "updated_time": 1,
@@ -241,7 +254,13 @@ def getEvents(topic_id, sortedBy, location, cursor, event_ids):
             # {'$skip': int(cursor)},
                 # {'$limit': 10}
             ]))
-            if len(events) >= len(event_ids):
+
+            for e in evs:
+                e['topic'] = topics[int(colname)]
+            events += evs
+            
+            e_ids = set([e['id'] for e in evs])
+            if len(set(event_ids) - e_ids) == 0:
                 break
         result['topic'] = "All topics"
 
@@ -272,7 +291,6 @@ def getEvents(topic_id, sortedBy, location, cursor, event_ids):
                 else:
                     print("Provided topic does not exist.")
                     return {'error': 'Topic does not exist and no event ids are provided.'}
-
 
         result['location'] = location
         match['end_time'] = {'$gte': time.time()}
