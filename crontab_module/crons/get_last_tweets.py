@@ -23,7 +23,7 @@ auth.set_access_token(access_token, access_secret)
 api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
 
 number_of_tweets = 10
-window_size = 850
+window_size = 850   
 
 def getTweets(id,number_of_tweets):
     '''
@@ -62,16 +62,16 @@ def updateTweetsDB():
         if users:
             print(("Processing non-processed ones" if not isProcessed else "Processing processed ones"))
             page = 1
-            while page*window_size < len(not_processed):
+            while page*window_size < len(users):
                 print("...Processing page",page)
-                batch = not_processed[(page - 1)*window_size:page*window_size]
+                batch = users[(page - 1)*window_size:page*window_size]
                 saveTweetsToDB(batch, isProcessed)
                 page += 1
 
             # remaining ones
             print("...Last page ...")
-            batch = not_processed[(page - 1)*window_size :]
-            saveTweetsToDB(batch)
+            batch = users[(page - 1)*window_size :]
+            saveTweetsToDB(batch, isProcessed)
 
 if __name__ == "__main__":
     updateTweetsDB()
