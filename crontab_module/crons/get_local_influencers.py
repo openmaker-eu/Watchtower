@@ -5,7 +5,8 @@ from nltk.corpus import stopwords
 from nltk.stem.porter import *
 from time import gmtime, strftime, time
 from decouple import config
-from datetime import datetime
+from datetime import datetime, timezone
+from dateutil import parser
 import pymongo
 import sys
 sys.path.insert(0, config("ROOT_DIR"))
@@ -86,15 +87,15 @@ def calculateScore(per, keywords):
     if not status_list:
         return None
 
-    last_tweet_outdated = (datetime.now() - status_list[-1].created_at).total_seconds() > timeThreshold * 30 * 24 * 60 * 60
+    last_tweet_outdated = (datetime.now(timezone.utc) - parser.parse(status_list[-1]["created_at"])).total_seconds() > timeThreshold * 30 * 24 * 60 * 60
     if last_tweet_outdated:
         penalty -= 50
 
-    hashtags = set([str(x["text"]).lower() for y in status_list for x in y.entities.get("hashtags")])
+    hashtags = set([str(x["text"]).lower() for y in status_list for x in y["entities"]["hashtags"]])
     hashtagCount = sum(y if x in hashtags else 0 for x,y in zip(keywords, keywordCounts))
     #hashtagCount = sum(keyword in hashtags for keyword in keywords)
     
-    fullTexts = [x.full_text for x in status_list]
+    fullTexts = [x["full_text"] for x in status_list]
     keywordOccurenceNumbers = countKeywordsInTweet(fullTexts, keywords)
     count = sum([keywordOccurence*multiplier for keywordOccurence, multiplier in zip(keywordOccurenceNumbers, keywordCounts)])
 
