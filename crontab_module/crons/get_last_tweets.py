@@ -56,7 +56,7 @@ def saveTweetsToDB(batch, isProcessed):
 def updateTweetsDB():
     # Process users in windows of size 60
     not_processed = list(Connection.Instance().MongoDBClient.last_tweets["tweets"].find({"processed_once" : False} ,{"id":1 , "_id" : 0}))
-    processed_once = list(Connection.Instance().MongoDBClient.last_tweets["tweets"].find({"processed_once" : True}))
+    processed_once = list(Connection.Instance().MongoDBClient.last_tweets["tweets"].find({"processed_once" : True} , {"id":1, "last_processed" : 1, "_id" : 0}))
     ## USE SKIP LIMIT !!!
     for users, isProcessed in zip([not_processed, processed_once] , [False, True]):
         if users:
