@@ -7,7 +7,7 @@ name = "pypi"
 
 [packages]
 
-"psycopg2" = "==2.7.1"
+"psycopg2" = "==2.7.3"
 "newspaper3k" = "==0.2.2"
 timeout-decorator = "==0.3.3"
 tweepy = "==3.5.0"
