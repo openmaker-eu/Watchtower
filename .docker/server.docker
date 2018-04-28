@@ -25,7 +25,9 @@ python3-dev
 
 # Pipenv
 ########
-RUN pip3 install pipenv
+RUN pip3 install --upgrade pip && \
+hash -r pip pip3 && \
+pip3 install pipenv
 ENV SHELL /bin/bash
 
 # Locale Encoding: make the "en_US.UTF-8" locale so utf-8 is enabled by default
@@ -33,6 +35,8 @@ ENV SHELL /bin/bash
 RUN apt-get update && apt-get install -y locales && rm -rf /var/lib/apt/lists/* \
 && localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
 ENV LANG en_US.utf8
+
+ENV PIPENV_PIPFILE /root/cloud/Pipfile
 
 ADD ./Pipfile /root/cloud/Pipfile
 ADD ./Pipfile.lock /root/cloud/Pipfile.lock
