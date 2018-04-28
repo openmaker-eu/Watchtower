@@ -1,7 +1,7 @@
 # This Dockerfile generates an image for a container for Python development purposes.
 # Latest updated on: 2018-01-08
 
-FROM ubuntu:latest
+FROM ubuntu:16.04
 
 # Linux Packages
 ################
