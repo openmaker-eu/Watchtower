@@ -686,7 +686,7 @@ def update_topic(topic):
     with Connection.Instance().get_cursor() as cur:
         sql = (
             "UPDATE topics "
-            "SET topic_description = %s, keywords = %s, languages = %s keyword_limit = %s "
+            "SET topic_description = %s, keywords = %s, languages = %s, keyword_limit = %s "
             "WHERE topic_id = %s"
         )
         cur.execute(sql, [topic['description'], topic['keywords'], topic['lang'], topic['keywordlimit'], topic['alertid']])
