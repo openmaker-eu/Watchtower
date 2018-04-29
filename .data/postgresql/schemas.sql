@@ -349,6 +349,20 @@ CREATE SEQUENCE user_id_seq
 ALTER TABLE user_id_seq OWNER TO ${POSTGRESQL_USER};
 
 --
+-- Name: cron_log_id_seq; Type: SEQUENCE; Schema: public; Owner: ${POSTGRESQL_USER}
+--
+
+CREATE SEQUENCE cron_log_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE cron_log_id_seq OWNER TO ${POSTGRESQL_USER};
+
+--
 -- Name: user_news_rating; Type: TABLE; Schema: public; Owner: ${POSTGRESQL_USER}
 --
 
