@@ -655,7 +655,9 @@ def delete_topic(topic_id, user_id):
             "keyword_limit, last_tweet_date, is_running, is_publish, user_id) "
             "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
         )
-        cur.execute(sql, topic)
+        cur.execute(sql,
+                    [topic[0], topic[1], topic[2], topic[3], topic[4], topic[5], topic[6], topic[7], topic[8], topic[9],
+                     int(user_id)])
         sql = (
             "DELETE FROM topics "
             "WHERE topic_id = %s"
@@ -689,7 +691,8 @@ def update_topic(topic):
             "SET topic_description = %s, keywords = %s, languages = %s, keyword_limit = %s "
             "WHERE topic_id = %s"
         )
-        cur.execute(sql, [topic['description'], topic['keywords'], topic['lang'], topic['keywordlimit'], topic['alertid']])
+        cur.execute(sql,
+                    [topic['description'], topic['keywords'], topic['lang'], topic['keywordlimit'], topic['alertid']])
     topic = get_topic_all_of_them_list(topic['alertid'])
     t = Thread(target=add_facebook_pages_and_subreddits, args=(topic['alertid'], topic['keywords'],))
     t.start()
