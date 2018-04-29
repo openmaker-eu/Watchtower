@@ -537,7 +537,7 @@ def get_topic(topic_id):
                      'lang': var[4].split(","), 'status': var[8],
                      'keywordlimit': var[6]}
     else:
-        topic = {'alertid': "", 'name': "", 'keywords': "", 'lang': "", 'status': False, 'keywordlimit': 10,
+        topic = {'alertid': "", 'name': "", 'keywords': "", 'lang': "", 'status': False, 'keywordlimit': 20,
                  'description': ""}
     return topic
 
@@ -686,10 +686,10 @@ def update_topic(topic):
     with Connection.Instance().get_cursor() as cur:
         sql = (
             "UPDATE topics "
-            "SET topic_description = %s, keywords = %s, languages = %s "
+            "SET topic_description = %s, keywords = %s, languages = %s keyword_limit = %s "
             "WHERE topic_id = %s"
         )
-        cur.execute(sql, [topic['description'], topic['keywords'], topic['lang'], topic['alertid']])
+        cur.execute(sql, [topic['description'], topic['keywords'], topic['lang'], topic['keywordlimit'], topic['alertid']])
     topic = get_topic_all_of_them_list(topic['alertid'])
     t = Thread(target=add_facebook_pages_and_subreddits, args=(topic['alertid'], topic['keywords'],))
     t.start()

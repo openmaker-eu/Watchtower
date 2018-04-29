@@ -1,7 +1,7 @@
 var main = function () {
     $(".keyword > .bootstrap-tagsinput").on('DOMSubtreeModified', function () {
         var keywordCount = $(".keyword > .bootstrap-tagsinput > .tag").length;
-        var limitLeft = 10 - keywordCount;
+        var limitLeft = 20 - keywordCount;
         if (limitLeft <= 0) {
             $('.counter').css('color', 'red');
             $(".keyword > .bootstrap-tagsinput > input").prop('disabled', true);
