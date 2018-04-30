@@ -36,6 +36,7 @@ DROP TABLE public.relevant_locations;
 DROP TABLE public.country_code;
 DROP TABLE public.archived_topics;
 DROP TABLE public.crons_log;
+DROP TABLE public.fetch_followers_job_queue;
 DROP SEQUENCE public.cron_log_id_seq;
 DROP EXTENSION adminpack;
 DROP EXTENSION plpgsql;
@@ -465,6 +466,20 @@ CREATE TABLE crons_log (
 l
 
 ALTER TABLE crons_log OWNER TO ${POSTGRESQL_USER};
+
+CREATE TABLE public.fetch_followers_job_queue (
+  user_id bigint,
+  influencer_id text COLLATE "pg_catalog"."default" NOT NULL,
+  "creation_time" timestamp(6),
+  "status" text COLLATE "pg_catalog"."default"
+)
+;
+ALTER TABLE public.fetch_followers_job_queue OWNER TO ${POSTGRESQL_USER};
+
+-- ----------------------------
+-- Primary Key structure for table fetch_followers_job_queue
+-- ----------------------------
+ALTER TABLE "public"."fetch_followers_job_queue" ADD CONSTRAINT "fetch_followers_job_queue_pkey" PRIMARY KEY ("influencer_id");
 
 --
 -- Name: users_and_topics; Type: VIEW; Schema: public; Owner: ${POSTGRESQL_USER}
