@@ -1690,7 +1690,7 @@ def get_tweet(topic_id, tweet_id):
 def get_crons_log():
     with Connection.Instance().get_cursor() as cur:
         sql = (
-            "SELECT cron_name, started_at, ended_at, status "
+            "SELECT cron_name, started_at, ended_at, status, frequency "
             "FROM crons_log "
             "WHERE id IN ("
             "SELECT MAX(id) "
@@ -1718,7 +1718,7 @@ def get_crons_log():
                 return "{0} h, {1} min, {2} sec.".format(hours, minutes, seconds)
 
             return [{'cron_name': cron[0], 'started_at': cron[1], 'ended_at': cron[2], 'status': cron[3],
-                     'duration': get_duration(cron[1], cron[2])} for cron in fetched]
+                     'duration': get_duration(cron[1], cron[2]), 'frequency': cron[4]} for cron in fetched]
 
         return []
 

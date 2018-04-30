@@ -459,9 +459,10 @@ CREATE TABLE crons_log (
     cron_name text,
     started_at timestamp,
     ended_at timestamp,
-    status boolean DEFAULT false
+    status boolean DEFAULT false,
+    frequency text
 );
-
+l
 
 ALTER TABLE crons_log OWNER TO ${POSTGRESQL_USER};
 

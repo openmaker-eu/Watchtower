@@ -2,6 +2,7 @@
     <table class="table">
         <thead class="thead-light">
         <tr>
+            <th scope="col">Cron Frequency</th>
             <th scope="col">Cron Name</th>
             <th scope="col">Started At</th>
             <th scope="col">Ended At</th>
@@ -12,6 +13,8 @@
         <tbody>
         {% for cron in crons %}
             <tr>
+                <th scope="row"><a href="https://crontab.guru/#{{ cron['frequency'] }}" target="_blank"
+                   style="color: #000000;text-decoration: none;">{{ cron['cron_name'] }}</a></th>
                 <th scope="row">{{ cron['cron_name'] }}</th>
                 <td>{{ cron['started_at'] }}</td>
                 <td>
