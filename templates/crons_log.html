@@ -14,7 +14,7 @@
         {% for cron in crons %}
             <tr>
                 <th scope="row"><a href="https://crontab.guru/#{{ cron['frequency'] }}" target="_blank"
-                   style="color: #000000;text-decoration: none;">{{ cron['cron_name'] }}</a></th>
+                   style="color: #000000;text-decoration: none;">{{ cron['frequency'] }}</a></th>
                 <th scope="row">{{ cron['cron_name'] }}</th>
                 <td>{{ cron['started_at'] }}</td>
                 <td>
