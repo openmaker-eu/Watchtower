@@ -24,7 +24,11 @@ if __name__ == "__main__":
     
     requests = [InsertOne({"id": twitter_id, "processed_once": False,"last_processed": None, "tweets": None}) for twitter_id in ids]
 
+    # Create collection with index, if it does not exist
+    collection = Connection.Instance().MongoDBClient.last_tweets["tweets"]
+    collection.create_index("id", unique=True)
+
     if requests:
-        Connection.Instance().MongoDBClient.last_tweets["tweets"].bulk_write(requests, ordered=False)
+        collection.bulk_write(requests, ordered=False)
     end = time.time()
-    print("DONE! It took {} seconds".format(end - begin))
+    print("DONE! It took {} seconds. Added {} documents.".format(end - begin , len(requests)))
