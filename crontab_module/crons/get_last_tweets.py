@@ -23,7 +23,7 @@ auth.set_access_token(access_token, access_secret)
 api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
 
 number_of_tweets = 10
-window_size = 850   
+batch_size = 850   
 
 def getTweets(id,number_of_tweets):
     '''
@@ -39,13 +39,13 @@ def getTweets(id,number_of_tweets):
 
     return status_list
 
-def saveTweetsToDB(batch, isProcessed):
+def saveTweetsToDB(batch):
     # For non processed ones, simply fetch tweets and write to database. For others, if last processed time
     # is older than 20 hours, then also fetch tweets and write to database otherwise do nothing.
     if batch:
         tweets = {}
         for t in batch:
-            if isProcessed and (datetime.datetime.utcnow() - t["last_processed"]).total_seconds() < 72000:
+            if t["processed_once"] and (datetime.datetime.utcnow() - t["last_processed"]).total_seconds() < 72000:
                 continue
             t_id = t["id"]
             tweets[t_id] = getTweets(t_id, number_of_tweets)
@@ -54,24 +54,16 @@ def saveTweetsToDB(batch, isProcessed):
         Connection.Instance().MongoDBClient.last_tweets["tweets"].bulk_write(requests, ordered=False)
 
 def updateTweetsDB():
-    # Process users in windows of size 60
-    not_processed = list(Connection.Instance().MongoDBClient.last_tweets["tweets"].find({"processed_once" : False} ,{"id":1 , "_id" : 0}))
-    processed_once = list(Connection.Instance().MongoDBClient.last_tweets["tweets"].find({"processed_once" : True} , {"id":1, "last_processed" : 1, "_id" : 0}))
-    ## USE SKIP LIMIT !!!
-    for users, isProcessed in zip([not_processed, processed_once] , [False, True]):
-        if users:
-            print(("Processing non-processed ones" if not isProcessed else "Processing processed ones"))
-            page = 1
-            while page*window_size < len(users):
-                print("...Processing page",page)
-                batch = users[(page - 1)*window_size:page*window_size]
-                saveTweetsToDB(batch, isProcessed)
-                page += 1
+    cursor = Connection.Instance().MongoDBClient.last_tweets["tweets"].find({"processed_once" : False} ,{"tweets":0, "_id" : 0}).sort("processed_once" , -1).limit(batch_size)
 
-            # remaining ones
-            print("...Last page ...")
-            batch = users[(page - 1)*window_size :]
-            saveTweetsToDB(batch, isProcessed)
+    page_no = 1
+    while cursor.count(with_limit_and_skip=True):
+        print("At page {}".format(page_no))
+        batch = list(cursor)
+        saveTweetsToDB(batch)
+        print("... Done !")
+        cursor = Connection.Instance().MongoDBClient.last_tweets["tweets"].find({"processed_once" : False} ,{"tweets":0, "_id" : 0}).sort("processed_once" , -1).limit(batch_size)
+        page_no += 1
 
 if __name__ == "__main__":
     updateTweetsDB()
