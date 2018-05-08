@@ -14,7 +14,8 @@ PIPENV_PIPFILE=/root/cloud/Pipfile
 0 1 * * 1 bash /root/cloud/crontab_module/cron.sh "Database Clean" "0_1_*_*_1" "pipenv run python3 /root/cloud/crontab_module/crons/clear_db_one_month.py"
 0 */3 * * * bash /root/cloud/crontab_module/cron.sh "Audience Filter" "0_*/3_*_*_*" "pipenv run python3 /root/cloud/crontab_module/crons/get_audience_sample.py"
 0 3 * * 0 bash /root/cloud/crontab_module/cron.sh "Update Predicted Location" "0_3_*_*_0" "pipenv run python3 /root/cloud/crontab_module/crons/update_predicted_location_crontab.py"
-0 */3 * * * bash /root/cloud/crontab_module/cron.sh "Local Influencers" "0_*/3_*_*_*" "pipenv run python3 /root/cloud/crontab_module/crons/get_local_influencers.py"
+0 0 * * 6 bash /root/cloud/crontab_module/cron.sh "Local Influencers" "0_0_*_*_6" "pipenv run python3 /root/cloud/crontab_module/crons/get_local_influencers.py"
 0 3 * * * bash /root/cloud/crontab_module/cron.sh "Events Harvester" "0_3_*_*_*" "pipenv run python3 /root/cloud/crontab_module/crons/get_events.py"
-
+0 */12 * * * bash /root/cloud/crontab_module/cron.sh "Update Ids of Last Tweets" "0_*/12_*_*_*" "pipenv run python3 /root/cloud/crontab_module/crons/update_ids_last_tweets.py"
+0 0 * * */4 bash /root/cloud/crontab_module/cron.sh "Get Last Tweets" "0_0_*_*_*/4" "pipenv run python3 /root/cloud/crontab_module/crons/update_ids_last_tweets.py"
 ##########################################################################
