@@ -1353,8 +1353,8 @@ def add_or_delete_fetch_followers_job(user_id, influencer_id, fetching):
 
 def get_local_influencers(topic_id, cursor, location):
     print("In get local infs")
-    print("Topic id:" + str(topic_id))
-    print("Location:" + location)
+    print("Topic id: " + str(topic_id))
+    print("Location: " + location)
     result = {}
     local_influencers = []
 
@@ -1405,6 +1405,15 @@ def get_local_influencers(topic_id, cursor, location):
                 influencer['in_fetch_followers_queue'] = True
             else:
                 influencer['in_fetch_followers_queue'] = False
+
+    # Convert last refreshed and last processed to date from datetime for readability
+    for influencer in local_influencers:
+        if 'last_refreshed' in influencer:
+            dt = influencer['last_refreshed']
+            influencer['last_refreshed'] = dt.date()
+        if 'last_processed' in influencer:
+            dt = influencer['last_processed']
+            influencer['last_processed'] = dt.date()
 
     cursor = int(cursor) + 21
     if cursor >= 500 or len(local_influencers) == 0:

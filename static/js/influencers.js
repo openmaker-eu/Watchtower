@@ -69,28 +69,8 @@ $(document).ready(function () {
     });
 });
 
-function getInfluencers() {
-    console.log("get influencers");
-    var cursor = 0;
-    var filter = $('.btn-success').val();
-    $.ajax({
-        type: "POST",
-        url: "/Influencers",
-        success: function (response) {
-            console.log("success");
-            cursor += 10;
-            $("#influencers").empty();
-            $("#influencers").append(response);
-            $(".btn-group").css("visibility", "visible")
-        },
-        error: function (response) {
-            console.log("failed");
-        }
-    });
-}
-
 function hideInfluencer(influencer_id, description, elem) {
-    var is_hide = ($(elem).attr("hiddenflag") == 'true');
+    var is_hide = ($(elem).attr("hiddenflag") === 'true');
     is_hide = !is_hide;
 
     $.ajax({
@@ -113,5 +93,33 @@ function hideInfluencer(influencer_id, description, elem) {
             $(elem).html("Hide")
           }
         }
+    });
+}
+
+function fetchFollowers(influencer_id, elem) {
+        var fetching = ($(elem).attr("fetchflag") === 'true');
+        fetching = !fetching;
+        console.log(influencer_id);
+
+        $.ajax({
+        url: '/fetch_followers',
+        method: 'POST',
+        data: {
+            'influencer_id': influencer_id,
+            'fetching': fetching
+        },
+        success: function (html) {
+          if (fetching) {
+            $("#".concat(influencer_id)).css("background-color", 'grey');
+            $(elem).attr("fetchflag", true);
+            $(elem).html("Cancel fetch followers")
+          }
+          else {
+            $("#".concat(influencer_id)).css("background-color", "white");
+            $(elem).attr("fetchflag", false);
+            $(elem).html("Fetch followers")
+          }
+        }
+
     });
 }
