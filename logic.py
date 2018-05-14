@@ -1762,6 +1762,7 @@ def topic_hashtag(topic_id, hashtag, save_type):
 
 def get_hashtag_aggregations(topic_id):
     aggregated_hashtags = {}
+    length_hashtags = {}
     days = Connection.Instance().daily_hastags[str(topic_id)].find()
     for day in days:
         hashtags = day['hashtag']
@@ -1769,6 +1770,10 @@ def get_hashtag_aggregations(topic_id):
         for hashtag_tuple in hashtags:
             hashtag = hashtag_tuple['hashtag']
             count = hashtag_tuple['count']
+            if hashtag not in length_hashtags:
+                length_hashtags[hashtag] = 1
+            else:
+                length_hashtags[hashtag] = length_hashtags[hashtag] + 1
             if hashtag not in aggregated_hashtags:
                 aggregated_hashtags[hashtag] = {}
                 aggregated_hashtags[hashtag]['labels'] = [date]
@@ -1781,5 +1786,8 @@ def get_hashtag_aggregations(topic_id):
                 data = aggregated_hashtags[hashtag]['data']
                 data.append(count)
                 aggregated_hashtags[hashtag]['data'] = data
-
-    return sorted(aggregated_hashtags, key=lambda k: len(aggregated_hashtags[k]['labels']), reverse=True)
+    sorted_length = sorted(length_hashtags, key=lambda k: len(length_hashtags[k]), reverse=True)
+    return {
+        'sorted': sorted_length,
+        'data': aggregated_hashtags
+    }

@@ -33,7 +33,8 @@ class HashtagChartHandler(BaseHandler, TemplateRendering):
         data = logic.get_hashtag_aggregations(topic['topic_id'])
         variables = {
             'title': "Hashtag Charts",
-            'data': data,
+            'data': data['data'],
+            'sorted': data['sorted'],
             'alertid': topic['topic_id'],
             'alerts': logic.get_topic_list(user_id),
             'alertname': topic['topic_name'],
@@ -54,7 +55,8 @@ class HashtagChartHandler(BaseHandler, TemplateRendering):
         template = 'hashtags.html'
         data = logic.get_hashtag_aggregations(topic['topic_id'])
         variables = {
-            'data': data,
+            'data': data['data'],
+            'sorted': data['sorted'],
         }
         content = self.render_template(template, variables)
         self.write(content)

@@ -1,7 +1,7 @@
 <div id="spin" style=" z-index: 100;"></div>
 <div class="container row" id="hashtags" style="margin-right: auto;margin-left:  auto;">
 
-  {% for hashtag, dicti in data.items() %}
+  {% for hashtag in sorted %}
     <div class="col-md-6">
     <canvas id="{{ hashtag }}" style="margin:16px"></canvas>
 
@@ -13,13 +13,13 @@
 
           // The data for our dataset
           data: {
-              labels: {{ dicti['labels'] }},
+              labels: {{ data[hashtag]['labels'] }},
               datasets: [{
                   label: '{{ hashtag }}',
                   fill: false,
                   backgroundColor: getRandomColor(),
                   borderColor: getRandomColor(),
-                  data: {{ dicti['data'] }},
+                  data: {{ data[hashtag]['data'] }},
               }]
           },
 
