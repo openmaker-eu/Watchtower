@@ -28,6 +28,7 @@ class Connection:
             self.filteredNewsPoolDB = self.MongoDBClient.filteredNewsPool
             self.infDB = self.MongoDBClient.influenceRanks
             self.tweetsDB = self.MongoDBClient.tweetsDB
+            self.daily_hastags = self.MongoDBClient.daily_hastags
 
             self.challengesDB = self.MongoDBClient.challenges
 
