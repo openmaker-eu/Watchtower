@@ -53,7 +53,7 @@ def calc(alertid):
     one_day = 86400000
 
     result = {
-        'hastags': getDateHashtags(alertid, current_milli_time - one_day),
+        'hashtags': getDateHashtags(alertid, current_milli_time - one_day),
         'modified_date': datetime.datetime.now()
     }
 
