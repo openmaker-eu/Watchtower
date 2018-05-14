@@ -1782,4 +1782,4 @@ def get_hashtag_aggregations(topic_id):
                 data.append(count)
                 aggregated_hashtags[hashtag]['data'] = data
 
-    return aggregated_hashtags
+    return sorted(aggregated_hashtags, key=lambda k: len(aggregated_hashtags[k]['labels']), reverse=True)
