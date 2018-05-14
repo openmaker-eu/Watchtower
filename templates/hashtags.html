@@ -1,0 +1,32 @@
+<div id="spin" style=" z-index: 100;"></div>
+<div class="container row" id="hashtags" style="margin-right: auto;margin-left:  auto;">
+
+  {% for hashtag, dicti in data.items() %}
+    <div class="col-md-6">
+    <canvas id="{{ hashtag }}" style="margin:16px"></canvas>
+
+    <script>
+      var ctx = document.getElementById('{{ hashtag }}').getContext('2d');
+      var chart = new Chart(ctx, {
+          // The type of chart we want to create
+          type: 'line',
+
+          // The data for our dataset
+          data: {
+              labels: {{ dicti['labels'] }},
+              datasets: [{
+                  label: '{{ hashtag }}',
+                  fill: false,
+                  backgroundColor: getRandomColor(),
+                  borderColor: getRandomColor(),
+                  data: {{ dicti['data'] }},
+              }]
+          },
+
+          // Configuration options go here
+          options: {}
+      });
+    </script>
+  </div>
+  {% endfor %}
+</div>

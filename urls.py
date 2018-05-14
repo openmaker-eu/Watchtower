@@ -31,7 +31,7 @@ from handlers.challenge import ChallengeV13Handler
 
 from handlers.crons_log import CronsLogHandler
 
-from handlers.hashtag import HashtagHandler
+from handlers.hashtag import HashtagHandler, HashtagChartHandler
 
 from handlers.tweet import RedirectHandler, NewTweetsHandler, TweetsHandler
 from handlers.recommendation import RecommendationsHandler
@@ -116,6 +116,7 @@ url_patterns = [
 
     # HASHTAG
     (r"/hashtag", HashtagHandler),
+    (r"/Hashtags", HashtagChartHandler),
 
     # DOCUMENTATION
     (r"/api", DocumentationHandler),
@@ -158,6 +159,3 @@ url_patterns = [
 
     (r"/(.*)", tornado.web.StaticFileHandler, {'path': settings['static_path']}),
 ]
-
-
-

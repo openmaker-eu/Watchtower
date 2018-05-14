@@ -1759,3 +1759,27 @@ def topic_hashtag(topic_id, hashtag, save_type):
                 cur.execute(sql, [int(topic_id), hashtag])
             else:
                 return
+
+def get_hashtag_aggregations(topic_id):
+    aggregated_hashtags = {}
+    days = Connection.Instance().daily_hastags[str(topic_id)].find()
+    for day in days:
+        hashtags = day['hashtag']
+        date = day['modified_date'].strftime("%d-%m-%Y")
+        for hashtag_tuple in hashtags:
+            hashtag = hashtag_tuple['hashtag']
+            count = hashtag_tuple['count']
+            if hashtag not in aggregated_hashtags:
+                aggregated_hashtags[hashtag] = {}
+                aggregated_hashtags[hashtag]['labels'] = [date]
+                aggregated_hashtags[hashtag]['data'] = [count]
+            else:
+                labels = aggregated_hashtags[hashtag]['labels']
+                labels.append(date)
+                aggregated_hashtags[hashtag]['labels'] = labels
+
+                data = aggregated_hashtags[hashtag]['data']
+                data.append(count)
+                aggregated_hashtags[hashtag]['data'] = data
+
+    return aggregated_hashtags

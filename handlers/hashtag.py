@@ -18,3 +18,43 @@ class HashtagHandler(BaseHandler, TemplateRendering):
         save_type = self.get_argument('save_type')
         save_type = True if save_type == 'true' else False
         logic.topic_hashtag(topic_id, hashtag, save_type)
+
+class HashtagChartHandler(BaseHandler, TemplateRendering):
+    @tornado.web.authenticated
+    def get(self, argument=None):
+        user_id = tornado.escape.xhtml_escape(self.current_user)
+        template = 'afterlogintemplate.html'
+        topic = logic.get_current_topic(tornado.escape.xhtml_escape(self.current_user))
+        location = logic.get_current_location(tornado.escape.xhtml_escape(self.current_user))
+        relevant_locations = logic.get_relevant_locations()
+        if topic is None:
+            self.redirect("/topicinfo")
+
+        data = logic.get_hashtag_aggregations(topic['topic_id'])
+        variables = {
+            'title': "Hashtag Charts",
+            'data': data,
+            'alertid': topic['topic_id'],
+            'alerts': logic.get_topic_list(user_id),
+            'alertname': topic['topic_name'],
+            'type': "hashtag_chart",
+            'username': str(tornado.escape.xhtml_escape(self.get_current_username())),
+            'topic': topic,
+            'location': location,
+            'relevant_locations': relevant_locations
+        }
+        content = self.render_template(template, variables)
+        self.write(content)
+
+    @tornado.web.authenticated
+    def post(self):
+        user_id = tornado.escape.xhtml_escape(self.current_user)
+        topic = logic.get_current_topic(tornado.escape.xhtml_escape(self.current_user))
+        variables = {}
+        template = 'hashtags.html'
+        data = logic.get_hashtag_aggregations(topic['topic_id'])
+        variables = {
+            'data': data,
+        }
+        content = self.render_template(template, variables)
+        self.write(content)
