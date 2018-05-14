@@ -1,5 +1,6 @@
 import sys
 from time import gmtime, strftime, time
+import datetime
 from decouple import config
 
 sys.path.insert(0, config("ROOT_DIR"))
@@ -53,7 +54,7 @@ def calc(alertid):
 
     result = {
         'hastags': getDateHashtags(alertid, current_milli_time - one_day),
-        'modified_date': gmtime()
+        'modified_date': datetime.datetime.now()
     }
 
     Connection.Instance().daily_hastags[str(alertid)].insert_one(result)
