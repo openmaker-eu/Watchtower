@@ -1771,9 +1771,9 @@ def get_hashtag_aggregations(topic_id):
             hashtag = hashtag_tuple['hashtag']
             count = hashtag_tuple['count']
             if hashtag not in length_hashtags:
-                length_hashtags[hashtag] = 1
+                length_hashtags[hashtag] = count
             else:
-                length_hashtags[hashtag] = length_hashtags[hashtag] + 1
+                length_hashtags[hashtag] = ((len(aggregated_hashtags[hashtag]['labels']) * length_hashtags[hashtag]) + count) // len(aggregated_hashtags[hashtag]['labels']) + 1
             if hashtag not in aggregated_hashtags:
                 aggregated_hashtags[hashtag] = {}
                 aggregated_hashtags[hashtag]['labels'] = [date]
