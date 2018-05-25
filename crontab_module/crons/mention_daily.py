@@ -34,7 +34,9 @@ def getDateMentions(alertid, date):
                 '_id': '$mention_id',
                 'count': {
                     '$sum': 1
-                }
+                },
+                'mention_username': '$mention_username',
+                'mention': '$mention',
             }
         },
         {
