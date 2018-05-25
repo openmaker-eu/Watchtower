@@ -33,6 +33,8 @@ from handlers.crons_log import CronsLogHandler
 
 from handlers.hashtag import HashtagHandler, HashtagChartHandler
 
+from handlers.mention import MentionChartHandler
+
 from handlers.tweet import RedirectHandler, NewTweetsHandler, TweetsHandler
 from handlers.recommendation import RecommendationsHandler
 from handlers.location import LocationHandler
