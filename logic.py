@@ -1798,7 +1798,7 @@ def get_hashtag_aggregations(topic_id):
 def get_mention_aggregations(topic_id):
     aggregated_mentions = {}
     length_mentions = {}
-    days = Connection.Instance().daily_hastags[str(topic_id)].find()
+    days = Connection.Instance().daily_mentions[str(topic_id)].find()
     for day in days:
         mentions = day['mention']
         date = day['modified_date'].strftime("%d-%m-%Y")
