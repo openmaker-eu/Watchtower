@@ -1,0 +1,32 @@
+<div id="spin" style=" z-index: 100;"></div>
+<div class="container row" id="mentions" style="margin-right: auto;margin-left:  auto;">
+
+  {% for mention in sorted %}
+    <div class="col-md-6">
+    <canvas id="{{ mention }}" style="margin:16px"></canvas>
+
+    <script>
+      var ctx = document.getElementById('{{ mention }}').getContext('2d');
+      var chart = new Chart(ctx, {
+          // The type of chart we want to create
+          type: 'line',
+
+          // The data for our dataset
+          data: {
+              labels: {{ data[mention]['labels'] }},
+              datasets: [{
+                  label: '{{ mention }}',
+                  fill: false,
+                  backgroundColor: getRandomColor(),
+                  borderColor: getRandomColor(),
+                  data: {{ data[mention]['data'] }},
+              }]
+          },
+
+          // Configuration options go here
+          options: {}
+      });
+    </script>
+  </div>
+  {% endfor %}
+</div>

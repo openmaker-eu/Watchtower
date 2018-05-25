@@ -118,6 +118,9 @@ url_patterns = [
     (r"/hashtag", HashtagHandler),
     (r"/Hashtags", HashtagChartHandler),
 
+    # MENTION
+    (r"/Mentions", MentionChartHandler),
+
     # DOCUMENTATION
     (r"/api", DocumentationHandler),
     (r"/api/v1\.1", Documentationv11Handler),

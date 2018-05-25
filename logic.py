@@ -1760,6 +1760,7 @@ def topic_hashtag(topic_id, hashtag, save_type):
             else:
                 return
 
+
 def get_hashtag_aggregations(topic_id):
     aggregated_hashtags = {}
     length_hashtags = {}
@@ -1773,7 +1774,8 @@ def get_hashtag_aggregations(topic_id):
             if hashtag not in length_hashtags:
                 length_hashtags[hashtag] = count
             else:
-                length_hashtags[hashtag] = ((len(aggregated_hashtags[hashtag]['labels']) * length_hashtags[hashtag]) + count) // len(aggregated_hashtags[hashtag]['labels']) + 1
+                length_hashtags[hashtag] = ((len(aggregated_hashtags[hashtag]['labels']) * length_hashtags[
+                    hashtag]) + count) // len(aggregated_hashtags[hashtag]['labels']) + 1
             if hashtag not in aggregated_hashtags:
                 aggregated_hashtags[hashtag] = {}
                 aggregated_hashtags[hashtag]['labels'] = [date]
@@ -1790,4 +1792,38 @@ def get_hashtag_aggregations(topic_id):
     return {
         'sorted': sorted_length,
         'data': aggregated_hashtags
+    }
+
+
+def get_mention_aggregations(topic_id):
+    aggregated_mentions = {}
+    length_mentions = {}
+    days = Connection.Instance().daily_hastags[str(topic_id)].find()
+    for day in days:
+        mentions = day['mention']
+        date = day['modified_date'].strftime("%d-%m-%Y")
+        for mention_tuple in mentions:
+            mention = mention_tuple['mention_username']
+            count = mention_tuple['count']
+            if mention not in length_mentions:
+                length_mentions[mention] = count
+            else:
+                length_mentions[mention] = ((len(aggregated_mentions[mention]['labels']) * length_mentions[
+                    mention]) + count) // len(aggregated_mentions[mention]['labels']) + 1
+            if mention not in aggregated_mentions:
+                aggregated_mentions[mention] = {}
+                aggregated_mentions[mention]['labels'] = [date]
+                aggregated_mentions[mention]['data'] = [count]
+            else:
+                labels = aggregated_mentions[mention]['labels']
+                labels.append(date)
+                aggregated_mentions[mention]['labels'] = labels
+
+                data = aggregated_mentions[mention]['data']
+                data.append(count)
+                aggregated_mentions[mention]['data'] = data
+    sorted_length = sorted(length_mentions, key=lambda k: length_mentions[k], reverse=True)[:50]
+    return {
+        'sorted': sorted_length,
+        'data': aggregated_mentions
     }

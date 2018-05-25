@@ -123,6 +123,23 @@
         <script src="/js/hashtags.js"></script>
     {% endif %}
 
+    {% if type == "mention_chart" %}
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
+        <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
+        <script src="/js/Chart.min.js"></script>
+        <script type="text/javascript">
+        function getRandomColor() {
+          var letters = '0123456789ABCDEF';
+          var color = '#';
+          for (var i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16)];
+          }
+          return color;
+        }
+        </script>
+        <script src="/js/mentions.js"></script>
+    {% endif %}
+
     {% if type == "influencers" %}
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
         <link rel="stylesheet" type="text/css" href="/css/influencer_card.css"/>
@@ -252,6 +269,10 @@
 
                 <li {% if type=="hashtag_chart" %} class="active" {% endif %}>
                     <a href="/Hashtags">Hashtags</a>
+                </li>
+
+                <li {% if type=="mention_chart" %} class="active" {% endif %}>
+                    <a href="/Mentions">Mentions</a>
                 </li>
 
                 <li {% if type=="news" %} class="active" {% endif %}>
@@ -441,6 +462,9 @@
 {% endif %}
 {% if type == "hashtag_chart" %}
     {% include 'hashtags.html' %}
+{% endif %}
+{% if type == "mention_chart" %}
+    {% include 'mentions.html' %}
 {% endif %}
 
 </body>
