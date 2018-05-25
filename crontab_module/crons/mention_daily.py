@@ -24,7 +24,7 @@ def getDateMentions(alertid, date):
                     '$toLower': "$entities.user_mentions.name"
                 },
                 'mention_username': {
-                    '$toLower': "$entities.user_mentions.username"
+                    '$toLower': "$entities.user_mentions.screen_name"
                 },
                 'mention_id': "$entities.user_mentions.id_str"
             },
@@ -40,9 +40,9 @@ def getDateMentions(alertid, date):
         {
             '$project': {
                 'count': 1,
-                'mention_id': '$_id',
-                'mention_username': '$mention_username',
-                'mention': '$mention',
+                'mention_id': '$_id.mention_id',
+                'mention_username': '$_id.mention_username',
+                'mention': '$_id.mention',
                 '_id': 0
             }
         },
