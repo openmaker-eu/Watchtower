@@ -1774,8 +1774,7 @@ def get_hashtag_aggregations(topic_id):
             if hashtag not in length_hashtags:
                 length_hashtags[hashtag] = count
             else:
-                length_hashtags[hashtag] = ((len(aggregated_hashtags[hashtag]['labels']) * length_hashtags[
-                    hashtag]) + count) // len(aggregated_hashtags[hashtag]['labels']) + 1
+                length_hashtags[hashtag] = length_hashtags[hashtag] + count
             if hashtag not in aggregated_hashtags:
                 aggregated_hashtags[hashtag] = {}
                 aggregated_hashtags[hashtag]['labels'] = [date]
@@ -1808,8 +1807,7 @@ def get_mention_aggregations(topic_id):
             if mention not in length_mentions:
                 length_mentions[mention] = count
             else:
-                length_mentions[mention] = ((len(aggregated_mentions[mention]['labels']) * length_mentions[
-                    mention]) + count) // len(aggregated_mentions[mention]['labels']) + 1
+                length_mentions[mention] = length_mentions[mention] + count
             if mention not in aggregated_mentions:
                 aggregated_mentions[mention] = {}
                 aggregated_mentions[mention]['labels'] = [date]
