@@ -31,12 +31,10 @@ def getDateMentions(alertid, date):
         },
         {
             '$group': {
-                '_id': '$mention_id',
+                '_id': {'mention_id': '$mention_id', 'mention_username': '$mention_username', 'mention': '$mention'},
                 'count': {
                     '$sum': 1
-                },
-                'mention_username': '$mention_username',
-                'mention': '$mention',
+                }
             }
         },
         {
