@@ -31,7 +31,7 @@ def getDateMentions(alertid, date):
         },
         {
             '$group': {
-                '_id': 'mention_id',
+                '_id': '$mention_id',
                 'count': {
                     '$sum': 1
                 }
