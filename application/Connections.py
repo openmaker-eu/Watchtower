@@ -63,7 +63,8 @@ class Connection:
             return object.__getattribute__(self, name)
         except:
             count = 0
-            while count < 5:
+            while count < 3:
+                print('I am trying to MongoDB server iteration #' + str(count))
                 object.__setattr__(self, 'MongoDBClient', pymongo.MongoClient(
                     'mongodb://' + config("MONGODB_USER") + ":" + config("MONGODB_PASSWORD") + '@' + config(
                         "HOST_IP") + ':27017/',
@@ -74,7 +75,7 @@ class Connection:
                 except:
                     pass
                 count += 1
-                if count == 5:
+                if count == 3:
                     raise Exception("I am unable to connect to the mongodb")
 
             return object.__getattribute__(self, name)
