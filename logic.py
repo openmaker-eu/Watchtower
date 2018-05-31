@@ -603,7 +603,9 @@ def ban_domain(user_id, topic_id, domain):
                     'yesterday': {'domain': domain},
                     'week': {'domain': domain},
                     'month': {'domain': domain}
-                }})
+                }},
+                upsert=True
+            )
 
 
 def add_topic(topic, user_id):
