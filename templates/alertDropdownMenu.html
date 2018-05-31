@@ -2,7 +2,12 @@
     {% if alert['type'] == 'me' or alert['type'] == 'subscribed' %}
         <li>
             <a data-id="{{ alert['alertid'] }}" class="newsalerts">
-                <h4><span> {{ alert['name'] }}</span></h4>
+                <h4>{% if alert['publish'] %}
+                        <span class="glyphicon glyphicon-ok-circle" style="color: green"></span>
+                    {% else %}
+                        <span class="glyphicon glyphicon-remove-circle" style="color: red;"></span>
+                    {% endif %}
+                    <span> {{ alert['name'] }}</span></h4>
                 <p>Keywords: {{ ", ".join(alert['keywords']) }} <br>
                     Languages: {{ ", ".join(alert['lang']) }} </p></a>
         </li>
