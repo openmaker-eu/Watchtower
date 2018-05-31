@@ -505,6 +505,8 @@ def get_topic_list(user_id):
                 {'hashtag': hash_tag['hashtag'], 'count': hash_tag['count'], 'active': hash_tag['hashtag'] not in tags}
                 for hash_tag in hash_tags]
             topic['hashtags'] = hash_tags
+
+        topics.sort(key=lambda topic: (topic['publish'], topic['newsCount']), reverse=True)
         return topics
 
 
