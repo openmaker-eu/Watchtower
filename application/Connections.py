@@ -65,7 +65,8 @@ class Connection:
             count = 0
             while count < 5:
                 object.__setattr__(self, 'MongoDBClient', pymongo.MongoClient(
-                    'mongodb://' + config("MONGODB_USER") + ":" + config("MONGODB_PASSWORD") + '@' + host + ':27017/',
+                    'mongodb://' + config("MONGODB_USER") + ":" + config("MONGODB_PASSWORD") + '@' + config(
+                        "HOST_IP") + ':27017/',
                     connect=False))
                 try:
                     object.__getattribute__(self, 'MongoDBClient').server_info()
