@@ -1780,7 +1780,11 @@ def get_hashtag_aggregations(topic_id):
             hashtag = hashtag_tuple['hashtag']
             count = hashtag_tuple['count']
             if hashtag not in table_data:
-                table_data[hashtag] = {}
+                table_data[hashtag] = {
+                    'today': [],
+                    'week': [],
+                    'month': []
+                }
                 if day['modified_date'].date() == today:
                     table_data[hashtag]['today'] = [count]
                     table_data[hashtag]['week'] = [count]
@@ -1860,7 +1864,11 @@ def get_mention_aggregations(topic_id):
             count = mention_tuple['count']
 
             if mention not in table_data:
-                table_data[mention] = {}
+                table_data[mention] = {
+                    'today': [],
+                    'week': [],
+                    'month': []
+                }
                 if day['modified_date'].date() == today:
                     table_data[mention]['today'] = [count]
                     table_data[mention]['week'] = [count]
