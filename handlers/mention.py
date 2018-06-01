@@ -47,6 +47,7 @@ class MentionChartHandler(BaseHandler, TemplateRendering):
         variables = {
             'data': data['data'],
             'sorted': data['sorted'],
+            'table_data': data['table_data'],
         }
         content = self.render_template(template, variables)
         self.write(content)
