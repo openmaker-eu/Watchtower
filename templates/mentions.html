@@ -1,32 +1,74 @@
 <div id="spin" style=" z-index: 100;"></div>
 <div class="container row" id="mentions" style="margin-right: auto;margin-left:  auto;">
 
-  {% for mention in sorted %}
-    <div class="col-md-6">
-    <canvas id="{{ mention }}" style="margin:16px"></canvas>
+    <table id="mention_table" class="table table-striped table-bordered">
+        <thead>
+        <tr>
+            <th>Mention</th>
+            <th>Last Day</th>
+            <th>Last Week Average</th>
+            <th>Last Month Average</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for mention in sorted %}
+            <tr>
+                <td>{{ mention }}</td>
+                <td>{% if table_data[mention]['today']|length > 0 %}
+                    {{ table_data[mention]['today']|sum // table_data[mention]['today']|length }}{% else %}
+                    0{% endif %}</td>
+                <td>{% if table_data[mention]['week']|length > 0 %}
+                    {{ table_data[mention]['week']|sum // table_data[mention]['week']|length }}{% else %}
+                    0{% endif %}</td>
+                <td>{% if table_data[mention]['month']|length > 0 %}
+                    {{ table_data[mention]['month']|sum // table_data[mention]['month']|length }}{% else %}
+                    0{% endif %}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+        <tfoot>
+        <tr>
+            <th>Mention</th>
+            <th>Last Day</th>
+            <th>Last Week Average</th>
+            <th>Last Month Average</th>
+        </tr>
+        </tfoot>
+    </table>
 
+    {% for mention in sorted %}
+        <div class="col-md-6">
+            <canvas id="{{ mention }}" style="margin:16px"></canvas>
+
+            <script>
+                var ctx = document.getElementById('{{ mention }}').getContext('2d');
+                var chart = new Chart(ctx, {
+                    // The type of chart we want to create
+                    type: 'line',
+
+                    // The data for our dataset
+                    data: {
+                        labels: {{ data[mention]['labels'] }},
+                        datasets: [{
+                            label: '{{ mention }}',
+                            fill: false,
+                            backgroundColor: getRandomColor(),
+                            borderColor: getRandomColor(),
+                            data: {{ data[mention]['data'] }},
+                        }]
+                    },
+
+                    // Configuration options go here
+                    options: {}
+                });
+            </script>
+        </div>
+    {% endfor %}
     <script>
-      var ctx = document.getElementById('{{ mention }}').getContext('2d');
-      var chart = new Chart(ctx, {
-          // The type of chart we want to create
-          type: 'line',
-
-          // The data for our dataset
-          data: {
-              labels: {{ data[mention]['labels'] }},
-              datasets: [{
-                  label: '{{ mention }}',
-                  fill: false,
-                  backgroundColor: getRandomColor(),
-                  borderColor: getRandomColor(),
-                  data: {{ data[mention]['data'] }},
-              }]
-          },
-
-          // Configuration options go here
-          options: {}
-      });
+        $(document).ready(function () {
+            $('#mention_table').DataTable({
+                "pageLength": 10
+            });
+        });
     </script>
-  </div>
-  {% endfor %}
 </div>

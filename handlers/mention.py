@@ -26,6 +26,7 @@ class MentionChartHandler(BaseHandler, TemplateRendering):
             'title': "Mention Charts",
             'data': data['data'],
             'sorted': data['sorted'],
+            'table_data': data['table_data'],
             'alertid': topic['topic_id'],
             'alerts': logic.get_topic_list(user_id),
             'alertname': topic['topic_name'],

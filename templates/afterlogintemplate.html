@@ -108,36 +108,41 @@
 
     {% if type == "hashtag_chart" %}
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
+        <script src="/js/jquery.dataTables.min.js"></script>
         <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
         <script src="/js/Chart.min.js"></script>
         <script type="text/javascript">
-        function getRandomColor() {
-          var letters = '0123456789ABCDEF';
-          var color = '#';
-          for (var i = 0; i < 6; i++) {
-            color += letters[Math.floor(Math.random() * 16)];
-          }
-          return color;
-        }
+            function getRandomColor() {
+                var letters = '0123456789ABCDEF';
+                var color = '#';
+                for (var i = 0; i < 6; i++) {
+                    color += letters[Math.floor(Math.random() * 16)];
+                }
+                return color;
+            }
         </script>
         <script src="/js/hashtags.js"></script>
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.10.16/css/dataTables.bootstrap.min.css"/>
     {% endif %}
 
     {% if type == "mention_chart" %}
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
+        <script src="/js/jquery.dataTables.min.js"></script>
         <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
         <script src="/js/Chart.min.js"></script>
         <script type="text/javascript">
-        function getRandomColor() {
-          var letters = '0123456789ABCDEF';
-          var color = '#';
-          for (var i = 0; i < 6; i++) {
-            color += letters[Math.floor(Math.random() * 16)];
-          }
-          return color;
-        }
+            function getRandomColor() {
+                var letters = '0123456789ABCDEF';
+                var color = '#';
+                for (var i = 0; i < 6; i++) {
+                    color += letters[Math.floor(Math.random() * 16)];
+                }
+                return color;
+            }
         </script>
         <script src="/js/mentions.js"></script>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.10.16/css/dataTables.bootstrap.min.css"/>
     {% endif %}
 
     {% if type == "influencers" %}
@@ -351,7 +356,7 @@
                 {% endif %}
             </ul>
 
-            <div class="navbar-brand" style="margin-left:30">
+            <div class="navbar-brand" style="margin-left:30px">
                 <p>
                     {% if type == "influencers" %}
                         Influencers
@@ -474,10 +479,12 @@
 ================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->
 
-<script src="/js/jquery-3.2.1.min.js"></script>
+{% if type != "hashtag_chart" and type != "mention_chart" %}
+    <script src="/js/jquery-3.2.1.min.js"></script>
+    <script src="/js/jquery.min.js"></script>
+{% endif %}
 <script src="/js/sweetalert.min.js"></script>
 <script src="/js/helpers.js"></script>
-<script src="/js/jquery.min.js"></script>
 <script src="/js/bootstrap.min.js"></script>
 <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
 <script src="/js/ie10-viewport-bug-workaround.js"></script>

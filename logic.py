@@ -1,5 +1,4 @@
 import csv
-import datetime
 import hashlib
 import json
 import re
@@ -7,6 +6,7 @@ import time
 import uuid
 from threading import Thread
 from urllib.parse import urlparse
+from datetime import datetime, timedelta
 
 import facebook
 import praw
@@ -1315,9 +1315,9 @@ def get_events(topic_id, sortedBy, location, cursor):
 
     for event in result['events']:
         if not isinstance(event['start_time'], str):
-            event['start_time'] = datetime.datetime.utcfromtimestamp(event['start_time']).strftime('%Y-%m-%dT%H:%M:%SZ')
+            event['start_time'] = datetime.utcfromtimestamp(event['start_time']).strftime('%Y-%m-%dT%H:%M:%SZ')
         if not isinstance(event['end_time'], str):
-            event['end_time'] = datetime.datetime.utcfromtimestamp(event['end_time']).strftime('%Y-%m-%dT%H:%M:%SZ')
+            event['end_time'] = datetime.utcfromtimestamp(event['end_time']).strftime('%Y-%m-%dT%H:%M:%SZ')
 
     return result
 
@@ -1337,7 +1337,7 @@ def add_or_delete_fetch_followers_job(user_id, influencer_id, fetching):
             params = {
                 'user_id': int(user_id),
                 'influencer_id': str(influencer_id),
-                'creation_time': datetime.datetime.utcnow(),
+                'creation_time': datetime.utcnow(),
                 'status': status,
             }
 
@@ -1768,13 +1768,58 @@ def topic_hashtag(topic_id, hashtag, save_type):
 def get_hashtag_aggregations(topic_id):
     aggregated_hashtags = {}
     length_hashtags = {}
+    table_data = {}
     days = Connection.Instance().daily_hastags[str(topic_id)].find()
+    today = datetime.today().date()
+    last_week = (datetime.today() - timedelta(days=7)).date()
+    last_month = (datetime.today() - timedelta(days=30)).date()
     for day in days:
         hashtags = day['hashtag']
         date = day['modified_date'].strftime("%d-%m-%Y")
         for hashtag_tuple in hashtags:
             hashtag = hashtag_tuple['hashtag']
             count = hashtag_tuple['count']
+            if hashtag not in table_data:
+                table_data[hashtag] = {}
+                if day['modified_date'].date() == today:
+                    table_data[hashtag]['today'] = [count]
+                    table_data[hashtag]['week'] = [count]
+                    table_data[hashtag]['month'] = [count]
+                elif day['modified_date'].date() > last_week:
+                    table_data[hashtag]['today'] = []
+                    table_data[hashtag]['week'] = [count]
+                    table_data[hashtag]['month'] = [count]
+                elif day['modified_date'].date() > last_month:
+                    table_data[hashtag]['today'] = []
+                    table_data[hashtag]['week'] = []
+                    table_data[hashtag]['month'] = [count]
+            else:
+                if day['modified_date'].date() == today:
+                    counts = table_data[hashtag]['today']
+                    counts.append(count)
+                    table_data[hashtag]['today'] = counts
+
+                    counts = table_data[hashtag]['week']
+                    counts.append(count)
+                    table_data[hashtag]['week'] = counts
+
+                    counts = table_data[hashtag]['month']
+                    counts.append(count)
+                    table_data[hashtag]['month'] = counts
+
+                elif day['modified_date'].date() > last_week:
+                    counts = table_data[hashtag]['week']
+                    counts.append(count)
+                    table_data[hashtag]['week'] = counts
+
+                    counts = table_data[hashtag]['month']
+                    counts.append(count)
+                    table_data[hashtag]['month'] = counts
+                elif day['modified_date'].date() > last_month:
+                    counts = table_data[hashtag]['month']
+                    counts.append(count)
+                    table_data[hashtag]['month'] = counts
+
             if hashtag not in length_hashtags:
                 length_hashtags[hashtag] = count
             else:
@@ -1794,20 +1839,67 @@ def get_hashtag_aggregations(topic_id):
     sorted_length = sorted(length_hashtags, key=lambda k: length_hashtags[k], reverse=True)[:50]
     return {
         'sorted': sorted_length,
-        'data': aggregated_hashtags
+        'data': aggregated_hashtags,
+        'table_data': table_data
     }
 
 
 def get_mention_aggregations(topic_id):
     aggregated_mentions = {}
     length_mentions = {}
+    table_data = {}
     days = Connection.Instance().daily_mentions[str(topic_id)].find()
+    today = datetime.today().date()
+    last_week = (datetime.today() - timedelta(days=7)).date()
+    last_month = (datetime.today() - timedelta(days=30)).date()
     for day in days:
         mentions = day['mention']
         date = day['modified_date'].strftime("%d-%m-%Y")
         for mention_tuple in mentions:
             mention = mention_tuple['mention_username']
             count = mention_tuple['count']
+
+            if mention not in table_data:
+                table_data[mention] = {}
+                if day['modified_date'].date() == today:
+                    table_data[mention]['today'] = [count]
+                    table_data[mention]['week'] = [count]
+                    table_data[mention]['month'] = [count]
+                elif day['modified_date'].date() > last_week:
+                    table_data[mention]['today'] = []
+                    table_data[mention]['week'] = [count]
+                    table_data[mention]['month'] = [count]
+                elif day['modified_date'].date() > last_month:
+                    table_data[mention]['today'] = []
+                    table_data[mention]['week'] = []
+                    table_data[mention]['month'] = [count]
+            else:
+                if day['modified_date'].date() == today:
+                    counts = table_data[mention]['today']
+                    counts.append(count)
+                    table_data[mention]['today'] = counts
+
+                    counts = table_data[mention]['week']
+                    counts.append(count)
+                    table_data[mention]['week'] = counts
+
+                    counts = table_data[mention]['month']
+                    counts.append(count)
+                    table_data[mention]['month'] = counts
+
+                elif day['modified_date'].date() > last_week:
+                    counts = table_data[mention]['week']
+                    counts.append(count)
+                    table_data[mention]['week'] = counts
+
+                    counts = table_data[mention]['month']
+                    counts.append(count)
+                    table_data[mention]['month'] = counts
+                elif day['modified_date'].date() > last_month:
+                    counts = table_data[mention]['month']
+                    counts.append(count)
+                    table_data[mention]['month'] = counts
+
             if mention not in length_mentions:
                 length_mentions[mention] = count
             else:
@@ -1827,5 +1919,6 @@ def get_mention_aggregations(topic_id):
     sorted_length = sorted(length_mentions, key=lambda k: length_mentions[k], reverse=True)[:50]
     return {
         'sorted': sorted_length,
-        'data': aggregated_mentions
+        'data': aggregated_mentions,
+        'table_data': table_data
     }
