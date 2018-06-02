@@ -43,7 +43,11 @@ class MentionChartHandler(BaseHandler, TemplateRendering):
     def post(self):
         topic = logic.get_current_topic(tornado.escape.xhtml_escape(self.current_user))
         template = 'mentions.html'
-        data = logic.get_mention_aggregations(topic['topic_id'])
+        topic_id = self.get_argument('topic_id', '')
+        if topic_id == '':
+            topic_id = topic['topic_id']
+        topic_id = int(topic_id)
+        data = logic.get_mention_aggregations(topic_id)
         variables = {
             'data': data['data'],
             'sorted': data['sorted'],

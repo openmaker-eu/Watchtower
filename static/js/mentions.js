@@ -11,10 +11,13 @@ $(document).ready(function () {
     $("#spin").spinner();
     $("#topic_dropdown").on('click', 'li a', function () {
         $("#spin").show();
+        var topicId = $(this).attr("data-id");
         $.ajax({
             url: '/Mentions',
             method: 'POST',
-            data: {},
+            data: {
+                topic_id: topicId
+            },
             timeout: 10000,
             error: function () {
                 $('#mentions').empty();
