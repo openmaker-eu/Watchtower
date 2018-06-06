@@ -2,6 +2,7 @@
 import sys
 from decouple import config
 sys.path.insert(0, config("ROOT_DIR"))
+sys.path.insert(0, './')
 
 from application.utils.basic import *
 from predict_location.predictor import Predictor  # for location
@@ -57,7 +58,7 @@ def get_audience_sample_by_topic(topic_id, locations, sample_size, signal_streng
                 print("Skipping audience since it has been sampled within the last " + str(hours) + " hour(s).")
                 continue
         start_ts = datetime.datetime.utcnow()
-        
+        start = time.time()
     # ====================================================================================
         location = location.lower()  # cast location to lowercase
         loc_filtered_audience_ids = []
@@ -121,7 +122,7 @@ def get_audience_sample_by_topic(topic_id, locations, sample_size, signal_streng
                 time.time() - start) + " seconds.")
             start = time.time()
 
-        print("Filtered audience by location in " + str(time.time() - start_ts) + " seconds.")
+        print("Filtered audience by location in " + str(time.time() - start) + " seconds.")
         start = time.time()
 
         # GET THE AUDIENCE TWITTER PROFILES
@@ -191,7 +192,7 @@ def get_audience_sample_by_topic(topic_id, locations, sample_size, signal_streng
     # ====================================================================================
 
             # save stats to POSTGRES
-            end = datetime.datetime.utcnow()
+            end_ts = datetime.datetime.utcnow()
 
             sql = (
                 "INSERT INTO audience_samples_last_executed "
@@ -203,8 +204,8 @@ def get_audience_sample_by_topic(topic_id, locations, sample_size, signal_streng
             params = {
                 'topicID': int(topic_id),
                 'location': location,
-                'execution_duration': end - start,
-                'last_executed': end,
+                'execution_duration': end_ts - start_ts,
+                'last_executed': end_ts,
                 'from_predicted_location': int(predicted_location_count),
                 'from_regex': int(regex_count)
             }
