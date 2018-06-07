@@ -471,6 +471,7 @@ CREATE TABLE public.fetch_followers_job_queue (
   user_id bigint,
   influencer_id text COLLATE "pg_catalog"."default" NOT NULL,
   "creation_time" timestamp(6),
+  "updated_time" timestamp(6),
   "status" text COLLATE "pg_catalog"."default"
 )
 ;
