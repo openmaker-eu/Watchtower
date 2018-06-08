@@ -1,8 +1,12 @@
+
 __author__ = ['Enis Simsar']
 
 from threading import Thread
 import tweepy
 from decouple import config
+
+from logic.helper import add_facebook_pages_and_subreddits
+from logic.users import set_user_topics_limit, set_current_topic
 
 import delete_community
 from application.Connections import Connection
@@ -198,7 +202,7 @@ def add_topic(topic, user_id):
         )
         cur.execute(sql, [int(user_id), int(topic_fetched[0])])
         topic = get_topic_all_of_them_list(int(topic_fetched[0]))
-        set_user_topics_imit(user_id, 'decrement')
+        set_user_topics_limit(user_id, 'decrement')
         set_current_topic(user_id)
         t = Thread(target=add_facebook_pages_and_subreddits, args=(topic_fetched[1], topic['keywords'],))
         t.start()
@@ -206,7 +210,7 @@ def add_topic(topic, user_id):
 
 def delete_topic(topic_id, user_id):
     alert = get_topic_all_of_them_list(topic_id)
-    set_user_topics_imit(user_id, 'increment')
+    set_user_topics_limit(user_id, 'increment')
     with Connection.Instance().get_cursor() as cur:
         sql = (
             "SELECT * "
