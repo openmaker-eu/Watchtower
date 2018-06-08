@@ -12,15 +12,10 @@ from datetime import datetime # to print the date & time in the output log whene
 
 from application.Connections import Connection
 
-# consumer_key = "utTM4qfuhmzeLUxRkBb1xb12P"  # API key
-# consumer_secret = "XteCQjAZCVAu7Tk5ftgcjv0jJlII2o7b8BqZc3sfEdwn1R6Ic7"  # API secret
-# access_token = "821415961467228161-iB85g0Lm8c4jLqIqxWcryWjE8nm6CPq"
-# access_secret = "BrNaqN0BP2K3rYzIurlaTIaJeOk4MBP6mzBtR73ay5ulU"
-
-consumer_key = "13sYRmQyD5jik98GnkDLohtxe"  # API key
-consumer_secret = "b0l4xLFrtyJhIXxPxZwarFbtkuITrNePFJa3DNjdaXaO4AmuIc"  # API secret
-access_token = "289364321-BMNwvvJJIFq0Vww1pqgnJuepRtffpBxlEKPS5FbT"
-access_secret = "kMfR2CoSImuH8i5fsiQlWYpdX9inYvM9y66zlEYuMhBdr"
+consumer_key = config("TWITTER_CONSUMER_KEY") # API key
+consumer_secret = config("TWITTER_CONSUMER_SECRET")  # API secret
+access_token = config("TWITTER_ACCESS_TOKEN")
+access_secret = config("TWITTER_ACCESS_SECRET")
 
 auth = OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_secret)
