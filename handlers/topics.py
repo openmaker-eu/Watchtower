@@ -1,21 +1,26 @@
 """
 Topic Handlers for Watchtower
 """
+
 __author__ = ['Enis Simsar', 'Kemal Berk Kocabagli']
 
 import tornado.web
 import tornado.escape
 
+from logic.helper import get_relevant_locations, source_selection
+from logic.topics import delete_topic, stop_topic, start_topic, publish_topic, unpublish_topic, subsribe_topic, \
+    unsubsribe_topic, get_topic_list, topic_exist, get_topic, update_topic, add_topic
+from logic.users import save_topic_id, get_current_topic, get_current_location, set_current_topic, get_topic_limit
+
 from handlers.base import BaseHandler, TemplateRendering, Api500ErrorHandler
 from apis import apiv1, apiv11, apiv12, apiv13
-import logic
 
 
 class TopicHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
     def post(self):
         user_id = tornado.escape.xhtml_escape(self.current_user)
-        logic.save_topic_id(self.get_argument("topic_id"), user_id)
+        save_topic_id(self.get_argument("topic_id"), user_id)
 
 
 class TopicsHandler(BaseHandler, TemplateRendering):
@@ -23,14 +28,14 @@ class TopicsHandler(BaseHandler, TemplateRendering):
     def get(self):
         user_id = tornado.escape.xhtml_escape(self.current_user)
         template = 'afterlogintemplate.html'
-        topic = logic.get_current_topic(tornado.escape.xhtml_escape(self.current_user))
-        location = logic.get_current_location(tornado.escape.xhtml_escape(self.current_user))
-        relevant_locations = logic.get_relevant_locations()
+        topic = get_current_topic(tornado.escape.xhtml_escape(self.current_user))
+        location = get_current_location(tornado.escape.xhtml_escape(self.current_user))
+        relevant_locations = get_relevant_locations()
         variables = {
             'title': "Topics",
-            'alerts': logic.get_topic_list(user_id),
+            'alerts': get_topic_list(user_id),
             'type': "alertlist",
-            'alertlimit': logic.get_topic_limit(user_id),
+            'alertlimit': get_topic_limit(user_id),
             'username': str(tornado.escape.xhtml_escape(self.get_current_username())),
             'topic': topic,
             'location': location,
@@ -45,29 +50,29 @@ class TopicsHandler(BaseHandler, TemplateRendering):
         posttype = self.get_argument("posttype")
         user_id = tornado.escape.xhtml_escape(self.current_user)
         if posttype == u'remove':
-            logic.delete_topic(topic_id, user_id)
+            delete_topic(topic_id, user_id)
         elif posttype == u'stop':
-            logic.stop_topic(topic_id)
+            stop_topic(topic_id)
         elif posttype == u'start':
-            logic.start_topic(topic_id)
+            start_topic(topic_id)
         elif posttype == u'publish':
-            logic.publish_topic(topic_id)
+            publish_topic(topic_id)
         elif posttype == u'unpublish':
-            logic.unpublish_topic(topic_id)
+            unpublish_topic(topic_id)
         elif posttype == u'subscribe':
-            logic.subsribe_topic(topic_id, user_id)
-            logic.set_current_topic(user_id)
+            subsribe_topic(topic_id, user_id)
+            set_current_topic(user_id)
         elif posttype == u'unsubscribe':
-            logic.unsubsribe_topic(topic_id, user_id)
-            logic.set_current_topic(user_id)
+            unsubsribe_topic(topic_id, user_id)
+            set_current_topic(user_id)
         template = "alerts.html"
         variables = {
             'title': "Topics",
-            'alerts': logic.get_topic_list(user_id),
+            'alerts': get_topic_list(user_id),
             'type': "alertlist",
-            'alertlimit': logic.get_topic_limit(user_id),
+            'alertlimit': get_topic_limit(user_id),
             'username': str(tornado.escape.xhtml_escape(self.get_current_username())),
-            'topic': logic.get_current_topic(tornado.escape.xhtml_escape(self.current_user))
+            'topic': get_current_topic(tornado.escape.xhtml_escape(self.current_user))
         }
         content = self.render_template(template, variables)
         dropdown = self.render_template("alertDropdownMenu.html", variables)
@@ -80,25 +85,25 @@ class CreateEditTopicHandler(BaseHandler, TemplateRendering):
         user_id = tornado.escape.xhtml_escape(self.current_user)
         template = 'afterlogintemplate.html'
         variables = dict()
-        variables['topic'] = logic.get_current_topic(tornado.escape.xhtml_escape(self.current_user))
+        variables['topic'] = get_current_topic(tornado.escape.xhtml_escape(self.current_user))
         variables['username'] = str(tornado.escape.xhtml_escape(self.get_current_username()))
-        variables['alerts'] = logic.get_topic_list(user_id)
-        relevant_locations = logic.get_relevant_locations()
+        variables['alerts'] = get_topic_list(user_id)
+        relevant_locations = get_relevant_locations()
         variables['relevant_locations'] = relevant_locations
-        variables['location'] = logic.get_current_location(tornado.escape.xhtml_escape(self.current_user))
+        variables['location'] = get_current_location(tornado.escape.xhtml_escape(self.current_user))
 
         if alertid is not None:
-            if logic.topic_exist(user_id):
+            if topic_exist(user_id):
                 variables['title'] = "Edit Topic"
-                variables['alert'] = logic.get_topic(alertid)
+                variables['alert'] = get_topic(alertid)
                 variables['type'] = "editAlert"
             else:
                 self.redirect("/Topics")
         else:
-            if logic.get_topic_limit(user_id) == 0:
+            if get_topic_limit(user_id) == 0:
                 self.redirect("/Topics")
             variables['title'] = "Create Topic"
-            variables['alert'] = logic.get_topic(alertid)
+            variables['alert'] = get_topic(alertid)
             variables['type'] = "createAlert"
         content = self.render_template(template, variables)
         self.write(content)
@@ -123,10 +128,10 @@ class CreateEditTopicHandler(BaseHandler, TemplateRendering):
 
         if alertid is not None:
             alert['alertid'] = alertid
-            logic.update_topic(alert)
+            update_topic(alert)
         else:
             alert['name'] = self.get_argument('alertname')
-            logic.add_topic(alert, user_id)
+            add_topic(alert, user_id)
         self.redirect("/Topics")
 
 
@@ -137,7 +142,7 @@ class PagesHandler(BaseHandler, TemplateRendering):
         keywords_list = self.get_argument("keywords").split(",")
 
         if keywords_list != ['']:
-            sourceSelection = logic.source_selection(keywords_list)
+            sourceSelection = source_selection(keywords_list)
         else:
             sourceSelection = {'pages': [], 'subreddits': []}
 

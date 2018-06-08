@@ -1,15 +1,11 @@
-import sys
-from datetime import datetime
 from time import sleep
 
-sys.path.append('./')
-
 from application.Connections import Connection
-from logic import get_all_running_topics_list
-from twitter_stream_thread import StreamCreator
+from logic.topics import get_all_running_topics_list
+from .twitter_stream_thread import StreamCreator
 
 
-class TwitterListen():
+class TwitterListen:
     def __init__(self):
         self.topic_dic = {}
         self.thread = None
@@ -43,7 +39,6 @@ def main():
     running_topic_list = get_all_running_topics_list()
     twitter_module = TwitterListen()
     twitter_module.setup(running_topic_list)
-    current_hour = datetime.now().hour
     try:
         last_sequence_id = str(Connection.Instance().db["counters"].find_one({'_id': "tweetDBId"})['seq'])
     except:

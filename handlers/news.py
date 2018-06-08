@@ -1,15 +1,21 @@
 """
 News Handlers for Watchtower
 """
+
 __author__ = ['Enis Simsar', 'Kemal Berk Kocabagli']
 
 import tornado.web
 import tornado.escape
 import json
 
+from logic.helper import get_relevant_locations
+from logic.news import search_news, get_news, sentiment_news, get_bookmarks, add_bookmark, remove_bookmark, ban_domain
+from logic.topics import get_topic_list
+from logic.tweets_feed import get_tweets, get_skip_tweets
+from logic.users import get_current_topic, get_current_location
+
 from handlers.base import BaseHandler, TemplateRendering, Api500ErrorHandler
 from apis import apiv1, apiv11, apiv12, apiv13
-import logic
 
 
 class PreviewNewsHandler(BaseHandler, TemplateRendering):
@@ -20,7 +26,7 @@ class PreviewNewsHandler(BaseHandler, TemplateRendering):
         # exculdedkeywords = self.get_argument("excludedkeywords")
         languages = self.get_argument("languages")
         variables = {
-            'feeds': logic.search_news(keywords, languages)
+            'feeds': search_news(keywords, languages)
         }
 
         print(variables['feeds'])
@@ -36,19 +42,19 @@ class NewsHandler(BaseHandler, TemplateRendering):
     def get(self, argument=None):
         user_id = tornado.escape.xhtml_escape(self.current_user)
         template = 'afterlogintemplate.html'
-        topic = logic.get_current_topic(tornado.escape.xhtml_escape(self.current_user))
-        location = logic.get_current_location(tornado.escape.xhtml_escape(self.current_user))
-        relevant_locations = logic.get_relevant_locations()
+        topic = get_current_topic(tornado.escape.xhtml_escape(self.current_user))
+        location = get_current_location(tornado.escape.xhtml_escape(self.current_user))
+        relevant_locations = get_relevant_locations()
         if topic is None:
             self.redirect("/topicinfo")
 
-        feeds = logic.get_news(user_id, topic['topic_id'], "yesterday", 0)
+        feeds = get_news(user_id, topic['topic_id'], "yesterday", 0)
         variables = {
             'title': "News",
             'feeds': feeds['feeds'],
             'cursor': feeds['next_cursor'],
             'alertid': topic['topic_id'],
-            'alerts': logic.get_topic_list(user_id),
+            'alerts': get_topic_list(user_id),
             'alertname': topic['topic_name'],
             'type': "news",
             'username': str(tornado.escape.xhtml_escape(self.get_current_username())),
@@ -77,7 +83,7 @@ class NewsHandler(BaseHandler, TemplateRendering):
                 date = 'yesterday'
                 pass
             try:
-                feeds = logic.get_news(user_id, alertid, date, int(next_cursor))
+                feeds = get_news(user_id, alertid, date, int(next_cursor))
                 variables = {
                     'feeds': feeds['feeds'],
                     'cursor': feeds['next_cursor'],
@@ -94,7 +100,7 @@ class NewsHandler(BaseHandler, TemplateRendering):
                 date = 'yesterday'
                 pass
             try:
-                feeds = logic.get_news(user_id, alertid, date, 0)
+                feeds = get_news(user_id, alertid, date, 0)
                 variables = {
                     'feeds': feeds['feeds'],
                     'cursor': feeds['next_cursor'],
@@ -171,20 +177,20 @@ class FeedHandler(BaseHandler, TemplateRendering):
         user_id = tornado.escape.xhtml_escape(self.current_user)
         template = 'afterlogintemplate.html'
 
-        topic = logic.get_current_topic(tornado.escape.xhtml_escape(self.current_user))
-        location = logic.get_current_location(tornado.escape.xhtml_escape(self.current_user))
-        relevant_locations = logic.get_relevant_locations()
+        topic = get_current_topic(tornado.escape.xhtml_escape(self.current_user))
+        location = get_current_location(tornado.escape.xhtml_escape(self.current_user))
+        relevant_locations = get_relevant_locations()
         if topic is None:
             self.redirect("/topicinfo")
 
-        tweets = logic.get_tweets(topic['topic_id'])
+        tweets = get_tweets(topic['topic_id'])
         variables = {
             'title': "Feed",
-            'alerts': logic.get_topic_list(user_id),
+            'alerts': get_topic_list(user_id),
             'type': "feed",
             'tweets': tweets,
             'username': str(tornado.escape.xhtml_escape(self.get_current_username())),
-            'topic': logic.get_current_topic(tornado.escape.xhtml_escape(self.current_user)),
+            'topic': get_current_topic(tornado.escape.xhtml_escape(self.current_user)),
             'location': location,
             'relevant_locations': relevant_locations
         }
@@ -199,13 +205,13 @@ class FeedHandler(BaseHandler, TemplateRendering):
             alertid = self.get_argument('alertid')
             lastTweetId = self.get_argument('lastTweetId')
             variables = {
-                'tweets': logic.get_skip_tweets(alertid, lastTweetId)
+                'tweets': get_skip_tweets(alertid, lastTweetId)
             }
         else:
             template = 'alertFeed.html'
             alertid = self.get_argument('alertid')
             variables = {
-                'tweets': logic.get_tweets(alertid),
+                'tweets': get_tweets(alertid),
                 'alertid': alertid
             }
             if len(variables['tweets']) == 0:
@@ -221,7 +227,7 @@ class SentimentHandler(BaseHandler, TemplateRendering):
         alertid = self.get_argument("alertid")
         rating = self.get_argument("rating")
         user_id = tornado.escape.xhtml_escape(self.current_user)
-        logic.sentiment_news(alertid, user_id, link_id, rating)
+        sentiment_news(alertid, user_id, link_id, rating)
         self.write("")
 
 
@@ -230,17 +236,17 @@ class BookmarkHandler(BaseHandler, TemplateRendering):
     def get(self, argument=None):
         user_id = tornado.escape.xhtml_escape(self.current_user)
         template = 'afterlogintemplate.html'
-        topic = logic.get_current_topic(tornado.escape.xhtml_escape(self.current_user))
-        location = logic.get_current_location(tornado.escape.xhtml_escape(self.current_user))
-        relevant_locations = logic.get_relevant_locations()
+        topic = get_current_topic(tornado.escape.xhtml_escape(self.current_user))
+        location = get_current_location(tornado.escape.xhtml_escape(self.current_user))
+        relevant_locations = get_relevant_locations()
         if topic is None:
             self.redirect("/topicinfo")
 
         variables = {
             'title': "Bookmark",
-            'feeds': logic.get_bookmarks(user_id),
+            'feeds': get_bookmarks(user_id),
             'alertid': topic['topic_id'],
-            'alerts': logic.get_topic_list(user_id),
+            'alerts': get_topic_list(user_id),
             'alertname': topic['topic_name'],
             'type': "bookmark",
             'username': str(tornado.escape.xhtml_escape(self.get_current_username())),
@@ -258,9 +264,9 @@ class BookmarkHandler(BaseHandler, TemplateRendering):
         user_id = tornado.escape.xhtml_escape(self.current_user)
         posttype = self.get_argument("posttype")
         if posttype == "add":
-            logic.add_bookmark(user_id, link_id)
+            add_bookmark(user_id, link_id)
         else:
-            logic.remove_bookmark(user_id, link_id)
+            remove_bookmark(user_id, link_id)
         self.write("")
 
 
@@ -270,7 +276,7 @@ class DomainHandler(BaseHandler, TemplateRendering):
         user_id = tornado.escape.xhtml_escape(self.current_user)
         domain = self.get_argument("domain")
         alertid = self.get_argument("alertid")
-        logic.ban_domain(user_id, alertid, domain)
+        ban_domain(user_id, alertid, domain)
         self.write({})
 
 

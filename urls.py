@@ -9,8 +9,8 @@ from settings import settings
 from handlers.main import MainHandler
 from handlers.auth import LoginHandler, LogoutHandler, ProfileHandler, RegisterHandler, TwitterAuthHandler # , FacebookAuthHandler
 
-from handlers.topic import TopicHandler, TopicsHandler, CreateEditTopicHandler, PagesHandler
-from handlers.topic import ThemesHandler, ThemesV11Handler, TopicsV12Handler
+from handlers.topics import TopicHandler, TopicsHandler, CreateEditTopicHandler, PagesHandler
+from handlers.topics import ThemesHandler, ThemesV11Handler, TopicsV12Handler
 
 from handlers.conversation import PreviewConversationHandler, ConversationHandler, ConversationPageHandler
 from handlers.conversation import ConversationV12Handler
