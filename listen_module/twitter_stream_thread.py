@@ -25,7 +25,7 @@ def get_info(topic_dic):
         topic = topic_dic[key]
         topics = topics + [topic['topic_id']]
         keywords = keywords + topic['keywords']
-        lang = lang + topic['lang']
+        lang = lang + topic['languages']
     lang = list(set(lang))
     lang = [str(l) for l in lang]
     keywords = list(set(keywords))
@@ -52,7 +52,7 @@ def separates_tweet(topic_dic, tweet):
     try:
         for key in topic_dic:
             topic = topic_dic[key]
-            if tweet['lang'] in topic['lang']:
+            if tweet['lang'] in topic['languages']:
                 for keyword in topic['keywords']:
                     keyword = re.compile(keyword.replace(" ", "(.?)"), re.IGNORECASE)
                     tweet['tweetDBId'] = get_next_tweets_sequence()

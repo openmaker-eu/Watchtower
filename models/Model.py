@@ -153,7 +153,7 @@ class Model:
                     if is_object:
                         dict_list.append(cls({key: model[i] for i, key in enumerate(cls.fields())}))
                     else:
-                        dict_list.append({key: model[i] for i, key in enumerate(cls.fields())})
+                        dict_list.append(cls({key: model[i] for i, key in enumerate(cls.fields())})._dict())
                 models = dict_list
             return models
 
