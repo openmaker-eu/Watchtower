@@ -77,9 +77,10 @@ class Topic(Model):
         if item == 'tweet_count':
             return Connection.Instance().db[
                 str(object.__getattribute__(self, self.model_id_column()))].find().count()
-        if item == 'type' and not hasattr(self, 'type'):
+        try:
+            return object.__getattribute__(self, item)
+        except AttributeError:
             return None
-        return object.__getattribute__(self, item)
 
     def __init__(self, model):
         super().__init__(model)
