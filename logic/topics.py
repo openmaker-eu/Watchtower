@@ -22,22 +22,6 @@ auth.set_access_token(access_token, access_secret)
 api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
 
 
-def get_all_running_topics_list():
-    with Connection.Instance().get_cursor() as cur:
-        sql = (
-            "SELECT * "
-            "FROM topics "
-            "WHERE is_running = %s"
-        )
-        cur.execute(sql, [True])
-        var = cur.fetchall()
-        alerts = [
-            {'alertid': i[0], 'name': i[1], 'description': i[2], 'keywords': sorted(i[3].split(",")),
-             'lang': sorted(i[4].split(","))}
-            for i in var]
-        return sorted(alerts, key=lambda k: k['alertid'])
-
-
 def get_topic_list(user_id):
     with Connection.Instance().get_cursor() as cur:
         sql = (

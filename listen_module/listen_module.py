@@ -1,8 +1,8 @@
 from time import sleep
 
 from application.Connections import Connection
-from logic.topics import get_all_running_topics_list
 from .twitter_stream_thread import StreamCreator
+from models.Topic import Topic
 
 
 class TwitterListen:
@@ -12,9 +12,9 @@ class TwitterListen:
 
     def setup(self, topic_list):
         if len(topic_list) != 0:
-            for alert in topic_list:
-                if str(alert['alertid']) not in self.topic_dic:
-                    self.topic_dic[str(alert['alertid'])] = alert
+            for topic in topic_list:
+                if str(topic['topic_id']) not in self.topic_dic:
+                    self.topic_dic[str(topic['topic_id'])] = topic
             self.thread = StreamCreator(self.topic_dic)
             self.thread.start()
 
@@ -24,8 +24,8 @@ class TwitterListen:
             self.kill()
         if len(topic_list) != 0:
             for alert in topic_list:
-                if str(alert['alertid']) not in self.topic_dic:
-                    self.topic_dic[str(alert['alertid'])] = alert
+                if str(alert['topic_id']) not in self.topic_dic:
+                    self.topic_dic[str(alert['topic_id'])] = alert
             self.thread = StreamCreator(self.topic_dic)
             self.thread.start()
 
@@ -36,7 +36,7 @@ class TwitterListen:
 
 
 def main():
-    running_topic_list = get_all_running_topics_list()
+    running_topic_list = Topic.find_all([('is_running', True)])
     twitter_module = TwitterListen()
     twitter_module.setup(running_topic_list)
     try:
@@ -50,7 +50,7 @@ def main():
         print("Loop is continuing. count = {0}".format(count))
         count += 1
         sleep(300)
-        new_running_topic_list = get_all_running_topics_list()
+        new_running_topic_list = Topic.find_all([('is_running', True)])
         if new_running_topic_list != running_topic_list:
             running_topic_list = new_running_topic_list
             print("Restarting Twitter Module!")

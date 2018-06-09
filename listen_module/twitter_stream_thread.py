@@ -12,25 +12,26 @@ from decouple import config
 from tweepy import OAuthHandler
 from tweepy import Stream
 from tweepy.streaming import StreamListener
+from models.Topic import Topic
 
 from application.Connections import Connection
 
 
-def get_info(alertDic):
+def get_info(topic_dic):
     keywords = []
-    alerts = []
+    topics = []
     lang = []
-    for key in alertDic:
-        alert = alertDic[key]
-        alerts = alerts + [alert['alertid']]
-        keywords = keywords + alert['keywords']
-        lang = lang + alert['lang']
+    for key in topic_dic:
+        topic = topic_dic[key]
+        topics = topics + [topic['topic_id']]
+        keywords = keywords + topic['keywords']
+        lang = lang + topic['lang']
     lang = list(set(lang))
     lang = [str(l) for l in lang]
     keywords = list(set(keywords))
     keywords = [str(keyword) for keyword in keywords]
     result = {
-        'alerts': sorted(alerts),
+        'topics': sorted(topics),
         'keywords': keywords,
         'lang': lang
     }
@@ -47,56 +48,37 @@ def get_next_tweets_sequence():
     return cursor['seq']
 
 
-def separates_tweet(alertDic, tweet):
+def separates_tweet(topic_dic, tweet):
     try:
-        for key in alertDic:
-            alert = alertDic[key]
-            if tweet['lang'] in alert['lang']:
-                for keyword in alert['keywords']:
+        for key in topic_dic:
+            topic = topic_dic[key]
+            if tweet['lang'] in topic['lang']:
+                for keyword in topic['keywords']:
                     keyword = re.compile(keyword.replace(" ", "(.?)"), re.IGNORECASE)
                     tweet['tweetDBId'] = get_next_tweets_sequence()
                     if 'extended_tweet' in tweet and 'full_text' in tweet['extended_tweet']:
                         if re.search(keyword, str(tweet['extended_tweet']['full_text'])):
-                            updatedTime = datetime.fromtimestamp(int(tweet['timestamp_ms']) / 1e3)
-                            with Connection.Instance().get_cursor() as cur:
-                                sql = (
-                                    "UPDATE topics "
-                                    "SET last_tweet_date = %s "
-                                    "WHERE topic_id = %s"
-                                )
-                                cur.execute(sql, [updatedTime, alert['alertid']])
+                            updated_time = datetime.fromtimestamp(int(tweet['timestamp_ms']) / 1e3)
+                            Topic.update_by_id({'last_tweet_date': updated_time}, topic['topic_id'])
                             tweet['_id'] = ObjectId()
-                            if tweet['entities']['urls'] != []:
+                            if tweet['entities']['urls']:
                                 tweet['redis'] = False
                             else:
                                 tweet['redis'] = True
-                            Connection.Instance().db[str(alert['alertid'])].insert_one(tweet)
+                            Connection.Instance().db[str(topic['topic_id'])].insert_one(tweet)
                             break
                     else:
                         if re.search(keyword, str(tweet['text'])):
-                            updatedTime = datetime.fromtimestamp(int(tweet['timestamp_ms']) / 1e3)
-                            with Connection.Instance().get_cursor() as cur:
-                                sql = (
-                                    "UPDATE topics "
-                                    "SET last_tweet_date = %s "
-                                    "WHERE topic_id = %s"
-                                )
-                                cur.execute(sql, [updatedTime, alert['alertid']])
+                            updated_time = datetime.fromtimestamp(int(tweet['timestamp_ms']) / 1e3)
+                            Topic.update_by_id({'last_tweet_date': updated_time}, topic['topic_id'])
                             tweet['_id'] = ObjectId()
                             if tweet['entities']['urls'] == [] or tweet['entities']['urls'][0]['expanded_url'] is None:
                                 tweet['redis'] = True
                             else:
                                 tweet['redis'] = False
-                            Connection.Instance().db[str(alert['alertid'])].insert_one(tweet)
+                            Connection.Instance().db[str(topic['topic_id'])].insert_one(tweet)
                             break
     except Exception as e:
-        f = open('../log.txt', 'a+')
-        s = '\n\n tweet lang: ' + tweet['lang']
-        f.write(s)
-        f.write('\n')
-        f.write(str(e))
-        f.write('\n\n')
-        f.close()
         pass
 
 
@@ -109,8 +91,8 @@ access_secret = config("TWITTER_ACCESS_SECRET")
 
 # This is a basic listener that just prints received tweets to stdout.
 class StdOutListener(StreamListener):
-    def __init__(self, alertDic):
-        self.alertDic = alertDic
+    def __init__(self, topic_dic):
+        self.topic_dic = topic_dic
         self.terminate = False
         self.connection = True
         super(StdOutListener, self).__init__()
@@ -119,16 +101,9 @@ class StdOutListener(StreamListener):
         if not self.terminate:
             try:
                 tweet = json.loads(data)
-                separates_tweet(self.alertDic, tweet)
+                separates_tweet(self.topic_dic, tweet)
                 return True
             except Exception as e:
-                f = open('../log.txt', 'a+')
-                s = '\n\n on_data : '
-                f.write(s)
-                f.write('\n')
-                f.write(str(e))
-                f.write('\n\n')
-                f.close()
                 pass
                 return True
         else:
@@ -151,14 +126,14 @@ class StdOutListener(StreamListener):
 
 
 class StreamCreator():
-    def __init__(self, alertDic):
+    def __init__(self, topic_dic):
         # This handles Twitter authetification and the connection to Twitter Streaming API
-        self.l = StdOutListener(alertDic)
+        self.l = StdOutListener(topic_dic)
 
-        self.info = get_info(alertDic=alertDic)
+        self.info = get_info(topic_dic=topic_dic)
         self.keywords = self.info['keywords']
         self.lang = self.info['lang']
-        self.alerts = self.info['alerts']
+        self.alerts = self.info['topics']
         print(self.alerts)
         print(self.keywords)
         print(self.lang)
@@ -169,16 +144,8 @@ class StreamCreator():
                                   kwargs={'track': self.keywords, 'languages': self.lang, 'stall_warnings': True})
 
     def start(self):
-        try:
-            self.t.deamon = True
-            self.t.start()
-        except Exception as e:
-            f = open('../log.txt', 'a+')
-            f.write('\n\n exception thread')
-            f.write('\n')
-            f.write(str(e))
-            f.write('\n\n')
-            f.close()
+        self.t.deamon = True
+        self.t.start()
 
     def terminate(self):
         self.l.running = False
