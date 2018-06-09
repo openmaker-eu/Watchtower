@@ -1,11 +1,12 @@
 from time import sleep
 import sys
+
 from decouple import config
 
 sys.path.insert(0, config('ROOT_DIR'))
 
 from application.Connections import Connection
-from .twitter_stream_thread import StreamCreator
+from listen_module.twitter_stream_thread import StreamCreator
 from models.Topic import Topic
 
 
@@ -59,7 +60,7 @@ def main():
             running_topic_list = new_running_topic_list
             print("Restarting Twitter Module!")
             twitter_module.restart(new_running_topic_list)
-        if count%6 == 0:
+        if count % 6 == 0:
             new_last_sequence_id = str(Connection.Instance().db["counters"].find_one({'_id': "tweetDBId"})['seq'])
             print("last_id = {0}, new_last_id = {1}".format(last_sequence_id, new_last_sequence_id))
             if last_sequence_id == new_last_sequence_id:
