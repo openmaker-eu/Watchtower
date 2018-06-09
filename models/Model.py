@@ -125,7 +125,7 @@ class Model:
         }
 
     @classmethod
-    def find_all(cls, filters=None, order_by=None, order_dir="ASC"):
+    def find_all(cls, filters=None, order_by=None, order_dir="ASC", is_object=True):
         if order_by is None:
             order_by = cls.model_id_column()
         builder = cls.find_query_builder(filters)
@@ -150,7 +150,10 @@ class Model:
             if len(models) > 0:
                 dict_list = []
                 for model in models:
-                    dict_list.append(cls({key: model[i] for i, key in enumerate(cls.fields())}))
+                    if is_object:
+                        dict_list.append(cls({key: model[i] for i, key in enumerate(cls.fields())}))
+                    else:
+                        dict_list.append({key: model[i] for i, key in enumerate(cls.fields())})
                 models = dict_list
             return models
 

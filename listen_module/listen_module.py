@@ -41,7 +41,7 @@ class TwitterListen:
 
 
 def main():
-    running_topic_list = Topic.find_all([('is_running', True)])
+    running_topic_list = Topic.find_all([('is_running', True)], is_object=False)
     twitter_module = TwitterListen()
     twitter_module.setup(running_topic_list)
     try:
@@ -55,7 +55,7 @@ def main():
         print("Loop is continuing. count = {0}".format(count))
         count += 1
         sleep(300)
-        new_running_topic_list = Topic.find_all([('is_running', True)])
+        new_running_topic_list = Topic.find_all([('is_running', True)], is_object=False)
         if new_running_topic_list != running_topic_list:
             running_topic_list = new_running_topic_list
             print("Restarting Twitter Module!")
