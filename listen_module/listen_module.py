@@ -1,4 +1,8 @@
 from time import sleep
+import sys
+from decouple import config
+
+sys.path.insert(0, config('ROOT_DIR'))
 
 from application.Connections import Connection
 from .twitter_stream_thread import StreamCreator
