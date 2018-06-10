@@ -56,7 +56,11 @@ def main():
         count += 1
         sleep(300)
         new_running_topic_list = Topic.find_all([('is_running', True)], is_object=False)
-        if new_running_topic_list != running_topic_list:
+        current_keywords = [i['keywords'] for i in running_topic_list]
+        current_languages = [i['languages'] for i in running_topic_list]
+        new_keywords = [i['keywords'] for i in new_running_topic_list]
+        new_languages = [i['languages'] for i in new_running_topic_list]
+        if current_keywords != new_keywords or current_languages != new_languages:
             running_topic_list = new_running_topic_list
             print("Restarting Twitter Module!")
             twitter_module.restart(new_running_topic_list)
