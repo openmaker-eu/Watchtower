@@ -68,18 +68,69 @@ def get_mention_aggregations(topic_id):
                 length_mentions[mention] = count
             else:
                 length_mentions[mention] = length_mentions[mention] + count
-            if mention not in aggregated_mentions:
-                aggregated_mentions[mention] = {}
-                aggregated_mentions[mention]['labels'] = [date]
-                aggregated_mentions[mention]['data'] = [count]
-            else:
-                labels = aggregated_mentions[mention]['labels']
-                labels.append(date)
-                aggregated_mentions[mention]['labels'] = labels
 
-                data = aggregated_mentions[mention]['data']
+            if mention not in aggregated_mentions:
+                aggregated_mentions[mention] = {
+                    'all': {},
+                    'week': {},
+                    'month': {}
+                }
+                aggregated_mentions[mention]['all']['labels'] = [date]
+                aggregated_mentions[mention]['all']['data'] = [count]
+
+                if day['modified_date'].date() > last_week:
+                    aggregated_mentions[mention]['week']['labels'] = [date]
+                    aggregated_mentions[mention]['week']['data'] = [count]
+
+                    aggregated_mentions[mention]['month']['labels'] = [date]
+                    aggregated_mentions[mention]['month']['data'] = [count]
+                elif day['modified_date'].date() > last_month:
+                    aggregated_mentions[mention]['week']['labels'] = []
+                    aggregated_mentions[mention]['week']['data'] = []
+
+                    aggregated_mentions[mention]['month']['labels'] = [date]
+                    aggregated_mentions[mention]['month']['data'] = [count]
+                else:
+                    aggregated_mentions[mention]['week']['labels'] = []
+                    aggregated_mentions[mention]['week']['data'] = []
+
+                    aggregated_mentions[mention]['month']['labels'] = []
+                    aggregated_mentions[mention]['month']['data'] = []
+
+            else:
+                labels = aggregated_mentions[mention]['all']['labels']
+                labels.append(date)
+                aggregated_mentions[mention]['all']['labels'] = labels
+
+                data = aggregated_mentions[mention]['all']['data']
                 data.append(count)
-                aggregated_mentions[mention]['data'] = data
+                aggregated_mentions[mention]['all']['data'] = data
+
+                if day['modified_date'].date() > last_week:
+                    labels = aggregated_mentions[mention]['week']['labels']
+                    labels.append(date)
+                    aggregated_mentions[mention]['week']['labels'] = labels
+
+                    data = aggregated_mentions[mention]['week']['data']
+                    data.append(count)
+                    aggregated_mentions[mention]['week']['data'] = data
+
+                    labels = aggregated_mentions[mention]['month']['labels']
+                    labels.append(date)
+                    aggregated_mentions[mention]['month']['labels'] = labels
+
+                    data = aggregated_mentions[mention]['month']['data']
+                    data.append(count)
+                    aggregated_mentions[mention]['month']['data'] = data
+                elif day['modified_date'].date() > last_month:
+                    labels = aggregated_mentions[mention]['month']['labels']
+                    labels.append(date)
+                    aggregated_mentions[mention]['month']['labels'] = labels
+
+                    data = aggregated_mentions[mention]['month']['data']
+                    data.append(count)
+                    aggregated_mentions[mention]['month']['data'] = data
+
     sorted_length = sorted(length_mentions, key=lambda k: length_mentions[k], reverse=True)[:50]
     return {
         'sorted': sorted_length,

@@ -96,18 +96,69 @@ def get_hashtag_aggregations(topic_id):
                 length_hashtags[hashtag] = count
             else:
                 length_hashtags[hashtag] = length_hashtags[hashtag] + count
-            if hashtag not in aggregated_hashtags:
-                aggregated_hashtags[hashtag] = {}
-                aggregated_hashtags[hashtag]['labels'] = [date]
-                aggregated_hashtags[hashtag]['data'] = [count]
-            else:
-                labels = aggregated_hashtags[hashtag]['labels']
-                labels.append(date)
-                aggregated_hashtags[hashtag]['labels'] = labels
 
-                data = aggregated_hashtags[hashtag]['data']
+            if hashtag not in aggregated_hashtags:
+                aggregated_hashtags[hashtag] = {
+                    'all': {},
+                    'week': {},
+                    'month': {}
+                }
+                aggregated_hashtags[hashtag]['all']['labels'] = [date]
+                aggregated_hashtags[hashtag]['all']['data'] = [count]
+
+                if day['modified_date'].date() > last_week:
+                    aggregated_hashtags[hashtag]['week']['labels'] = [date]
+                    aggregated_hashtags[hashtag]['week']['data'] = [count]
+
+                    aggregated_hashtags[hashtag]['month']['labels'] = [date]
+                    aggregated_hashtags[hashtag]['month']['data'] = [count]
+                elif day['modified_date'].date() > last_month:
+                    aggregated_hashtags[hashtag]['week']['labels'] = []
+                    aggregated_hashtags[hashtag]['week']['data'] = []
+
+                    aggregated_hashtags[hashtag]['month']['labels'] = [date]
+                    aggregated_hashtags[hashtag]['month']['data'] = [count]
+                else:
+                    aggregated_hashtags[hashtag]['week']['labels'] = []
+                    aggregated_hashtags[hashtag]['week']['data'] = []
+
+                    aggregated_hashtags[hashtag]['month']['labels'] = []
+                    aggregated_hashtags[hashtag]['month']['data'] = []
+
+            else:
+                labels = aggregated_hashtags[hashtag]['all']['labels']
+                labels.append(date)
+                aggregated_hashtags[hashtag]['all']['labels'] = labels
+
+                data = aggregated_hashtags[hashtag]['all']['data']
                 data.append(count)
-                aggregated_hashtags[hashtag]['data'] = data
+                aggregated_hashtags[hashtag]['all']['data'] = data
+
+                if day['modified_date'].date() > last_week:
+                    labels = aggregated_hashtags[hashtag]['week']['labels']
+                    labels.append(date)
+                    aggregated_hashtags[hashtag]['week']['labels'] = labels
+
+                    data = aggregated_hashtags[hashtag]['week']['data']
+                    data.append(count)
+                    aggregated_hashtags[hashtag]['week']['data'] = data
+
+                    labels = aggregated_hashtags[hashtag]['month']['labels']
+                    labels.append(date)
+                    aggregated_hashtags[hashtag]['month']['labels'] = labels
+
+                    data = aggregated_hashtags[hashtag]['month']['data']
+                    data.append(count)
+                    aggregated_hashtags[hashtag]['month']['data'] = data
+                elif day['modified_date'].date() > last_month:
+                    labels = aggregated_hashtags[hashtag]['month']['labels']
+                    labels.append(date)
+                    aggregated_hashtags[hashtag]['month']['labels'] = labels
+
+                    data = aggregated_hashtags[hashtag]['month']['data']
+                    data.append(count)
+                    aggregated_hashtags[hashtag]['month']['data'] = data
+
     sorted_length = sorted(length_hashtags, key=lambda k: length_hashtags[k], reverse=True)[:50]
     return {
         'sorted': sorted_length,
