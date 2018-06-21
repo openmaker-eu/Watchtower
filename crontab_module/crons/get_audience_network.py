@@ -21,110 +21,49 @@ auth = OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_secret)
 api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
 
-def get_audience_network(topicID, location):
-    start = time.time()
-    # filter audience by location
+# Decorator for measuring execution time of functions
+def timeit(method):
+    def timed(*args, **kw):
+        start = time.time()
+        result = method(*args, **kw)
+        end = time.time()
+        print("... {} seconds".format(end - start))
+        return result
+    return timed
+
+@timeit
+def construct_audience_members(topicID, location):
     regx = location_regex.getLocationRegex(location)
-    loc_filtered_audience_ids =[]
-    try:
-        loc_filtered_audience_ids = Connection.Instance().audienceDB[str(topicID)].distinct('id',{'location':regx})
-    except Exception as ex:
-        print("appending one by one...")
-        for audience_member in Connection.Instance().audienceDB[str(topicID)].find({'location':regx},{'id':1,'location':1}):
-            loc_filtered_audience_ids.append({'id':audience_member['id'], 'location':audience_member['location']})
-    print("Filtered audience by location in " + str(time.time()-start) + " seconds.")
-    start = time.time()
-    # pprint.pprint(loc_filtered_audience_ids[:10])
-    audience_member_count=1
-    audience_size = len(loc_filtered_audience_ids)
-    for audience_member_id in loc_filtered_audience_ids:
-        audience_member = Connection.Instance().audience_networks_DB[str(topicID)+"_"+str(location)].find_one({'id':audience_member_id})
-        if (audience_member is not None):
-            if "last_processed" in audience_member:
-                if ((datetime.today()- audience_member['last_processed']).days < 1): # if this audience member is processed today, continue
-                    print(str(audience_member_id) + " HAS ALREADY BEEN PROCESSED TODAY.")
-                    continue
-        else:
-            # first time adding this person. Initialize with empty followers list.
-            Connection.Instance().audience_networks_DB[str(topicID)+"_"+str(location)].update_one(
-                    { 'id': audience_member_id},
-                    { '$setOnInsert': {'followers':[]}},
-                    upsert=True
-            )
+    # upsert many
+    operations = []
+    for audience_member in Connection.Instance().audienceDB[str(topicID)].find({'location':regx},{'id':1,'location':1}):
+        operations.append(
+               pymongo.UpdateOne(
+               {'id': audience_member['id']},
+               {
+                '$addToSet':{
+                'topics': topicID,
+                'locations': audience_member['location'],
+                },
 
-        print("Processing audience member (" + str(audience_member_count) + "/" + str(audience_size) + ") with id: " + str(audience_member_id))
-        # get all the follower ids page by page
-    	# starting from most recent follower
-        page_count = 0
-        followers_count = 0
-        STOP_FLAG= 0
-        THRESHOLD = 10
-        already_added_ids = []
-        cursor = tweepy.Cursor(api.followers_ids, id=audience_member_id, cursor=-1)
-        try:
-            for page in cursor.pages():
-                #pprint.pprint(api.rate_limit_status()['resources']['followers'])
-                print("Page length: " + str(len(page)))
-                # upsert many
-                print("UPSERTING")
-                operations = []
-                inside_network = [userID for userID in page if userID in loc_filtered_audience_ids]
-                for i in range(len(inside_network)): # look at all the ids inside this network who also follow current audience member
-                    follower_id = inside_network[i]
-
-                    if Connection.Instance().audience_networks_DB[str(topicID)+"_"+str(location)].count({"$and":[ {"id":audience_member_id}, {"followers":follower_id}]}) != 0:
-                        already_added_ids.append(follower_id)
-                        print("follower # " + str(i) + " was already added. Follower id: " + str(follower_id))
-                    else:
-                        already_added_ids=[]
-                        print("ALREADY ADDED IDS EMTPIED at follower # " + str(i) + " with follower id: " + str(follower_id))
-                        operations.append(
-                            pymongo.UpdateOne(
-                            { 'id': audience_member_id},
-                            { '$addToSet': {'followers': follower_id}
-                            }, upsert=True)
-                        )
-                        followers_count +=1
-                    if len(already_added_ids) == THRESHOLD:
-                        STOP_FLAG=1
-                        break
-
-                print("Writing to MongoDB...")
-                # save the followers to MongoDB
-                try:
-                    # max size of operations will be 5000 (page size).
-                    if (len(operations)!=0):
-                        Connection.Instance().audience_networks_DB[str(topicID)+"_"+str(location)].bulk_write(operations,ordered=False)
-                except Exception as e:
-                    print("Exception in bulk_write:" + str(e))
-
-                if STOP_FLAG == 1:
-                    page_count +=1
-                    print("Stopping at page " + str(page_count-1))
-                    print("Followers that resulted in STOP: " + str (already_added_ids))
-                    break
-                page_count +=1 # increment page count
-
-        except tweepy.TweepError as twperr:
-            print(twperr) # in case of errors due to protected accounts
-            pass
-
-        print("Processed " + str(page_count) + " page(s).")
-
-        Connection.Instance().audience_networks_DB[str(topicID)+"_"+str(location)].update(
-            { 'id': audience_member_id },
-            { '$set':{'last_processed': datetime.now(), # update last processed time of this audience member
-                    'last_followers_count': audience_member['last_followers_count']+followers_count}
-            }
+                '$setOnInsert' : {
+                'last_processed' : False,
+                'last_cursor' : None,
+                'finished_last_time' : False,
+                'followers':[], # initialize followers list empty,
+                }
+               }, 
+               upsert=True)
         )
-
-        print("Processed audience_member: " + str(audience_member_id) + " : " + str(followers_count) + " new followers." ) # Processing DONE.
-        print("========================================")
-        audience_member_count +=1
+    #print(operations[:10])
+    try:
+        Connection.Instance().audience_networks_DB['all_audience_members'].bulk_write(operations, ordered=False)
+    except Exception as e:
+        print("Exception in bulk_write." + str(e))
 
 def construct_all_audience_members ():
     Connection.Instance().audience_networks_DB['all_audience_members'].create_index("id",unique=True)
-    locations = ['italy', 'slovakia', 'spain', 'uk'] # relevant locations
+    locations = ['italy', 'slovakia', 'spain', 'uk', 'tr'] # relevant locations
 
     with Connection.Instance().get_cursor() as cur:
         sql = (
@@ -134,209 +73,91 @@ def construct_all_audience_members ():
         cur.execute(sql)
         topics = cur.fetchall() # list of all topics
 
+    print("There are {} many topic-location pairs.".format(len(topics) * len(locations)))
+    index = 0
     for topicID,topicName in topics:
         for location in locations:
-            print("================================================================================================")
-            print("Getting audience members...  " + ", TOPIC: " + topicName + "(" + str(topicID) + ")" +  " , LOCATION: " + location )
-            start = time.time()
-            # filter audience by location
-            regx = location_regex.getLocationRegex(location)
-            # upsert many
-            print("UPSERTING")
-            operations = []
-            for audience_member in Connection.Instance().audienceDB[str(topicID)].find({'location':regx},{'id':1,'location':1}):
-                operations.append(
-                       pymongo.UpdateOne(
-                       { 'id': audience_member['id']},
-                       { '$addToSet':{
-                       'topics': topicID,
-                       'locations': audience_member['location'],
-                       'followers':[], # initiate followers list empty,
-                       'finished_once':False
-                       }
-                       }, upsert=True)
-                )
-            print("Filtered audience by location in " + str(time.time()-start) + " seconds.")
-            start = time.time()
-            print(operations[:10])
-            try:
-                Connection.Instance().audience_networks_DB['all_audience_members'].bulk_write(operations, ordered=False)
-            except Exception as e:
-                print("Exception in bulk_write." + str(e))
+            print("{}) {}-{}".format(index + 1 , topicName, location) , end='', flush=True)
+            index += 1
+            construct_audience_members(topicID, location)
 
+def is_processable(member, threshold_in_day):
+    # Do we need this or should the script get followers no matter what ???
+    if not member:
+        return False
 
-def get_followers_of_all_audience_members(MIN_FOLLOWERS_COUNT, MAX_FOLLOWERS_COUNT):
-        start = time.time()
+    if member["last_processed"] and (datetime.today()- member['last_processed']).days < threshold_in_day:
+        return False
 
-        all_audience_member_ids = []
-        try:
-            all_audience_member_ids = Connection.Instance().audience_networks_DB['all_audience_members'].distinct('id')
-        except:
-            for all_audience_member_id in Connection.Instance().audience_networks_DB['all_audience_members'].find({},{'_id':0,'id':1}):
-                all_audience_member_ids.append(all_audience_member_id)
+    return True
 
-        all_audience_members = list(Connection.Instance().audienceDB['all_audience'].find({'id': {'$in': all_audience_member_ids}, 'followers_count':{'$gt':MIN_FOLLOWERS_COUNT,'$lt':MAX_FOLLOWERS_COUNT}}, {'_id':0, 'id':1, 'followers_count':1}))
-        audience_size = len(all_audience_members)
-        audience_member_count=1
+@timeit
+def get_network_twitter_profiles(MIN_FOLLOWERS_COUNT, MAX_FOLLOWERS_COUNT):
+    network_member_ids = Connection.Instance().audience_networks_DB['twitter_network'].distinct('id')
+    network_members = list(Connection.Instance().audienceDB['all_audience'].find({'id': {'$in': network_member_ids}, 'followers_count':{'$gt':MIN_FOLLOWERS_COUNT,'$lt':MAX_FOLLOWERS_COUNT}}, {'_id':0, 'id':1, 'followers_count':1}))
+    return network_members
 
-        for audience_member in all_audience_members:
-            audience_member_id = audience_member['id']
+def get_start_cursor(member):
+    if member["last_cursor"]:
+        cursor = member['last_cursor']
+    else:
+        cursor = -1
 
-            aud_member = Connection.Instance().audience_networks_DB['all_audience_members'].find_one({'id':audience_member_id})
+    tweepy_cursor = tweepy.Cursor(api.followers_ids, id=member["id"], cursor=cursor)
 
-            if (aud_member is not None):
-                if "last_processed" in aud_member:
-                    if 'finished_once' in aud_member:
-                        if aud_member['finished_once'] == True:
-                            # if this audience member is finished once and processed within the last 10 days, continue
-                            if ((datetime.today() - aud_member['last_processed']).days < 10):
-                                print(str(audience_member_id) + "(finished once) HAS ALREADY BEEN PROCESSED IN LAST 10 DAYS.")
-                                audience_member_count+=1
-                                continue
-                        else:
-                            # if this audience member is not finished once and processed today, continue
-                            if ((datetime.today()- aud_member['last_processed']).days < 1):
-                                print(str(audience_member_id) + " HAS ALREADY BEEN PROCESSED TODAY.")
-                                audience_member_count+=1
-                                continue
+    # if this member is totally processed last time, move one cursor if possible
+    if member["finished_last_time"] and tweepy_cursor.iterator.next_cursor != 0:
+        cursor = cursor.iterator.next_cursor
+        tweepy_cursor = tweepy.Cursor(api.followers_ids, id=member["id"], cursor=cursor)
 
-            print("Processing audience member (" + str(audience_member_count) + "/" + str(audience_size) + ") with id: " + str(audience_member_id) + " and followers count: " + str(audience_member['followers_count']))
+    return (cursor, tweepy_cursor)
 
-            start_cursor = -1  # get all the follower ids page by page, starting from most recent follower (first page)
-            # if an influencer has not been processed until the end once, start from last cursor.
-            if 'finished_once' in aud_member:
-                if aud_member['finished_once'] == False:
-                    if 'last_cursor' in aud_member:
-                        start_cursor = aud_member['last_cursor']
+def process_member(member):
+    print("Processing user : {}".format(member["id"]))
+    
+    last_cursor, cursor = get_start_cursor(member)
 
-            print("Start cursor value: " + str(start_cursor))
+    requests = []
 
-            cursor = tweepy.Cursor(api.followers_ids, id=audience_member_id, cursor=start_cursor)
-            last_cursor = start_cursor
+    try:
+        for page in cursor.pages():
+            if (cursor.iterator.next_cursor != 0):
+                last_cursor = cursor.iterator.next_cursor
 
-            # get all the follower ids page by page
-        	# starting from most recent follower
-            page_count = 0
-            followers_count = 0
-            STOP_FLAG= 0
-            THRESHOLD = 10
-            already_added_ids = []
-            cursor = tweepy.Cursor(api.followers_ids, id=audience_member_id, cursor=-1)
-            try:
-                for page in cursor.pages():
-                    if (cursor.iterator.next_cursor != 0):
-                        last_cursor = cursor.iterator.next_cursor
-                    #pprint.pprint(api.rate_limit_status()['resources']['followers'])
-                    print("Page length: " + str(len(page)))
-                    # upsert many
-                    print("UPSERTING")
-                    operations = []
-                    for i in range(len(page)):
-                        follower_id = page[i]
-                        if 'finished_once' in aud_member:
-                            if aud_member['finished_once'] == True:
-                                if Connection.Instance().audience_networks_DB['all_audience_members'].count({"$and":[ {"id":audience_member_id}, {"followers":follower_id}]}) != 0:
-                                    already_added_ids.append(follower_id)
-                                    print("follower # " + str(i) + " was already added. Follower id: " + str(follower_id))
-                                else:
-                                    already_added_ids=[]
-                                    print("ALREADY ADDED IDS EMTPIED at follower # " + str(i) + " with follower id: " + str(follower_id))
-                                    operations.append(
-                                        pymongo.UpdateOne(
-                                        { 'id': audience_member_id},
-                                        { '$addToSet': {'followers': follower_id}
-                                        }, upsert=True)
-                                    )
-                                    followers_count +=1
-                                if len(already_added_ids) == THRESHOLD:
-                                    STOP_FLAG=1
-                                    break
-                            else:
-                                operations.append(
-                                    pymongo.UpdateOne(
-                                    { 'id': audience_member_id},
-                                    { '$addToSet': {'followers': follower_id}
-                                    }, upsert=True)
-                                )
-                                followers_count +=1
-
-                    print("Writing to MongoDB...")
-                    # save the followers to MongoDB
-                    try:
-                        # max size of operations will be 5000 (page size).
-                        if (len(operations)!=0):
-                            Connection.Instance().audience_networks_DB['all_audience_members'].bulk_write(operations,ordered=False)
-                    except Exception as e:
-                        print("Exception in bulk_write:" + str(e))
-
-                    if STOP_FLAG == 1:
-                        page_count +=1
-                        print("Stopping at page " + str(page_count-1))
-                        print("Followers that resulted in STOP: " + str (already_added_ids))
-                        break
-
-                    if aud_member[
-                        'finished_once'] == False:  # if we haven't finished processing an the audience member, we need to update the last cursor.
-                        Connection.Instance().audience_networks_DB['all_audience_members'].update(
-                            {'id': audience_member_id},
-                            {'$set': {'last_cursor': last_cursor}}  # update last cursor of this influencer
-                        )
-                    page_count +=1 # increment page count
-                    if cursor.iterator.next_cursor == 0:  # if true, we are at the end of the followers for this influencer.
-                        Connection.Instance().audience_networks_DB['all_audience_members'].update(
-                            {'id': audience_member_id},
-                            {'$set': {'finished_once': True}}
-                        )
-
-            except tweepy.TweepError as twperr:
-                print(twperr) # in case of errors due to protected accounts
-                pass
-
-            print("Processed " + str(page_count) + " page(s).")
-
-            Connection.Instance().audience_networks_DB['all_audience_members'].update(
-                { 'id': audience_member_id },
-                { '$set':{'last_processed': datetime.now(), # update last processed time of this audience member
-                        'last_followers_count': audience_member['last_followers_count']+ followers_count}
+            requests.append(pymongo.UpdateOne(
+                {"id" : member["id"]},
+                {
+                    "$addToSet" : {"followers" : {"$each" : page}},
+                    "$set" : {
+                        "last_cursor" : last_cursor,
+                        "last_processed" : datetime.today(),
+                        "finished_last_time" : (cursor.iterator.next_cursor == 0)
+                    }
                 }
-            )
+            ))
+    except (tweepy.TweepError , tweepy.error.TweepError) as twperr:
+        print(twperr) # in case of errors due to protected accounts
 
-            print("Processed audience_member: " + str(audience_member_id) + " : " + str(followers_count) + " new followers." ) # Processing DONE.
-            print("========================================")
-            audience_member_count +=1
+    try:
+        if (len(requests)!=0):
+            Connection.Instance().audience_networks_DB['twitter_network'].bulk_write(requests,ordered=False)
+    except Exception as e:
+        print("Exception in bulk_write:" + str(e))
 
+@timeit
+def get_followers_of_network_members(MIN_FOLLOWERS_COUNT, MAX_FOLLOWERS_COUNT):
+    print("Getting twitter profiles of the members in the network")
+    network_twitter_profiles = get_network_twitter_profiles(MIN_FOLLOWERS_COUNT, MAX_FOLLOWERS_COUNT)
+
+    print("There are {} many members that satisfy given follower count criteria".format(len(network_twitter_profiles)))
+    for twitter_profile in network_twitter_profiles:
+        member = Connection.Instance().audience_networks_DB['twitter_network'].find_one({'id':twitter_profile["id"]})
+
+        if is_processable(member,1):
+            process_member(member)
 
 def main():
-    get_followers_of_all_audience_members(5000,20000)
-
-    #construct_all_audience_members()
-    return
-    if (len(sys.argv) >= 2):
-
-        locations = ['italy'] # relevant locations
-        #locations.append('slovakia')
-        #locations.append('spain')
-        #locations.append('uk')
-
-        print("Script ran: " + str(datetime.now()))
-
-        with Connection.Instance().get_cursor() as cur:
-            sql = (
-            "SELECT topic_id, topic_name "
-            "FROM topics "
-            )
-            cur.execute(sql)
-            topics = cur.fetchall() # list of all topics
-
-        for topicID,topicName in topics:
-            if topicID == 24 or topicID == 25 or topicID ==26 or topicID ==27:
-                continue
-            for location in locations:
-                print("================================================================================================")
-                print("Getting audience network...  " + ", TOPIC: " + topicName + "(" + str(topicID) + ")" +  " , LOCATION: " + location )
-                get_audience_network(topicID=topicID, location=location)
-    else:
-        print("Usage: python get_audience_network.py <server_ip>")
+    construct_all_audience_members()
 
 if __name__ == "__main__":
     main()

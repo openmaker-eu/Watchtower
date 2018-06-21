@@ -5,6 +5,8 @@ italy_in_different_langs = ["italy","IT","an Eadailt","yr Eidal","Étalie","an I
 slovakia_in_different_langs = ["slovakia","SK","Eslovakia","Eslovaquia","Eslováquia","Eslovàquia","Horowākia","Seullobakia","Sīluòfákè","Slovacchia","Slovacia","Slovakia","Slovakiet","Slovensko"]
 spain_in_different_langs = ["spain","ES","Espainia","España","Espanya","Hispania","İspanya","Spagna","Spanien"]
 uk_in_different_langs = ["UK","GB","united\s*kingdom","Britania","England","İngiltere"]
+tr_in_different_langs = ["türkiye", "tr" , "turkiye", "turkey", "turkei"]
+
 
 def getLocationRegex(location):
     location = location.lower()
@@ -17,6 +19,8 @@ def getLocationRegex(location):
         location_in_different_langs += ("|".join(spain_in_different_langs) + ")")
     elif location == 'uk' or location =='gb':
         location_in_different_langs += ("|".join(uk_in_different_langs) + ")")
+    elif location == 'tr' or location =='türkiye' or location == "turkiye":
+        location_in_different_langs += ("|".join(tr_in_different_langs) + ")")
     else:
         location_in_different_langs = location
 
