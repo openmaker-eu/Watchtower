@@ -93,7 +93,7 @@ def is_processable(member, threshold_in_day):
 
 @timeit
 def get_network_twitter_profiles(MIN_FOLLOWERS_COUNT, MAX_FOLLOWERS_COUNT):
-    network_member_ids = Connection.Instance().audience_networks_DB['twitter_network'].distinct('id')
+    network_member_ids = Connection.Instance().audience_networks_DB['all_audience_members'].distinct('id')
     network_members = list(Connection.Instance().audienceDB['all_audience'].find({'id': {'$in': network_member_ids}, 'followers_count':{'$gt':MIN_FOLLOWERS_COUNT,'$lt':MAX_FOLLOWERS_COUNT}}, {'_id':0, 'id':1, 'followers_count':1}))
     return network_members
 
@@ -140,7 +140,7 @@ def process_member(member):
 
     try:
         if (len(requests)!=0):
-            Connection.Instance().audience_networks_DB['twitter_network'].bulk_write(requests,ordered=False)
+            Connection.Instance().audience_networks_DB['all_audience_members'].bulk_write(requests,ordered=False)
     except Exception as e:
         print("Exception in bulk_write:" + str(e))
 
@@ -151,7 +151,7 @@ def get_followers_of_network_members(MIN_FOLLOWERS_COUNT, MAX_FOLLOWERS_COUNT):
 
     print("There are {} many members that satisfy given follower count criteria".format(len(network_twitter_profiles)))
     for twitter_profile in network_twitter_profiles:
-        member = Connection.Instance().audience_networks_DB['twitter_network'].find_one({'id':twitter_profile["id"]})
+        member = Connection.Instance().audience_networks_DB['all_audience_members'].find_one({'id':twitter_profile["id"]})
 
         if is_processable(member,1):
             process_member(member)
