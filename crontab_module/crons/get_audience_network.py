@@ -47,7 +47,7 @@ def construct_audience_members(topicID, location):
                 },
 
                 '$setOnInsert' : {
-                'last_processed' : False,
+                'last_processed' : None,
                 'last_cursor' : None,
                 'finished_last_time' : False,
                 'followers':[], # initialize followers list empty,
@@ -107,7 +107,7 @@ def get_start_cursor(member):
 
     # if this member is totally processed last time, move one cursor if possible
     if member["finished_last_time"] and tweepy_cursor.iterator.next_cursor != 0:
-        cursor = cursor.iterator.next_cursor
+        cursor = tweepy_cursor.iterator.next_cursor
         tweepy_cursor = tweepy.Cursor(api.followers_ids, id=member["id"], cursor=cursor)
 
     return (cursor, tweepy_cursor)
