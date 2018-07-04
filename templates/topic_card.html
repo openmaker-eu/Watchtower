@@ -20,9 +20,14 @@
                            posttype="publish" alertid="{{ alert['alertid'] }}">Publish</a> {% else %}
                         <a href="javascript:void(0)" onclick="alertbuttonclick({{ alert['alertid'] }}, 'unpublish');"
                            posttype="unpublish" alertid="{{ alert['alertid'] }}">Unpublish</a>
-                    {% endif %} {% elif alert['type'] == 'subscribed' %}
+                    {% endif %}
+                {% elif alert['type'] == 'subscribed' %}
                     <a href="javascript:void(0)" onclick="alertbuttonclick({{ alert['alertid'] }}, 'unsubscribe');"
-                       posttype="unsubscribe" alertid="{{ alert['alertid'] }}">Unsubscribe</a> {% endif %}
+                       posttype="unsubscribe" alertid="{{ alert['alertid'] }}">Unsubscribe</a>
+                {% elif alert['type'] == 'unsubscribed' %}
+                    <a href="javascript:void(0)" onclick="alertbuttonclick({{ alert['alertid'] }}, 'subscribe');"
+                       posttype="subscribe" alertid="{{ alert['alertid'] }}">Subscribe</a>
+                {% endif %}
             </div>
         </div>
         <hr>
