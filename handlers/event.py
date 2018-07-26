@@ -1,30 +1,35 @@
 """
 Event Handlers for Watchtower
 """
+
 __author__ = ['Enis Simsar', 'Kemal Berk Kocabagli']
 
 import tornado.web
 import tornado.escape
 import json
 
+from logic.events import get_events, hide_event
+from logic.helper import get_relevant_locations
+from logic.topics import get_topic_list
+from logic.users import get_current_topic, get_current_location
+
 from handlers.base import BaseHandler, TemplateRendering, Api500ErrorHandler
-from apis import apiv1, apiv11, apiv12, apiv13
-import logic
-from crontab_module.crons import facebook_reddit_crontab
+from apis import apiv12, apiv13
+from crontab_module.crons.get_events import mineEventsFromEventBrite
+from crontab_module.crons.facebook_reddit_crontab import sourceSelection
 
 
 class PreviewEventHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
     def get(self):
-        keywords = self.get_argument('keywords', '0')
         keywords_list = self.get_argument("keywords").split(",")
-        sources = facebook_reddit_crontab.sourceSelection(keywords_list)
+        sources = sourceSelection(keywords_list)
         t = []
         for source in sources:
             ids = []
             for event in source['events']:
                 ids.append(event['event_id'])
-            t.extend(facebook_reddit_crontab.mineEvents(ids, True))
+            t.extend(mineEventsFromEventBrite(ids))
             if len(t) > 4:
                 break
         temp = []
@@ -40,16 +45,16 @@ class EventPageHandler(BaseHandler, TemplateRendering):
     def get(self):
         user_id = tornado.escape.xhtml_escape(self.current_user)
         template = 'afterlogintemplate.html'
-        topic = logic.get_current_topic(tornado.escape.xhtml_escape(self.current_user))
-        location = logic.get_current_location(tornado.escape.xhtml_escape(self.current_user))
-        relevant_locations = logic.get_relevant_locations()
-        events = logic.get_events(topic['topic_id'], "date", location, 0)
+        topic = get_current_topic(tornado.escape.xhtml_escape(self.current_user))
+        location = get_current_location(tornado.escape.xhtml_escape(self.current_user))
+        relevant_locations = get_relevant_locations()
+        events = get_events(topic['topic_id'], "date", location, 0)
 
         if topic is None:
             self.redirect("/topicinfo")
         variables = {
             'title': "Events",
-            'alerts': logic.get_topic_list(user_id),
+            'alerts': get_topic_list(user_id),
             'type': "events",
             'username': str(tornado.escape.xhtml_escape(self.get_current_username())),
             'cursor': events['next_cursor'],
@@ -75,10 +80,10 @@ class EventHandler(BaseHandler, TemplateRendering):
         try:
             location = self.get_argument('location')  # this will be called upon a change in location
         except:
-            location = logic.get_current_location(tornado.escape.xhtml_escape(
+            location = get_current_location(tornado.escape.xhtml_escape(
                 self.current_user))  # this will be called when new events are loading (cursoring)
         print("CURSOR:" + str(cursor))
-        document = logic.get_events(topic_id, filter, location, cursor)
+        document = get_events(topic_id, filter, location, cursor)
         self.write(self.render_template("single-event.html", {"document": document}))
 
 
@@ -86,11 +91,11 @@ class HideEventHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
     def post(self):
         event_link = str(self.get_argument("event_link"))
-        topic_id = logic.get_current_topic(tornado.escape.xhtml_escape(self.current_user))['topic_id']
+        topic_id = get_current_topic(tornado.escape.xhtml_escape(self.current_user))['topic_id']
         is_hide = (self.get_argument("is_hide") == "true")
         description = self.get_argument("description")
         user_id = tornado.escape.xhtml_escape(self.current_user)
-        logic.hide_event(topic_id, user_id, event_link, description, is_hide)
+        hide_event(topic_id, user_id, event_link, description, is_hide)
         self.write("")
 
 

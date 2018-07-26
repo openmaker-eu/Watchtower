@@ -1,28 +1,17 @@
-import tweepy  # Twitter API helper package
 import urllib
 import nltk
 import json
 from nltk.corpus import stopwords
 from nltk.stem.porter import *
-from tweepy import OAuthHandler
-from tweepy.error import TweepError
 from time import gmtime, strftime, time
 from decouple import config
-from datetime import datetime
+from datetime import datetime, timezone
+from dateutil import parser
 import pymongo
 import sys
-import pdb
 sys.path.insert(0, config("ROOT_DIR"))
 from application.Connections import Connection
 
-consumer_key = config("TWITTER_CONSUMER_KEY")  # API key
-consumer_secret = config("TWITTER_CONSUMER_SECRET")  # API secret
-access_token = config("TWITTER_ACCESS_TOKEN")
-access_secret = config("TWITTER_ACCESS_SECRET")
-
-auth = OAuthHandler(consumer_key, consumer_secret)
-auth.set_access_token(access_token, access_secret)
-api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
 
 blacklist = ["party", "erasmus", "deal", "discount"]
 numOfTweets = 10
@@ -93,29 +82,34 @@ def calculateScore(per, keywords):
 
     penalty = -20*sum([word in per["description"] for word in blacklist])
 
-    try:
-        status_list = list(tweepy.Cursor(api.user_timeline, id=per["id"], tweet_mode='extended').items(numOfTweets))
-    except tweepy.error.TweepError as e:
-        return None
+    status_list = get_last_tweets(per["id"])
 
     if not status_list:
         return None
 
-    last_tweet_outdated = (datetime.now() - status_list[-1].created_at).total_seconds() > timeThreshold * 30 * 24 * 60 * 60
+    last_tweet_outdated = (datetime.now(timezone.utc) - parser.parse(status_list[-1]["created_at"])).total_seconds() > timeThreshold * 30 * 24 * 60 * 60
     if last_tweet_outdated:
         penalty -= 50
 
-    hashtags = set([str(x["text"]).lower() for y in status_list for x in y.entities.get("hashtags")])
+    hashtags = set([str(x["text"]).lower() for y in status_list for x in y["entities"]["hashtags"]])
     hashtagCount = sum(y if x in hashtags else 0 for x,y in zip(keywords, keywordCounts))
     #hashtagCount = sum(keyword in hashtags for keyword in keywords)
     
-    fullTexts = [x.full_text for x in status_list]
+    fullTexts = [x["full_text"] for x in status_list]
     keywordOccurenceNumbers = countKeywordsInTweet(fullTexts, keywords)
     count = sum([keywordOccurence*multiplier for keywordOccurence, multiplier in zip(keywordOccurenceNumbers, keywordCounts)])
 
     final_score = per["followers_count"]*(count + hashtagCount + penalty)
 
     return final_score
+
+def get_last_tweets(twitter_id):
+    resp = list(Connection.Instance().MongoDBClient.last_tweets["tweets"].find({"id" : twitter_id}))
+
+    if resp:
+        return resp[0]["tweets"]
+    
+    return None
 
 def update_influencer_score():
     for collection_name in Connection.Instance().audience_samples_DB.collection_names():
@@ -131,8 +125,6 @@ def update_influencer_score():
 
         bulk = collection.initialize_unordered_bulk_op()
         
-        # Calculate score only for not processed
-        #cursor = collection.find({"influencer_score" : {"$exists" : False}})
         # Calculate score every time
         cursor = collection.find()
 

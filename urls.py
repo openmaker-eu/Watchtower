@@ -9,8 +9,8 @@ from settings import settings
 from handlers.main import MainHandler
 from handlers.auth import LoginHandler, LogoutHandler, ProfileHandler, RegisterHandler, TwitterAuthHandler # , FacebookAuthHandler
 
-from handlers.topic import TopicHandler, TopicsHandler, CreateEditTopicHandler, PagesHandler
-from handlers.topic import ThemesHandler, ThemesV11Handler, TopicsV12Handler
+from handlers.topics import TopicHandler, TopicsHandler, CreateEditTopicHandler, PagesHandler
+from handlers.topics import ThemesHandler, ThemesV11Handler, TopicsV12Handler
 
 from handlers.conversation import PreviewConversationHandler, ConversationHandler, ConversationPageHandler
 from handlers.conversation import ConversationV12Handler
@@ -31,7 +31,9 @@ from handlers.challenge import ChallengeV13Handler
 
 from handlers.crons_log import CronsLogHandler
 
-from handlers.hashtag import HashtagHandler
+from handlers.hashtag import HashtagHandler, HashtagChartHandler
+
+from handlers.mention import MentionChartHandler
 
 from handlers.tweet import RedirectHandler, NewTweetsHandler, TweetsHandler
 from handlers.recommendation import RecommendationsHandler
@@ -116,6 +118,10 @@ url_patterns = [
 
     # HASHTAG
     (r"/hashtag", HashtagHandler),
+    (r"/Hashtags", HashtagChartHandler),
+
+    # MENTION
+    (r"/Mentions", MentionChartHandler),
 
     # DOCUMENTATION
     (r"/api", DocumentationHandler),
@@ -158,6 +164,3 @@ url_patterns = [
 
     (r"/(.*)", tornado.web.StaticFileHandler, {'path': settings['static_path']}),
 ]
-
-
-

@@ -1,6 +1,8 @@
 """
 Auth Handlers for Watchtower
 """
+from logic.topics import get_topic_list
+
 __author__ = ['Enis Simsar', 'Kemal Berk Kocabagli']
 
 import tornado.web
@@ -9,7 +11,10 @@ import json
 from decouple import config
 
 from handlers.base import BaseHandler, TemplateRendering
-import logic
+from logic.auth import register, login
+from logic.users import set_current_topic, get_current_topic, get_current_location, get_user, \
+    get_twitter_auth_url, update_user, update_twitter_auth
+from logic.helper import get_relevant_locations
 
 
 class RegisterHandler(BaseHandler, TemplateRendering):
@@ -25,7 +30,7 @@ class RegisterHandler(BaseHandler, TemplateRendering):
         username = self.get_argument("username")
         password = str(self.get_argument("password"))
         country = str(self.get_argument("country"))
-        register_info = logic.register(str(username), password, country.lower())
+        register_info = register(str(username), password, country.lower())
         if register_info['response']:
             self.set_secure_cookie("user_id", str(register_info['user_id']))
             self.set_secure_cookie("username", str(username))
@@ -45,11 +50,11 @@ class LoginHandler(BaseHandler, TemplateRendering):
 
     def post(self):
         username = self.get_argument("username")
-        login_info = logic.login(str(username), str(self.get_argument("password")))
+        login_info = login(str(username), str(self.get_argument("password")))
         if login_info['response']:
             self.set_secure_cookie("user_id", str(login_info['user_id']))
             self.set_secure_cookie("username", str(username))
-            logic.set_current_topic(str(login_info['user_id']))
+            set_current_topic(str(login_info['user_id']))
             self.write({'response': True, 'redirectUrl': self.get_argument('next', '/Topics')})
         else:
             self.write(json.dumps(login_info))
@@ -66,17 +71,17 @@ class ProfileHandler(BaseHandler, TemplateRendering):
     def get(self):
         user_id = tornado.escape.xhtml_escape(self.current_user)
         template = 'afterlogintemplate.html'
-        topic = logic.get_current_topic(tornado.escape.xhtml_escape(self.current_user))
-        location = logic.get_current_location(tornado.escape.xhtml_escape(self.current_user))
-        relevant_locations = logic.get_relevant_locations()
-        user = logic.get_user(user_id)
-        auth_url = logic.get_twitter_auth_url()
+        topic = get_current_topic(tornado.escape.xhtml_escape(self.current_user))
+        location = get_current_location(tornado.escape.xhtml_escape(self.current_user))
+        relevant_locations = get_relevant_locations()
+        user = get_user(user_id)
+        auth_url = get_twitter_auth_url()
         variables = {
             'title': "My Profile",
             'type': "profile",
             'username': user['username'],
             'country': user['country'],
-            'alerts': logic.get_topic_list(user_id),
+            'alerts': get_topic_list(user_id),
             'topic': topic,
             'location': location,
             'relevant_locations': relevant_locations,
@@ -94,7 +99,7 @@ class ProfileHandler(BaseHandler, TemplateRendering):
         user_id = tornado.escape.xhtml_escape(self.current_user)
         auth_token = self.get_secure_cookie("request_token")
         self.clear_cookie("request_token")
-        update_info = logic.update_user(user_id, password, country.lower(), auth_token, twitter_pin)
+        update_info = update_user(user_id, password, country.lower(), auth_token, twitter_pin)
         if update_info['response']:
             self.write({'response': True, 'redirectUrl': '/Topics'})
         else:
@@ -114,23 +119,22 @@ class ProfileHandler(BaseHandler, TemplateRendering):
 #         }
 
 
-
 class TwitterAuthHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
     def get(self):
         user_id = tornado.escape.xhtml_escape(self.current_user)
         template = 'afterlogintemplate.html'
-        topic = logic.get_current_topic(tornado.escape.xhtml_escape(self.current_user))
-        location = logic.get_current_location(tornado.escape.xhtml_escape(self.current_user))
-        relevant_locations = logic.get_relevant_locations()
-        user = logic.get_user(user_id)
-        auth_url = logic.get_twitter_auth_url()
+        topic = get_current_topic(tornado.escape.xhtml_escape(self.current_user))
+        location = get_current_location(tornado.escape.xhtml_escape(self.current_user))
+        relevant_locations = get_relevant_locations()
+        user = get_user(user_id)
+        auth_url = get_twitter_auth_url()
         variables = {
             'title': "Twitter Auth",
             'type': "twitterAuth",
             'username': user['username'],
             'country': user['country'],
-            'alerts': logic.get_topic_list(user_id),
+            'alerts': get_topic_list(user_id),
             'topic': topic,
             'location': location,
             'relevant_locations': relevant_locations,
@@ -146,7 +150,7 @@ class TwitterAuthHandler(BaseHandler, TemplateRendering):
         user_id = tornado.escape.xhtml_escape(self.current_user)
         auth_token = self.get_secure_cookie("request_token")
         self.clear_cookie("request_token")
-        update_info = logic.update_twitter_auth(user_id, auth_token, twitter_pin)
+        update_info = update_twitter_auth(user_id, auth_token, twitter_pin)
         if update_info['response']:
             self.write({'response': True, 'redirectUrl': '/Topics'})
         else:

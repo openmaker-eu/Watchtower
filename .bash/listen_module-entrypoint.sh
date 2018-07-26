@@ -1,3 +1,3 @@
 #!/bin/sh
 
-pipenv shell python3 ./listen_module/listen_module.py
+pipenv run python3 ./listen_module/listen_module.py

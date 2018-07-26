@@ -1,0 +1,171 @@
+<div id="spin" style=" z-index: 100;"></div>
+<div class="container row" id="hashtags" style="margin-right: auto;margin-left:  auto;">
+
+    <table id="hashtag_table" class="table table-striped table-bordered">
+        <thead>
+        <tr>
+            <th>Hashtag</th>
+            <th>Last Day</th>
+            <th>Last Week Average</th>
+            <th>Last Month Average</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for hashtag in sorted %}
+            <tr>
+                <td>{{ hashtag }}</td>
+                <td>{% if table_data[hashtag]['today']|length > 0 %}
+                    {{ table_data[hashtag]['today']|sum // table_data[hashtag]['today']|length }}{% else %}
+                    0{% endif %}</td>
+                <td>{% if table_data[hashtag]['week']|length > 0 %}
+                    {{ table_data[hashtag]['week']|sum // table_data[hashtag]['week']|length }}{% else %}
+                    0{% endif %}</td>
+                <td>{% if table_data[hashtag]['month']|length > 0 %}
+                    {{ table_data[hashtag]['month']|sum // table_data[hashtag]['month']|length }}{% else %}
+                    0{% endif %}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+        <tfoot>
+        <tr>
+            <th>Hashtag</th>
+            <th>Last Day</th>
+            <th>Last Week Average</th>
+            <th>Last Month Average</th>
+        </tr>
+        </tfoot>
+    </table>
+
+    {% for hashtag in sorted %}
+        <div class="col-md-4">
+            <canvas id="{{ hashtag }}_week" style="margin:16px"></canvas>
+
+            <script>
+                var ctx = document.getElementById('{{ hashtag }}_week').getContext('2d');
+                var chart = new Chart(ctx, {
+                    // The type of chart we want to create
+                    type: 'line',
+
+                    // The data for our dataset
+                    data: {
+                        labels: {{ data[hashtag]['week']['labels'] }},
+                        datasets: [{
+                            label: '{{ hashtag }}',
+                            fill: false,
+                            backgroundColor: getRandomColor(),
+                            borderColor: getRandomColor(),
+                            data: {{ data[hashtag]['week']['data'] }},
+                        }]
+                    },
+
+                    // Configuration options go here
+                    options: {
+                        title: {
+                            display: true,
+                            text: 'Week Data'
+                        },
+                        scales: {
+                            yAxes: [{
+                                display: true,
+                                ticks: {
+                                    suggestedMin: 0,    // minimum will be 0, unless there is a lower value.
+                                    // OR //
+                                    beginAtZero: true   // minimum value will be 0.
+                                }
+                            }]
+                        }
+                    }
+                });
+            </script>
+        </div>
+        <div class="col-md-4">
+            <canvas id="{{ hashtag }}_month" style="margin:16px"></canvas>
+
+            <script>
+                var ctx = document.getElementById('{{ hashtag }}_month').getContext('2d');
+                var chart = new Chart(ctx, {
+                    // The type of chart we want to create
+                    type: 'line',
+
+                    // The data for our dataset
+                    data: {
+                        labels: {{ data[hashtag]['month']['labels'] }},
+                        datasets: [{
+                            label: '{{ hashtag }}',
+                            fill: false,
+                            backgroundColor: getRandomColor(),
+                            borderColor: getRandomColor(),
+                            data: {{ data[hashtag]['month']['data'] }},
+                        }]
+                    },
+
+                    // Configuration options go here
+                    options: {
+                        title: {
+                            display: true,
+                            text: 'Month Data'
+                        },
+                        scales: {
+                            yAxes: [{
+                                display: true,
+                                ticks: {
+                                    suggestedMin: 0,    // minimum will be 0, unless there is a lower value.
+                                    // OR //
+                                    beginAtZero: true   // minimum value will be 0.
+                                }
+                            }]
+                        }
+                    }
+                });
+            </script>
+        </div>
+        <div class="col-md-4">
+            <canvas id="{{ hashtag }}_all" style="margin:16px"></canvas>
+
+            <script>
+                var ctx = document.getElementById('{{ hashtag }}_all').getContext('2d');
+                var chart = new Chart(ctx, {
+                    // The type of chart we want to create
+                    type: 'line',
+
+                    // The data for our dataset
+                    data: {
+                        labels: {{ data[hashtag]['all']['labels'] }},
+                        datasets: [{
+                            label: '{{ hashtag }}',
+                            fill: false,
+                            backgroundColor: getRandomColor(),
+                            borderColor: getRandomColor(),
+                            data: {{ data[hashtag]['all']['data'] }},
+                        }]
+                    },
+
+                    // Configuration options go here
+                    options: {
+                        title: {
+                            display: true,
+                            text: 'All Data'
+                        },
+                        scales: {
+                            yAxes: [{
+                                display: true,
+                                ticks: {
+                                    suggestedMin: 0,    // minimum will be 0, unless there is a lower value.
+                                    // OR //
+                                    beginAtZero: true   // minimum value will be 0.
+                                }
+                            }]
+                        }
+                    }
+                });
+            </script>
+        </div>
+    {% endfor %}
+    <script>
+        $(document).ready(function () {
+            $('#hashtag_table').DataTable({
+                "pageLength": 10
+            });
+        });
+    </script>
+</div>

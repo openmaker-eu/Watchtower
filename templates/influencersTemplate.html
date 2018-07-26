@@ -13,17 +13,44 @@
                 <li>Tweets <span>{{ influencer['statuses_count'] }}</span></li>
                 <li>Follow <span>{{ influencer['friends_count'] }}</span></li>
                 <li>Followers <span>{{ influencer['followers_count'] }}</span></li>
+            
+                {% if 'retrieved_follower_id_count' in influencer and 'retrieved_follower_count' in influencer%}
+                    <li> Retrieved follower profiles/ids <span> {{ influencer['retrieved_follower_count'] }} / {{ influencer['retrieved_follower_id_count'] }}</span></li>
+                {% elif 'retrieved_follower_id_count' in influencer %}
+                    <li> Retrieved follower profiles/ids <span> N/A / {{ influencer['retrieved_follower_id_count'] }} </span></li>
+                {% elif 'retrieved_follower_count' in influencer %}
+                    <li> Retrieved follower profiles/ids <span>{{ influencer['retrieved_follower_count'] }} /  N/A </span></li>
+                {% endif %}
+
+                {% if 'last_refreshed' in influencer %}
+                    <li> Last Refreshed <span> {{ influencer['last_refreshed'] }} </span> </li>
+                {% endif %}
+
+                {% if 'last_processed' in influencer %}
+                    <li> Last Processed <span> {{ influencer['last_processed'] }} </span> </li>
+                {% endif %}
             </ul>
         </div>
 
-        <button class="hidebtn" onclick="hideInfluencer('{{influencer['id']}}','',$(this).children('a'));">
-          {% if influencer['hidden'] == False %}
+        <button class="managebtn" onclick="hideInfluencer('{{influencer['id']}}','',$(this).children('a'));">
+            {% if influencer['hidden'] == False %}
               <a class="text" hiddenflag=false href="javascript:void(0)">Hide</a>
-          {% endif %}
-          {% if influencer['hidden'] == True %}
+            {% endif %}
+            {% if influencer['hidden'] == True %}
               <a class="text" hiddenflag=true href="javascript:void(0)">Unhide</a>
-          {% endif %}
+            {% endif %}
         </button>
+
+        <button class="managebtn" style="left:0" onclick="fetchFollowers('{{influencer['id']}}', $(this).children('a'));">
+            {% if influencer['in_fetch_followers_queue'] == False %}
+              <a class="text" fetchflag=false href="javascript:void(0)"> Fetch followers </a>
+            {% endif %}
+            {% if influencer['in_fetch_followers_queue'] == True %}
+              <a class="text" fetchflag=true href="javascript:void(0)"> Cancel fetch followers </a>
+            {% endif %}
+        </button>
+
+
 
     </div>
 

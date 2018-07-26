@@ -6,6 +6,10 @@ import tweepy  # Twitter API helper package
 import pymongo
 from tweepy import OAuthHandler
 
+import sys
+from decouple import config
+sys.path.insert(0, config("ROOT_DIR"))
+
 from application.Connections import Connection
 
 consumer_key = config("TWITTER_CONSUMER_KEY")  # API key

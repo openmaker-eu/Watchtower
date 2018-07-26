@@ -1,77 +1,28 @@
 # coding=utf-8
 import re # for regex in location filtering
 
+italy_in_different_langs = ["italy","IT","an Eadailt","yr Eidal","Étalie","an Iodáil","Itaalia","Italia","Itàlia","Italía","Itália","Ítalía","Italii","Italië","Italie","Itálie","Italien","Italija","Itālija","Italio","Īṭāliya","Italiya","l\-Italja","Itallia","Itaeri","Italska","Italya","İtalya","Italye","Itaria","Olaszország","Talia","Taliansko","Ṭālyān","Włochy","Yìdàlì"]
+slovakia_in_different_langs = ["slovakia","SK","Eslovakia","Eslovaquia","Eslováquia","Eslovàquia","Horowākia","Seullobakia","Sīluòfákè","Slovacchia","Slovacia","Slovakia","Slovakiet","Slovensko"]
+spain_in_different_langs = ["spain","ES","Espainia","España","Espanya","Hispania","İspanya","Spagna","Spanien"]
+uk_in_different_langs = ["UK","GB","united\s*kingdom","Britania","England","İngiltere"]
+tr_in_different_langs = ["türkiye", "tr" , "turkiye", "turkey", "turkei"]
+
+
 def getLocationRegex(location):
     location = location.lower()
-    location_in_different_langs ="("
-    if location == 'italy' or location =='it': # source : wikipedia
-        location_in_different_langs += "italy|IT|"
-        location_in_different_langs += "an Eadailt|"
-        location_in_different_langs += "yr Eidal|"
-        location_in_different_langs += "Étalie|"
-        location_in_different_langs += "an Iodáil|"
-        location_in_different_langs += "Itaalia|"
-        location_in_different_langs += "Italia|"
-        location_in_different_langs += "Itàlia|"
-        location_in_different_langs += "Italía|"
-        location_in_different_langs += "Itália|"
-        location_in_different_langs += "Ítalía|"
-        location_in_different_langs += "Italii|"
-        location_in_different_langs += "Italië|"
-        location_in_different_langs += "Italie|"
-        location_in_different_langs += "Itálie|"
-        location_in_different_langs += "Italien|"
-        location_in_different_langs += "Italija|"
-        location_in_different_langs += "Itālija|"
-        location_in_different_langs += "Italio|"
-        location_in_different_langs += "Īṭāliya|"
-        location_in_different_langs += "Italiya|"
-        location_in_different_langs += "l\-Italja|"
-        location_in_different_langs += "Itallia|"
-        location_in_different_langs += "Itaeri|"
-        location_in_different_langs += "Italska|"
-        location_in_different_langs += "Italya|"
-        location_in_different_langs += "İtalya|"
-        location_in_different_langs += "Italye|"
-        location_in_different_langs += "Itaria|"
-        location_in_different_langs += "Olaszország|"
-        location_in_different_langs += "Talia|"
-        location_in_different_langs += "Taliansko|"
-        location_in_different_langs += "Ṭālyān|"
-        location_in_different_langs += "Włochy|"
-        location_in_different_langs += "Yìdàlì)"
+    location_in_different_langs = "("
+    if location == "italy" or location == "it":
+        location_in_different_langs += ("|".join(italy_in_different_langs) + ")")
     elif location == 'slovakia' or location =='sk':
-        location_in_different_langs += "slovakia|SK|"
-        location_in_different_langs += "Eslovakia|"
-        location_in_different_langs += "Eslovaquia|"
-        location_in_different_langs += "Eslováquia|"
-        location_in_different_langs += "Eslovàquia|"
-        location_in_different_langs += "Horowākia|"
-        location_in_different_langs += "Seullobakia|"
-        location_in_different_langs += "Sīluòfákè|"
-        location_in_different_langs += "Slovacchia|"
-        location_in_different_langs += "Slovacia|"
-        location_in_different_langs += "Slovakia|"
-        location_in_different_langs += "Slovakiet|"
-        location_in_different_langs += "Slovensko)"
+        location_in_different_langs += ("|".join(slovakia_in_different_langs) + ")")
     elif location == 'spain' or location =='es':
-        location_in_different_langs += "spain|ES|"
-        location_in_different_langs += "Espainia|"
-        location_in_different_langs += "España|"
-        location_in_different_langs += "Espanya|"
-        location_in_different_langs += "Hispania|"
-        location_in_different_langs += "İspanya|"
-        location_in_different_langs += "Spagna|"
-        location_in_different_langs += "Spanien)"
+        location_in_different_langs += ("|".join(spain_in_different_langs) + ")")
     elif location == 'uk' or location =='gb':
-        location_in_different_langs += "UK|GB"
-        location_in_different_langs += "united\s*kingdom|"
-        location_in_different_langs += "Britania|"
-        location_in_different_langs += "England|"
-        location_in_different_langs += "İngiltere)"
+        location_in_different_langs += ("|".join(uk_in_different_langs) + ")")
+    elif location == 'tr' or location =='türkiye' or location == "turkiye":
+        location_in_different_langs += ("|".join(tr_in_different_langs) + ")")
     else:
         location_in_different_langs = location
 
-    #print(location_in_different_langs)
     # PROBLEM! Non-unicode characters are also counted as boundary values. Need to fix this.
     return re.compile("^.*\\b" + location_in_different_langs + "\\b.*$", re.IGNORECASE)

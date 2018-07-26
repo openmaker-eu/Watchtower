@@ -36,6 +36,7 @@ DROP TABLE public.relevant_locations;
 DROP TABLE public.country_code;
 DROP TABLE public.archived_topics;
 DROP TABLE public.crons_log;
+DROP TABLE public.fetch_followers_job_queue;
 DROP SEQUENCE public.cron_log_id_seq;
 DROP EXTENSION adminpack;
 DROP EXTENSION plpgsql;
@@ -349,6 +350,20 @@ CREATE SEQUENCE user_id_seq
 ALTER TABLE user_id_seq OWNER TO ${POSTGRESQL_USER};
 
 --
+-- Name: cron_log_id_seq; Type: SEQUENCE; Schema: public; Owner: ${POSTGRESQL_USER}
+--
+
+CREATE SEQUENCE cron_log_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE cron_log_id_seq OWNER TO ${POSTGRESQL_USER};
+
+--
 -- Name: user_news_rating; Type: TABLE; Schema: public; Owner: ${POSTGRESQL_USER}
 --
 
@@ -445,11 +460,27 @@ CREATE TABLE crons_log (
     cron_name text,
     started_at timestamp,
     ended_at timestamp,
-    status boolean DEFAULT false
+    status boolean DEFAULT false,
+    frequency text
 );
-
+l
 
 ALTER TABLE crons_log OWNER TO ${POSTGRESQL_USER};
+
+CREATE TABLE public.fetch_followers_job_queue (
+  user_id bigint,
+  influencer_id text COLLATE "pg_catalog"."default" NOT NULL,
+  "creation_time" timestamp(6),
+  "updated_time" timestamp(6),
+  "status" text COLLATE "pg_catalog"."default"
+)
+;
+ALTER TABLE public.fetch_followers_job_queue OWNER TO ${POSTGRESQL_USER};
+
+-- ----------------------------
+-- Primary Key structure for table fetch_followers_job_queue
+-- ----------------------------
+ALTER TABLE "public"."fetch_followers_job_queue" ADD CONSTRAINT "fetch_followers_job_queue_pkey" PRIMARY KEY ("influencer_id");
 
 --
 -- Name: users_and_topics; Type: VIEW; Schema: public; Owner: ${POSTGRESQL_USER}

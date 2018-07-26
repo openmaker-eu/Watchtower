@@ -1,14 +1,19 @@
 """
 Influencer Handlers for Watchtower
 """
+
 __author__ = ['Kemal Berk Kocabagli', 'Enis Simsar']
 
 import tornado.web
 import tornado.escape
 
+from logic.helper import get_relevant_locations, add_or_delete_fetch_followers_job
+from logic.influencers import get_local_influencers, hide_influencer
+from logic.topics import get_topic_list
+from logic.users import get_current_topic, get_current_location
+
 from handlers.base import BaseHandler, TemplateRendering, Api500ErrorHandler
 from apis import apiv1, apiv11, apiv12, apiv13
-import logic
 
 
 class LocalInfluencersHandler(BaseHandler, TemplateRendering):
@@ -16,17 +21,17 @@ class LocalInfluencersHandler(BaseHandler, TemplateRendering):
     def get(self, argument=None):
         user_id = tornado.escape.xhtml_escape(self.current_user)
         template = 'afterlogintemplate.html'
-        topic = logic.get_current_topic(tornado.escape.xhtml_escape(self.current_user))
+        topic = get_current_topic(tornado.escape.xhtml_escape(self.current_user))
         try:
             location = self.get_argument('location')
         except:
-            location = logic.get_current_location(tornado.escape.xhtml_escape(self.current_user))
-        relevant_locations = logic.get_relevant_locations()
+            location = get_current_location(tornado.escape.xhtml_escape(self.current_user))
+        relevant_locations = get_relevant_locations()
 
         if topic is None:
             self.redirect("/topicinfo")
 
-        local_influencers = logic.get_local_influencers(topic['topic_id'], 0, location)
+        local_influencers = get_local_influencers(topic['topic_id'], 0, location)
         variables = {
             'title': "Influencers",
             'alertname': topic['topic_name'],
@@ -34,7 +39,7 @@ class LocalInfluencersHandler(BaseHandler, TemplateRendering):
             'location': location,
             'local_influencers': local_influencers['local_influencers'],
             'cursor': local_influencers['next_cursor'],
-            'alerts': logic.get_topic_list(user_id),
+            'alerts': get_topic_list(user_id),
             'type': "influencers",
             'username': str(tornado.escape.xhtml_escape(self.get_current_username())),
             'topic': topic,
@@ -47,11 +52,11 @@ class LocalInfluencersHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
     def post(self, argument=None):
         variables = {}
-        topic = logic.get_current_topic(tornado.escape.xhtml_escape(self.current_user))
+        topic = get_current_topic(tornado.escape.xhtml_escape(self.current_user))
         try:
             location = self.get_argument('location')
         except:
-            location = logic.get_current_location(tornado.escape.xhtml_escape(self.current_user))
+            location = get_current_location(tornado.escape.xhtml_escape(self.current_user))
         user_id = tornado.escape.xhtml_escape(self.current_user)
 
         if argument is not None:
@@ -62,7 +67,7 @@ class LocalInfluencersHandler(BaseHandler, TemplateRendering):
                 next_cursor = 0
                 pass
             try:
-                local_influencers = logic.get_local_influencers(topic['topic_id'], int(next_cursor), location)
+                local_influencers = get_local_influencers(topic['topic_id'], int(next_cursor), location)
                 variables = {
                     'local_influencers': local_influencers['local_influencers'],
                     'cursor': local_influencers['next_cursor']
@@ -73,7 +78,7 @@ class LocalInfluencersHandler(BaseHandler, TemplateRendering):
         else:
             template = 'alertInfluencers.html'
             try:
-                local_influencers = logic.get_local_influencers(topic['topic_id'], 0, location)
+                local_influencers = get_local_influencers(topic['topic_id'], 0, location)
                 variables = {
                     'local_influencers': local_influencers['local_influencers'],
                     'alertid': topic['topic_id'],
@@ -90,12 +95,12 @@ class HideInfluencerHandler(BaseHandler, TemplateRendering):
     @tornado.web.authenticated
     def post(self):
         influencer_id = str(self.get_argument("influencer_id"))
-        topic_id = logic.get_current_topic(tornado.escape.xhtml_escape(self.current_user))['topic_id']
+        topic_id = get_current_topic(tornado.escape.xhtml_escape(self.current_user))['topic_id']
         is_hide = (self.get_argument("is_hide") == "true")
         description = self.get_argument("description")
         user_id = tornado.escape.xhtml_escape(self.current_user)
-        location = logic.get_current_location(tornado.escape.xhtml_escape(self.current_user))
-        logic.hide_influencer(topic_id, user_id, influencer_id, description, is_hide, location)
+        location = get_current_location(tornado.escape.xhtml_escape(self.current_user))
+        hide_influencer(topic_id, user_id, influencer_id, description, is_hide, location)
         self.write("")
 
 
@@ -105,7 +110,7 @@ class FetchFollowersHandler(BaseHandler, TemplateRendering):
         user_id = tornado.escape.xhtml_escape(self.current_user)
         influencer_id = str(self.get_argument("influencer_id"))
         fetching = (self.get_argument("fetching") == "true")
-        logic.add_or_delete_fetch_followers_job(user_id, influencer_id, fetching)
+        add_or_delete_fetch_followers_job(user_id, influencer_id, fetching)
         self.write("")
 
 

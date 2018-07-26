@@ -1,3 +1,4 @@
+requests
 redis
 psycopg2
 pymongo
