@@ -73,7 +73,7 @@ def get_events(topic_id, sortedBy, location, cursor):
         COUNTRY_LIMIT = 80
         cdl = []
 
-        with open('../rank_countries.csv', 'r') as f:
+        with open('rank_countries.csv', 'r') as f:
             reader = csv.reader(f)
             country_distance_lists = list(reader)
             for i in range(len(country_distance_lists)):
