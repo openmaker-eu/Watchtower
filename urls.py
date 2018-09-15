@@ -27,6 +27,8 @@ from handlers.audience import AudienceV12Handler, AudienceSampleV13Handler
 from handlers.influencer import LocalInfluencersHandler, HideInfluencerHandler, FetchFollowersHandler
 from handlers.influencer import InfluencersHandler, InfluencersV11Handler, LocalInfluencersV13Handler
 
+from handlers.user_location import PredictedLocationV13Handler
+
 from handlers.challenge import ChallengeV13Handler
 
 from handlers.crons_log import CronsLogHandler
@@ -161,6 +163,7 @@ url_patterns = [
     (r"/api/v1.3/get_conversations", ConversationV12Handler),
     (r"/api/v1.3/get_hashtags", HashtagsV12Handler),
     (r"/api/v1.3/get_challenges", ChallengeV13Handler),  # new
+    (r"/api/v1.3/get_predicted_locations", PredictedLocationV13Handler),  # new
 
     (r"/(.*)", tornado.web.StaticFileHandler, {'path': settings['static_path']}),
 ]

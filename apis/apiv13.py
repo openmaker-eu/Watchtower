@@ -10,6 +10,98 @@ from application.utils import general
 from application.Connections import Connection
 from predict_location.predictor import Predictor # for location
 
+from collections import Counter
+
+import tweepy  # Twitter API helper package
+from tweepy import OAuthHandler
+from tweepy.error import RateLimitError, TweepError
+
+consumer_key = config("TWITTER_CONSUMER_KEY") # API key
+consumer_secret = config("TWITTER_CONSUMER_SECRET")  # API secret
+access_token = config("TWITTER_ACCESS_TOKEN")
+access_secret = config("TWITTER_ACCESS_SECRET")
+
+auth = OAuthHandler(consumer_key, consumer_secret)
+auth.set_access_token(access_token, access_secret)
+api = tweepy.API(auth)
+
+def getPredictedLocations(user_ids):
+    '''
+    Returns predicted locations for the provided user ids.
+    '''
+    result = {}
+
+    if not user_ids:
+        # Empty list, why even call this endpoint ???
+        result["error"] = {"message" : "Please provide user ids."}
+        return result
+    elif len(user_ids) > 100:
+        # Twitter api endpoint requires at most 100 user ids
+        result["error"] = {"message" : "Please specify at most 100 users."}
+        return result
+
+    # Dict for storing the predicted locations for each user id
+    locations = dict.fromkeys(user_ids,"")
+
+    # Location predictor
+    loc_pred = Predictor()
+
+    # Download profiles of all users
+    try:
+        profiles = api.lookup_users(user_ids)
+    except RateLimitError as e:
+        # Rate limit error, return error message
+        timestamp = api.rate_limit_status()["resources"]["users"]['users/lookup']["reset"]
+        remaining_time = (datetime.datetime.fromtimestamp(timestamp) - datetime.datetime.now()).total_seconds()
+        error = {"message" : "Rate limit exceeded" , "endpoint" : "/followers/list", "reset_in_seconds" : remaining_time}
+        result["error"] = error
+        return result 
+
+    # Now that we have the profiles, predict location for each user
+
+    failed_users = []
+
+    for profile in profiles:
+        successful, predicted_location = get_predicted_location(profile, loc_pred)
+
+        locations[profile.id] = predicted_location
+
+        if not successful:
+            failed_users.append(profile.id)
+
+    result["result"] = locations
+
+
+    if failed_users:
+        timestamp = api.rate_limit_status()["resources"]["followers"]['/followers/list']["reset"]
+        remaining_time = (datetime.datetime.fromtimestamp(timestamp) - datetime.datetime.now()).total_seconds()
+        result["warning"] = {"message" : "The location of the users with the specified user ids could "
+            "not be predicted due to rate limit errors. You may want to try those again, seperately.", 
+            "endpoint" : "/followers/list", "reset_in_seconds":remaining_time, "failed_user_ids" : failed_users}
+    return result
+
+def get_predicted_location(user_profile, loc_pred):
+    '''
+    Helper method for getPredictedLocations(user_ids).
+
+    Returns rate limit error status and the predicted location (via loc_pred) of the specified user profile.
+    '''
+    location = loc_pred.predict_location(user_profile.location)
+        
+    # if the location can not be predicted, use neighbours location information
+    if not location:
+        try:
+            neighbour_locations = [loc_pred.predict_location(neighbour.location) 
+                for neighbour in api.followers(screen_name = user_profile.screen_name)]
+        except RateLimitError as e:
+            return (False, "")
+
+        most_common = Counter([x for x in neighbour_locations if x]).most_common(1)
+        location = most_common[0][0] if most_common else ""
+
+    return (True, location)
+
+
 def getLocalInfluencers(topic_id, location, cursor):
     '''
     returns maximum 20 local influencers for the given topic and location; 10 in each page.
