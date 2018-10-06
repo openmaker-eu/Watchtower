@@ -84,9 +84,11 @@ def mineEventsFromFacebook(topicList):
     graph = facebook.GraphAPI(access_token=my_token, version="2.7")
     fb_result_events = []
     for topic in topicList:
-
-        response = graph.get_object('search?q=' + topic +
-                                    '&type=event&limit=100&fields=attending_count,updated_time,cover,end_time,id,interested_count,name,place,start_time')
+        try:
+            response = graph.get_object('search?q=' + topic + '&type=event&limit=100&fields=attending_count,updated_time,cover,end_time,id,interested_count,name,place,start_time')
+        except Exception as e:
+            print(topic, e)
+            continue
 
         #traverse pagination of response
         while True:
