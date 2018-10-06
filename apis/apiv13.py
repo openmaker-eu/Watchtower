@@ -536,7 +536,7 @@ def getEvents(topic_id, sortedBy, location, cursor, event_ids):
 def getNewsFeeds(date, cursor, forbidden_domain, topics):
     result = {}
     cursor_range = 20
-    max_cursor = 60
+    max_cursor = 200
     cursor = int(cursor)
 
     if topics == [""]:

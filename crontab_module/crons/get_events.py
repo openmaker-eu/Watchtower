@@ -24,6 +24,9 @@ def mineEventsFromMeetUp(topicList):
         response = requests.get(url_mtup + "find/upcoming_events", params = mtup_params)
         response = response.json()
 
+        if "events" not in response:
+            return []
+
         mtup_response_events = response["events"]
 
         for event in mtup_response_events:
