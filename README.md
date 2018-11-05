@@ -71,7 +71,7 @@ Open your favourite browser and type [http://localhost:8484](http://localhost:84
 
 ## Authors
 
-* **Enis Simsar** - *Initial work* - [enisimsar](https://github.com/enisimsar)
+* **Enis Simsar** - [enisimsar](https://github.com/enisimsar)
 * **Kemal Berk Kocabağlı** - [berk94](https://github.com/berk94)
 * **Barış Can Esmer** - [barisesmer](https://github.com/barisesmer)
 
