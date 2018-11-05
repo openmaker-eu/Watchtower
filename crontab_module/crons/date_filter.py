@@ -59,7 +59,7 @@ def getDateList(alertid, date, forbidden_domain):
             'domain': {'$nin': forbidden_domain}
         }},
         {'$sort': {'popularity': -1}},
-        {'$limit': 60}
+        {'$limit': 200}
     ], allowDiskUse=True))
 
 

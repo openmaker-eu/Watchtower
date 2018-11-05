@@ -1,24 +1,25 @@
-import sys
-from datetime import datetime
 from time import sleep
+import sys
 
-sys.path.append('./')
+from decouple import config
+
+sys.path.insert(0, config('ROOT_DIR'))
 
 from application.Connections import Connection
-from logic import get_all_running_topics_list
-from twitter_stream_thread import StreamCreator
+from listen_module.twitter_stream_thread import StreamCreator
+from models.Topic import Topic
 
 
-class TwitterListen():
+class TwitterListen:
     def __init__(self):
         self.topic_dic = {}
         self.thread = None
 
     def setup(self, topic_list):
         if len(topic_list) != 0:
-            for alert in topic_list:
-                if str(alert['alertid']) not in self.topic_dic:
-                    self.topic_dic[str(alert['alertid'])] = alert
+            for topic in topic_list:
+                if str(topic['topic_id']) not in self.topic_dic:
+                    self.topic_dic[str(topic['topic_id'])] = topic
             self.thread = StreamCreator(self.topic_dic)
             self.thread.start()
 
@@ -28,8 +29,8 @@ class TwitterListen():
             self.kill()
         if len(topic_list) != 0:
             for alert in topic_list:
-                if str(alert['alertid']) not in self.topic_dic:
-                    self.topic_dic[str(alert['alertid'])] = alert
+                if str(alert['topic_id']) not in self.topic_dic:
+                    self.topic_dic[str(alert['topic_id'])] = alert
             self.thread = StreamCreator(self.topic_dic)
             self.thread.start()
 
@@ -40,10 +41,9 @@ class TwitterListen():
 
 
 def main():
-    running_topic_list = get_all_running_topics_list()
+    running_topic_list = Topic.find_all([('is_running', True)], is_object=False)
     twitter_module = TwitterListen()
     twitter_module.setup(running_topic_list)
-    current_hour = datetime.now().hour
     try:
         last_sequence_id = str(Connection.Instance().db["counters"].find_one({'_id': "tweetDBId"})['seq'])
     except:
@@ -55,12 +55,16 @@ def main():
         print("Loop is continuing. count = {0}".format(count))
         count += 1
         sleep(300)
-        new_running_topic_list = get_all_running_topics_list()
-        if new_running_topic_list != running_topic_list:
+        new_running_topic_list = Topic.find_all([('is_running', True)], is_object=False)
+        current_keywords = [i['keywords'] for i in running_topic_list]
+        current_languages = [i['languages'] for i in running_topic_list]
+        new_keywords = [i['keywords'] for i in new_running_topic_list]
+        new_languages = [i['languages'] for i in new_running_topic_list]
+        if current_keywords != new_keywords or current_languages != new_languages:
             running_topic_list = new_running_topic_list
             print("Restarting Twitter Module!")
             twitter_module.restart(new_running_topic_list)
-        if count%6 == 0:
+        if count % 6 == 0:
             new_last_sequence_id = str(Connection.Instance().db["counters"].find_one({'_id': "tweetDBId"})['seq'])
             print("last_id = {0}, new_last_id = {1}".format(last_sequence_id, new_last_sequence_id))
             if last_sequence_id == new_last_sequence_id:

@@ -37,29 +37,126 @@
     </table>
 
     {% for mention in sorted %}
-        <div class="col-md-6">
-            <canvas id="{{ mention }}" style="margin:16px"></canvas>
+        <div class="col-md-4">
+            <canvas id="{{ mention }}_week" style="margin:16px"></canvas>
 
             <script>
-                var ctx = document.getElementById('{{ mention }}').getContext('2d');
+                var ctx = document.getElementById('{{ mention }}_week').getContext('2d');
                 var chart = new Chart(ctx, {
                     // The type of chart we want to create
                     type: 'line',
 
                     // The data for our dataset
                     data: {
-                        labels: {{ data[mention]['labels'] }},
+                        labels: {{ data[mention]['week']['labels'] }},
                         datasets: [{
                             label: '{{ mention }}',
                             fill: false,
                             backgroundColor: getRandomColor(),
                             borderColor: getRandomColor(),
-                            data: {{ data[mention]['data'] }},
+                            data: {{ data[mention]['week']['data'] }},
                         }]
                     },
 
                     // Configuration options go here
-                    options: {}
+                    options: {
+                        title: {
+                            display: true,
+                            text: 'Week Data'
+                        },
+                        scales: {
+                            yAxes: [{
+                                display: true,
+                                ticks: {
+                                    suggestedMin: 0,    // minimum will be 0, unless there is a lower value.
+                                    // OR //
+                                    beginAtZero: true   // minimum value will be 0.
+                                }
+                            }]
+                        }
+                    }
+                });
+            </script>
+        </div>
+        <div class="col-md-4">
+            <canvas id="{{ mention }}_month" style="margin:16px"></canvas>
+
+            <script>
+                var ctx = document.getElementById('{{ mention }}_month').getContext('2d');
+                var chart = new Chart(ctx, {
+                    // The type of chart we want to create
+                    type: 'line',
+
+                    // The data for our dataset
+                    data: {
+                        labels: {{ data[mention]['month']['labels'] }},
+                        datasets: [{
+                            label: '{{ mention }}',
+                            fill: false,
+                            backgroundColor: getRandomColor(),
+                            borderColor: getRandomColor(),
+                            data: {{ data[mention]['month']['data'] }},
+                        }]
+                    },
+
+                    // Configuration options go here
+                    options: {
+                        title: {
+                            display: true,
+                            text: 'Month Data'
+                        },
+                        scales: {
+                            yAxes: [{
+                                display: true,
+                                ticks: {
+                                    suggestedMin: 0,    // minimum will be 0, unless there is a lower value.
+                                    // OR //
+                                    beginAtZero: true   // minimum value will be 0.
+                                }
+                            }]
+                        }
+                    }
+                });
+            </script>
+        </div>
+        <div class="col-md-4">
+            <canvas id="{{ mention }}_all" style="margin:16px"></canvas>
+
+            <script>
+                var ctx = document.getElementById('{{ mention }}_all').getContext('2d');
+                var chart = new Chart(ctx, {
+                    // The type of chart we want to create
+                    type: 'line',
+
+                    // The data for our dataset
+                    data: {
+                        labels: {{ data[mention]['all']['labels'] }},
+                        datasets: [{
+                            label: '{{ mention }}',
+                            fill: false,
+                            backgroundColor: getRandomColor(),
+                            borderColor: getRandomColor(),
+                            data: {{ data[mention]['all']['data'] }},
+                        }]
+                    },
+
+                    // Configuration options go here
+                    options: {
+                        title: {
+                            display: true,
+                            text: 'All Data'
+                        },
+                        scales: {
+                            yAxes: [{
+                                display: true,
+                                ticks: {
+                                    suggestedMin: 0,    // minimum will be 0, unless there is a lower value.
+                                    // OR //
+                                    beginAtZero: true   // minimum value will be 0.
+                                }
+                            }]
+                        }
+                    }
                 });
             </script>
         </div>

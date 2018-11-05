@@ -37,29 +37,126 @@
     </table>
 
     {% for hashtag in sorted %}
-        <div class="col-md-6">
-            <canvas id="{{ hashtag }}" style="margin:16px"></canvas>
+        <div class="col-md-4">
+            <canvas id="{{ hashtag }}_week" style="margin:16px"></canvas>
 
             <script>
-                var ctx = document.getElementById('{{ hashtag }}').getContext('2d');
+                var ctx = document.getElementById('{{ hashtag }}_week').getContext('2d');
                 var chart = new Chart(ctx, {
                     // The type of chart we want to create
                     type: 'line',
 
                     // The data for our dataset
                     data: {
-                        labels: {{ data[hashtag]['labels'] }},
+                        labels: {{ data[hashtag]['week']['labels'] }},
                         datasets: [{
                             label: '{{ hashtag }}',
                             fill: false,
                             backgroundColor: getRandomColor(),
                             borderColor: getRandomColor(),
-                            data: {{ data[hashtag]['data'] }},
+                            data: {{ data[hashtag]['week']['data'] }},
                         }]
                     },
 
                     // Configuration options go here
-                    options: {}
+                    options: {
+                        title: {
+                            display: true,
+                            text: 'Week Data'
+                        },
+                        scales: {
+                            yAxes: [{
+                                display: true,
+                                ticks: {
+                                    suggestedMin: 0,    // minimum will be 0, unless there is a lower value.
+                                    // OR //
+                                    beginAtZero: true   // minimum value will be 0.
+                                }
+                            }]
+                        }
+                    }
+                });
+            </script>
+        </div>
+        <div class="col-md-4">
+            <canvas id="{{ hashtag }}_month" style="margin:16px"></canvas>
+
+            <script>
+                var ctx = document.getElementById('{{ hashtag }}_month').getContext('2d');
+                var chart = new Chart(ctx, {
+                    // The type of chart we want to create
+                    type: 'line',
+
+                    // The data for our dataset
+                    data: {
+                        labels: {{ data[hashtag]['month']['labels'] }},
+                        datasets: [{
+                            label: '{{ hashtag }}',
+                            fill: false,
+                            backgroundColor: getRandomColor(),
+                            borderColor: getRandomColor(),
+                            data: {{ data[hashtag]['month']['data'] }},
+                        }]
+                    },
+
+                    // Configuration options go here
+                    options: {
+                        title: {
+                            display: true,
+                            text: 'Month Data'
+                        },
+                        scales: {
+                            yAxes: [{
+                                display: true,
+                                ticks: {
+                                    suggestedMin: 0,    // minimum will be 0, unless there is a lower value.
+                                    // OR //
+                                    beginAtZero: true   // minimum value will be 0.
+                                }
+                            }]
+                        }
+                    }
+                });
+            </script>
+        </div>
+        <div class="col-md-4">
+            <canvas id="{{ hashtag }}_all" style="margin:16px"></canvas>
+
+            <script>
+                var ctx = document.getElementById('{{ hashtag }}_all').getContext('2d');
+                var chart = new Chart(ctx, {
+                    // The type of chart we want to create
+                    type: 'line',
+
+                    // The data for our dataset
+                    data: {
+                        labels: {{ data[hashtag]['all']['labels'] }},
+                        datasets: [{
+                            label: '{{ hashtag }}',
+                            fill: false,
+                            backgroundColor: getRandomColor(),
+                            borderColor: getRandomColor(),
+                            data: {{ data[hashtag]['all']['data'] }},
+                        }]
+                    },
+
+                    // Configuration options go here
+                    options: {
+                        title: {
+                            display: true,
+                            text: 'All Data'
+                        },
+                        scales: {
+                            yAxes: [{
+                                display: true,
+                                ticks: {
+                                    suggestedMin: 0,    // minimum will be 0, unless there is a lower value.
+                                    // OR //
+                                    beginAtZero: true   // minimum value will be 0.
+                                }
+                            }]
+                        }
+                    }
                 });
             </script>
         </div>

@@ -43,7 +43,7 @@ class Documentationv13Handler(BaseHandler, TemplateRendering):
         template = 'apiv13.html'
         variables = {
             'title': "Watchtower Api v1.3",
-            'host': config("HOST_NAME")
+            'host': "http://"+config("HOST_IP")+":8484/"
         }
         content = self.render_template(template, variables)
         self.write(content)

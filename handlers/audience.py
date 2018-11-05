@@ -1,15 +1,19 @@
 """
 Audience Handlers for Watchtower
 """
+
 __author__ = ['Kemal Berk Kocabagli', 'Enis Simsar']
 
 import tornado.web
 import tornado.escape
-import pprint
+
+from logic.audience import get_audience, get_audience_stats, rate_audience
+from logic.helper import get_relevant_locations
+from logic.topics import get_topic_list
+from logic.users import get_current_topic, get_current_location
 
 from handlers.base import BaseHandler, TemplateRendering, Api500ErrorHandler
-from apis import apiv1, apiv11, apiv12, apiv13
-import logic
+from apis import apiv12, apiv13
 
 
 class AudienceHandler(BaseHandler, TemplateRendering):
@@ -17,23 +21,23 @@ class AudienceHandler(BaseHandler, TemplateRendering):
     def get(self, argument=None):
         user_id = tornado.escape.xhtml_escape(self.current_user)
         template = 'afterlogintemplate.html'
-        topic = logic.get_current_topic(user_id)
+        topic = get_current_topic(user_id)
         print(" (GET) Getting audience for topic " + str(topic['topic_id']))
         try:
             location = self.get_argument('location')
         except:
-            location = logic.get_current_location(tornado.escape.xhtml_escape(self.current_user))
-        relevant_locations = logic.get_relevant_locations()
+            location = get_current_location(tornado.escape.xhtml_escape(self.current_user))
+        relevant_locations = get_relevant_locations()
         if topic is None:
             self.redirect("/topicinfo")
-        audiences = logic.get_audience(topic['topic_id'], user_id, 0, location)
-        audience_stats = logic.get_audience_stats(topic['topic_id'], location)
+        audiences = get_audience(topic['topic_id'], user_id, 0, location)
+        audience_stats = get_audience_stats(topic['topic_id'], location)
         variables = {
             'title': "Audience",
             'topic': topic,
             'audiences': audiences['audiences'],
             'cursor': audiences['next_cursor'],
-            'alerts': logic.get_topic_list(user_id),
+            'alerts': get_topic_list(user_id),
             'type': "audiences",
             'audience_stats': audience_stats,
             'username': str(tornado.escape.xhtml_escape(self.get_current_username())),
@@ -48,14 +52,14 @@ class AudienceHandler(BaseHandler, TemplateRendering):
     def post(self, argument=None):
         variables = {}
         user_id = tornado.escape.xhtml_escape(self.current_user)
-        topic = logic.get_current_topic(user_id)
+        topic = get_current_topic(user_id)
         topic_id = topic['topic_id']
         print(" (POST) Getting audience for topic " + str(topic_id))
         try:
             location = self.get_argument('location')
             print("got location from JS.")
         except:
-            location = logic.get_current_location(tornado.escape.xhtml_escape(self.current_user))
+            location = get_current_location(tornado.escape.xhtml_escape(self.current_user))
 
         if argument is not None:  # scroll
             print("Scrolled down.")
@@ -66,8 +70,8 @@ class AudienceHandler(BaseHandler, TemplateRendering):
                 next_cursor = 0
                 pass
             try:
-                audiences = logic.get_audience(topic_id, user_id, int(next_cursor), location)
-                audience_stats = logic.get_audience_stats(topic_id, location)
+                audiences = get_audience(topic_id, user_id, int(next_cursor), location)
+                audience_stats = get_audience_stats(topic_id, location)
 
                 variables = {
                     'audiences': audiences['audiences'],
@@ -86,8 +90,8 @@ class AudienceHandler(BaseHandler, TemplateRendering):
             template = 'alertAudience.html'
             user_id = tornado.escape.xhtml_escape(self.current_user)
             try:
-                audiences = logic.get_audience(topic_id, user_id, 0, location)
-                audience_stats = logic.get_audience_stats(topic_id, location)
+                audiences = get_audience(topic_id, user_id, 0, location)
+                audience_stats = get_audience_stats(topic_id, location)
 
                 variables = {
                     'audiences': audiences['audiences'],
@@ -109,7 +113,7 @@ class RateAudienceHandler(BaseHandler, TemplateRendering):
         topic_id = self.get_argument("topic_id")
         rating = self.get_argument("rating")
         user_id = tornado.escape.xhtml_escape(self.current_user)
-        logic.rate_audience(topic_id, user_id, audience_id, rating)
+        rate_audience(topic_id, user_id, audience_id, rating)
         self.write("")
 
 
