@@ -429,43 +429,43 @@ def getEvents(topic_id, sortedBy, location, cursor, event_ids):
 
             for distance, country in distances:
                 if count ==0:
-                        count+=1
-                        continue
-                    print("Checking db for country (#" + str(count) + "): " + str(country))
-
-                    match['$or'] = [{'place':location_regex.getLocationRegex(country)},{'predicted_place':country}]
-                    match['link'] = {'$nin': hidden_event_links}
-
-                    new_events = list(Connection.Instance().events[str(topic_id)].aggregate([
-                        {'$match': match},
-                        {'$project': {'_id': 0,
-                                      "updated_time": 1,
-                                      "cover": 1,
-                                      "description": 1,
-                                      "start_time": 1,
-                                      "end_time": 1,
-                                      "id": 1,
-                                      "name": 1,
-                                      "place": 1,
-                                      "link": 1,
-                                      "interested": 1,
-                                      "coming": 1
-                                      }},
-                        {'$sort': sort}
-                        # {'$skip': int(cursor)},
-                        # {'$limit': 10}
-                    ]))
-
-                    new_events = [{**event, 'distance': distance, 'country': country.lower()} for event in new_events]
-
-                    events += new_events
-
                     count+=1
-                    print("length:" + str(len(events)))
-                    if len(events) >= min(cursor+cursor_range,EVENT_LIMIT):
-                        break
-                    if (count > COUNTRY_LIMIT):
-                        break
+                    continue
+                print("Checking db for country (#" + str(count) + "): " + str(country))
+
+                match['$or'] = [{'place':location_regex.getLocationRegex(country)},{'predicted_place':country}]
+                match['link'] = {'$nin': hidden_event_links}
+
+                new_events = list(Connection.Instance().events[str(topic_id)].aggregate([
+                    {'$match': match},
+                    {'$project': {'_id': 0,
+                                    "updated_time": 1,
+                                    "cover": 1,
+                                    "description": 1,
+                                    "start_time": 1,
+                                    "end_time": 1,
+                                    "id": 1,
+                                    "name": 1,
+                                    "place": 1,
+                                    "link": 1,
+                                    "interested": 1,
+                                    "coming": 1
+                                    }},
+                    {'$sort': sort}
+                    # {'$skip': int(cursor)},
+                    # {'$limit': 10}
+                ]))
+
+                new_events = [{**event, 'distance': distance, 'country': country.lower()} for event in new_events]
+
+                events += new_events
+
+                count+=1
+                print("length:" + str(len(events)))
+                if len(events) >= min(cursor+cursor_range,EVENT_LIMIT):
+                    break
+                if (count > COUNTRY_LIMIT):
+                    break
 
             #pprint.pprint([e['place'] for e in events])
             display_events = events[cursor:min(cursor+cursor_range,max_cursor)]
