@@ -285,7 +285,7 @@ def getAudienceSample(topic_id, location, cursor):
         result['error'] = "Topic not found."
     return result
 
-def getEvents(topic_id, sortedBy, location, cursor, event_ids):
+def getEvents(topic_id, sortedBy, location, cursor, event_ids, country_threshold):
     cursor_range = 10
     max_cursor = 100
     cursor = int(cursor)
@@ -400,7 +400,6 @@ def getEvents(topic_id, sortedBy, location, cursor, event_ids):
 
             print("Filtering and sorting by location: " + location)
             EVENT_LIMIT = 70
-            COUNTRY_LIMIT=80
             cdl = []
 
             # GET HIDDEN EVENTS
@@ -463,7 +462,7 @@ def getEvents(topic_id, sortedBy, location, cursor, event_ids):
                 print("length:" + str(len(events)))
                 if len(events) >= min(cursor+cursor_range,EVENT_LIMIT):
                     break
-                if (count > COUNTRY_LIMIT):
+                if (count > country_threshold):
                     break
 
             #pprint.pprint([e['place'] for e in events])
