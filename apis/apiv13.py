@@ -427,10 +427,9 @@ def getEvents(topic_id, sortedBy, location, cursor, event_ids):
             distance_matrix = pd.read_csv('distance-matrix.csv.gz')
             distances = distance_matrix.sort_values(location)[[location, 'Country']].values
 
+            count = 0
+
             for distance, country in distances:
-                if count ==0:
-                    count+=1
-                    continue
                 print("Checking db for country (#" + str(count) + "): " + str(country))
 
                 match['$or'] = [{'place':location_regex.getLocationRegex(country)},{'predicted_place':country}]
