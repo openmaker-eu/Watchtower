@@ -6,6 +6,7 @@ sys.path.insert(0, config("ROOT_DIR"))
 
 from application.utils.basic import *
 from application.utils import general
+import pandas as pd
 
 from application.Connections import Connection
 from predict_location.predictor import Predictor # for location
@@ -422,16 +423,12 @@ def getEvents(topic_id, sortedBy, location, cursor, event_ids):
                     result['error'] = "Problem in fetching hidden events for current topic."
                     return result
 
-            with open('rank_countries.csv', 'r') as f:
-                reader = csv.reader(f)
-                country_distance_lists = list(reader)
-                for i in range(len(country_distance_lists)):
-                    if country_distance_lists[i][0] == location:
-                        cdl = country_distance_lists[i]
-                print("Found cdl!")
-                count = 0
-                for country in cdl:
-                    if count ==0:
+            location = location.upper()
+            distance_matrix = pd.read_csv('distance-matrix.csv.gz')
+            distances = distance_matrix.sort_values('TR')[['TR', 'Country']].values
+
+            for distance, country in distances:
+                if count ==0:
                         count+=1
                         continue
                     print("Checking db for country (#" + str(count) + "): " + str(country))
@@ -439,7 +436,7 @@ def getEvents(topic_id, sortedBy, location, cursor, event_ids):
                     match['$or'] = [{'place':location_regex.getLocationRegex(country)},{'predicted_place':country}]
                     match['link'] = {'$nin': hidden_event_links}
 
-                    events += list(Connection.Instance().events[str(topic_id)].aggregate([
+                    new_events = list(Connection.Instance().events[str(topic_id)].aggregate([
                         {'$match': match},
                         {'$project': {'_id': 0,
                                       "updated_time": 1,
@@ -458,6 +455,10 @@ def getEvents(topic_id, sortedBy, location, cursor, event_ids):
                         # {'$skip': int(cursor)},
                         # {'$limit': 10}
                     ]))
+
+                    new_events = [{**event, 'distance': distance, 'country': country.lower()} for event in new_events]
+
+                    events += new_events
 
                     count+=1
                     print("length:" + str(len(events)))
