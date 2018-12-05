@@ -425,7 +425,7 @@ def getEvents(topic_id, sortedBy, location, cursor, event_ids):
 
             location = location.upper()
             distance_matrix = pd.read_csv('distance-matrix.csv.gz')
-            distances = distance_matrix.sort_values('TR')[['TR', 'Country']].values
+            distances = distance_matrix.sort_values(location)[[location, 'Country']].values
 
             for distance, country in distances:
                 if count ==0:
