@@ -120,15 +120,17 @@ class EventV13Handler(BaseHandler, TemplateRendering, Api500ErrorHandler):
         location = str(self.get_argument("location", ""))
         try:
             cursor = int(self.get_argument('cursor', '0'))
+            country_threshold = int(self.get_argument("country_threshold", 80))
             if cursor < 0:
                 cursor = 0
         except:
             cursor = 0
+            country_threshold = 80
             pass
         event_ids = self.get_argument("event_ids", None)
         if event_ids is not None:
             event_ids= event_ids.split(",")
         print(event_ids)
-        events = apiv13.getEvents(topic_id, sorted_by, location, int(cursor), event_ids)
+        events = apiv13.getEvents(topic_id, sorted_by, location, int(cursor), event_ids, country_threshold)
         self.set_header('Content-Type', 'application/json')
         self.write(events)
