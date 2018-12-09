@@ -6,6 +6,7 @@ sys.path.insert(0, config("ROOT_DIR"))
 
 from application.utils.basic import *
 from application.utils import general
+import pandas as pd
 
 from application.Connections import Connection
 from predict_location.predictor import Predictor # for location
@@ -284,7 +285,7 @@ def getAudienceSample(topic_id, location, cursor):
         result['error'] = "Topic not found."
     return result
 
-def getEvents(topic_id, sortedBy, location, cursor, event_ids):
+def getEvents(topic_id, sortedBy, location, cursor, event_ids, country_threshold):
     cursor_range = 10
     max_cursor = 100
     cursor = int(cursor)
@@ -389,17 +390,16 @@ def getEvents(topic_id, sortedBy, location, cursor, event_ids):
 
         print("Location: " + str(location))
         if location !="" and location.lower()!="global":
-            #location_predictor = Predictor()
-            #location = location_predictor.predict_location(location)
-            if location == "italy": location = "it"
-            elif location == "spain": location = "es"
-            elif location == "slovakia": location = "sk"
-            elif location == "uk": location = "gb"
-            elif location == "turkey": location = "tr"
+            location_predictor = Predictor()
+            location = location_predictor.predict_location(location)
+            # if location == "italy": location = "it"
+            # elif location == "spain": location = "es"
+            # elif location == "slovakia": location = "sk"
+            # elif location == "uk": location = "gb"
+            # elif location == "turkey": location = "tr"
 
             print("Filtering and sorting by location: " + location)
             EVENT_LIMIT = 70
-            COUNTRY_LIMIT=80
             cdl = []
 
             # GET HIDDEN EVENTS
@@ -422,49 +422,48 @@ def getEvents(topic_id, sortedBy, location, cursor, event_ids):
                     result['error'] = "Problem in fetching hidden events for current topic."
                     return result
 
-            with open('rank_countries.csv', 'r') as f:
-                reader = csv.reader(f)
-                country_distance_lists = list(reader)
-                for i in range(len(country_distance_lists)):
-                    if country_distance_lists[i][0] == location:
-                        cdl = country_distance_lists[i]
-                print("Found cdl!")
-                count = 0
-                for country in cdl:
-                    if count ==0:
-                        count+=1
-                        continue
-                    print("Checking db for country (#" + str(count) + "): " + str(country))
+            location = location.upper()
+            distance_matrix = pd.read_csv('distance-matrix.csv.gz')
+            distances = distance_matrix.sort_values(location)[[location, 'Country']].values
 
-                    match['$or'] = [{'place':location_regex.getLocationRegex(country)},{'predicted_place':country}]
-                    match['link'] = {'$nin': hidden_event_links}
+            count = 0
 
-                    events += list(Connection.Instance().events[str(topic_id)].aggregate([
-                        {'$match': match},
-                        {'$project': {'_id': 0,
-                                      "updated_time": 1,
-                                      "cover": 1,
-                                      "description": 1,
-                                      "start_time": 1,
-                                      "end_time": 1,
-                                      "id": 1,
-                                      "name": 1,
-                                      "place": 1,
-                                      "link": 1,
-                                      "interested": 1,
-                                      "coming": 1
-                                      }},
-                        {'$sort': sort}
-                        # {'$skip': int(cursor)},
-                        # {'$limit': 10}
-                    ]))
+            for distance, country in distances:
+                print("Checking db for country (#" + str(count) + "): " + str(country))
 
-                    count+=1
-                    print("length:" + str(len(events)))
-                    if len(events) >= min(cursor+cursor_range,EVENT_LIMIT):
-                        break
-                    if (count > COUNTRY_LIMIT):
-                        break
+                match['$or'] = [{'place':location_regex.getLocationRegex(country)},{'predicted_place':country}]
+                match['link'] = {'$nin': hidden_event_links}
+
+                new_events = list(Connection.Instance().events[str(topic_id)].aggregate([
+                    {'$match': match},
+                    {'$project': {'_id': 0,
+                                    "updated_time": 1,
+                                    "cover": 1,
+                                    "description": 1,
+                                    "start_time": 1,
+                                    "end_time": 1,
+                                    "id": 1,
+                                    "name": 1,
+                                    "place": 1,
+                                    "link": 1,
+                                    "interested": 1,
+                                    "coming": 1
+                                    }},
+                    {'$sort': sort}
+                    # {'$skip': int(cursor)},
+                    # {'$limit': 10}
+                ]))
+
+                new_events = [{**event, 'distance': distance, 'country': country.lower()} for event in new_events]
+
+                events += new_events
+
+                count+=1
+                print("length:" + str(len(events)))
+                if len(events) >= min(cursor+cursor_range,EVENT_LIMIT):
+                    break
+                if (count > country_threshold):
+                    break
 
             #pprint.pprint([e['place'] for e in events])
             display_events = events[cursor:min(cursor+cursor_range,max_cursor)]
