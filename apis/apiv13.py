@@ -390,13 +390,13 @@ def getEvents(topic_id, sortedBy, location, cursor, event_ids, country_threshold
 
         print("Location: " + str(location))
         if location !="" and location.lower()!="global":
-            #location_predictor = Predictor()
-            #location = location_predictor.predict_location(location)
-            if location == "italy": location = "it"
-            elif location == "spain": location = "es"
-            elif location == "slovakia": location = "sk"
-            elif location == "uk": location = "gb"
-            elif location == "turkey": location = "tr"
+            location_predictor = Predictor()
+            location = location_predictor.predict_location(location)
+            # if location == "italy": location = "it"
+            # elif location == "spain": location = "es"
+            # elif location == "slovakia": location = "sk"
+            # elif location == "uk": location = "gb"
+            # elif location == "turkey": location = "tr"
 
             print("Filtering and sorting by location: " + location)
             EVENT_LIMIT = 70
