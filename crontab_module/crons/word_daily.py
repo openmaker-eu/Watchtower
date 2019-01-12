@@ -38,7 +38,7 @@ def getDateWords(alertid, date):
         {
             '$project' : {
                 'text': '$text',
-                'text_len': {'$length': "$text" },
+                'text_len': {'$strLenCP': "$text" },
             }
         },
         {
