@@ -31,6 +31,7 @@ class Connection:
             self.tweetsDB = self.MongoDBClient.tweetsDB
             self.daily_hastags = self.MongoDBClient.daily_hastags
             self.daily_mentions = self.MongoDBClient.daily_mentions
+            self.daily_words = self.MongoDBClient.daily_words
 
             self.challengesDB = self.MongoDBClient.challenges
 

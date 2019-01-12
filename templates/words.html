@@ -1,0 +1,171 @@
+<div id="spin" style=" z-index: 100;"></div>
+<div class="container row" id="words" style="margin-right: auto;margin-left:  auto;">
+
+    <table id="word_table" class="table table-striped table-bordered">
+        <thead>
+        <tr>
+            <th>Word</th>
+            <th>Last Day</th>
+            <th>Last Week Average</th>
+            <th>Last Month Average</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for word in sorted %}
+            <tr>
+                <td>{{ word }}</td>
+                <td>{% if table_data[word]['today']|length > 0 %}
+                    {{ table_data[word]['today']|sum // table_data[word]['today']|length }}{% else %}
+                    0{% endif %}</td>
+                <td>{% if table_data[word]['week']|length > 0 %}
+                    {{ table_data[word]['week']|sum // table_data[word]['week']|length }}{% else %}
+                    0{% endif %}</td>
+                <td>{% if table_data[word]['month']|length > 0 %}
+                    {{ table_data[word]['month']|sum // table_data[word]['month']|length }}{% else %}
+                    0{% endif %}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+        <tfoot>
+        <tr>
+            <th>Word</th>
+            <th>Last Day</th>
+            <th>Last Week Average</th>
+            <th>Last Month Average</th>
+        </tr>
+        </tfoot>
+    </table>
+
+    {% for word in sorted %}
+        <div class="col-md-4">
+            <canvas id="{{ word }}_week" style="margin:16px"></canvas>
+
+            <script>
+                var ctx = document.getElementById('{{ word }}_week').getContext('2d');
+                var chart = new Chart(ctx, {
+                    // The type of chart we want to create
+                    type: 'line',
+
+                    // The data for our dataset
+                    data: {
+                        labels: {{ data[word]['week']['labels'] }},
+                        datasets: [{
+                            label: '{{ word }}',
+                            fill: false,
+                            backgroundColor: getRandomColor(),
+                            borderColor: getRandomColor(),
+                            data: {{ data[word]['week']['data'] }},
+                        }]
+                    },
+
+                    // Configuration options go here
+                    options: {
+                        title: {
+                            display: true,
+                            text: 'Week Data'
+                        },
+                        scales: {
+                            yAxes: [{
+                                display: true,
+                                ticks: {
+                                    suggestedMin: 0,    // minimum will be 0, unless there is a lower value.
+                                    // OR //
+                                    beginAtZero: true   // minimum value will be 0.
+                                }
+                            }]
+                        }
+                    }
+                });
+            </script>
+        </div>
+        <div class="col-md-4">
+            <canvas id="{{ word }}_month" style="margin:16px"></canvas>
+
+            <script>
+                var ctx = document.getElementById('{{ word }}_month').getContext('2d');
+                var chart = new Chart(ctx, {
+                    // The type of chart we want to create
+                    type: 'line',
+
+                    // The data for our dataset
+                    data: {
+                        labels: {{ data[word]['month']['labels'] }},
+                        datasets: [{
+                            label: '{{ word }}',
+                            fill: false,
+                            backgroundColor: getRandomColor(),
+                            borderColor: getRandomColor(),
+                            data: {{ data[word]['month']['data'] }},
+                        }]
+                    },
+
+                    // Configuration options go here
+                    options: {
+                        title: {
+                            display: true,
+                            text: 'Month Data'
+                        },
+                        scales: {
+                            yAxes: [{
+                                display: true,
+                                ticks: {
+                                    suggestedMin: 0,    // minimum will be 0, unless there is a lower value.
+                                    // OR //
+                                    beginAtZero: true   // minimum value will be 0.
+                                }
+                            }]
+                        }
+                    }
+                });
+            </script>
+        </div>
+        <div class="col-md-4">
+            <canvas id="{{ word }}_all" style="margin:16px"></canvas>
+
+            <script>
+                var ctx = document.getElementById('{{ word }}_all').getContext('2d');
+                var chart = new Chart(ctx, {
+                    // The type of chart we want to create
+                    type: 'line',
+
+                    // The data for our dataset
+                    data: {
+                        labels: {{ data[word]['all']['labels'] }},
+                        datasets: [{
+                            label: '{{ word }}',
+                            fill: false,
+                            backgroundColor: getRandomColor(),
+                            borderColor: getRandomColor(),
+                            data: {{ data[word]['all']['data'] }},
+                        }]
+                    },
+
+                    // Configuration options go here
+                    options: {
+                        title: {
+                            display: true,
+                            text: 'All Data'
+                        },
+                        scales: {
+                            yAxes: [{
+                                display: true,
+                                ticks: {
+                                    suggestedMin: 0,    // minimum will be 0, unless there is a lower value.
+                                    // OR //
+                                    beginAtZero: true   // minimum value will be 0.
+                                }
+                            }]
+                        }
+                    }
+                });
+            </script>
+        </div>
+    {% endfor %}
+    <script>
+        $(document).ready(function () {
+            $('#word_table').DataTable({
+                "pageLength": 10
+            });
+        });
+    </script>
+</div>
