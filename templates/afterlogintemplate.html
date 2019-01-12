@@ -145,6 +145,26 @@
         <link rel="stylesheet" href="https://cdn.datatables.net/1.10.16/css/dataTables.bootstrap.min.css"/>
     {% endif %}
 
+    {% if type == "word_chart" %}
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
+        <script src="/js/jquery.dataTables.min.js"></script>
+        <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
+        <script src="/js/Chart.min.js"></script>
+        <script type="text/javascript">
+            function getRandomColor() {
+                var letters = '0123456789ABCDEF';
+                var color = '#';
+                for (var i = 0; i < 6; i++) {
+                    color += letters[Math.floor(Math.random() * 16)];
+                }
+                return color;
+            }
+        </script>
+        <script src="/js/words.js"></script>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.10.16/css/dataTables.bootstrap.min.css"/>
+    {% endif %}
+
     {% if type == "influencers" %}
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
         <link rel="stylesheet" type="text/css" href="/css/influencer_card.css"/>
@@ -278,6 +298,10 @@
 
                 <li {% if type=="mention_chart" %} class="active" {% endif %}>
                     <a href="/Mentions">Mentions</a>
+                </li>
+
+                <li {% if type=="word_chart" %} class="active" {% endif %}>
+                    <a href="/Words">Words</a>
                 </li>
 
                 <li {% if type=="news" %} class="active" {% endif %}>
@@ -471,6 +495,9 @@
 {% if type == "mention_chart" %}
     {% include 'mentions.html' %}
 {% endif %}
+{% if type == "word_chart" %}
+    {% include 'words.html' %}
+{% endif %}
 
 </body>
 
@@ -479,7 +506,7 @@
 ================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->
 
-{% if type != "hashtag_chart" and type != "mention_chart" %}
+{% if type != "hashtag_chart" and type != "mention_chart" and type != "word_chart" %}
     <script src="/js/jquery-3.2.1.min.js"></script>
     <script src="/js/jquery.min.js"></script>
 {% endif %}

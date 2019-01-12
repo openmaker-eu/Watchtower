@@ -37,6 +37,8 @@ from handlers.hashtag import HashtagHandler, HashtagChartHandler
 
 from handlers.mention import MentionChartHandler
 
+from handlers.words import WordsChartHandler
+
 from handlers.tweet import RedirectHandler, NewTweetsHandler, TweetsHandler
 from handlers.recommendation import RecommendationsHandler
 from handlers.location import LocationHandler
@@ -124,6 +126,9 @@ url_patterns = [
 
     # MENTION
     (r"/Mentions", MentionChartHandler),
+
+    # MENTION
+    (r"/Words", WordsChartHandler),
 
     # DOCUMENTATION
     (r"/api", DocumentationHandler),

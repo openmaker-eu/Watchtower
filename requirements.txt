@@ -16,4 +16,4 @@ python-decouple
 python-crontab
 tornado
 jinja2
-bson
+pandas
