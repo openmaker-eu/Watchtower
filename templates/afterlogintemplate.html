@@ -292,16 +292,23 @@
                     <a href="/Tweets">Tweets</a>
                 </li>
 
-                <li {% if type=="hashtag_chart" %} class="active" {% endif %}>
-                    <a href="/Hashtags">Hashtags</a>
-                </li>
+                <li class="dropdown" {% type=="hashtag_chart" or type=="mention_chart" or type=="word_chart" %} class="active" {% endif %}>
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                        Stats <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a href="/Hashtags">Hashtags</a>
+                        </li>
+                        
+                        <li>
+                            <a href="/Mentions">Mentions</a>
+                        </li>
+                        
+                        <li>
+                            <a href="/Words">Words</a>
+                        </li>
 
-                <li {% if type=="mention_chart" %} class="active" {% endif %}>
-                    <a href="/Mentions">Mentions</a>
-                </li>
-
-                <li {% if type=="word_chart" %} class="active" {% endif %}>
-                    <a href="/Words">Words</a>
+                    </ul>
                 </li>
 
                 <li {% if type=="news" %} class="active" {% endif %}>
