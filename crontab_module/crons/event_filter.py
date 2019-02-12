@@ -2,12 +2,12 @@ import sys
 from time import gmtime, strftime, time
 from decouple import config
 
+sys.path.insert(0, config("ROOT_DIR"))
+
 from application.utils.basic import *
 from application.utils import general
 import pandas as pd
 from predict_location.predictor import Predictor # for location
-
-sys.path.insert(0, config("ROOT_DIR"))
 
 from application.Connections import Connection
 
