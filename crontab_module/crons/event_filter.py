@@ -10,7 +10,12 @@ from predict_location.predictor import Predictor # for location
 
 from application.Connections import Connection
 
+import os
+
 location_predictor = Predictor()
+
+distance_matrix = pd.read_csv(os.path.join(config("ROOT_DIR"), 'distance-matrix.csv.gz'))
+distance_matrix.fillna('NA', inplace=True)
 
 def getEvents(topic_id, sortedBy, location):
     result = {}
@@ -34,8 +39,6 @@ def getEvents(topic_id, sortedBy, location):
         cdl = []
 
         location = location.upper()
-        distance_matrix = pd.read_csv('distance-matrix.csv.gz')
-        distance_matrix.fillna('NA', inplace=True)
         distances = distance_matrix.sort_values(location)[[location, 'Country']].values
 
 
