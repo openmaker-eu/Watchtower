@@ -74,7 +74,7 @@ def getEvents(topic_id, sortedBy, location):
                                 "coming": 1
                                 }},
                 {'$sort': sort},
-                {'$limit': 200
+                {'$limit': 200}
             ], allowDiskUse=True))
 
             new_events = [{**event, 'distance': distance, 'country': country.lower()} for event in new_events]
@@ -98,7 +98,7 @@ def getEvents(topic_id, sortedBy, location):
                             "coming": 1
                             }},
             {'$sort': sort},
-            {'$limit': 200
+            {'$limit': 200}
         ], allowDiskUse=True))
 
     # Correct date time format
