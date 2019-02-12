@@ -25,7 +25,7 @@ def getEvents(topic_id, sortedBy, location):
         sort['start_time']=1
 
     result['location'] = location
-    match['end_time'] = {'$gte': time()}
+    match['end_time'] = {'$gte': time.time()}
 
     if location.lower()!="global":
         location_predictor = Predictor()
