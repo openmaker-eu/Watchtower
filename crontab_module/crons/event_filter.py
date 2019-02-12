@@ -111,6 +111,7 @@ def getEvents(topic_id, sortedBy, location):
     return events
 
 def calc(alertid):
+    lookup = {'tr': 'turkey', 'it': 'italy', 'es': 'spain', 'sk': 'slovakia', 'uk': 'gb', 'global': 'global'}
     locations = ["it", "es", "sk", "gb", "tr", "global"]
     sorted_by = ["interested", "date"]
     for location in locations:
@@ -118,10 +119,10 @@ def calc(alertid):
             result = {
                 'name': location,
                 'sort': sort_key,
-                date: getEvents(alertid, sort_key, location),
+                lookup[location]: getEvents(alertid, sort_key, location),
                 'modified_date': strftime("%a, %d %b %Y %H:%M:%S", gmtime())
             }
-            if result[date] != []:
+            if lookup[location] != []:
                 Connection.Instance().filteredEventsPoolDB[str(alertid)].remove({'name': result['name'], 'sort': result['sort']})
                 Connection.Instance().filteredEventsPoolDB[str(alertid)].insert_one(result)
 
