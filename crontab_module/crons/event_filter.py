@@ -32,26 +32,6 @@ def getEvents(topic_id, sortedBy, location):
         location = location_predictor.predict_location(location)
         cdl = []
 
-        # GET HIDDEN EVENTS
-        with Connection.Instance().get_cursor() as cur:
-            hidden_event_links=[]
-
-            try:
-                colnames = Connection.Instance().events.collection_names() if no_topic_id else [topic_id]
-                for colname in colnames:
-                    print(colname)
-                    sql = (
-                        "SELECT event_link "
-                        "FROM hidden_events "
-                        "WHERE topic_id = %s "
-                    )
-                    cur.execute(sql, [int(colname)])
-                    hidden_event_links.extend(str(event[0]) for event in cur.fetchall())
-                    print(hidden_event_links)
-            except:
-                result['error'] = "Problem in fetching hidden events for current topic."
-                return result
-
         location = location.upper()
         distance_matrix = pd.read_csv('distance-matrix.csv.gz')
         distance_matrix.fillna('NA', inplace=True)
@@ -115,7 +95,7 @@ def getEvents(topic_id, sortedBy, location):
     return events
 
 def calc(alertid):
-    lookup = {'tr': 'turkey', 'it': 'italy', 'es': 'spain', 'sk': 'slovakia', 'uk': 'gb', 'global': 'global'}
+    lookup = {'tr': 'turkey', 'it': 'italy', 'es': 'spain', 'sk': 'slovakia', 'gb': 'uk', 'global': 'global'}
     locations = ["it", "es", "sk", "gb", "tr", "global"]
     sorted_by = ["interested", "date"]
     for location in locations:
