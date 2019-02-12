@@ -124,7 +124,7 @@ def calc(alertid):
                 'name': location,
                 'sort': sort_key,
                 lookup[location]: getEvents(alertid, sort_key, location),
-                'modified_date': time.strftime("%a, %d %b %Y %H:%M:%S", gmtime())
+                'modified_date': time.strftime("%a, %d %b %Y %H:%M:%S", time.gmtime())
             }
             if lookup[location]:
                 Connection.Instance().filteredEventsPoolDB[str(alertid)].remove({'name': result['name'], 'sort': result['sort']})
