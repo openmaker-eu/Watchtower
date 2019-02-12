@@ -10,6 +10,8 @@ from predict_location.predictor import Predictor # for location
 
 from application.Connections import Connection
 
+location_predictor = Predictor()
+
 def getEvents(topic_id, sortedBy, location):
     result = {}
     match = {}
@@ -28,7 +30,6 @@ def getEvents(topic_id, sortedBy, location):
     match['end_time'] = {'$gte': time.time()}
 
     if location.lower()!="global":
-        location_predictor = Predictor()
         location = location_predictor.predict_location(location)
         cdl = []
 
@@ -40,7 +41,7 @@ def getEvents(topic_id, sortedBy, location):
 
         for distance, country in distances:
             match['$or'] = [{'place':location_regex.getLocationRegex(country)},{'predicted_place':country}]
-            
+
             new_events = list(Connection.Instance().events[str(topic_id)].aggregate([
                 {'$match': match},
                 {'$project': {'_id': 0,
