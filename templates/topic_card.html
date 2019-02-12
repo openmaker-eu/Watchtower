@@ -1,7 +1,7 @@
 <div class="topic_card" ontouchstart="this.classList.toggle('hover');">
     <div class="flipper">
         <div class="front">
-            <img src="{{ alert['image'] }}" alt="Avatar" style="width:100%;height:400px;opacity: 0.7;">
+            <img {% if alert['image'] != '' %}src="{{ alert['image'] }}"{% else %}src='https://phadvocates.org/wp-content/themes/cardinal/images/default-thumb.png' {% endif %} alt="Avatar" style="width:100%;height:400px;opacity: 0.7;">
             <div class="text_over_image">
                 <p>{{ alert['name'] }}</p>
             </div>
