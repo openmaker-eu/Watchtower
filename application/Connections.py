@@ -27,6 +27,7 @@ class Connection:
             self.hashtags = self.MongoDBClient.hashtags
             self.newsPoolDB = self.MongoDBClient.newsPool
             self.filteredNewsPoolDB = self.MongoDBClient.filteredNewsPool
+            self.filteredEventsPoolDB = self.MongoDBClient.filteredEventsPool
             self.infDB = self.MongoDBClient.influenceRanks
             self.tweetsDB = self.MongoDBClient.tweetsDB
             self.daily_hastags = self.MongoDBClient.daily_hastags
