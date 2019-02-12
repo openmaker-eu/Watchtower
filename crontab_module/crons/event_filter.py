@@ -2,6 +2,11 @@ import sys
 from time import gmtime, strftime, time
 from decouple import config
 
+from application.utils.basic import *
+from application.utils import general
+import pandas as pd
+from predict_location.predictor import Predictor # for location
+
 sys.path.insert(0, config("ROOT_DIR"))
 
 from application.Connections import Connection
@@ -21,7 +26,7 @@ def getEvents(topic_id, sortedBy, location):
         sort['start_time']=1
 
     result['location'] = location
-    match['end_time'] = {'$gte': time.time()}
+    match['end_time'] = {'$gte': time()}
 
     if location.lower()!="global":
         location_predictor = Predictor()
@@ -122,7 +127,7 @@ def calc(alertid):
                 lookup[location]: getEvents(alertid, sort_key, location),
                 'modified_date': strftime("%a, %d %b %Y %H:%M:%S", gmtime())
             }
-            if lookup[location] != []:
+            if lookup[location]:
                 Connection.Instance().filteredEventsPoolDB[str(alertid)].remove({'name': result['name'], 'sort': result['sort']})
                 Connection.Instance().filteredEventsPoolDB[str(alertid)].insert_one(result)
 
