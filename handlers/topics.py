@@ -126,6 +126,8 @@ class CreateEditTopicHandler(BaseHandler, TemplateRendering):
         else:
             alert['lang'] = ""
 
+        alert['image'] = self.get_argument("alertimage", '')
+
         if alertid is not None:
             alert['alertid'] = alertid
             update_topic(alert)

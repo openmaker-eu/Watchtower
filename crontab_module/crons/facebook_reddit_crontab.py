@@ -19,7 +19,7 @@ from decouple import config
 
 def sourceSelection(topicList):
     my_token = config("FACEBOOK_TOKEN")
-    graph = facebook.GraphAPI(access_token=my_token, version="2.7")
+    graph = facebook.GraphAPI(access_token=my_token, version="2.12")
 
     allSearches = []
     for topic in topicList:
@@ -40,7 +40,7 @@ def sourceSelection(topicList):
 
 def mineFacebookConversations(search_ids, isPreview, timeFilter="day"):
     my_token = config("FACEBOOK_TOKEN")
-    graph = facebook.GraphAPI(access_token=my_token, version="2.7")
+    graph = facebook.GraphAPI(access_token=my_token, version="2.12")
 
     if timeFilter == "day":
         d = str(datetime.utcnow() - timedelta(hours=24))
@@ -330,7 +330,7 @@ def searchSubredditNews(topic_id, subredditNames):
 # day filter can be 'day', 'week', 'month'; default is 'day'
 def searchFacebookNews(topic_id, search_ids):
     my_token = config("FACEBOOK_TOKEN")
-    graph = facebook.GraphAPI(access_token=my_token, version="2.7")
+    graph = facebook.GraphAPI(access_token=my_token, version="2.12")
 
     dayAgo = (int(round(time.time())) - 86400000) * 1000
 

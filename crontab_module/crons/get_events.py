@@ -81,7 +81,7 @@ def mineEventsFromEventBrite(topicList):
 
 def mineEventsFromFacebook(topicList):
     my_token = config("FACEBOOK_TOKEN")
-    graph = facebook.GraphAPI(access_token=my_token, version="2.7")
+    graph = facebook.GraphAPI(access_token=my_token, version="2.12")
     fb_result_events = []
     for topic in topicList:
         topic = topic.replace("#", '')

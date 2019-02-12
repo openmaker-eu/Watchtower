@@ -104,7 +104,7 @@ def source_selection(topic_list):
 
 def source_selection_from_facebook(topic_list):
     my_token = config("FACEBOOK_TOKEN")
-    graph = facebook.GraphAPI(access_token=my_token, version="2.7")
+    graph = facebook.GraphAPI(access_token=my_token, version="2.12")
     pages = []
     for topic in topic_list:
         s = graph.get_object("search?q=" + topic + "&type=page&limit=3")

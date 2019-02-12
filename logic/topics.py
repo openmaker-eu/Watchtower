@@ -5,6 +5,10 @@ from threading import Thread
 import tweepy
 from decouple import config
 
+from requests import get
+
+import numpy as np
+
 from logic.helper import add_facebook_pages_and_subreddits
 from logic.users import set_user_topics_limit, set_current_topic
 
@@ -80,6 +84,35 @@ def get_topic_list(user_id):
                 temp_topic['type'] = 'subscribed'
             elif i[0] in remaining_topics_topics:
                 temp_topic['type'] = 'unsubscribed'
+
+            def crawl_image(keyword):
+                params = {
+                    'key': config('PIXABAY_KEY'),
+                    'q': keyword,
+                    'image_type': 'photo',
+                    'safesearch': 'true'
+                }
+                url = 'https://pixabay.com/api/'
+
+                resp = get(url, params=params)
+
+                if resp.status_code == 200:
+                    image = resp.json()
+                    if image['hits']:
+                        image = np.random.choice(image['hits'])['largeImageURL']
+                    else:
+                        image = ''
+                else:
+                    image = ''
+
+                return image
+            if not i[12]:
+                image = crawl_image(temp_topic['name'])
+                if image == '':
+                    image = crawl_image(temp_topic['keywords'][0])
+                temp_topic['image'] = image
+            else:
+                temp_topic['image'] = i[12]
             topics.append(temp_topic)
 
         topics = sorted(topics, key=lambda k: k['alertid'])
@@ -137,10 +170,10 @@ def get_topic(topic_id):
             var = cur.fetchone()
             topic = {'alertid': var[0], 'name': var[1], 'description': var[2], 'keywords': var[3],
                      'lang': var[4].split(","), 'status': var[8],
-                     'keywordlimit': var[6]}
+                     'keywordlimit': var[6], 'image': var[12]}
     else:
         topic = {'alertid': "", 'name': "", 'keywords': "", 'lang': "", 'status': False, 'keywordlimit': 20,
-                 'description': ""}
+                 'description': "", 'image': ''}
     return topic
 
 
@@ -245,11 +278,11 @@ def update_topic(topic):
     with Connection.Instance().get_cursor() as cur:
         sql = (
             "UPDATE topics "
-            "SET topic_description = %s, keywords = %s, languages = %s, keyword_limit = %s "
+            "SET topic_description = %s, keywords = %s, languages = %s, keyword_limit = %s, image = %s "
             "WHERE topic_id = %s"
         )
         cur.execute(sql,
-                    [topic['description'], topic['keywords'], topic['lang'], topic['keywordlimit'],
+                    [topic['description'], topic['keywords'], topic['lang'], topic['keywordlimit'], topic['image'],
                      topic['alertid']])
     topic = get_topic_all_of_them_list(topic['alertid'])
     t = Thread(target=add_facebook_pages_and_subreddits, args=(topic['alertid'], topic['keywords'],))

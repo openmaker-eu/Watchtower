@@ -3,6 +3,56 @@
     transition: 0.3s;
     float: left;
     margin: 15px 0 0 15px;
+    perspective: 1000px;
+}
+
+.topic_card, .front, .back {
+	width: auto;
+    height: 400px;
+    overflow: auto;
+}
+
+.text_over_image{
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    font-size: 2.4rem;
+    color: whitesmoke;
+}   
+
+/* flip the pane when hovered */
+.topic_card:hover .flipper, .topic_card.hover .flipper {
+    transform: rotateY(180deg);
+}
+
+/* flip speed goes here */
+.flipper {
+	transition: 0.6s;
+	transform-style: preserve-3d;
+
+	position: relative;
+}
+
+/* hide back of pane during swap */
+.front, .back {
+	backface-visibility: hidden;
+
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+
+/* front pane, placed above back */
+.front {
+	z-index: 2;
+	/* for firefox 31 */
+    transform: rotateY(0deg);
+    background-color: black;
+}
+
+/* back, initially hidden pane */
+.back {
+	transform: rotateY(180deg);
 }
 
 .grid {

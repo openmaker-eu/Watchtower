@@ -35,6 +35,13 @@
                 </div>
               -->
             <!-- Select Multiple -->
+
+            <div class="form-group">
+                <label for="Alert Name">Topic Image URL</label>
+                <input name="alertimage" class="form-control" id="alertimage" type="text"
+                    {% if alert[ 'image'] != "" and alert[ 'image'] %}value="{{ alert['image'] }}"{% endif %}>
+            </div>
+
             <div class="form-group">
                 <label for="Languages">Languages</label>
                 <select size="7" class="form-control" name="languages" id="languages" multiple="multiple">
