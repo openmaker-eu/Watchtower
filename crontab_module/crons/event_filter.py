@@ -40,8 +40,7 @@ def getEvents(topic_id, sortedBy, location):
 
         for distance, country in distances:
             match['$or'] = [{'place':location_regex.getLocationRegex(country)},{'predicted_place':country}]
-            match['link'] = {'$nin': hidden_event_links}
-
+            
             new_events = list(Connection.Instance().events[str(topic_id)].aggregate([
                 {'$match': match},
                 {'$project': {'_id': 0,
