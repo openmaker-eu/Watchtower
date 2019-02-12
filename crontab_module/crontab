@@ -7,6 +7,7 @@ LC_ALL=en_US.UTF-8
 PIPENV_VENV_IN_PROJECT=1
 PIPENV_PIPFILE=/root/cloud/Pipfile
 
+0 */2 * * * bash /root/cloud/crontab_module/cron.sh "Events Filter" "0_*/2_*_*_*" "pipenv run python3 /root/cloud/crontab_module/crons/event_filter.py"
 0 */1 * * * bash /root/cloud/crontab_module/cron.sh "News Date Filter" "0_*/1_*_*_*" "pipenv run python3 /root/cloud/crontab_module/crons/date_filter.py"
 0 3 * * * bash /root/cloud/crontab_module/cron.sh "Facebook Reddit" "0_3_*_*_*" "pipenv run python3 /root/cloud/crontab_module/crons/facebook_reddit_crontab.py"
 0 1 * * * bash /root/cloud/crontab_module/cron.sh "Hashtag Filter" "0_1_*_*_*" "pipenv run python3 /root/cloud/crontab_module/crons/hashtagcrontab.py"
