@@ -1,5 +1,4 @@
 import sys
-from time import gmtime, strftime, time
 from decouple import config
 
 sys.path.insert(0, config("ROOT_DIR"))
