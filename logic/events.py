@@ -7,8 +7,106 @@ import time
 from application.Connections import Connection
 from datetime import datetime
 
-
 def get_events(topic_id, sortedBy, location, cursor):
+    cursor_range = 10
+    max_cursor = 100
+    cursor = int(cursor)
+    result = {}
+    events = []
+    location = location.lower()
+    if cursor >= max_cursor:
+        result['events'] = []
+        result['error'] = "Cannot exceed max cursor = " + str(max_cursor) + "."
+        return result
+    try:
+        topic_id = int(topic_id)
+    except:
+        result['event'] = "topic not found"
+        return result
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "SELECT topic_name "
+            "FROM topics "
+            "WHERE topic_id = %s;"
+        )
+        try:
+            cur.execute(sql, [topic_id])
+            var = cur.fetchall()
+            topic_name = var[0][0]
+        except:
+            result['error'] = "Topic does not exist."
+            return result
+
+        events = []  # all events to be returned
+        match = {'end_time': {'$gte': time.time()}}
+        sort = {}
+
+        result['topic'] = topic_name
+        result['location'] = location
+
+    if location == "it":
+        long_location = "italy"
+    elif location == "es":
+        long_location = "spain"
+    elif location == "sk":
+        long_location = "slovakia"
+    elif location == "gb":
+        long_location = "uk"
+    elif location == "tr":
+        long_location = "turkey"
+    elif location == "global":
+        long_location = "global"
+
+    events = Connection.Instance().filteredEventsPoolDB[str(topic_id)].find_one({
+        'name': location, 
+        'sort': sortedBy,
+    })
+
+    events = events[long_location][cursor:min(cursor + cursor_range, max_cursor)]
+
+    cursor = int(cursor)
+    result['next_cursor'] = cursor + (cursor_range - cursor % cursor_range)
+    if cursor != 0: result[
+        'previous_cursor'] = cursor - cursor_range if cursor % cursor_range == 0 else cursor - cursor % cursor_range  # if we are on the first page, there is no previous cursor
+
+    # cursor boundary checks
+    if result['next_cursor'] >= max_cursor or len(events) < cursor_range:
+        result['next_cursor'] = 0
+    if 'previous_cursor' in result:
+        if result['previous_cursor'] == 0:
+            result['previous_cursor'] = -1
+
+    result['next_cursor_str'] = str(result['next_cursor'])
+    result['events'] = events
+
+    with Connection.Instance().get_cursor() as cur:
+        sql = (
+            "SELECT event_link "
+            "FROM hidden_events "
+            "WHERE topic_id = %s "
+        )
+        cur.execute(sql, [int(topic_id)])
+        hidden_links = [str(event_link[0]) for event_link in cur.fetchall()]
+        # print("Hidden ids:")
+        # print(hidden_ids)
+        for event in result['events']:
+            if str(event['link']) in hidden_links:
+                # print(str(event['link']) + " is hidden")
+                event['hidden'] = True
+            else:
+                event['hidden'] = False
+                # print(str(event['link']) + " not hidden")
+
+    for event in result['events']:
+        if not isinstance(event['start_time'], str):
+            event['start_time'] = datetime.utcfromtimestamp(event['start_time']).strftime('%Y-%m-%dT%H:%M:%SZ')
+        if not isinstance(event['end_time'], str):
+            event['end_time'] = datetime.utcfromtimestamp(event['end_time']).strftime('%Y-%m-%dT%H:%M:%SZ')
+
+    return result
+
+
+def get_events_old(topic_id, sortedBy, location, cursor):
     cursor_range = 10
     max_cursor = 100
     cursor = int(cursor)
