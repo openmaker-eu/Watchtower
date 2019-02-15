@@ -22,6 +22,7 @@ $(document).ready(function () {
     $("#location_dropdown").on('click', 'li a', function () {
         $('#all-events').empty();
         $("#spin").show();
+        cursor = 0;
         filter = $('.btn-success').val();
         loc = $(this).attr("data-id");
         isEventsOver = false;
@@ -39,6 +40,7 @@ $(document).ready(function () {
                 $("#spin").hide();
             },
             success: function (html) {
+                cursor += 10;
                 $('#all-events').empty();
                 $('#all-events').append(html);
                 $("#spin").hide();
