@@ -2,12 +2,12 @@ var cursor = 10;
 var isReadyForLoading = true;
 var isEventsOver = false;
 var topic_id = -1;
-var location = 'global';
+var loc = 'global';
 
 var main = function () {
     $("#spin").spinner();
     topic_id = $('#topic_dropdown > li.active > a').attr("data-id");
-    location = $('#location_dropdown > li.active > a').attr('data-id');
+    loc = $('#location_dropdown > li.active > a').attr('data-id');
 };
 $(document).ready(main);
 
@@ -23,7 +23,7 @@ $(document).ready(function () {
         $('#all-events').empty();
         $("#spin").show();
         filter = $('.btn-success').val();
-        location = $(this).attr("data-id");
+        loc = $(this).attr("data-id");
         isEventsOver = false;
         $.ajax({
             url: '/get_events',
@@ -31,7 +31,7 @@ $(document).ready(function () {
             data: {
                 'topic_id':topic_id,
                 'filter': filter,
-                'location':location
+                'location': loc
             },
             timeout: 10000,
             error: function () {
@@ -65,7 +65,7 @@ function loadNewEvents() {
     $.ajax({
         type: "GET",
         url: "/get_events",
-        data: {topic_id: topic_id, filter: filter, cursor: cursor, location: location},
+        data: { topic_id: topic_id, filter: filter, cursor: cursor, location: loc},
         success: function (response) {
             console.log("success");
             if (response.length < 200) isEventsOver = true;
@@ -89,7 +89,7 @@ function getEvents() {
     $.ajax({
         type: "GET",
         url: "/get_events",
-        data: { topic_id: topic_id, filter: filter, cursor: cursor, location: location},
+        data: { topic_id: topic_id, filter: filter, cursor: cursor, location: loc},
         success: function (response) {
             console.log("success");
             if (response.length < 200) isEventsOver = true;
