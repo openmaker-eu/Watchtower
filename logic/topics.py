@@ -84,35 +84,7 @@ def get_topic_list(user_id):
                 temp_topic['type'] = 'subscribed'
             elif i[0] in remaining_topics_topics:
                 temp_topic['type'] = 'unsubscribed'
-
-            def crawl_image(keyword):
-                params = {
-                    'key': config('PIXABAY_KEY'),
-                    'q': keyword,
-                    'image_type': 'photo',
-                    'safesearch': 'true'
-                }
-                url = 'https://pixabay.com/api/'
-
-                resp = get(url, params=params)
-
-                if resp.status_code == 200:
-                    image = resp.json()
-                    if image['hits']:
-                        image = np.random.choice(image['hits'])['largeImageURL']
-                    else:
-                        image = ''
-                else:
-                    image = ''
-
-                return image
-            if not i[12]:
-                image = crawl_image(temp_topic['name'])
-                if image == '':
-                    image = crawl_image(temp_topic['keywords'][0])
-                temp_topic['image'] = image
-            else:
-                temp_topic['image'] = i[12]
+                
             topics.append(temp_topic)
 
         topics = sorted(topics, key=lambda k: k['alertid'])
