@@ -291,7 +291,8 @@ CREATE TABLE topics (
     is_running boolean DEFAULT true,
     is_publish boolean DEFAULT false,
     last_news_date date,
-    is_masked_location boolean default false
+    is_masked_location boolean default false,
+    image text
 );
 
 
